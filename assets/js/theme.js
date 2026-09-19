@@ -58,12 +58,15 @@
     }
 
     var index = 0;
+    var gapCache = 0;
+    var resizeRaf = 0;
 
     function perView() {
-      if (window.innerWidth < 640) {
+      var width = window.innerWidth;
+      if (width < 640) {
         return 1;
       }
-      if (window.innerWidth < 1100) {
+      if (width < 1100) {
         return 2;
       }
       return 4;
@@ -76,9 +79,11 @@
     function apply() {
       index = Math.min(index, maxIndex());
       var card = cards[0];
-      var styles = window.getComputedStyle(track);
-      var gap = parseFloat(styles.columnGap || styles.gap) || 18;
-      var width = card.getBoundingClientRect().width + gap;
+      if (!gapCache) {
+        var styles = window.getComputedStyle(track);
+        gapCache = parseFloat(styles.columnGap || styles.gap) || 18;
+      }
+      var width = card.getBoundingClientRect().width + gapCache;
       var rtl = document.documentElement.getAttribute("dir") !== "ltr";
       var sign = rtl ? 1 : -1;
       track.style.transform = "translateX(" + (sign * index * width) + "px)";
@@ -123,8 +128,27 @@
       apply();
     });
 
-    window.addEventListener("resize", apply);
-    apply();
+    window.addEventListener("resize", function () {
+      gapCache = 0;
+      if (resizeRaf) {
+        window.cancelAnimationFrame(resizeRaf);
+      }
+      resizeRaf = window.requestAnimationFrame(apply);
+    });
+
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            apply();
+            io.disconnect();
+          }
+        });
+      }, { rootMargin: "200px 0px" });
+      io.observe(root);
+    } else {
+      apply();
+    }
   }
 
   document.querySelectorAll("[data-slider]").forEach(initSlider);

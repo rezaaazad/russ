@@ -93,9 +93,10 @@ $heading   = is_front_page() ? 'h2' : 'h2';
 					'id'       => liferuss_opt( 'form_image_id' ),
 					'fallback' => 'consult-student.jpg',
 					'alt'      => liferuss_t( 'form_alt' ),
-					'width'    => 520,
-					'height'   => 640,
+					'width'    => 720,
+					'height'   => 480,
 					'size'     => 'medium_large',
+					'sizes'    => '(max-width: 860px) 92vw, 520px',
 				)
 			);
 			?>

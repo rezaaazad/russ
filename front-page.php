@@ -11,14 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-$hero_bg = liferuss_media_url( liferuss_opt( 'hero_bg_id' ), '', 'liferuss-wide' );
-if ( ! $hero_bg ) {
-	$hero_bg = liferuss_media_url( liferuss_opt( 'hero_image_id' ), 'st-basil.jpg', 'liferuss-wide' );
+$hero_bg_id = absint( liferuss_opt( 'hero_bg_id' ) );
+if ( ! $hero_bg_id ) {
+	$hero_bg_id = absint( liferuss_opt( 'hero_image_id' ) );
 }
-$style = $hero_bg ? ' style="--hero-image:url(' . esc_url( $hero_bg ) . ')"' : '';
 ?>
 
-<section class="hero" id="about"<?php echo $style; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+<section class="hero" id="about">
+	<?php liferuss_the_hero_lcp( $hero_bg_id, 'st-basil.jpg' ); ?>
 	<div class="hero-overlay" aria-hidden="true"></div>
 	<div class="container hero-grid">
 		<div class="hero-copy">
@@ -45,11 +45,12 @@ $style = $hero_bg ? ' style="--hero-image:url(' . esc_url( $hero_bg ) . ')"' : '
 						'id'       => liferuss_opt( 'hero_student_id' ),
 						'fallback' => 'hero-student.jpg',
 						'alt'      => liferuss_t( 'hero_alt_student' ),
-						'width'    => 420,
-						'height'   => 520,
+						'width'    => 400,
+						'height'   => 535,
 						'size'     => 'medium_large',
-						'lazy'     => false,
-						'priority' => true,
+						'lazy'     => true,
+						'priority' => false,
+						'sizes'    => '(max-width: 640px) 1px, (max-width: 860px) 200px, 320px',
 					)
 				);
 				?>
@@ -161,6 +162,7 @@ $style = $hero_bg ? ' style="--hero-image:url(' . esc_url( $hero_bg ) . ')"' : '
 									'width'    => 640,
 									'height'   => 400,
 									'size'     => 'liferuss-card',
+									'sizes'    => '(max-width: 640px) 92vw, (max-width: 1100px) 46vw, 280px',
 								)
 							);
 							?>
@@ -259,6 +261,7 @@ $style = $hero_bg ? ' style="--hero-image:url(' . esc_url( $hero_bg ) . ')"' : '
 								'width'    => 72,
 								'height'   => 72,
 								'size'     => 'thumbnail',
+								'sizes'    => '72px',
 							)
 						);
 						?>

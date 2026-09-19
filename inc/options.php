@@ -195,6 +195,7 @@ function liferuss_the_image( $args ) {
 		'lazy'     => true,
 		'priority' => false,
 		'class'    => '',
+		'sizes'    => '',
 	);
 	$args     = array_merge( $defaults, $args );
 	$id       = absint( $args['id'] );
@@ -203,6 +204,9 @@ function liferuss_the_image( $args ) {
 		'class'    => $args['class'],
 		'decoding' => 'async',
 	);
+	if ( $args['sizes'] ) {
+		$attr['sizes'] = $args['sizes'];
+	}
 	if ( $args['priority'] ) {
 		$attr['loading']       = 'eager';
 		$attr['fetchpriority'] = 'high';
@@ -221,15 +225,39 @@ function liferuss_the_image( $args ) {
 	if ( ! $src ) {
 		return;
 	}
+
+	$priority_attr = ! empty( $attr['fetchpriority'] ) ? ' fetchpriority="high"' : '';
+	$sizes_attr    = $args['sizes'] ? ' sizes="' . esc_attr( $args['sizes'] ) . '"' : '';
+	$webp          = liferuss_bundled_webp_sources( $args['fallback'] );
+
+	if ( $webp ) {
+		$srcset = liferuss_webp_srcset( $webp );
+		printf(
+			'<picture><source type="image/webp" srcset="%s"%s><img src="%s" alt="%s" width="%d" height="%d" class="%s" loading="%s" decoding="async"%s%s></picture>',
+			esc_attr( $srcset ),
+			$sizes_attr,
+			esc_url( $src ),
+			esc_attr( $args['alt'] ),
+			(int) $args['width'],
+			(int) $args['height'],
+			esc_attr( $args['class'] ),
+			esc_attr( $attr['loading'] ),
+			$priority_attr,
+			$sizes_attr
+		);
+		return;
+	}
+
 	printf(
-		'<img src="%s" alt="%s" width="%d" height="%d" class="%s" loading="%s" decoding="async"%s>',
+		'<img src="%s" alt="%s" width="%d" height="%d" class="%s" loading="%s" decoding="async"%s%s>',
 		esc_url( $src ),
 		esc_attr( $args['alt'] ),
 		(int) $args['width'],
 		(int) $args['height'],
 		esc_attr( $args['class'] ),
 		esc_attr( $attr['loading'] ),
-		! empty( $attr['fetchpriority'] ) ? ' fetchpriority="high"' : ''
+		$priority_attr,
+		$sizes_attr
 	);
 }
 
