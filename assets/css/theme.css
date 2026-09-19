@@ -206,31 +206,42 @@ p {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-shrink: 0;
+  min-width: 0;
+  flex: 0 1 auto;
 }
 
 .brand-mark,
-.brand-cap {
+.brand-cap,
+.brand .custom-logo,
+.brand img {
   width: 42px;
   height: 42px;
   display: block;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .brand-text {
   display: flex;
   flex-direction: column;
   line-height: 1.15;
+  min-width: 0;
 }
 
 .brand-text strong {
   color: #fff;
   font-size: 1.1rem;
+  white-space: nowrap;
 }
 
 .brand-text small {
   color: rgba(255, 255, 255, 0.65);
   font-size: 0.7rem;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 14em;
 }
 
 .site-nav {
@@ -1656,15 +1667,35 @@ body.nav-open .nav-toggle-bars::after {
     color: #fff;
   }
 
+  .header-inner {
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .header-actions {
+    margin-inline-start: auto;
+    gap: 8px;
+  }
+
   .nav-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    order: 1;
   }
 
   .header-actions .btn,
   .header-phone {
     display: none;
+  }
+
+  .brand-text strong {
+    font-size: 0.95rem;
+  }
+
+  .brand-text small {
+    font-size: 0.62rem;
+    max-width: 9.5em;
   }
 
   /* Keep header lang switcher compact even on mobile */

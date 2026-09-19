@@ -28,12 +28,14 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 <a class="skip-link" href="#main"><?php echo esc_html( liferuss_t( 'skip_link' ) ); ?></a>
 <header class="site-header" id="top">
 	<div class="container header-inner">
-		<a class="brand" href="<?php echo esc_url( liferuss_home() ); ?>" aria-label="<?php echo esc_attr( $brand ); ?>">
-			<?php if ( $logo_id ) : ?>
-				<?php echo wp_get_attachment_image( $logo_id, 'full', false, array( 'class' => 'custom-logo', 'alt' => $brand ) ); ?>
-			<?php elseif ( has_custom_logo() ) : ?>
-				<?php the_custom_logo(); ?>
-			<?php else : ?>
+		<a class="brand" href="<?php echo esc_url( liferuss_home() ); ?>">
+			<?php
+			if ( $logo_id ) {
+				echo wp_get_attachment_image( $logo_id, 'full', false, array( 'class' => 'custom-logo', 'alt' => '' ) );
+			} elseif ( has_custom_logo() ) {
+				echo wp_get_attachment_image( (int) get_theme_mod( 'custom_logo' ), 'full', false, array( 'class' => 'custom-logo', 'alt' => '' ) );
+			} else {
+				?>
 				<span class="brand-mark" aria-hidden="true">
 					<svg viewBox="0 0 48 48" class="brand-cap">
 						<circle cx="24" cy="24" r="24" fill="#0B2341"/>
@@ -42,11 +44,13 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 						<circle cx="38" cy="22.2" r="1.5" fill="#F6D768"/>
 					</svg>
 				</span>
-				<span class="brand-text">
-					<strong><?php echo esc_html( $brand ); ?></strong>
-					<small><?php echo esc_html( $brand_en ); ?></small>
-				</span>
-			<?php endif; ?>
+				<?php
+			}
+			?>
+			<span class="brand-text">
+				<strong><?php echo esc_html( $brand ); ?></strong>
+				<small><?php echo esc_html( $brand_en ); ?></small>
+			</span>
 		</a>
 
 		<nav class="site-nav" id="site-nav" aria-label="<?php echo esc_attr( liferuss_t( 'nav_aria' ) ); ?>">
