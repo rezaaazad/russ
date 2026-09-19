@@ -63,7 +63,8 @@ if ( ! $hero_bg_id ) {
 			<?php endif; ?>
 		</div>
 	</div>
-	<div class="hero-trust trust-bar" aria-label="<?php echo esc_attr( liferuss_t( 'trust_aria' ) ); ?>">
+	<div class="hero-trust trust-bar">
+		<p class="screen-reader-text"><?php echo esc_html( liferuss_t( 'trust_aria' ) ); ?></p>
 		<div class="container trust-grid">
 			<?php foreach ( (array) liferuss_opt( 'trust', array() ) as $item ) : ?>
 				<article class="trust-item">
@@ -274,7 +275,8 @@ if ( ! $hero_bg_id ) {
 					<p class="story-meta"><?php echo esc_html( $story['meta'] ); ?></p>
 				</article>
 			<?php endforeach; ?>
-			<aside class="stat-card" aria-label="<?php echo esc_attr( liferuss_t( 'stories_aria' ) ); ?>">
+			<aside class="stat-card">
+				<p class="screen-reader-text"><?php echo esc_html( liferuss_t( 'stories_aria' ) ); ?></p>
 				<div class="ru-flag" aria-hidden="true"><span></span><span></span><span></span></div>
 				<p class="stat-plus"><?php echo esc_html( liferuss_opt( 'stat_value' ) ); ?></p>
 				<p><?php echo esc_html( liferuss_opt( 'stat_text' ) ); ?></p>

@@ -54,7 +54,8 @@ get_header();
 			</div>
 		</figure>
 	</div>
-	<div class="landing-trust" aria-label="<?php echo esc_attr( liferuss_t( 'trust_aria' ) ); ?>">
+	<div class="landing-trust">
+		<p class="screen-reader-text"><?php echo esc_html( liferuss_t( 'trust_aria' ) ); ?></p>
 		<div class="container trust-grid">
 			<?php foreach ( (array) liferuss_opt( 'trade_trust', array() ) as $item ) : ?>
 				<article class="trust-item">

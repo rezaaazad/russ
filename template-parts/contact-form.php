@@ -22,7 +22,8 @@ $message   = isset( $_GET['consult_msg'] ) ? sanitize_text_field( rawurldecode( 
 			<p class="eyebrow"><?php echo esc_html( liferuss_t( 'contact_page_eye' ) ); ?></p>
 			<h2><?php echo esc_html( liferuss_t( 'contact_form_title' ) ); ?></h2>
 			<p><?php echo esc_html( liferuss_t( 'contact_form_intro' ) ); ?></p>
-			<div class="consult-channels" aria-label="<?php echo esc_attr( liferuss_t( 'channels_aria' ) ); ?>">
+			<div class="consult-channels">
+				<p class="screen-reader-text"><?php echo esc_html( liferuss_t( 'channels_aria' ) ); ?></p>
 				<?php if ( $whatsapp ) : ?>
 					<a class="channel" href="<?php echo esc_url( liferuss_whatsapp_url( $whatsapp ) ); ?>" target="_blank" rel="noopener noreferrer">
 						<?php echo liferuss_icon( 'whatsapp' ); ?>
