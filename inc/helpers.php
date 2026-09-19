@@ -265,7 +265,8 @@ function liferuss_study_levels() {
  */
 function liferuss_stars( $rating ) {
 	$rating = max( 1, min( 5, (int) $rating ) );
-	$html = '<div class="stars" role="img" aria-label="' . esc_attr( (string) $rating ) . ' / 5">';
+	$html  = '<div class="stars">';
+	$html .= '<span class="screen-reader-text">' . esc_html( (string) $rating ) . ' / 5</span>';
 	for ( $i = 1; $i <= 5; $i++ ) {
 		$html .= '<span' . ( $i <= $rating ? ' class="is-on"' : '' ) . ' aria-hidden="true">' . liferuss_icon( 'star' ) . '</span>';
 	}
