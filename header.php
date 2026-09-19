@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $brand      = liferuss_brand();
 $brand_en   = liferuss_opt( 'brand_name_en', 'LifeRuss' );
+$html_dir   = liferuss_lang_meta( 'dir' );
 $cta_text   = liferuss_opt( 'header_cta_text', 'دریافت مشاوره رایگان' );
 $cta_link   = liferuss_cta_url( liferuss_opt( 'header_cta_link', '#consultation' ) );
 $show_phone = '1' === (string) liferuss_opt( 'header_show_phone', '1' );
@@ -23,7 +24,7 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<?php wp_head(); ?>
 </head>
-<body <?php body_class(); ?>>
+<body <?php body_class(); ?> dir="<?php echo esc_attr( $html_dir ? $html_dir : 'rtl' ); ?>">
 <?php wp_body_open(); ?>
 <a class="skip-link" href="#main"><?php echo esc_html( liferuss_t( 'skip_link' ) ); ?></a>
 <header class="site-header" id="top">
@@ -49,7 +50,9 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 			?>
 			<span class="brand-text">
 				<strong><?php echo esc_html( $brand ); ?></strong>
-				<small><?php echo esc_html( $brand_en ); ?></small>
+				<?php if ( $brand_en && 0 !== strcasecmp( $brand, $brand_en ) ) : ?>
+					<small><?php echo esc_html( $brand_en ); ?></small>
+				<?php endif; ?>
 			</span>
 		</a>
 

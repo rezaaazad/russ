@@ -74,6 +74,13 @@ body.liferuss-theme {
   text-align: right;
 }
 
+html[dir="ltr"] body.liferuss-theme,
+body.liferuss-theme.dir-ltr,
+body.liferuss-theme[dir="ltr"] {
+  direction: ltr;
+  text-align: left;
+}
+
 img {
   max-width: 100%;
   height: auto;
@@ -733,6 +740,11 @@ body.nav-open .nav-toggle-bars::after {
   display: flex;
   gap: 12px;
   align-items: flex-start;
+  min-width: 0;
+}
+
+.trust-item > div {
+  min-width: 0;
 }
 
 .trust-item .icon-circle {
@@ -747,6 +759,8 @@ body.nav-open .nav-toggle-bars::after {
   display: block;
   color: #fff;
   font-size: 0.95rem;
+  line-height: 1.35;
+  overflow-wrap: break-word;
 }
 
 .trust-item p {
@@ -1847,10 +1861,6 @@ body.nav-open .nav-toggle-bars::after {
 }
 
 /* LTR (English, Russian) — RTL remains the default for fa / ar */
-html[dir="ltr"] body.liferuss-theme {
-  direction: ltr;
-  text-align: left;
-}
 
 html[lang="en"] body.liferuss-theme {
   font-family: "Vazirmatn", "Segoe UI", system-ui, sans-serif;
@@ -1878,7 +1888,11 @@ html[dir="ltr"] .hero-quote {
 html[dir="ltr"] .section-head-split,
 html[dir="ltr"] .service-card-wide,
 html[dir="ltr"] .trust-item,
-html[dir="ltr"] .service-card.service-card-wide {
+html[dir="ltr"] .service-card.service-card-wide,
+body.dir-ltr .section-head-split,
+body.dir-ltr .service-card-wide,
+body.dir-ltr .trust-item,
+body.dir-ltr .service-card.service-card-wide {
   text-align: left;
 }
 
@@ -1898,9 +1912,43 @@ html[dir="ltr"] .consult-form .btn svg {
 }
 
 @media (max-width: 640px) {
+  html[dir="ltr"] .trust-grid,
+  body.dir-ltr .trust-grid {
+    gap: 16px 14px;
+  }
+
+  html[dir="ltr"] .trust-item,
+  body.dir-ltr .trust-item {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 8px;
+  }
+
+  html[dir="ltr"] .trust-item .icon-circle,
+  body.dir-ltr .trust-item .icon-circle {
+    width: 36px;
+    height: 36px;
+  }
+
+  html[dir="ltr"] .trust-item strong,
+  body.dir-ltr .trust-item strong {
+    font-size: 0.88rem;
+    line-height: 1.3;
+  }
+
+  html[dir="ltr"] .trust-item p,
+  body.dir-ltr .trust-item p {
+    font-size: 0.76rem;
+    line-height: 1.45;
+  }
+
   html[dir="ltr"] .trust-item,
   html[dir="ltr"] .service-card,
-  html[dir="ltr"] .service-card-wide {
+  html[dir="ltr"] .service-card-wide,
+  body.dir-ltr .trust-item,
+  body.dir-ltr .service-card,
+  body.dir-ltr .service-card-wide {
     text-align: left;
   }
 
@@ -2328,13 +2376,13 @@ html[dir="ltr"] .consult-form .btn svg {
   --lr-fab-x: 16px;
   --lr-fab-y: 16px;
   position: fixed;
-  left: var(--lr-fab-x);
+  inset-inline-end: var(--lr-fab-x);
+  inset-inline-start: auto;
   bottom: var(--lr-fab-y);
   z-index: 90;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  direction: ltr;
+  align-items: flex-end;
 }
 
 .lr-float__backdrop {
@@ -2353,14 +2401,8 @@ html[dir="ltr"] .consult-form .btn svg {
   background: #fff;
   border-radius: 36px;
   box-shadow: 0 22px 50px rgba(11, 35, 65, 0.22);
-  transform-origin: 28px bottom;
-  direction: rtl;
-  text-align: right;
-}
-
-html[dir="ltr"] .lr-float__panel {
-  direction: ltr;
-  text-align: left;
+  transform-origin: calc(100% - 28px) bottom;
+  text-align: start;
 }
 
 .lr-float.is-open .lr-float__panel {
@@ -2645,11 +2687,8 @@ body.float-open {
   overflow: hidden;
 }
 
-html[dir="ltr"] .lr-float {
-  align-items: flex-start;
-}
-
-html[dir="ltr"] .lr-float__row-label {
+html[dir="ltr"] .lr-float__row-label,
+body.dir-ltr .lr-float__row-label {
   text-align: start;
 }
 

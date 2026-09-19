@@ -207,7 +207,7 @@ function liferuss_sanitize_i18n( $raw ) {
 		'form_phone_label', 'form_phone_ph', 'form_level_label', 'form_submit', 'form_note', 'form_success',
 		'address', 'footer_about', 'footer_copyright', 'footer_en',
 		'seo_title', 'seo_description', 'seo_og_title', 'seo_og_description',
-		'float_widget_title', 'float_widget_subtitle',
+		'float_widget_title', 'float_widget_subtitle', 'brand_name',
 	);
 	$repeaters = array(
 		'trust'            => array( 'title' => 'text', 'text' => 'text' ),
@@ -662,7 +662,7 @@ function liferuss_options_page() {
 				liferuss_admin_field( 'float_widget_enabled', $o['float_widget_enabled'] ?? '1', 'نمایش ویجت تماس شناور', 'checkbox' );
 				liferuss_admin_field( 'float_widget_title', $o['float_widget_title'] ?? '', 'عنوان کارت تماس' );
 				liferuss_admin_field( 'float_widget_subtitle', $o['float_widget_subtitle'] ?? '', 'توضیح کارت تماس', 'textarea' );
-				liferuss_admin_field( 'float_widget_offset_x', $o['float_widget_offset_x'] ?? '16', 'فاصله از لبه چپ (پیکسل، ۰ تا ۸۰)' );
+				liferuss_admin_field( 'float_widget_offset_x', $o['float_widget_offset_x'] ?? '16', 'فاصله از لبهٔ انتها (چپ در RTL، راست در LTR؛ پیکسل ۰ تا ۸۰)' );
 				liferuss_admin_field( 'float_widget_offset_y', $o['float_widget_offset_y'] ?? '16', 'فاصله از پایین دسکتاپ (پیکسل، ۰ تا ۸۰)' );
 				liferuss_admin_table_end();
 				echo '<h3>کانال‌های تماس</h3><p class="description">نوع: phone، whatsapp، telegram، instagram، consult یا custom. آیکون خالی = همان نوع. ردیف بدون عنوان یا غیرفعال نمایش داده نمی‌شود.</p><div class="liferuss-grid">';
@@ -774,6 +774,7 @@ function liferuss_admin_i18n_tab() {
 		'ar' => 'العربية · RTL · /ar/',
 	);
 	$sections = array(
+		'brand_name'             => array( 'نام برند (نمایش در هدر)', 'text' ),
 		'header_cta_text'        => array( 'هدر / CTA', 'text' ),
 		'tagline'                => array( 'شعار', 'textarea' ),
 		'hero_eyebrow'           => array( 'هیرو: خط بالا', 'text' ),

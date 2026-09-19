@@ -34,6 +34,7 @@ function liferuss_i18n_packaged_all() {
 
 	$data = array(
 		'en' => array(
+			'brand_name'           => 'LifeRuss',
 			'tagline'              => 'Study, admission, and settling-in advice for Russia',
 			'header_cta_text'      => 'Get a free consultation',
 			'hero_eyebrow'         => 'Higher Education · A Brighter Tomorrow',
@@ -161,9 +162,10 @@ function liferuss_i18n_packaged_all() {
 			),
 		),
 		'ru' => array(
+			'brand_name'           => 'Лайф Расс',
 			'tagline'              => 'Консультации по учёбе, поступлению и обустройству в России',
 			'header_cta_text'      => 'Бесплатная консультация',
-			'hero_eyebrow'         => 'Higher Education · A Brighter Tomorrow',
+			'hero_eyebrow'         => 'Высшее образование · Светлое будущее',
 			'hero_headline'        => 'Учёба в России — начало светлого будущего',
 			'hero_subheadline'     => 'От профильного поступления до визы, общежития и обустройства мы рядом, чтобы путь в ведущие вузы России был понятным и надёжным.',
 			'hero_cta1_text'       => 'Бесплатная консультация',
@@ -171,9 +173,9 @@ function liferuss_i18n_packaged_all() {
 			'hero_quote'           => 'Светлое будущее начинается здесь.',
 			'hero_quote_cite'      => 'Knowledge Bridge',
 			'trust'                => array(
-				array( 'title' => '+500 успешных студентов', 'text' => 'Поступление и обустройство в вузах России' ),
+				array( 'title' => '+500 студентов', 'text' => 'Поступление и обустройство в вузах России' ),
 				array( 'title' => 'Полное сопровождение', 'text' => 'От первого шага до заселения' ),
-				array( 'title' => 'Профильная консультация', 'text' => 'Опытная команда по поступлению' ),
+				array( 'title' => 'Консультация', 'text' => 'Опытная команда по поступлению' ),
 				array( 'title' => 'Быстрые ответы', 'text' => 'Все дни недели' ),
 			),
 			'services_eyebrow'     => 'От поступления до обустройства',
@@ -288,6 +290,7 @@ function liferuss_i18n_packaged_all() {
 			),
 		),
 		'ar' => array(
+			'brand_name'           => 'لایف روس',
 			'tagline'              => 'استشارات الدراسة والقبول والاستقرار في روسيا',
 			'header_cta_text'      => 'احصل على استشارة مجانية',
 			'hero_eyebrow'         => 'Higher Education · A Brighter Tomorrow',
