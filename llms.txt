@@ -1,0 +1,14 @@
+# لایف روس (LifeRuss)
+
+> Multilingual study-abroad advisory for Russia, plus Iran–Russia freight and trade/sourcing landings. Domain: liferuss.com. Not an e-commerce store.
+
+Place this file at the site root (https://liferuss.com/llms.txt). The theme also serves `/llms.txt` dynamically from Theme Options so the live site stays in sync.
+
+Organization: لایف روس
+Alternate names: LifeRuss, Life Russ
+Languages:
+- fa — Persian (default, RTL) https://liferuss.com/
+- ru — Russian (LTR) https://liferuss.com/ru/
+- ar — Arabic (RTL) https://liferuss.com/ar/
+- en — English (LTR) https://liferuss.com/en/
+hreflang: fa, ru, ar, en, x-default → fa
