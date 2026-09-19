@@ -1725,6 +1725,11 @@ body.nav-open .nav-toggle-bars::after {
     padding: 36px 0 0;
   }
 
+  .hero-overlay {
+    background:
+      linear-gradient(180deg, rgba(7, 22, 39, 0.42) 0%, rgba(7, 22, 39, 0.62) 55%, rgba(7, 22, 39, 0.78) 100%);
+  }
+
   .hero-grid {
     padding-bottom: 28px;
     gap: 0;
