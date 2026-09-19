@@ -1,0 +1,77 @@
+.liferuss-options {
+  max-width: 1100px;
+}
+
+.liferuss-options[dir="rtl"] {
+  font-family: Tahoma, Vazirmatn, sans-serif;
+}
+
+.liferuss-options .nav-tab-wrapper {
+  margin-bottom: 16px;
+}
+
+.liferuss-tab {
+  display: none;
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-top: 0;
+  padding: 20px 22px 8px;
+}
+
+.liferuss-tab.is-active {
+  display: block;
+}
+
+.liferuss-options h2 {
+  margin-top: 0;
+}
+
+.liferuss-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 24px;
+}
+
+.liferuss-card {
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 0 0 16px;
+}
+
+.liferuss-card h3 {
+  margin: 0 0 10px;
+}
+
+.liferuss-preview img {
+  max-width: 160px;
+  height: auto;
+  display: block;
+  margin: 8px 0;
+  border-radius: 6px;
+}
+
+.liferuss-media-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.liferuss-i18n-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+
+.liferuss-i18n-panel {
+  margin-top: 8px;
+}
+
+@media (max-width: 782px) {
+  .liferuss-grid {
+    grid-template-columns: 1fr;
+  }
+}
