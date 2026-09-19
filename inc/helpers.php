@@ -265,11 +265,11 @@ function liferuss_study_levels() {
  */
 function liferuss_stars( $rating ) {
 	$rating = max( 1, min( 5, (int) $rating ) );
-	$html   = '<p class="stars" aria-label="' . esc_attr( (string) $rating ) . ' / 5">';
+	$html = '<div class="stars" role="img" aria-label="' . esc_attr( (string) $rating ) . ' / 5">';
 	for ( $i = 1; $i <= 5; $i++ ) {
-		$html .= '<span' . ( $i <= $rating ? ' class="is-on"' : '' ) . '>' . liferuss_icon( 'star' ) . '</span>';
+		$html .= '<span' . ( $i <= $rating ? ' class="is-on"' : '' ) . ' aria-hidden="true">' . liferuss_icon( 'star' ) . '</span>';
 	}
-	return $html . '</p>';
+	return $html . '</div>';
 }
 
 /**
