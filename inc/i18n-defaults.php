@@ -143,6 +143,22 @@ function liferuss_i18n_packaged_all() {
 			'seo_description' => 'LifeRuss (لایف روس) advises on studying in Russia: admission, preparatory year, visa, dormitory, document translation, and settling in — liferuss.com',
 			'seo_og_title'    => 'LifeRuss | Study in Russia',
 			'seo_og_description' => 'Admission, visa, dormitory, and settling-in support for universities in Russia. لایف روس / LifeRuss — liferuss.com',
+			'float_widget_title'    => 'We are here to help',
+			'float_widget_subtitle' => 'Choose one of the ways below to get in touch',
+			'float_channels'        => array(
+				array( 'label' => 'Call an adviser' ),
+				array( 'label' => 'Message on WhatsApp' ),
+				array( 'label' => 'Message on Telegram' ),
+				array( 'label' => 'Instagram page' ),
+				array( 'label' => 'Free consultation' ),
+			),
+			'bottom_nav_items'      => array(
+				array( 'label' => 'Home' ),
+				array( 'label' => 'Services' ),
+				array( 'label' => 'Universities' ),
+				array( 'label' => 'Contact' ),
+				array( 'label' => 'Consult' ),
+			),
 		),
 		'ru' => array(
 			'tagline'              => 'Консультации по учёбе, поступлению и обустройству в России',
@@ -254,6 +270,22 @@ function liferuss_i18n_packaged_all() {
 			'seo_description'    => 'LifeRuss (لایف روس) — консультации по учёбе в России: поступление, падфак, виза, общежитие, перевод документов и обустройство — liferuss.com',
 			'seo_og_title'       => 'LifeRuss | Учёба в России',
 			'seo_og_description' => 'Поступление, виза, общежитие и обустройство в вузах России. لایف روس / LifeRuss — liferuss.com',
+			'float_widget_title'    => 'Мы на связи',
+			'float_widget_subtitle' => 'Выберите удобный способ связи',
+			'float_channels'        => array(
+				array( 'label' => 'Позвонить консультанту' ),
+				array( 'label' => 'Написать в WhatsApp' ),
+				array( 'label' => 'Написать в Telegram' ),
+				array( 'label' => 'Страница Instagram' ),
+				array( 'label' => 'Бесплатная консультация' ),
+			),
+			'bottom_nav_items'      => array(
+				array( 'label' => 'Главная' ),
+				array( 'label' => 'Услуги' ),
+				array( 'label' => 'Университеты' ),
+				array( 'label' => 'Контакты' ),
+				array( 'label' => 'Консультация' ),
+			),
 		),
 		'ar' => array(
 			'tagline'              => 'استشارات الدراسة والقبول والاستقرار في روسيا',
@@ -365,6 +397,22 @@ function liferuss_i18n_packaged_all() {
 			'seo_description'    => 'لایف روس (LifeRuss) مؤسسة استشارات الدراسة في روسيا. القبول والسنة التحضيرية والتأشيرة والسكن وترجمة الوثائق والاستقرار — liferuss.com',
 			'seo_og_title'       => 'لایف روس | الدراسة في روسيا',
 			'seo_og_description' => 'قبول وتأشيرة وسكن واستقرار في جامعات روسيا. لایف روس / LifeRuss — liferuss.com',
+			'float_widget_title'    => 'نحن هنا للرد عليكم',
+			'float_widget_subtitle' => 'اختاروا إحدى طرق التواصل أدناه',
+			'float_channels'        => array(
+				array( 'label' => 'الاتصال بالمستشار' ),
+				array( 'label' => 'التواصل عبر واتساب' ),
+				array( 'label' => 'التواصل عبر تيليغرام' ),
+				array( 'label' => 'صفحة إنستغرام' ),
+				array( 'label' => 'استشارة مجانية' ),
+			),
+			'bottom_nav_items'      => array(
+				array( 'label' => 'الرئيسية' ),
+				array( 'label' => 'الخدمات' ),
+				array( 'label' => 'الجامعات' ),
+				array( 'label' => 'اتصل بنا' ),
+				array( 'label' => 'استشارة' ),
+			),
 		),
 	);
 

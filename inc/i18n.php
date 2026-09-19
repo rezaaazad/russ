@@ -484,6 +484,10 @@ function liferuss_ui_strings() {
 			'faq_a3'             => 'پذیرش تحصیلی، پادفک، ویزا، خوابگاه، ترجمه مدارک و استقبال فرودگاه — بدون فروش کالا.',
 			'service_type'       => 'مشاوره تحصیل و پذیرش در روسیه',
 			'lang_switcher'      => 'انتخاب زبان',
+			'float_open'         => 'راه‌های ارتباطی',
+			'float_close'        => 'بستن راه‌های ارتباطی',
+			'float_dialog'       => 'راه‌های ارتباطی',
+			'bottom_nav_aria'    => 'ناوبری سریع',
 		),
 		'en' => array(
 			'skip_link'          => 'Skip to content',
@@ -587,6 +591,10 @@ function liferuss_ui_strings() {
 			'faq_a3'             => 'University admission, preparatory year, visa, dormitory, document translation, and airport pickup — not retail goods.',
 			'service_type'       => 'Study-abroad and admission advisory for Russia',
 			'lang_switcher'      => 'Language',
+			'float_open'         => 'Contact options',
+			'float_close'        => 'Close contact options',
+			'float_dialog'       => 'Contact options',
+			'bottom_nav_aria'    => 'Quick navigation',
 		),
 		'ru' => array(
 			'skip_link'          => 'Перейти к содержанию',
@@ -690,6 +698,10 @@ function liferuss_ui_strings() {
 			'faq_a3'             => 'Поступление, падфак, виза, общежитие, перевод документов и встреча в аэропорту — без продажи товаров.',
 			'service_type'       => 'Консультации по поступлению и учёбе в России',
 			'lang_switcher'      => 'Язык',
+			'float_open'         => 'Способы связи',
+			'float_close'        => 'Закрыть способы связи',
+			'float_dialog'       => 'Способы связи',
+			'bottom_nav_aria'    => 'Быстрая навигация',
 		),
 		'ar' => array(
 			'skip_link'          => 'تخطي إلى المحتوى',
@@ -793,6 +805,10 @@ function liferuss_ui_strings() {
 			'faq_a3'             => 'القبول الجامعي والسنة التحضيرية والتأشيرة والسكن وترجمة الوثائق والاستقبال في المطار — دون بيع سلع.',
 			'service_type'       => 'استشارات الدراسة والقبول في روسيا',
 			'lang_switcher'      => 'اللغة',
+			'float_open'         => 'طرق التواصل',
+			'float_close'        => 'إغلاق طرق التواصل',
+			'float_dialog'       => 'طرق التواصل',
+			'bottom_nav_aria'    => 'تنقل سريع',
 		),
 	);
 }

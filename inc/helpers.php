@@ -322,6 +322,7 @@ function liferuss_icon( $name ) {
 		'globe'     => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.8 12h16.4M12 3.5c2.4 2.4 3.7 5.3 3.7 8.5S14.4 18.1 12 20.5C9.6 18.1 8.3 15.2 8.3 12S9.6 5.9 12 3.5z"/></svg>',
 		'search'    => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.2 4.2"/></svg>',
 		'info'      => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v6M12 8v.2"/></svg>',
+		'building'  => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V9l8-5 8 5v11H4z"/><path d="M9 20v-6h6v6"/><path d="M9 11h.01M15 11h.01M12 11h.01"/></svg>',
 	);
 
 	return isset( $icons[ $name ] ) ? $icons[ $name ] : '';
@@ -363,4 +364,87 @@ function liferuss_cta_url( $link ) {
 		return liferuss_url( $link );
 	}
 	return $link;
+}
+
+/**
+ * Resolve a floating-contact channel href from type + optional URL.
+ *
+ * Empty URL reuses Theme Options phone / WhatsApp / Telegram / Instagram.
+ *
+ * @param array $item Channel row.
+ * @return string
+ */
+function liferuss_channel_href( $item ) {
+	$type = isset( $item['type'] ) ? sanitize_key( $item['type'] ) : '';
+	$url  = isset( $item['url'] ) ? trim( (string) $item['url'] ) : '';
+
+	if ( '' !== $url ) {
+		if ( 0 === strpos( $url, 'tel:' ) ) {
+			return $url;
+		}
+		if ( 'phone' === $type ) {
+			$digits = preg_replace( '/\D+/', '', $url );
+			return $digits ? 'tel:' . $digits : liferuss_cta_url( $url );
+		}
+		return liferuss_cta_url( $url );
+	}
+
+	switch ( $type ) {
+		case 'phone':
+			$phone = liferuss_opt( 'phone' );
+			$digits = preg_replace( '/\s+/', '', (string) $phone );
+			return $digits ? 'tel:' . $digits : '';
+		case 'whatsapp':
+			return liferuss_whatsapp_url( liferuss_opt( 'whatsapp' ) );
+		case 'telegram':
+			return liferuss_social_url( liferuss_opt( 'telegram' ), 'telegram' );
+		case 'instagram':
+			return liferuss_social_url( liferuss_opt( 'instagram' ), 'instagram' );
+		case 'consult':
+			return liferuss_cta_url( '#consultation' );
+		default:
+			return '';
+	}
+}
+
+/**
+ * Whether a href should open in a new tab.
+ *
+ * @param string $href Href.
+ * @return bool
+ */
+function liferuss_href_is_external( $href ) {
+	$href = (string) $href;
+	if ( '' === $href || '#' === $href[0] || 0 === strpos( $href, 'tel:' ) || 0 === strpos( $href, 'mailto:' ) ) {
+		return false;
+	}
+	if ( ! preg_match( '#^https?://#i', $href ) ) {
+		return false;
+	}
+	$host = wp_parse_url( $href, PHP_URL_HOST );
+	$home = wp_parse_url( home_url(), PHP_URL_HOST );
+	return $host && $home && strtolower( $host ) !== strtolower( $home );
+}
+
+/**
+ * Whether the current request matches a nav href (path only).
+ *
+ * @param string $href Href.
+ * @return bool
+ */
+function liferuss_href_is_current( $href ) {
+	$href = trim( (string) $href );
+	if ( '' === $href || ( isset( $href[0] ) && '#' === $href[0] ) ) {
+		return false;
+	}
+	$path = wp_parse_url( $href, PHP_URL_PATH );
+	if ( ! $path ) {
+		return false;
+	}
+	$current = function_exists( 'liferuss_current_path' ) ? liferuss_current_path() : '/';
+	$norm    = function ( $p ) {
+		$p = '/' . trim( (string) $p, '/' );
+		return '/' === $p ? '/' : trailingslashit( $p );
+	};
+	return $norm( $path ) === $norm( $current );
 }

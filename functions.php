@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.4.3' );
+define( 'LIFERUSS_VERSION', '1.4.4' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -98,11 +98,13 @@ function liferuss_assets() {
 			'nonce'   => wp_create_nonce( 'liferuss_consult' ),
 			'dir'     => liferuss_lang_meta( 'dir' ),
 			'strings' => array(
-				'openMenu'  => liferuss_t( 'open_menu' ),
-				'closeMenu' => liferuss_t( 'close_menu' ),
-				'formOk'    => liferuss_t( 'form_ok_short' ),
-				'formErr'   => liferuss_t( 'form_err_short' ),
-				'formNet'   => liferuss_t( 'form_net' ),
+				'openMenu'   => liferuss_t( 'open_menu' ),
+				'closeMenu'  => liferuss_t( 'close_menu' ),
+				'openFloat'  => liferuss_t( 'float_open' ),
+				'closeFloat' => liferuss_t( 'float_close' ),
+				'formOk'     => liferuss_t( 'form_ok_short' ),
+				'formErr'    => liferuss_t( 'form_err_short' ),
+				'formNet'    => liferuss_t( 'form_net' ),
 			),
 		)
 	);
@@ -212,6 +214,12 @@ function liferuss_body_class( $classes ) {
 	$classes[] = 'liferuss-theme';
 	if ( is_front_page() ) {
 		$classes[] = 'is-front';
+	}
+	if ( '1' === (string) liferuss_opt( 'float_widget_enabled', '1' ) ) {
+		$classes[] = 'has-float-widget';
+	}
+	if ( '1' === (string) liferuss_opt( 'bottom_nav_enabled', '1' ) ) {
+		$classes[] = 'has-bottom-nav';
 	}
 	return $classes;
 }
