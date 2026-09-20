@@ -320,37 +320,58 @@ function liferuss_llms_txt() {
 	$brand = liferuss_brand();
 	$lines = array(
 		'# ' . $brand . ' (LifeRuss)',
-		'> Multilingual study-abroad and immigration advisory for Russia. Not an e-commerce store.',
+		'> Multilingual study-abroad and immigration advisory for Russia, plus Iran–Russia freight and trade/sourcing. Not an e-commerce store.',
 		'',
-		'Site (Persian, default, RTL): ' . liferuss_home( 'fa' ),
-		'Site (Russian, LTR): ' . liferuss_home( 'ru' ),
-		'Site (Arabic, RTL): ' . liferuss_home( 'ar' ),
-		'Site (English, LTR): ' . liferuss_home( 'en' ),
-		'Organization: ' . $brand,
-		'Alternate names: LifeRuss, Life Russ, لایف روس',
-		'Languages: fa (default, x-default), ru, ar, en',
-		'Email: ' . liferuss_opt( 'email' ),
-		'Phone: ' . liferuss_opt( 'phone' ),
-		'Address: ' . liferuss_opt( 'address' ),
+		'## Organization',
+		'- Name: ' . $brand,
+		'- Alternate names: LifeRuss, Life Russ, لایف روس',
+		'- Languages: fa (default, x-default), ru, ar, en',
+		'- Email: ' . liferuss_opt( 'email' ),
+		'- Phone: ' . liferuss_opt( 'phone' ),
+		'- Address: ' . liferuss_opt( 'address' ),
 		'',
-		'## Services',
+		'## Language homes',
+		'- [Persian (RTL)](' . liferuss_home( 'fa' ) . ')',
+		'- [Russian (LTR)](' . liferuss_home( 'ru' ) . ')',
+		'- [Arabic (RTL)](' . liferuss_home( 'ar' ) . ')',
+		'- [English (LTR)](' . liferuss_home( 'en' ) . ')',
+		'',
+		'## Pages',
 	);
+	$pages = array(
+		'/'              => 'Home',
+		'/about/'        => 'About',
+		'/universities/' => 'Universities',
+		'/services/'     => 'Services',
+		'/costs/'        => 'Costs',
+		'/freight/'      => 'Freight and shipping',
+		'/trade/'        => 'Trade and sourcing',
+		'/contact/'      => 'Contact',
+		'/blog/'         => 'Blog',
+	);
+	foreach ( $pages as $path => $label ) {
+		$lines[] = '- [' . $label . '](' . liferuss_url( $path, 'fa' ) . ')';
+	}
+	$lines[] = '';
+	$lines[] = '## Services';
 	foreach ( liferuss_services() as $service ) {
 		$lines[] = '- ' . $service['title'] . ': ' . $service['text'];
 	}
 	$lines[] = '';
 	$lines[] = '## SameAs';
 	foreach ( array( 'telegram', 'instagram', 'linkedin', 'youtube' ) as $net ) {
-		$url = liferuss_opt( $net );
+		$url = liferuss_social_url( liferuss_opt( $net ), $net );
 		if ( $url ) {
-			$lines[] = '- ' . $url;
+			$lines[] = '- [' . $net . '](' . $url . ')';
 		}
 	}
 	$lines[] = '';
 	$lines[] = '## Preferred sources (all language variants)';
-	foreach ( array( '/', '/about/', '/services/', '/contact/' ) as $p ) {
+	foreach ( array_keys( $pages ) as $path ) {
 		foreach ( array_keys( liferuss_languages() ) as $code ) {
-			$lines[] = '- ' . liferuss_url( $p, $code );
+			$url   = liferuss_url( $path, $code );
+			$label = $pages[ $path ] . ' (' . $code . ')';
+			$lines[] = '- [' . $label . '](' . $url . ')';
 		}
 	}
 	echo implode( "\n", $lines );

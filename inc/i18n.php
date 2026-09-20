@@ -471,6 +471,11 @@ function liferuss_ui_strings() {
 			'contact_page_eye'   => 'همین امروز',
 			'contact_page_h1'    => 'مشاوره رایگان تحصیل در روسیه',
 			'contact_page_lead'  => 'فرم را پر کنید یا از واتساپ، تلگرام و اینستاگرام پیام بگذارید.',
+			'contact_form_title' => 'ارسال پیام',
+			'contact_form_intro' => 'نام، تلفن و پیام خود را بفرستید؛ تیم پشتیبانی پاسخ می‌دهد.',
+			'contact_message_label' => 'پیام',
+			'contact_message_ph' => 'پیام شما',
+			'contact_form_success' => 'پیام شما ثبت شد. به‌زودی تماس می‌گیریم.',
 			'faq_q1'             => 'هزینه تحصیل در روسیه چقدر است؟',
 			'faq_a1'             => 'شهریه معمولاً سالانه ۲۰۰۰ تا ۷۰۰۰ دلار است؛ خوابگاه ماهانه ۲۰ تا ۵۰ دلار و زندگی حدود ۲۰۰ تا ۴۰۰ دلار.',
 			'faq_q2'             => 'آیا برای تحصیل در روسیه به پادفک نیاز است؟',
@@ -479,6 +484,10 @@ function liferuss_ui_strings() {
 			'faq_a3'             => 'پذیرش تحصیلی، پادفک، ویزا، خوابگاه، ترجمه مدارک و استقبال فرودگاه — بدون فروش کالا.',
 			'service_type'       => 'مشاوره تحصیل و پذیرش در روسیه',
 			'lang_switcher'      => 'انتخاب زبان',
+			'float_open'         => 'راه‌های ارتباطی',
+			'float_close'        => 'بستن راه‌های ارتباطی',
+			'float_dialog'       => 'راه‌های ارتباطی',
+			'bottom_nav_aria'    => 'ناوبری سریع',
 		),
 		'en' => array(
 			'skip_link'          => 'Skip to content',
@@ -569,6 +578,11 @@ function liferuss_ui_strings() {
 			'contact_page_eye'   => 'Start today',
 			'contact_page_h1'    => 'Free consultation on studying in Russia',
 			'contact_page_lead'  => 'Fill in the form or message us on WhatsApp, Telegram, or Instagram.',
+			'contact_form_title' => 'Send a message',
+			'contact_form_intro' => 'Leave your name, phone, and message. Support will get back to you.',
+			'contact_message_label' => 'Message',
+			'contact_message_ph' => 'Your message',
+			'contact_form_success' => 'Your message was saved. We will contact you shortly.',
 			'faq_q1'             => 'How much does it cost to study in Russia?',
 			'faq_a1'             => 'Tuition is usually USD 2,000–7,000 a year; dormitories USD 20–50 a month and living costs about USD 200–400.',
 			'faq_q2'             => 'Do I need a preparatory year (Padfak) to study in Russia?',
@@ -577,6 +591,10 @@ function liferuss_ui_strings() {
 			'faq_a3'             => 'University admission, preparatory year, visa, dormitory, document translation, and airport pickup — not retail goods.',
 			'service_type'       => 'Study-abroad and admission advisory for Russia',
 			'lang_switcher'      => 'Language',
+			'float_open'         => 'Contact options',
+			'float_close'        => 'Close contact options',
+			'float_dialog'       => 'Contact options',
+			'bottom_nav_aria'    => 'Quick navigation',
 		),
 		'ru' => array(
 			'skip_link'          => 'Перейти к содержанию',
@@ -667,6 +685,11 @@ function liferuss_ui_strings() {
 			'contact_page_eye'   => 'Начните сегодня',
 			'contact_page_h1'    => 'Бесплатная консультация по учёбе в России',
 			'contact_page_lead'  => 'Заполните форму или напишите в WhatsApp, Telegram или Instagram.',
+			'contact_form_title' => 'Написать нам',
+			'contact_form_intro' => 'Оставьте имя, телефон и сообщение — поддержка ответит.',
+			'contact_message_label' => 'Сообщение',
+			'contact_message_ph' => 'Ваше сообщение',
+			'contact_form_success' => 'Сообщение сохранено. Мы скоро свяжемся с вами.',
 			'faq_q1'             => 'Сколько стоит учёба в России?',
 			'faq_a1'             => 'Обучение обычно 2000–7000 долларов в год; общежитие 20–50 долларов в месяц, жизнь около 200–400 долларов.',
 			'faq_q2'             => 'Нужен ли падфак для учёбы в России?',
@@ -675,6 +698,10 @@ function liferuss_ui_strings() {
 			'faq_a3'             => 'Поступление, падфак, виза, общежитие, перевод документов и встреча в аэропорту — без продажи товаров.',
 			'service_type'       => 'Консультации по поступлению и учёбе в России',
 			'lang_switcher'      => 'Язык',
+			'float_open'         => 'Способы связи',
+			'float_close'        => 'Закрыть способы связи',
+			'float_dialog'       => 'Способы связи',
+			'bottom_nav_aria'    => 'Быстрая навигация',
 		),
 		'ar' => array(
 			'skip_link'          => 'تخطي إلى المحتوى',
@@ -765,6 +792,11 @@ function liferuss_ui_strings() {
 			'contact_page_eye'   => 'ابدأ اليوم',
 			'contact_page_h1'    => 'استشارة مجانية للدراسة في روسيا',
 			'contact_page_lead'  => 'املأ النموذج أو راسلنا عبر واتساب أو تيليغرام أو إنستغرام.',
+			'contact_form_title' => 'إرسال رسالة',
+			'contact_form_intro' => 'اترك الاسم والهاتف والرسالة وسيتواصل الدعم معك.',
+			'contact_message_label' => 'الرسالة',
+			'contact_message_ph' => 'رسالتك',
+			'contact_form_success' => 'تم حفظ رسالتك. سنتواصل معك قريباً.',
 			'faq_q1'             => 'كم تكلفة الدراسة في روسيا؟',
 			'faq_a1'             => 'الرسوم عادةً ٢٠٠٠ إلى ٧٠٠٠ دولار سنوياً؛ السكن ٢٠ إلى ٥٠ دولاراً شهرياً والمعيشة نحو ٢٠٠ إلى ٤٠٠ دولار.',
 			'faq_q2'             => 'هل أحتاج السنة التحضيرية (بادفاك) للدراسة في روسيا؟',
@@ -773,6 +805,10 @@ function liferuss_ui_strings() {
 			'faq_a3'             => 'القبول الجامعي والسنة التحضيرية والتأشيرة والسكن وترجمة الوثائق والاستقبال في المطار — دون بيع سلع.',
 			'service_type'       => 'استشارات الدراسة والقبول في روسيا',
 			'lang_switcher'      => 'اللغة',
+			'float_open'         => 'طرق التواصل',
+			'float_close'        => 'إغلاق طرق التواصل',
+			'float_dialog'       => 'طرق التواصل',
+			'bottom_nav_aria'    => 'تنقل سريع',
 		),
 	);
 }
@@ -941,17 +977,25 @@ add_action( 'template_redirect', 'liferuss_redirect_query_lang', 0 );
 /**
  * Body class for the active language and direction.
  *
+ * WordPress adds `rtl` whenever the site locale is RTL (Persian), even on
+ * /ru/ and /en/. Strip that on LTR theme languages so chrome is not flipped.
+ *
  * @param array $classes Classes.
  * @return array
  */
 function liferuss_language_body_class( $classes ) {
 	$lang = liferuss_current_lang();
 	$meta = liferuss_languages()[ $lang ];
+	$dir  = isset( $meta['dir'] ) ? $meta['dir'] : 'rtl';
+
+	$classes   = array_values( array_diff( (array) $classes, array( 'rtl', 'ltr', 'dir-rtl', 'dir-ltr' ) ) );
 	$classes[] = 'lang-' . $lang;
-	$classes[] = 'dir-' . $meta['dir'];
+	$classes[] = 'dir-' . $dir;
+	$classes[] = ( 'ltr' === $dir ) ? 'ltr' : 'rtl';
+
 	return $classes;
 }
-add_filter( 'body_class', 'liferuss_language_body_class' );
+add_filter( 'body_class', 'liferuss_language_body_class', 99 );
 
 /**
  * Keep the search form on the same language home.

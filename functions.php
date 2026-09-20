@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.4.0' );
+define( 'LIFERUSS_VERSION', '1.4.7' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -78,15 +78,9 @@ add_action( 'after_setup_theme', 'liferuss_content_width', 0 );
  */
 function liferuss_assets() {
 	wp_enqueue_style(
-		'liferuss-fonts',
-		LIFERUSS_URI . '/assets/fonts/vazirmatn.css',
-		array(),
-		LIFERUSS_VERSION
-	);
-	wp_enqueue_style(
 		'liferuss-theme',
 		LIFERUSS_URI . '/assets/css/theme.css',
-		array( 'liferuss-fonts' ),
+		array(),
 		LIFERUSS_VERSION
 	);
 	wp_enqueue_script(
@@ -104,11 +98,13 @@ function liferuss_assets() {
 			'nonce'   => wp_create_nonce( 'liferuss_consult' ),
 			'dir'     => liferuss_lang_meta( 'dir' ),
 			'strings' => array(
-				'openMenu'  => liferuss_t( 'open_menu' ),
-				'closeMenu' => liferuss_t( 'close_menu' ),
-				'formOk'    => liferuss_t( 'form_ok_short' ),
-				'formErr'   => liferuss_t( 'form_err_short' ),
-				'formNet'   => liferuss_t( 'form_net' ),
+				'openMenu'   => liferuss_t( 'open_menu' ),
+				'closeMenu'  => liferuss_t( 'close_menu' ),
+				'openFloat'  => liferuss_t( 'float_open' ),
+				'closeFloat' => liferuss_t( 'float_close' ),
+				'formOk'     => liferuss_t( 'form_ok_short' ),
+				'formErr'    => liferuss_t( 'form_err_short' ),
+				'formNet'    => liferuss_t( 'form_net' ),
 			),
 		)
 	);
@@ -122,20 +118,23 @@ function liferuss_preload() {
 	$font = LIFERUSS_URI . '/assets/fonts/vazirmatn-700.woff2';
 	echo '<link rel="preload" as="font" type="font/woff2" href="' . esc_url( $font ) . '" crossorigin>' . "\n";
 	if ( is_front_page() ) {
-		$hero = liferuss_media_url( liferuss_opt( 'hero_image_id' ), 'st-basil.jpg', 'liferuss-wide' );
-		if ( $hero ) {
-			echo '<link rel="preload" as="image" href="' . esc_url( $hero ) . '">' . "\n";
+		$hero_id = absint( liferuss_opt( 'hero_bg_id' ) );
+		if ( ! $hero_id ) {
+			$hero_id = absint( liferuss_opt( 'hero_image_id' ) );
 		}
+		liferuss_print_image_preload( $hero_id, 'st-basil.jpg', '100vw' );
 	} elseif ( is_page_template( 'templates/freight.php' ) ) {
-		$hero = liferuss_media_url( liferuss_opt( 'freight_hero_image_id' ), liferuss_opt( 'freight_hero_image', 'st-basil.jpg' ), 'liferuss-wide' );
-		if ( $hero ) {
-			echo '<link rel="preload" as="image" href="' . esc_url( $hero ) . '">' . "\n";
-		}
+		liferuss_print_image_preload(
+			liferuss_opt( 'freight_hero_image_id' ),
+			liferuss_opt( 'freight_hero_image', 'st-basil.jpg' ),
+			'(max-width: 860px) 92vw, 560px'
+		);
 	} elseif ( is_page_template( 'templates/trade.php' ) ) {
-		$hero = liferuss_media_url( liferuss_opt( 'trade_hero_image_id' ), liferuss_opt( 'trade_hero_image', 'st-basil.jpg' ), 'liferuss-wide' );
-		if ( $hero ) {
-			echo '<link rel="preload" as="image" href="' . esc_url( $hero ) . '">' . "\n";
-		}
+		liferuss_print_image_preload(
+			liferuss_opt( 'trade_hero_image_id' ),
+			liferuss_opt( 'trade_hero_image', 'st-basil.jpg' ),
+			'(max-width: 860px) 92vw, 560px'
+		);
 	}
 }
 add_action( 'wp_head', 'liferuss_preload', 1 );
@@ -215,6 +214,12 @@ function liferuss_body_class( $classes ) {
 	$classes[] = 'liferuss-theme';
 	if ( is_front_page() ) {
 		$classes[] = 'is-front';
+	}
+	if ( '1' === (string) liferuss_opt( 'float_widget_enabled', '1' ) ) {
+		$classes[] = 'has-float-widget';
+	}
+	if ( '1' === (string) liferuss_opt( 'bottom_nav_enabled', '1' ) ) {
+		$classes[] = 'has-bottom-nav';
 	}
 	return $classes;
 }

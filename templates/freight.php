@@ -41,6 +41,7 @@ get_header();
 					'lazy'     => false,
 					'priority' => true,
 					'class'    => 'landing-hero-photo',
+					'sizes'    => '(max-width: 860px) 92vw, 560px',
 				)
 			);
 			?>
@@ -53,7 +54,8 @@ get_header();
 			</div>
 		</figure>
 	</div>
-	<div class="landing-trust" aria-label="<?php echo esc_attr( liferuss_t( 'trust_aria' ) ); ?>">
+	<div class="landing-trust">
+		<p class="screen-reader-text"><?php echo esc_html( liferuss_t( 'trust_aria' ) ); ?></p>
 		<div class="container trust-grid">
 			<?php foreach ( (array) liferuss_opt( 'freight_trust', array() ) as $item ) : ?>
 				<article class="trust-item">
@@ -85,6 +87,7 @@ get_header();
 								'width'    => 480,
 								'height'   => 280,
 								'size'     => 'liferuss-card',
+								'sizes'    => '(max-width: 860px) 92vw, 360px',
 							)
 						);
 						?>
@@ -146,6 +149,7 @@ if ( liferuss_section_on( 'freight_form_enabled' ) ) {
 							'width'    => 160,
 							'height'   => 160,
 							'size'     => 'thumbnail',
+							'sizes'    => '160px',
 						)
 					);
 					?>

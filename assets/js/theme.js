@@ -58,12 +58,15 @@
     }
 
     var index = 0;
+    var gapCache = 0;
+    var resizeRaf = 0;
 
     function perView() {
-      if (window.innerWidth < 640) {
+      var width = window.innerWidth;
+      if (width < 640) {
         return 1;
       }
-      if (window.innerWidth < 1100) {
+      if (width < 1100) {
         return 2;
       }
       return 4;
@@ -76,9 +79,11 @@
     function apply() {
       index = Math.min(index, maxIndex());
       var card = cards[0];
-      var styles = window.getComputedStyle(track);
-      var gap = parseFloat(styles.columnGap || styles.gap) || 18;
-      var width = card.getBoundingClientRect().width + gap;
+      if (!gapCache) {
+        var styles = window.getComputedStyle(track);
+        gapCache = parseFloat(styles.columnGap || styles.gap) || 18;
+      }
+      var width = card.getBoundingClientRect().width + gapCache;
       var rtl = document.documentElement.getAttribute("dir") !== "ltr";
       var sign = rtl ? 1 : -1;
       track.style.transform = "translateX(" + (sign * index * width) + "px)";
@@ -123,11 +128,133 @@
       apply();
     });
 
-    window.addEventListener("resize", apply);
-    apply();
+    window.addEventListener("resize", function () {
+      gapCache = 0;
+      if (resizeRaf) {
+        window.cancelAnimationFrame(resizeRaf);
+      }
+      resizeRaf = window.requestAnimationFrame(apply);
+    });
+
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            apply();
+            io.disconnect();
+          }
+        });
+      }, { rootMargin: "200px 0px" });
+      io.observe(root);
+    } else {
+      apply();
+    }
   }
 
   document.querySelectorAll("[data-slider]").forEach(initSlider);
+
+  function initFloatWidget() {
+    var root = document.querySelector("[data-float-widget]");
+    if (!root) {
+      return;
+    }
+    var fab = root.querySelector("[data-float-toggle]");
+    var backdrop = root.querySelector("[data-float-backdrop]");
+    var panel = root.querySelector("[data-float-panel]");
+    var labels = window.liferussTheme && window.liferussTheme.strings ? window.liferussTheme.strings : {};
+
+    function focusables() {
+      if (!panel) {
+        return [];
+      }
+      return Array.prototype.slice.call(panel.querySelectorAll("a, button, [tabindex]:not([tabindex='-1'])"));
+    }
+
+    function setOpen(open) {
+      root.classList.toggle("is-open", open);
+      document.body.classList.toggle("float-open", open);
+      if (fab) {
+        fab.setAttribute("aria-expanded", open ? "true" : "false");
+        fab.setAttribute("aria-label", open ? (labels.closeFloat || "Close") : (labels.openFloat || "Open"));
+      }
+      if (panel) {
+        panel.setAttribute("aria-hidden", open ? "false" : "true");
+        if (open) {
+          panel.removeAttribute("hidden");
+        } else {
+          panel.setAttribute("hidden", "");
+        }
+      }
+      if (backdrop) {
+        if (open) {
+          backdrop.removeAttribute("hidden");
+        } else {
+          backdrop.setAttribute("hidden", "");
+        }
+      }
+      if (open) {
+        var first = focusables()[0];
+        if (first) {
+          first.focus();
+        }
+      }
+    }
+
+    if (fab) {
+      fab.addEventListener("click", function () {
+        setOpen(!root.classList.contains("is-open"));
+      });
+    }
+    if (backdrop) {
+      backdrop.addEventListener("click", function () {
+        setOpen(false);
+        if (fab) {
+          fab.focus();
+        }
+      });
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (!root.classList.contains("is-open")) {
+        return;
+      }
+      if (event.key === "Escape") {
+        setOpen(false);
+        if (fab) {
+          fab.focus();
+        }
+        return;
+      }
+      if (event.key !== "Tab") {
+        return;
+      }
+      var items = focusables();
+      if (!items.length) {
+        return;
+      }
+      items.push(fab);
+      var first = items[0];
+      var last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
+    root.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", function () {
+        var href = link.getAttribute("href") || "";
+        if (link.classList.contains("js-scroll-consult") || href.charAt(0) === "#" || href.indexOf("tel:") === 0) {
+          setOpen(false);
+        }
+      });
+    });
+  }
+
+  initFloatWidget();
 
   document.querySelectorAll(".lang-switch a").forEach(function (link) {
     link.addEventListener("click", function () {

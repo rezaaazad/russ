@@ -12,3 +12,5 @@ Bundled photographs are used under their original licenses:
 - Student / graduate photographs — Pexels (free license)
 
 Do not treat these files as original brand photography. Replace them in production with licensed campaign photos if needed.
+
+WebP derivatives (`*.webp`, `st-basil-800.webp`, `hero-student-400.webp`) are generated from the same sources for responsive delivery. Keep the original JPEGs as fallbacks.

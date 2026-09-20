@@ -35,6 +35,7 @@ get_header();
 							'width'    => 640,
 							'height'   => 400,
 							'size'     => 'liferuss-card',
+							'sizes'    => '(max-width: 640px) 92vw, (max-width: 1100px) 46vw, 360px',
 						)
 					);
 					?>

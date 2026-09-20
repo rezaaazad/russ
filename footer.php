@@ -114,6 +114,10 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 		</div>
 	</div>
 </footer>
-<?php wp_footer(); ?>
+<?php
+get_template_part( 'template-parts/bottom-nav' );
+get_template_part( 'template-parts/contact-widget' );
+wp_footer();
+?>
 </body>
 </html>

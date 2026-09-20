@@ -91,6 +91,7 @@ function liferuss_sanitize_options( $input ) {
 		'phone', 'phone_alt', 'address', 'whatsapp',
 		'footer_about', 'footer_copyright', 'footer_en',
 		'seo_title', 'seo_description', 'org_name', 'org_legal',
+		'float_widget_title', 'float_widget_subtitle', 'float_widget_offset_x', 'float_widget_offset_y',
 	);
 	if ( function_exists( 'liferuss_landing_text_keys' ) ) {
 		$text_keys = array_merge( $text_keys, liferuss_landing_text_keys() );
@@ -121,8 +122,12 @@ function liferuss_sanitize_options( $input ) {
 		$out[ $ik ] = absint( $out[ $ik ] ?? 0 );
 	}
 
-	$out['header_show_phone'] = empty( $input['header_show_phone'] ) ? '0' : '1';
-	$out['services_enabled']  = empty( $input['services_enabled'] ) ? '0' : '1';
+	$out['header_show_phone']      = empty( $input['header_show_phone'] ) ? '0' : '1';
+	$out['services_enabled']       = empty( $input['services_enabled'] ) ? '0' : '1';
+	$out['float_widget_enabled']   = empty( $input['float_widget_enabled'] ) ? '0' : '1';
+	$out['bottom_nav_enabled']     = empty( $input['bottom_nav_enabled'] ) ? '0' : '1';
+	$out['float_widget_offset_x']  = (string) max( 0, min( 80, absint( $out['float_widget_offset_x'] ?? 16 ) ) );
+	$out['float_widget_offset_y']  = (string) max( 0, min( 80, absint( $out['float_widget_offset_y'] ?? 16 ) ) );
 	if ( function_exists( 'liferuss_landing_flag_keys' ) ) {
 		foreach ( liferuss_landing_flag_keys() as $flag ) {
 			$out[ $flag ] = empty( $input[ $flag ] ) ? '0' : '1';
@@ -161,6 +166,14 @@ function liferuss_sanitize_options( $input ) {
 		$out['footer_links'] ?? array(),
 		array( 'label' => 'text', 'url' => 'text' )
 	);
+	$out['float_channels'] = liferuss_sanitize_repeater(
+		$out['float_channels'] ?? array(),
+		array( 'enabled' => 'text', 'type' => 'text', 'label' => 'text', 'url' => 'text', 'icon' => 'text' )
+	);
+	$out['bottom_nav_items'] = liferuss_sanitize_repeater(
+		$out['bottom_nav_items'] ?? array(),
+		array( 'enabled' => 'text', 'label' => 'text', 'url' => 'text', 'icon' => 'text', 'primary' => 'text' )
+	);
 	if ( function_exists( 'liferuss_landing_repeater_schemas' ) ) {
 		foreach ( liferuss_landing_repeater_schemas() as $rep_key => $schema ) {
 			$out[ $rep_key ] = liferuss_sanitize_repeater( $out[ $rep_key ] ?? array(), $schema );
@@ -194,16 +207,19 @@ function liferuss_sanitize_i18n( $raw ) {
 		'form_phone_label', 'form_phone_ph', 'form_level_label', 'form_submit', 'form_note', 'form_success',
 		'address', 'footer_about', 'footer_copyright', 'footer_en',
 		'seo_title', 'seo_description', 'seo_og_title', 'seo_og_description',
+		'float_widget_title', 'float_widget_subtitle', 'brand_name',
 	);
 	$repeaters = array(
-		'trust'         => array( 'title' => 'text', 'text' => 'text' ),
-		'services'      => array( 'title' => 'text', 'text' => 'text' ),
-		'universities'  => array( 'name' => 'text', 'city' => 'text', 'rank' => 'text', 'focus' => 'text' ),
-		'majors'        => array( 'title' => 'text' ),
-		'costs'         => array( 'title' => 'text', 'value' => 'text', 'note' => 'text' ),
-		'roadmap'       => array( 'num' => 'text', 'title' => 'text', 'text' => 'text' ),
-		'testimonials'  => array( 'name' => 'text', 'meta' => 'text', 'quote' => 'text' ),
-		'footer_links'  => array( 'label' => 'text' ),
+		'trust'            => array( 'title' => 'text', 'text' => 'text' ),
+		'services'         => array( 'title' => 'text', 'text' => 'text' ),
+		'universities'     => array( 'name' => 'text', 'city' => 'text', 'rank' => 'text', 'focus' => 'text' ),
+		'majors'           => array( 'title' => 'text' ),
+		'costs'            => array( 'title' => 'text', 'value' => 'text', 'note' => 'text' ),
+		'roadmap'          => array( 'num' => 'text', 'title' => 'text', 'text' => 'text' ),
+		'testimonials'     => array( 'name' => 'text', 'meta' => 'text', 'quote' => 'text' ),
+		'footer_links'     => array( 'label' => 'text' ),
+		'float_channels'   => array( 'label' => 'text' ),
+		'bottom_nav_items' => array( 'label' => 'text' ),
 	);
 	if ( function_exists( 'liferuss_landing_i18n_text_keys' ) ) {
 		$text_keys = array_merge( $text_keys, liferuss_landing_i18n_text_keys() );
@@ -383,6 +399,7 @@ function liferuss_options_page() {
 		'testimonials'  => 'نظرات',
 		'form'          => 'فرم مشاوره',
 		'contact'       => 'تماس و شبکه‌ها',
+		'widgets'       => 'ویجت تماس / ناوبری',
 		'footer'        => 'فوتر',
 		'seo'           => 'سئو',
 		'languages'     => 'زبان‌ها / Languages',
@@ -637,6 +654,46 @@ function liferuss_options_page() {
 				?>
 			</div>
 
+			<div id="tab-widgets" class="liferuss-tab">
+				<h2>ویجت تماس شناور و ناوبری پایین موبایل</h2>
+				<p>دکمهٔ شناور تماس در پایین-چپ صفحه باز می‌شود. نوار پایین فقط روی موبایل دیده می‌شود و با دکمهٔ شناور تداخل ندارد. لینک خالی در کانال‌ها از تلفن / واتساپ / تلگرام / اینستاگرام همین تنظیمات پر می‌شود.</p>
+				<?php
+				liferuss_admin_table_start();
+				liferuss_admin_field( 'float_widget_enabled', $o['float_widget_enabled'] ?? '1', 'نمایش ویجت تماس شناور', 'checkbox' );
+				liferuss_admin_field( 'float_widget_title', $o['float_widget_title'] ?? '', 'عنوان کارت تماس' );
+				liferuss_admin_field( 'float_widget_subtitle', $o['float_widget_subtitle'] ?? '', 'توضیح کارت تماس', 'textarea' );
+				liferuss_admin_field( 'float_widget_offset_x', $o['float_widget_offset_x'] ?? '16', 'فاصله از لبهٔ انتها (چپ در RTL، راست در LTR؛ پیکسل ۰ تا ۸۰)' );
+				liferuss_admin_field( 'float_widget_offset_y', $o['float_widget_offset_y'] ?? '16', 'فاصله از پایین دسکتاپ (پیکسل، ۰ تا ۸۰)' );
+				liferuss_admin_table_end();
+				echo '<h3>کانال‌های تماس</h3><p class="description">نوع: phone، whatsapp، telegram، instagram، consult یا custom. آیکون خالی = همان نوع. ردیف بدون عنوان یا غیرفعال نمایش داده نمی‌شود.</p><div class="liferuss-grid">';
+				foreach ( (array) ( $o['float_channels'] ?? array() ) as $i => $item ) {
+					echo '<div class="liferuss-card"><h3>کانال ' . esc_html( (string) ( $i + 1 ) ) . '</h3>';
+					liferuss_admin_subfield( "float_channels][$i][enabled", $item['enabled'] ?? '1', 'نمایش', 'checkbox' );
+					liferuss_admin_subfield( "float_channels][$i][label", $item['label'] ?? '', 'برچسب' );
+					liferuss_admin_subfield( "float_channels][$i][type", $item['type'] ?? 'custom', 'نوع' );
+					liferuss_admin_subfield( "float_channels][$i][url", $item['url'] ?? '', 'لینک (خالی = مقدار پیش‌فرض قالب)' );
+					liferuss_admin_subfield( "float_channels][$i][icon", $item['icon'] ?? '', 'آیکون (phone, whatsapp, telegram, instagram, chat, …)' );
+					echo '</div>';
+				}
+				echo '</div>';
+
+				liferuss_admin_table_start();
+				liferuss_admin_field( 'bottom_nav_enabled', $o['bottom_nav_enabled'] ?? '1', 'نمایش نوار پایین موبایل', 'checkbox' );
+				liferuss_admin_table_end();
+				echo '<h3>آیتم‌های نوار پایین</h3><p class="description">فقط روی صفحه‌های باریک. یکی را به‌عنوان اقدام اصلی (طلایی) علامت بزنید — معمولاً مشاوره.</p><div class="liferuss-grid">';
+				foreach ( (array) ( $o['bottom_nav_items'] ?? array() ) as $i => $item ) {
+					echo '<div class="liferuss-card"><h3>آیتم ' . esc_html( (string) ( $i + 1 ) ) . '</h3>';
+					liferuss_admin_subfield( "bottom_nav_items][$i][enabled", $item['enabled'] ?? '1', 'نمایش', 'checkbox' );
+					liferuss_admin_subfield( "bottom_nav_items][$i][label", $item['label'] ?? '', 'برچسب' );
+					liferuss_admin_subfield( "bottom_nav_items][$i][url", $item['url'] ?? '', 'لینک' );
+					liferuss_admin_subfield( "bottom_nav_items][$i][icon", $item['icon'] ?? '', 'آیکون (home, cap, building, phone, chat, …)' );
+					liferuss_admin_subfield( "bottom_nav_items][$i][primary", $item['primary'] ?? '0', 'اقدام اصلی (طلایی)', 'checkbox' );
+					echo '</div>';
+				}
+				echo '</div>';
+				?>
+			</div>
+
 			<div id="tab-footer" class="liferuss-tab">
 				<h2>فوتر</h2>
 				<?php
@@ -717,6 +774,7 @@ function liferuss_admin_i18n_tab() {
 		'ar' => 'العربية · RTL · /ar/',
 	);
 	$sections = array(
+		'brand_name'             => array( 'نام برند (نمایش در هدر)', 'text' ),
 		'header_cta_text'        => array( 'هدر / CTA', 'text' ),
 		'tagline'                => array( 'شعار', 'textarea' ),
 		'hero_eyebrow'           => array( 'هیرو: خط بالا', 'text' ),
@@ -764,6 +822,8 @@ function liferuss_admin_i18n_tab() {
 		'seo_description'        => array( 'سئو: توضیحات / OG', 'textarea' ),
 		'seo_og_title'           => array( 'سئو: عنوان Open Graph', 'text' ),
 		'seo_og_description'     => array( 'سئو: توضیح Open Graph', 'textarea' ),
+		'float_widget_title'     => array( 'ویجت تماس: عنوان', 'text' ),
+		'float_widget_subtitle'  => array( 'ویجت تماس: توضیح', 'textarea' ),
 	);
 
 	$fa = liferuss_default_options();
@@ -794,7 +854,9 @@ function liferuss_admin_i18n_tab() {
 			'costs'        => array( 'هزینه‌ها', array( 'title' => 'عنوان', 'value' => 'مقدار', 'note' => 'یادداشت' ), count( $fa['costs'] ) ),
 			'roadmap'      => array( 'مسیر پذیرش', array( 'num' => 'شماره', 'title' => 'عنوان', 'text' => 'توضیح' ), count( $fa['roadmap'] ) ),
 			'testimonials' => array( 'نظرات', array( 'name' => 'نام', 'meta' => 'متا', 'quote' => 'نقل‌قول' ), count( $fa['testimonials'] ) ),
-			'footer_links' => array( 'لینک فوتر', array( 'label' => 'برچسب' ), count( $fa['footer_links'] ) ),
+			'footer_links'     => array( 'لینک فوتر', array( 'label' => 'برچسب' ), count( $fa['footer_links'] ) ),
+			'float_channels'   => array( 'کانال‌های ویجت تماس', array( 'label' => 'برچسب' ), count( $fa['float_channels'] ) ),
+			'bottom_nav_items' => array( 'نوار پایین موبایل', array( 'label' => 'برچسب' ), count( $fa['bottom_nav_items'] ) ),
 		);
 		if ( function_exists( 'liferuss_admin_i18n_landings' ) ) {
 			liferuss_admin_i18n_landings( $code, $fa );
