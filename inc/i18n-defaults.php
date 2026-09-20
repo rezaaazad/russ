@@ -284,7 +284,7 @@ function liferuss_i18n_packaged_all() {
 			'bottom_nav_items'      => array(
 				array( 'label' => 'Главная' ),
 				array( 'label' => 'Услуги' ),
-				array( 'label' => 'Университеты' ),
+				array( 'label' => 'Вузы' ),
 				array( 'label' => 'Контакты' ),
 				array( 'label' => 'Консультация' ),
 			),

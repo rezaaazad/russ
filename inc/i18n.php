@@ -977,17 +977,25 @@ add_action( 'template_redirect', 'liferuss_redirect_query_lang', 0 );
 /**
  * Body class for the active language and direction.
  *
+ * WordPress adds `rtl` whenever the site locale is RTL (Persian), even on
+ * /ru/ and /en/. Strip that on LTR theme languages so chrome is not flipped.
+ *
  * @param array $classes Classes.
  * @return array
  */
 function liferuss_language_body_class( $classes ) {
 	$lang = liferuss_current_lang();
 	$meta = liferuss_languages()[ $lang ];
+	$dir  = isset( $meta['dir'] ) ? $meta['dir'] : 'rtl';
+
+	$classes   = array_values( array_diff( (array) $classes, array( 'rtl', 'ltr', 'dir-rtl', 'dir-ltr' ) ) );
 	$classes[] = 'lang-' . $lang;
-	$classes[] = 'dir-' . $meta['dir'];
+	$classes[] = 'dir-' . $dir;
+	$classes[] = ( 'ltr' === $dir ) ? 'ltr' : 'rtl';
+
 	return $classes;
 }
-add_filter( 'body_class', 'liferuss_language_body_class' );
+add_filter( 'body_class', 'liferuss_language_body_class', 99 );
 
 /**
  * Keep the search form on the same language home.
