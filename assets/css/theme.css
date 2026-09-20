@@ -53,6 +53,7 @@
   --header: 78px;
   --max: 1180px;
   --lr-nav-h: 64px;
+  --lr-fab-clearance: 32px;
 }
 
 *,
@@ -63,6 +64,9 @@
 
 html {
   scroll-behavior: smooth;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body.liferuss-theme {
@@ -73,6 +77,9 @@ body.liferuss-theme {
   line-height: 1.8;
   direction: rtl;
   text-align: right;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 html[dir="ltr"] body.liferuss-theme,
@@ -116,7 +123,10 @@ p {
 
 .container {
   width: min(var(--max), calc(100% - 32px));
+  max-width: 100%;
+  min-width: 0;
   margin-inline: auto;
+  box-sizing: border-box;
 }
 
 .screen-reader-text {
@@ -819,23 +829,43 @@ body.nav-open .nav-toggle-bars::after {
 
 .section-head-split {
   width: 100%;
-  max-width: none;
+  max-width: 100%;
+  min-width: 0;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-end;
   text-align: right;
   gap: 20px;
+  box-sizing: border-box;
+}
+
+.section-head-split > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .section-head-split > div:first-child {
   max-width: 640px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .slider-controls {
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 1 auto;
+  box-sizing: border-box;
+}
+
+.slider-controls .text-link {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .text-link {
@@ -1748,6 +1778,24 @@ body.nav-open .nav-toggle-bars::after {
     grid-template-columns: 1fr;
   }
 
+  /* Flex header: stack so .slider-controls cannot widen the document. */
+  .section-head-split {
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    min-width: 0;
+    max-width: 100%;
+    gap: 16px;
+  }
+
+  .section-head-split > * {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
   .hero-visual {
     min-height: 0;
     justify-content: center;
@@ -1769,9 +1817,19 @@ body.nav-open .nav-toggle-bars::after {
 
   .slider-controls {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    box-sizing: border-box;
+  }
+
+  .slider-controls .text-link {
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 1 auto;
   }
 }
 

@@ -285,8 +285,8 @@ function liferuss_i18n_packaged_all() {
 				array( 'label' => 'Главная' ),
 				array( 'label' => 'Услуги' ),
 				array( 'label' => 'Вузы' ),
-				array( 'label' => 'Контакты' ),
-				array( 'label' => 'Консультация' ),
+				array( 'label' => 'Связь' ),
+				array( 'label' => 'Чат' ),
 			),
 		),
 		'ar' => array(
