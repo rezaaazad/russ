@@ -2388,7 +2388,7 @@ html[dir="ltr"] .consult-form .btn svg {
   flex-direction: column;
   align-items: flex-start;
   direction: ltr;
-  max-width: calc(100vw - 32px);
+  max-width: calc(100% - 32px);
   box-sizing: border-box;
 }
 
@@ -2421,8 +2421,8 @@ body.dir-rtl .lr-float {
 .lr-float__panel {
   position: relative;
   z-index: 91;
-  width: min(360px, calc(100vw - 32px));
-  max-width: calc(100vw - 32px);
+  width: min(360px, calc(100% - 32px));
+  max-width: calc(100% - 32px);
   margin-bottom: 12px;
   padding: 26px 18px 18px;
   background: #fff;
@@ -2649,8 +2649,8 @@ body.dir-rtl .lr-float__panel {
     left: 0;
     right: 0;
     bottom: 0;
-    width: 100%;
-    max-width: 100vw;
+    width: auto;
+    max-width: none;
     z-index: 70;
     align-items: flex-end;
     justify-content: space-around;
