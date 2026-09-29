@@ -207,59 +207,8 @@ class Repository {
 	public function paginate( array $args ): array {
 		global $wpdb;
 
-		$where  = array( '1=1' );
-		$params = array();
-
-		if ( Tables::soft_deletes( $this->suffix ) && empty( $args['with_trashed'] ) ) {
-			$where[] = 'deleted_at IS NULL';
-		}
-
-		if ( isset( $args['consultant_id'] ) ) {
-			$where[]  = 'consultant_id = %d';
-			$params[] = (int) $args['consultant_id'];
-		}
-
-		if ( isset( $args['operator_scope'] ) ) {
-			$operator = (int) $args['operator_scope'];
-			if ( $operator < 1 ) {
-				$where[] = '1=0';
-			} else {
-				$where[]  = '(operator_id = %d OR operator_id IS NULL)';
-				$params[] = $operator;
-			}
-		}
-
-		if ( isset( $args['lead_consultant_id'] ) ) {
-			$leads    = $wpdb->prefix . 'lr_leads';
-			$where[]  = "lead_id IN (SELECT id FROM {$leads} WHERE consultant_id = %d AND deleted_at IS NULL)";
-			$params[] = (int) $args['lead_consultant_id'];
-		}
-
-		if ( ! empty( $args['stale_before'] ) && $this->has_column( 'last_verified_at' ) ) {
-			$where[]  = 'last_verified_at < %s';
-			$params[] = (string) $args['stale_before'];
-		}
-
-		$search = isset( $args['search'] ) ? (string) $args['search'] : '';
-		$cols   = isset( $args['search_columns'] ) && is_array( $args['search_columns'] ) ? $args['search_columns'] : array();
-		if ( '' !== $search && $cols ) {
-			$like  = '%' . $wpdb->esc_like( $search ) . '%';
-			$parts = array();
-			foreach ( $cols as $col ) {
-				$col = (string) $col;
-				if ( ! $this->has_column( $col ) ) {
-					continue;
-				}
-				$parts[]  = "{$col} LIKE %s";
-				$params[] = $like;
-			}
-			if ( $parts ) {
-				$where[] = '(' . implode( ' OR ', $parts ) . ')';
-			}
-		}
-
-		$where_sql = implode( ' AND ', $where );
-		$count_sql = "SELECT COUNT(*) FROM {$this->table()} WHERE {$where_sql}";
+		list( $where_sql, $params ) = $this->conditions( $args );
+		$count_sql                  = "SELECT COUNT(*) FROM {$this->table()} WHERE {$where_sql}";
 		if ( $params ) {
 			$total = (int) $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		} else {
@@ -280,6 +229,126 @@ class Repository {
 			'items' => is_array( $items ) ? $items : array(),
 			'total' => $total,
 		);
+	}
+
+	/**
+	 * Count rows grouped by one whitelisted column.
+	 *
+	 * @param string               $column Group column.
+	 * @param array<string, mixed> $args   Same filters as paginate().
+	 * @return array<string, int>
+	 */
+	public function counts_grouped( string $column, array $args = array() ): array {
+		global $wpdb;
+
+		if ( ! $this->has_column( $column ) ) {
+			return array();
+		}
+		list( $where_sql, $params ) = $this->conditions( $args );
+		$sql                        = "SELECT {$column} AS grp, COUNT(*) AS total FROM {$this->table()} WHERE {$where_sql} GROUP BY {$column}";
+		if ( $params ) {
+			$rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		} else {
+			$rows = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		}
+		$out = array();
+		foreach ( (array) $rows as $row ) {
+			$out[ (string) $row['grp'] ] = (int) $row['total'];
+		}
+		return $out;
+	}
+
+	/**
+	 * WHERE clause and placeholders for list filters.
+	 *
+	 * @param array<string, mixed> $args Filters.
+	 * @return array{0: string, 1: array<int, mixed>}
+	 */
+	private function conditions( array $args ): array {
+		global $wpdb;
+
+		$where  = array( '1=1' );
+		$params = array();
+
+		if ( Tables::soft_deletes( $this->suffix ) && empty( $args['with_trashed'] ) ) {
+			$where[] = 'deleted_at IS NULL';
+		}
+
+		if ( ! empty( $args['unassigned'] ) && $this->has_column( 'consultant_id' ) ) {
+			$where[] = 'consultant_id IS NULL';
+		} elseif ( isset( $args['consultant_id'] ) ) {
+			$where[]  = 'consultant_id = %d';
+			$params[] = (int) $args['consultant_id'];
+		}
+
+		if ( isset( $args['operator_scope'] ) ) {
+			$operator = (int) $args['operator_scope'];
+			if ( $operator < 1 ) {
+				$where[] = '1=0';
+			} else {
+				$where[]  = '(operator_id = %d OR operator_id IS NULL)';
+				$params[] = $operator;
+			}
+		}
+
+		if ( isset( $args['lead_consultant_id'] ) ) {
+			$leads    = $wpdb->prefix . 'lr_leads';
+			$where[]  = "lead_id IN (SELECT id FROM {$leads} WHERE consultant_id = %d AND deleted_at IS NULL)";
+			$params[] = (int) $args['lead_consultant_id'];
+		}
+
+		$equals = array( 'status', 'service_id', 'source', 'priority', 'stage', 'form_type', 'operator_id', 'assigned_to', 'lead_id' );
+		foreach ( $equals as $column ) {
+			if ( ! isset( $args[ $column ] ) || '' === (string) $args[ $column ] || ! $this->has_column( $column ) ) {
+				continue;
+			}
+			$where[]  = "{$column} = " . $this->format_for( $column );
+			$params[] = $args[ $column ];
+		}
+
+		if ( ! empty( $args['created_after'] ) && $this->has_column( 'created_at' ) ) {
+			$where[]  = 'created_at >= %s';
+			$params[] = (string) $args['created_after'];
+		}
+		if ( ! empty( $args['created_before'] ) && $this->has_column( 'created_at' ) ) {
+			$where[]  = 'created_at <= %s';
+			$params[] = (string) $args['created_before'];
+		}
+		if ( ! empty( $args['due_before'] ) && $this->has_column( 'due_at' ) ) {
+			$where[]  = 'due_at <= %s';
+			$params[] = (string) $args['due_before'];
+		}
+		if ( ! empty( $args['stale_before'] ) && $this->has_column( 'last_verified_at' ) ) {
+			$where[]  = 'last_verified_at < %s';
+			$params[] = (string) $args['stale_before'];
+		}
+		if ( ! empty( $args['follow_up_due'] ) && $this->has_column( 'next_follow_up_at' ) ) {
+			$where[]  = "next_follow_up_at IS NOT NULL AND next_follow_up_at <= %s AND status NOT IN ('completed','lost')";
+			$params[] = (string) $args['follow_up_due'];
+		}
+		if ( ! empty( $args['purge_due'] ) && $this->has_column( 'purge_after' ) ) {
+			$where[] = 'purge_after IS NOT NULL AND purge_after <= CURDATE() AND purged_at IS NULL';
+		}
+
+		$search = isset( $args['search'] ) ? (string) $args['search'] : '';
+		$cols   = isset( $args['search_columns'] ) && is_array( $args['search_columns'] ) ? $args['search_columns'] : array();
+		if ( '' !== $search && $cols ) {
+			$like  = '%' . $wpdb->esc_like( $search ) . '%';
+			$parts = array();
+			foreach ( $cols as $col ) {
+				$col = (string) $col;
+				if ( ! $this->has_column( $col ) ) {
+					continue;
+				}
+				$parts[]  = "{$col} LIKE %s";
+				$params[] = $like;
+			}
+			if ( $parts ) {
+				$where[] = '(' . implode( ' OR ', $parts ) . ')';
+			}
+		}
+
+		return array( implode( ' AND ', $where ), $params );
 	}
 
 	/**

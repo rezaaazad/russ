@@ -47,3 +47,47 @@
 .lr-wrap .search-box {
 	float: none;
 }
+
+.lr-pipeline {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	list-style: none;
+	margin: 8px 0 16px;
+	padding: 0;
+}
+
+.lr-pipeline li {
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	padding: 4px 8px;
+}
+
+.lr-pipeline li.is-current {
+	background: #1d2327;
+	border-color: #1d2327;
+	color: #fff;
+}
+
+.lr-filters {
+	margin: 12px 0;
+}
+
+.lr-filters select,
+.lr-filters input[type="text"],
+.lr-filters input[type="date"] {
+	margin-left: 6px;
+}
+
+.lr-report {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	max-width: 720px;
+	padding: 12px;
+	white-space: pre-wrap;
+}
+
+.lr-breakdown {
+	margin: 0 0 16px;
+}

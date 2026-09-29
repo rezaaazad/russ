@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.4.7' );
+define( 'LIFERUSS_VERSION', '1.4.8' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -90,13 +90,32 @@ function liferuss_assets() {
 		LIFERUSS_VERSION,
 		true
 	);
+	$lead_url  = '';
+	$turnstile = '';
+	if ( defined( 'LIFERUSS_CORE_VERSION' ) && class_exists( '\LifeRuss\Core\Settings\Settings' ) ) {
+		$lead_url  = rest_url( 'liferuss/v1/leads' );
+		$forms     = \LifeRuss\Core\Settings\Settings::get( 'forms' );
+		$turnstile = isset( $forms['turnstile_site_key'] ) ? (string) $forms['turnstile_site_key'] : '';
+	}
+	if ( $turnstile ) {
+		wp_enqueue_script(
+			'cloudflare-turnstile',
+			'https://challenges.cloudflare.com/turnstile/v0/api.js',
+			array(),
+			null,
+			true
+		);
+	}
 	wp_localize_script(
 		'liferuss-theme',
 		'liferussTheme',
 		array(
-			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-			'nonce'   => wp_create_nonce( 'liferuss_consult' ),
-			'dir'     => liferuss_lang_meta( 'dir' ),
+			'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
+			'leadUrl'          => $lead_url,
+			'restNonce'        => wp_create_nonce( 'wp_rest' ),
+			'turnstileSiteKey' => $turnstile,
+			'nonce'            => wp_create_nonce( 'liferuss_consult' ),
+			'dir'              => liferuss_lang_meta( 'dir' ),
 			'strings' => array(
 				'openMenu'   => liferuss_t( 'open_menu' ),
 				'closeMenu'  => liferuss_t( 'close_menu' ),
@@ -110,6 +129,26 @@ function liferuss_assets() {
 	);
 }
 add_action( 'wp_enqueue_scripts', 'liferuss_assets' );
+
+/**
+ * UTM, landing page, referrer, and Turnstile fields shared by every public form.
+ */
+function liferuss_form_tracking_fields() {
+	$keys = array( 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term' );
+	foreach ( $keys as $key ) {
+		echo '<input type="hidden" name="' . esc_attr( $key ) . '" value="">';
+	}
+	echo '<input type="hidden" name="landing_page" value="">';
+	echo '<input type="hidden" name="referrer" value="">';
+	$site = '';
+	if ( class_exists( '\LifeRuss\Core\Settings\Settings' ) ) {
+		$forms = \LifeRuss\Core\Settings\Settings::get( 'forms' );
+		$site  = isset( $forms['turnstile_site_key'] ) ? (string) $forms['turnstile_site_key'] : '';
+	}
+	if ( '' !== $site ) {
+		echo '<div class="cf-turnstile" data-sitekey="' . esc_attr( $site ) . '"></div>';
+	}
+}
 
 /**
  * Preload the 700-weight font and LCP hero image.

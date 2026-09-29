@@ -119,17 +119,23 @@ All use the `{wpdb prefix}lr_` prefix, InnoDB. Physical foreign keys exist only 
 
 **لایف‌روس ← تنظیمات لایف‌روس**. گروه‌ها: عمومی، تماس و شبکه‌ها، پاورقی، نرخ ارز دستی (با `updated_at` و `updated_by`؛ ذخیره نرخ، `amount_usd` شهریه‌های همان ارز را همان لحظه دوباره حساب می‌کند و در گزارش فعالیت می‌نویسد)، اعلان تلگرام و ایمیل به تفکیک سرویس، اسکریپت رهگیری، متن فرم، امنیت، زبان، پشتیبان. تزریق اسکریپت در قالب، Polylang، و job پشتیبان در این نسخه اجرا نمی‌شوند.
 
-## مهاجرت `liferuss-leads` (انجام نشده)
+## مهاجرت `liferuss-leads`
 
-افزونهٔ فعلی لیدها دست نخورده می‌ماند. در نسخهٔ بعد جدول `lr_leads` آن را جذب می‌کند:
+مهاجرت idempotent و قابل ادامه است. از پنل **CRM — همه لیدها** دکمهٔ «مهاجرت لیدهای قبلی» (با گزینهٔ dry-run) یا از WP-CLI:
 
-- `legacy_post_id` به شناسهٔ نوشتهٔ CPT `liferuss_lead` وصل می‌شود.
-- وضعیت‌ها: `new` → `new`، `in-progress` → `contacted`، `done` → `completed`.
-- نوع فرم `consult` / `freight` / `trade` / `contact` به درخت `lr_services` نگاشت می‌شود (`freight` به گروه کارگو).
-- نقش `liferuss_support` به مشاور یا اپراتور به‌اضافهٔ `lr_allowed_services` منتقل می‌شود.
-- مدیر محدود `modiriat` همان `lr_admin` است.
+```bash
+wp liferuss migrate-leads --dry-run
+wp liferuss migrate-leads --batch=50
+```
 
-The existing `liferuss-leads` plugin is unchanged. The next release maps `liferuss_lead` posts onto `lr_leads.legacy_post_id`, the three lead statuses onto `new` / `contacted` / `completed`, form types onto `lr_services`, and `liferuss_support` onto a consultant or operator plus `lr_allowed_services`.
+- `legacy_post_id` به شناسهٔ نوشتهٔ CPT `liferuss_lead` وصل می‌شود. اجرای دوباره همان ردیف را دوباره نمی‌سازد.
+- وضعیت‌ها در متای افزونهٔ قبلی `new` / `in_progress` / `done` هستند و به `new` / `contacted` / `completed` می‌روند. شکل `in-progress` هم پذیرفته می‌شود.
+- نوع فرم `consult` روی سرویس پذیرش، `freight` روی کارگو، `trade` روی تجارت، `contact` روی تماس، و `exchange` روی صرافی می‌نشیند. برای هر نوع به‌جز تماس یک ردیف درخواست ساخته می‌شود.
+- افزونهٔ قبلی جدول یادداشت و تاریخچه ندارد. مهاجرت یک ردیف تاریخچه با دلیل `migration` می‌نویسد و متای اضافه را در پیام لید کپی می‌کند.
+- کاربر `liferuss_support` نقش مشاور می‌گیرد، مگر اینکه فقط فرم کارگو، تجارت، یا صرافی داشته باشد که در آن صورت اپراتور همان سرویس می‌شود. سرویس‌های مجاز در `lr_allowed_services` ذخیره می‌شوند. نقش قبلی حذف نمی‌شود.
+- بعد از فعال بودن هسته، افزونهٔ `liferuss-leads` هوک‌های ذخیرهٔ فرم را برمی‌دارد و اگر هنوز فعال باشد دادهٔ جدید نمی‌نویسد.
+
+Migration is resumable. `wp liferuss migrate-leads` copies `liferuss_lead` posts into `lr_leads` (`legacy_post_id`), maps `new` / `in_progress` / `done` to `new` / `contacted` / `completed`, writes the matching request row, and maps `liferuss_support` users onto a consultant or operator plus `lr_allowed_services`. While core is active, the old plugin stops accepting new submissions.
 
 ## تفسیرهای مشخصات / Spec interpretations
 
@@ -140,4 +146,8 @@ The existing `liferuss-leads` plugin is unchanged. The next release maps `liferu
 - `user_id` در `lr_activity_logs` بعد از حذف کاربر باقی می‌ماند. ستون‌های کاربرِ تهی‌پذیر خالی می‌شوند؛ `lead_notes.user_id` و `lead_tasks.assigned_to` به کاربر جایگزین منتقل می‌شوند.
 - ستون‌های کش دانشگاه (`min_tuition_usd`، وضعیت وزارتخانه‌ها، `best_world_rank`) ذخیره می‌شوند و در این نسخه محاسبه نمی‌شوند.
 - `health_ministry_status` پیش‌فرض `unknown` دارد.
-- اجرای ریدایرکت فرانت، Rank Math، Polylang، سازندهٔ بخش، و endpoint عمومی لید خارج از این نسخه است.
+- اجرای ریدایرکت فرانت، Rank Math، Polylang، و سازندهٔ بخش خارج از این نسخه است.
+- فرم‌های قالب consult، freight، trade، و contact به `POST /wp-json/liferuss/v1/leads` می‌روند و اگر جاوااسکریپت نباشد همان `admin-post.php` قبلی را دارند. فرم مشاوره روی درخواست پذیرش می‌نشیند. برگهٔ جداگانه‌ای برای صرافی و پذیرش در قالب نیست؛ همان endpoint نوع `exchange` و `admission` را هم می‌پذیرد.
+- فیلتر تاریخ در فهرست لید میلادی است (`input type="date"`). نمایش تاریخ در جدول و جزئیات شمسی است و tooltip میلادی UTC دارد.
+- نوتیفیکیشن ایمیل و تلگرام با `lr_notify_lead` حدود ۱۵ ثانیه بعد از ثبت، از wp-cron ارسال می‌شود. خطای ارسال به بازدیدکننده برنمی‌گردد.
+- فایل لید بیرون از `uploads` در `wp-content/liferuss-private` است. پاک‌سازی روزانه فایل‌هایی را حذف می‌کند که `purge_after`شان گذشته و `purged_at` خالی است. بستن لید (`completed` یا `lost`) این تاریخ را ۱۲ ماه بعد می‌گذارد.

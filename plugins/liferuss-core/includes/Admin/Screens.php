@@ -7,6 +7,7 @@
 
 namespace LifeRuss\Core\Admin;
 
+use LifeRuss\Core\CRM\Jalali;
 use LifeRuss\Core\Repositories\Repository;
 use LifeRuss\Core\Roles\Access;
 
@@ -25,31 +26,29 @@ class Screens {
 	public static function dashboard(): void {
 		self::guard( 'lr_view_dashboard' );
 		echo '<div class="wrap lr-wrap"><h1>' . esc_html__( 'داشبورد لایف‌روس', 'liferuss-core' ) . '</h1>';
-		echo '<p class="description">' . esc_html__( 'نمای خلاصه. نمودارها و کش پنج‌دقیقه‌ای در نسخهٔ بعدی می‌آیند.', 'liferuss-core' ) . '</p>';
 		echo '<div class="lr-kpis">';
+		$lead_scope = null;
 		if ( current_user_can( 'lr_manage_leads' ) || current_user_can( 'lr_view_own_leads' ) ) {
-			$args  = array();
-			$scope = Access::apply( $args, Access::lead_scope() );
-			$count = null === $scope ? 0 : Repository::for( 'leads' )->count( $scope );
-			self::kpi( __( 'لیدها', 'liferuss-core' ), $count );
+			$lead_scope = Access::apply( array(), Access::lead_scope() );
 		}
+		if ( is_array( $lead_scope ) ) {
+			$leads = Repository::for( 'leads' );
+			$now   = gmdate( 'Y-m-d H:i:s' );
+			self::kpi( __( 'لیدهای امروز', 'liferuss-core' ), $leads->count( array_merge( $lead_scope, array( 'created_after' => Jalali::period_start_utc( 'today' ) ) ) ) );
+			self::kpi( __( 'لیدهای این هفته', 'liferuss-core' ), $leads->count( array_merge( $lead_scope, array( 'created_after' => Jalali::period_start_utc( 'week' ) ) ) ) );
+			self::kpi( __( 'پیگیری‌های سررسید', 'liferuss-core' ), $leads->count( array_merge( $lead_scope, array( 'follow_up_due' => $now ) ) ) );
+		}
+		self::request_kpis();
 		if ( current_user_can( 'lr_view_university_data' ) ) {
 			self::kpi( __( 'دانشگاه‌ها', 'liferuss-core' ), Repository::for( 'universities' )->count() );
 			self::kpi( __( 'شهریه‌ها', 'liferuss-core' ), Repository::for( 'tuition_fees' )->count() );
 		}
-		if ( current_user_can( 'lr_manage_exchange_requests' ) ) {
-			$scope = Access::apply( array(), Access::operator_request_scope( 'lr_manage_exchange_requests' ) );
-			self::kpi( __( 'درخواست صرافی', 'liferuss-core' ), null === $scope ? 0 : Repository::for( 'exchange_requests' )->count( $scope ) );
+		echo '</div>';
+		if ( is_array( $lead_scope ) ) {
+			self::breakdown( __( 'لید به تفکیک سرویس', 'liferuss-core' ), self::service_counts( $lead_scope ) );
+			self::breakdown( __( 'لید به تفکیک منبع', 'liferuss-core' ), Repository::for( 'leads' )->counts_grouped( 'source', $lead_scope ) );
 		}
-		if ( current_user_can( 'lr_manage_cargo_requests' ) ) {
-			$scope = Access::apply( array(), Access::operator_request_scope( 'lr_manage_cargo_requests' ) );
-			self::kpi( __( 'درخواست کارگو', 'liferuss-core' ), null === $scope ? 0 : Repository::for( 'cargo_requests' )->count( $scope ) );
-		}
-		if ( current_user_can( 'lr_manage_trade_requests' ) ) {
-			$scope = Access::apply( array(), Access::operator_request_scope( 'lr_manage_trade_requests' ) );
-			self::kpi( __( 'درخواست تجارت', 'liferuss-core' ), null === $scope ? 0 : Repository::for( 'trade_requests' )->count( $scope ) );
-		}
-		echo '</div></div>';
+		echo '</div>';
 	}
 
 	/**
@@ -283,6 +282,63 @@ class Screens {
 		if ( ! current_user_can( $cap ) ) {
 			wp_die( esc_html__( 'به این بخش دسترسی ندارید.', 'liferuss-core' ), '', array( 'response' => 403 ) );
 		}
+	}
+
+	/**
+	 * Request counts the current user is allowed to see.
+	 */
+	private static function request_kpis(): void {
+		$queues = array(
+			'lr_access_admission'         => array( 'admission_requests', __( 'درخواست پذیرش', 'liferuss-core' ), true ),
+			'lr_manage_exchange_requests' => array( 'exchange_requests', __( 'درخواست صرافی', 'liferuss-core' ), false ),
+			'lr_manage_cargo_requests'    => array( 'cargo_requests', __( 'درخواست کارگو', 'liferuss-core' ), false ),
+			'lr_manage_trade_requests'    => array( 'trade_requests', __( 'درخواست تجارت', 'liferuss-core' ), false ),
+		);
+		foreach ( $queues as $cap => $meta ) {
+			if ( ! current_user_can( $cap ) && ! ( $meta[2] && current_user_can( 'lr_view_own_admission_requests' ) ) ) {
+				continue;
+			}
+			if ( $meta[2] ) {
+				$scope = Access::apply( array( 'lead_consultant' => true ), Access::admission_scope() );
+			} else {
+				$scope = Access::apply( array(), Access::operator_request_scope( $cap ) );
+			}
+			self::kpi( $meta[1], null === $scope ? 0 : Repository::for( $meta[0] )->count( $scope ) );
+		}
+	}
+
+	/**
+	 * Map service ids to Persian names.
+	 *
+	 * @param array<string, mixed> $scope Lead scope.
+	 * @return array<string, int>
+	 */
+	private static function service_counts( array $scope ): array {
+		$raw = Repository::for( 'leads' )->counts_grouped( 'service_id', $scope );
+		$out = array();
+		foreach ( $raw as $id => $count ) {
+			$service       = Repository::for( 'services' )->find( (int) $id );
+			$label         = $service ? (string) $service['name_fa'] : (string) $id;
+			$out[ $label ] = $count;
+		}
+		return $out;
+	}
+
+	/**
+	 * Label/count list under the KPI row.
+	 *
+	 * @param string             $title Heading.
+	 * @param array<string, int> $rows  Rows.
+	 */
+	private static function breakdown( string $title, array $rows ): void {
+		echo '<h2>' . esc_html( $title ) . '</h2><ul class="lr-breakdown">';
+		if ( ! $rows ) {
+			echo '<li>' . esc_html__( 'موردی نیست.', 'liferuss-core' ) . '</li>';
+		}
+		foreach ( $rows as $label => $count ) {
+			echo '<li>' . esc_html( (string) $label ) . ': <strong>' . esc_html( (string) $count ) . '</strong></li>';
+		}
+		echo '</ul>';
 	}
 
 	/**

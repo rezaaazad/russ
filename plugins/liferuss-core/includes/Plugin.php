@@ -8,7 +8,13 @@
 namespace LifeRuss\Core;
 
 use LifeRuss\Core\Admin\Assets;
+use LifeRuss\Core\Admin\LeadAdmin;
 use LifeRuss\Core\Admin\Menu;
+use LifeRuss\Core\CRM\Cli;
+use LifeRuss\Core\CRM\Files;
+use LifeRuss\Core\CRM\Intake;
+use LifeRuss\Core\CRM\Notifier;
+use LifeRuss\Core\CRM\Purge;
 use LifeRuss\Core\Database\Migrator;
 use LifeRuss\Core\PostTypes\PostTypeRegistrar;
 use LifeRuss\Core\PostTypes\RequestGuard;
@@ -41,9 +47,18 @@ class Plugin {
 		RoleRegistrar::hooks();
 		LimitedAdmin::hooks();
 		Profile::hooks();
+		Intake::hooks();
+		Notifier::hooks();
+		Purge::hooks();
+		Files::hooks();
+
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			Cli::hooks();
+		}
 
 		if ( is_admin() ) {
 			Menu::hooks();
+			LeadAdmin::hooks();
 			SettingsPage::hooks();
 			Assets::hooks();
 		}

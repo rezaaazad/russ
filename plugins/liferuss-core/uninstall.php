@@ -45,6 +45,9 @@ $lr_options = array(
 	'lr_settings_backup',
 	'lr_seed_version',
 	'lr_last_migration_errors',
+	'lr_leads_migration_cursor',
+	'lr_leads_migration_report',
+	'lr_last_notice',
 );
 
 foreach ( $lr_options as $lr_option ) {

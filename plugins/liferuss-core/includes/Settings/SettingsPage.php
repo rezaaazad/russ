@@ -334,12 +334,15 @@ class SettingsPage {
 	}
 
 	/**
-	 * Form copy. The public form endpoint comes later.
+	 * Form copy and Cloudflare Turnstile. Empty keys leave the check off.
 	 */
 	private static function fields_forms(): void {
 		$v = Settings::get( 'forms' );
 		self::area_row( 'success_message', __( 'پیام موفقیت', 'liferuss-core' ), (string) $v['success_message'] );
 		self::text_row( 'notify_email', __( 'ایمیل اطلاع‌رسانی پیش‌فرض', 'liferuss-core' ), (string) $v['notify_email'], 'email' );
+		self::text_row( 'turnstile_site_key', 'Turnstile site key', (string) $v['turnstile_site_key'] );
+		self::text_row( 'turnstile_secret', 'Turnstile secret', (string) $v['turnstile_secret'] );
+		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'اگر هر دو کلید خالی باشند، فرم عمومی بدون Turnstile ثبت می‌شود.', 'liferuss-core' ) . '</p></td></tr>';
 	}
 
 	/**
@@ -478,8 +481,10 @@ class SettingsPage {
 		Settings::update(
 			'forms',
 			array(
-				'success_message' => self::posted_area( 'success_message' ),
-				'notify_email'    => sanitize_email( self::posted_text( 'notify_email' ) ),
+				'success_message'    => self::posted_area( 'success_message' ),
+				'notify_email'       => sanitize_email( self::posted_text( 'notify_email' ) ),
+				'turnstile_site_key' => self::posted_text( 'turnstile_site_key' ),
+				'turnstile_secret'   => self::posted_text( 'turnstile_secret' ),
 			)
 		);
 	}

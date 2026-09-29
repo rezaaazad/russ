@@ -64,6 +64,7 @@ $heading   = is_front_page() ? 'h2' : 'h2';
 				<div class="hp" aria-hidden="true">
 					<label>شرکت<input type="text" name="liferuss_company" tabindex="-1" autocomplete="off"></label>
 				</div>
+				<?php liferuss_form_tracking_fields(); ?>
 				<label>
 					<span><?php echo esc_html( liferuss_opt( 'form_name_label' ) ); ?></span>
 					<input type="text" name="consult_name" required autocomplete="name" placeholder="<?php echo esc_attr( liferuss_opt( 'form_name_ph' ) ); ?>">

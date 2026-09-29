@@ -57,3 +57,30 @@ function liferuss_leads_admin_assets( $hook ) {
 	);
 }
 add_action( 'admin_enqueue_scripts', 'liferuss_leads_admin_assets' );
+
+/**
+ * When LifeRuss core is active, new submissions are stored in lr_leads.
+ */
+function liferuss_leads_defer_to_core() {
+	if ( ! defined( 'LIFERUSS_CORE_VERSION' ) ) {
+		return;
+	}
+	remove_action( 'wp_ajax_liferuss_consult', 'liferuss_leads_ajax' );
+	remove_action( 'wp_ajax_nopriv_liferuss_consult', 'liferuss_leads_ajax' );
+	remove_action( 'admin_post_liferuss_consult', 'liferuss_leads_admin_post' );
+	remove_action( 'admin_post_nopriv_liferuss_consult', 'liferuss_leads_admin_post' );
+	add_action( 'admin_notices', 'liferuss_leads_core_notice' );
+}
+add_action( 'plugins_loaded', 'liferuss_leads_defer_to_core', 0 );
+
+/**
+ * Tell admins this plugin no longer stores new requests.
+ */
+function liferuss_leads_core_notice() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	echo '<div class="notice notice-info"><p>';
+	echo esc_html__( 'ذخیرهٔ درخواست‌های جدید به هستهٔ لایف‌روس منتقل شده است. این افزونه برای مشاهده و مهاجرت لیدهای قبلی می‌ماند.', 'liferuss-leads' );
+	echo '</p></div>';
+}
