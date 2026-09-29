@@ -191,6 +191,36 @@ add_action( 'init', 'liferuss_maybe_dedupe_primary_menu', 45 );
 
 
 /**
+ * Point saved footer and menu URLs at the canonical hubs.
+ */
+function liferuss_migrate_canonical_urls() {
+	if ( get_option( 'liferuss_url_canon' ) ) {
+		return;
+	}
+	$map  = array(
+		'/study/'            => '/study-russia/',
+		'/podfak/'           => '/padfak/',
+		'/direct-admission/' => '/direct-course/',
+		'/immigration/'      => '/migration-russia/',
+	);
+	$opts = get_option( 'liferuss_options', array() );
+	if ( is_array( $opts ) && ! empty( $opts['footer_links'] ) && is_array( $opts['footer_links'] ) ) {
+		foreach ( $opts['footer_links'] as $i => $item ) {
+			if ( ! is_array( $item ) || empty( $item['url'] ) ) {
+				continue;
+			}
+			$path = trailingslashit( '/' . trim( (string) $item['url'], '/' ) );
+			if ( isset( $map[ $path ] ) ) {
+				$opts['footer_links'][ $i ]['url'] = $map[ $path ];
+			}
+		}
+		update_option( 'liferuss_options', $opts );
+	}
+	update_option( 'liferuss_url_canon', '1', false );
+}
+add_action( 'init', 'liferuss_migrate_canonical_urls', 46 );
+
+/**
  * Flush rewrite rules once after multilingual 1.2.0.
  */
 function liferuss_maybe_flush_i18n() {

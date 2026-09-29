@@ -654,11 +654,11 @@ function liferuss_llms_txt() {
 		'/universities/' => 'Universities',
 		'/services/'     => 'Services',
 		'/costs/'             => 'Costs',
-		'/study/'             => 'Study in Russia',
+		'/study-russia/'      => 'Study in Russia',
 		'/scholarships/'      => 'Scholarships',
-		'/podfak/'            => 'Preparatory faculty',
-		'/direct-admission/'  => 'Direct admission',
-		'/immigration/'       => 'Immigration',
+		'/padfak/'            => 'Preparatory faculty',
+		'/direct-course/'     => 'Direct admission',
+		'/migration-russia/'  => 'Immigration',
 		'/admission/'         => 'Admission request',
 		'/exchange/'          => 'Exchange rate inquiry',
 		'/cargo/'             => 'Freight and shipping',
@@ -739,6 +739,12 @@ function liferuss_sitemap_excluded_ids() {
 	global $wpdb;
 	$ids = $wpdb->get_col( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_lr_noindex' AND meta_value = '1'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	$ids = is_array( $ids ) ? $ids : array();
+	foreach ( array( 'sample-page', 'برگه-نمونه' ) as $sample_slug ) {
+		$sample = get_page_by_path( $sample_slug );
+		if ( $sample ) {
+			$ids[] = (int) $sample->ID;
+		}
+	}
 	if ( function_exists( 'pll_languages_list' ) && ! liferuss_index_incomplete() ) {
 		$more = $wpdb->get_col(
 			"SELECT p.ID FROM {$wpdb->posts} p

@@ -27,6 +27,7 @@ use LifeRuss\Core\Front\Routes;
 use LifeRuss\Core\Search\Cli as SearchCli;
 use LifeRuss\Core\Search\Indexer;
 use LifeRuss\Core\Content\Editor as ContentEditor;
+use LifeRuss\Core\Content\Canonical;
 use LifeRuss\Core\Content\Seed as ContentSeed;
 use LifeRuss\Core\Content\ServiceSeed;
 use LifeRuss\Core\Redirects\Runner;
@@ -95,6 +96,7 @@ class Plugin {
 		Demo::hooks();
 		ContentEditor::hooks();
 		ContentSeed::hooks();
+		Canonical::hooks();
 		ServiceSeed::hooks();
 		Runner::hooks();
 		NotFound::hooks();

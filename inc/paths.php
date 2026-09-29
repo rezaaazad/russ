@@ -18,7 +18,7 @@ function liferuss_path_links() {
 	return array(
 		array(
 			'title' => liferuss_t( 'nav_study' ),
-			'url'   => '/study/',
+			'url'   => '/study-russia/',
 		),
 		array(
 			'title' => liferuss_t( 'nav_scholarships' ),
@@ -26,15 +26,15 @@ function liferuss_path_links() {
 		),
 		array(
 			'title' => liferuss_t( 'nav_podfak' ),
-			'url'   => '/podfak/',
+			'url'   => '/padfak/',
 		),
 		array(
 			'title' => liferuss_t( 'nav_direct' ),
-			'url'   => '/direct-admission/',
+			'url'   => '/direct-course/',
 		),
 		array(
 			'title' => liferuss_t( 'nav_immigration' ),
-			'url'   => '/immigration/',
+			'url'   => '/migration-russia/',
 		),
 		array(
 			'title' => liferuss_t( 'nav_admission' ),

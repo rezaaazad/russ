@@ -70,7 +70,7 @@ class Seed {
 		return array(
 			array(
 				'title'   => 'تحصیل در روسیه (نمونه)',
-				'slug'    => 'study',
+				'slug'    => 'study-russia',
 				'parent'  => '',
 				'catalog' => 'children',
 				'degree'  => '',
@@ -83,7 +83,7 @@ class Seed {
 			array(
 				'title'   => 'کارشناسی (نمونه)',
 				'slug'    => 'bachelor',
-				'parent'  => 'study',
+				'parent'  => 'study-russia',
 				'catalog' => 'degree',
 				'degree'  => 'bachelor',
 				'field'   => '',
@@ -95,7 +95,7 @@ class Seed {
 			array(
 				'title'   => 'کارشناسی ارشد (نمونه)',
 				'slug'    => 'master',
-				'parent'  => 'study',
+				'parent'  => 'study-russia',
 				'catalog' => 'degree',
 				'degree'  => 'master',
 				'field'   => '',
@@ -107,7 +107,7 @@ class Seed {
 			array(
 				'title'   => 'دکتری (نمونه)',
 				'slug'    => 'phd',
-				'parent'  => 'study',
+				'parent'  => 'study-russia',
 				'catalog' => 'degree',
 				'degree'  => 'phd',
 				'field'   => '',
@@ -119,7 +119,7 @@ class Seed {
 			array(
 				'title'   => 'پزشکی (نمونه)',
 				'slug'    => 'medicine',
-				'parent'  => 'study',
+				'parent'  => 'study-russia',
 				'catalog' => 'degree',
 				'degree'  => 'specialist',
 				'field'   => 'general-medicine',
@@ -131,7 +131,7 @@ class Seed {
 			array(
 				'title'   => 'دندانپزشکی (نمونه)',
 				'slug'    => 'dentistry',
-				'parent'  => 'study',
+				'parent'  => 'study-russia',
 				'catalog' => 'degree',
 				'degree'  => 'specialist',
 				'field'   => 'dentistry',
@@ -143,7 +143,7 @@ class Seed {
 			array(
 				'title'   => 'داروسازی (نمونه)',
 				'slug'    => 'pharmacy',
-				'parent'  => 'study',
+				'parent'  => 'study-russia',
 				'catalog' => 'degree',
 				'degree'  => 'specialist',
 				'field'   => 'pharmacy',
@@ -155,7 +155,7 @@ class Seed {
 			array(
 				'title'   => 'مراحل پذیرش (نمونه)',
 				'slug'    => 'admission-steps',
-				'parent'  => 'study',
+				'parent'  => 'study-russia',
 				'catalog' => '',
 				'degree'  => '',
 				'field'   => '',
@@ -167,7 +167,7 @@ class Seed {
 			array(
 				'title'   => 'مدارک لازم (نمونه)',
 				'slug'    => 'documents',
-				'parent'  => 'study',
+				'parent'  => 'study-russia',
 				'catalog' => '',
 				'degree'  => '',
 				'field'   => '',
@@ -179,7 +179,7 @@ class Seed {
 			array(
 				'title'   => 'ویزای تحصیلی (نمونه)',
 				'slug'    => 'visa',
-				'parent'  => 'study',
+				'parent'  => 'study-russia',
 				'catalog' => '',
 				'degree'  => '',
 				'field'   => '',
@@ -190,7 +190,7 @@ class Seed {
 			),
 			array(
 				'title'   => 'پادفک (نمونه)',
-				'slug'    => 'podfak',
+				'slug'    => 'padfak',
 				'parent'  => '',
 				'catalog' => 'padfak',
 				'degree'  => '',
@@ -202,7 +202,7 @@ class Seed {
 			),
 			array(
 				'title'   => 'پذیرش مستقیم (نمونه)',
-				'slug'    => 'direct-admission',
+				'slug'    => 'direct-course',
 				'parent'  => '',
 				'catalog' => 'direct',
 				'degree'  => '',
@@ -214,7 +214,7 @@ class Seed {
 			),
 			array(
 				'title'   => 'مهاجرت (نمونه)',
-				'slug'    => 'immigration',
+				'slug'    => 'migration-russia',
 				'parent'  => '',
 				'catalog' => 'children',
 				'degree'  => '',
@@ -227,7 +227,7 @@ class Seed {
 			array(
 				'title'   => 'اقامت (نمونه)',
 				'slug'    => 'residence',
-				'parent'  => 'immigration',
+				'parent'  => 'migration-russia',
 				'catalog' => '',
 				'degree'  => '',
 				'field'   => '',
@@ -239,7 +239,7 @@ class Seed {
 			array(
 				'title'   => 'کار در روسیه (نمونه)',
 				'slug'    => 'work',
-				'parent'  => 'immigration',
+				'parent'  => 'migration-russia',
 				'catalog' => '',
 				'degree'  => '',
 				'field'   => '',
@@ -251,7 +251,7 @@ class Seed {
 			array(
 				'title'   => 'تابعیت (نمونه)',
 				'slug'    => 'citizenship',
-				'parent'  => 'immigration',
+				'parent'  => 'migration-russia',
 				'catalog' => '',
 				'degree'  => '',
 				'field'   => '',
