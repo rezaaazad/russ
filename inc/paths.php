@@ -296,6 +296,9 @@ function liferuss_path_tuition_block() {
 		return;
 	}
 	$snap = \LifeRuss\Core\Catalog\Query::snapshot( array() );
+	if ( (int) $snap['total'] < 1 ) {
+		return;
+	}
 	echo '<section class="section path-live"><div class="container">';
 	echo '<h2>' . esc_html( liferuss_t( 'path_tuition' ) ) . '</h2>';
 	echo '<ul class="lr-facts">';

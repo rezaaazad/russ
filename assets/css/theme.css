@@ -736,7 +736,7 @@ body.nav-open .nav-toggle-bars::after {
 }
 
 .eyebrow {
-  color: var(--gold-deep);
+  color: var(--gold-ink);
   font-weight: 700;
   letter-spacing: 0.02em;
   margin-bottom: 10px;
@@ -1028,7 +1028,7 @@ body.nav-open .nav-toggle-bars::after {
 }
 
 .text-link:hover {
-  color: var(--gold-deep);
+  color: var(--gold-ink);
 }
 
 .slider-nav {
@@ -1097,12 +1097,12 @@ body.nav-open .nav-toggle-bars::after {
   color: #fff;
 }
 
-.services-section .service-card h3 {
+.service-card h3 {
   color: #fff;
 }
 
-.services-section .service-card p {
-  color: rgba(213, 222, 234, 0.9);
+.service-card p {
+  color: rgba(213, 222, 234, 0.92);
 }
 
 .service-card:hover,
@@ -1125,10 +1125,15 @@ body.nav-open .nav-toggle-bars::after {
   font-size: 1.05rem;
 }
 
-.service-card p,
 .uni-body p,
 .cost-note {
   color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.service-card p {
+  color: rgba(213, 222, 234, 0.92);
   font-size: 0.9rem;
   margin: 0;
 }
@@ -1207,7 +1212,7 @@ body.nav-open .nav-toggle-bars::after {
 }
 
 .uni-latin {
-  color: var(--gold-deep);
+  color: var(--gold-ink);
   font-weight: 700;
   font-size: 0.78rem;
   margin: 0 0 4px;
@@ -1296,17 +1301,31 @@ body.nav-open .nav-toggle-bars::after {
 .cost-card {
   padding: 22px 16px;
   text-align: center;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.cost-card h3 {
+  color: var(--navy);
+}
+
+.cost-card .cost-note {
+  color: var(--muted);
+}
+
+.costs-section .cost-card {
   background: transparent;
   border: 0;
   box-shadow: none;
 }
 
-.cost-card h3 {
+.costs-section .cost-card h3 {
   color: #fff;
 }
 
-.cost-card .cost-note {
-  color: rgba(213, 222, 234, 0.8);
+.costs-section .cost-card .cost-note {
+  color: rgba(213, 222, 234, 0.88);
 }
 
 .cost-card .icon-circle {
@@ -1317,9 +1336,13 @@ body.nav-open .nav-toggle-bars::after {
 }
 
 .cost-value {
-  color: var(--gold);
+  color: var(--gold-ink);
   font-weight: 700;
   margin: 0 0 6px;
+}
+
+.costs-section .cost-value {
+  color: var(--gold);
 }
 
 /* Roadmap */
@@ -2274,7 +2297,7 @@ html[dir="ltr"] .consult-form .btn svg {
 
 /* Homepage landing cards + long-scroll freight / trade pages */
 .gold-text {
-  color: var(--gold-deep);
+  color: var(--gold-ink);
 }
 
 .home-landings-section {
@@ -2852,7 +2875,7 @@ body.dir-rtl .lr-float__panel {
 }
 
 .lr-float__row.is-consult .lr-float__row-icon {
-  color: var(--gold-deep);
+  color: var(--gold-ink);
 }
 
 .lr-float__fab {

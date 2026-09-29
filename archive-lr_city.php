@@ -35,8 +35,8 @@ $result = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::cities( $page
 				</div></article>
 			<?php endforeach; ?>
 		</div>
-		<?php endif; ?>
 		<?php liferuss_catalog_pager( $page, (int) $result['pages'] ); ?>
+		<?php endif; ?>
 	</div>
 </div>
 <?php
