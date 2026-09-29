@@ -1,0 +1,18 @@
+# Block public reads of docs, package metadata, and the uninstall script.
+# WordPress still includes uninstall.php when the plugin is deleted.
+<IfModule mod_authz_core.c>
+	<FilesMatch "\.(md|json|lock|txt|yml|yaml|dist|log|xml)$">
+		Require all denied
+	</FilesMatch>
+	<Files "uninstall.php">
+		Require all denied
+	</Files>
+</IfModule>
+<IfModule !mod_authz_core.c>
+	<FilesMatch "\.(md|json|lock|txt|yml|yaml|dist|log|xml)$">
+		Deny from all
+	</FilesMatch>
+	<Files "uninstall.php">
+		Deny from all
+	</Files>
+</IfModule>
