@@ -146,6 +146,15 @@ function liferuss_complete_langs() {
  * noindex for filtered archives, paginated archives, explicit flags, and incomplete translations.
  */
 function liferuss_should_noindex() {
+	if ( get_query_var( 'lr_find' ) ) {
+		return true;
+	}
+	if ( get_query_var( 'lr_compare' ) && class_exists( '\LifeRuss\Core\Compare\Set' ) ) {
+		$data = \LifeRuss\Core\Compare\Set::current();
+		if ( empty( $data['indexable'] ) ) {
+			return true;
+		}
+	}
 	if ( function_exists( 'liferuss_catalog_is_filtered' ) && liferuss_catalog_is_filtered() ) {
 		return true;
 	}
@@ -210,6 +219,15 @@ function liferuss_seo_title() {
  * Description used by our tags and by Rank Math.
  */
 function liferuss_seo_description() {
+	if ( get_query_var( 'lr_compare' ) && class_exists( '\LifeRuss\Core\Compare\Set' ) ) {
+		$data = \LifeRuss\Core\Compare\Set::current();
+		if ( ! empty( $data['description'] ) ) {
+			return (string) $data['description'];
+		}
+	}
+	if ( get_query_var( 'lr_find' ) ) {
+		return 'جستجو در دانشگاه‌ها، رشته‌ها، شهرها، بورسیه‌ها، دانستنی‌ها و مجله.';
+	}
 	$desc = (string) liferuss_opt( 'seo_description' );
 	if ( is_page_template( 'templates/freight.php' ) && liferuss_opt( 'freight_seo_description' ) ) {
 		$desc = (string) liferuss_opt( 'freight_seo_description' );
@@ -241,6 +259,20 @@ function liferuss_seo_description() {
  * Canonical URL, unfiltered for catalog filters.
  */
 function liferuss_seo_canonical() {
+	if ( get_query_var( 'lr_compare' ) && class_exists( '\LifeRuss\Core\Compare\Set' ) ) {
+		$data = \LifeRuss\Core\Compare\Set::current();
+		if ( ! empty( $data['canonical'] ) ) {
+			return (string) $data['canonical'];
+		}
+	}
+	if ( get_query_var( 'lr_find' ) ) {
+		$url = liferuss_url( '/search/' );
+		$q   = isset( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( '' !== $q ) {
+			$url = add_query_arg( 'q', $q, $url );
+		}
+		return $url;
+	}
 	if ( function_exists( 'liferuss_catalog_is_filtered' ) && liferuss_catalog_is_filtered() ) {
 		return liferuss_catalog_canonical();
 	}

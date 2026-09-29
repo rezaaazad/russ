@@ -76,6 +76,7 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 		</nav>
 
 		<div class="header-actions">
+			<?php liferuss_header_search(); ?>
 			<?php liferuss_language_switcher( 'header' ); ?>
 			<?php if ( $show_phone && $phone ) : ?>
 				<a class="header-phone" href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>">

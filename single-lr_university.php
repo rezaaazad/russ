@@ -21,6 +21,9 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 	<div class="container">
 		<p class="eyebrow"><?php echo esc_html( $row && ! empty( $row['city']['name_fa'] ) ? $row['city']['name_fa'] : liferuss_brand() ); ?></p>
 		<h1><?php the_title(); ?></h1>
+		<?php if ( $row ) : ?>
+			<p><button type="button" class="btn btn-ghost lr-compare-add" data-slug="<?php echo esc_attr( (string) $row['slug'] ); ?>" data-name="<?php echo esc_attr( (string) $row['name_fa'] ); ?>" aria-pressed="false">مقایسه</button></p>
+		<?php endif; ?>
 		<?php liferuss_breadcrumbs(); ?>
 	</div>
 </header>

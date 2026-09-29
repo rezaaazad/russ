@@ -1,8 +1,8 @@
 # استقرار فاز ۱ / Phase 1 deployment
 
-قالب ۱.۶.۰ و افزونهٔ هسته ۱.۵.۰ (پایگاه ۱.۱.۰). Rank Math و Polylang اختیاری‌اند و داخل بسته نیستند.
+قالب ۱.۷.۰ و افزونهٔ هسته ۱.۶.۰ (پایگاه ۱.۲.۰). Rank Math و Polylang اختیاری‌اند و داخل بسته نیستند.
 
-Theme 1.6.0 and core plugin 1.5.0 (database 1.1.0). Rank Math and Polylang are optional and are not bundled.
+Theme 1.7.0 and core plugin 1.6.0 (database 1.2.0). Rank Math and Polylang are optional and are not bundled.
 
 ## ترتیب نصب / Install order
 
@@ -14,7 +14,7 @@ Theme 1.6.0 and core plugin 1.5.0 (database 1.1.0). Rank Math and Polylang are o
 
 ## مهاجرت / Migration
 
-- گزینهٔ `lr_db_version` باید به `1.1.0` برسد. اولین درخواست پس از فعال‌سازی این کار را با `dbDelta` می‌کند.
+- گزینهٔ `lr_db_version` باید به `1.2.0` برسد. اولین درخواست پس از فعال‌سازی جدول‌های مقایسه و جستجو را با `dbDelta` می‌سازد و نمایهٔ محلی جستجو را یک‌بار پر می‌کند.
 - ریدایرکت `/freight/` → `/cargo/` و اسلاگ‌های قدیمی مجله از قبل در `lr_redirects` هستند. آن ردیف‌ها را پاک نکنید.
 - فایل‌های جدید لید بیرون از ریشهٔ وب در `liferuss-private` (کنار پوشهٔ وردپرس) ذخیره می‌شوند. اگر پوشهٔ قدیمی `wp-content/liferuss-private` هنوز هست، در nginx/Apache دسترسی مستقیم را ببندید. دانلود فقط از پیشخوان و با مجوز است.
 
@@ -55,3 +55,10 @@ Theme 1.6.0 and core plugin 1.5.0 (database 1.1.0). Rank Math and Polylang are o
 - یک مسیر ساختگی باید در لایف‌روس ← سئو — پایش ۴۰۴ دیده شود و ساخت ریدایرکت از همان‌جا به `lr_redirects` برود
 
 سربرگ‌های امنیتی (`X-Content-Type-Options`، `X-Frame-Options`، `Referrer-Policy`، `Permissions-Policy`) روی پاسخ عمومی هستند و با فیلتر `liferuss_security_headers` قابل تغییرند. کش مهمان `Cache-Control: public, max-age=120` است (`liferuss_cache_headers`).
+
+## جستجو و مقایسه / Search and compare
+
+- جستجو در `/search/` و پیشنهادها از `/wp-json/liferuss/v1/search/suggest` است. بدون Meilisearch همان نمایهٔ MySQL جواب می‌دهد.
+- Meilisearch اختیاری است: لایف‌روس ← تنظیمات ← جستجو، آدرس (مثلاً `http://127.0.0.1:7700`) و کلید. دکمهٔ «بازسازی نمایه» یا `wp liferuss search reindex` نمایه را از نو می‌سازد. ورود CSV دانشگاه، رشته و شهر در صف می‌رود.
+- `/compare/?u=msu,spbu` همیشه noindex است. جفت‌های قابل ایندکس را مدیر سئو در لایف‌روس ← سئو — مقایسه دانشگاه با نامکی مثل `msu-vs-spbu` علامت می‌زند. آدرس آن‌ها `/compare/msu-vs-spbu/` است.
+- آمار عبارت‌ها در لایف‌روس ← سئو — آمار جستجو است. پیشنهاد لحظه‌ای در آمار نمی‌آید.

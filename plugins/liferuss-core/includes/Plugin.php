@@ -12,9 +12,14 @@ use LifeRuss\Core\Admin\LeadAdmin;
 use LifeRuss\Core\Admin\Menu;
 use LifeRuss\Core\Admin\NotFoundScreen;
 use LifeRuss\Core\Admin\RedirectScreen;
+use LifeRuss\Core\Admin\CompareScreen;
 use LifeRuss\Core\Catalog\Demo;
 use LifeRuss\Core\Catalog\Editor;
 use LifeRuss\Core\Catalog\Rest;
+use LifeRuss\Core\Front\Api;
+use LifeRuss\Core\Front\Routes;
+use LifeRuss\Core\Search\Cli as SearchCli;
+use LifeRuss\Core\Search\Indexer;
 use LifeRuss\Core\Content\Editor as ContentEditor;
 use LifeRuss\Core\Content\Seed as ContentSeed;
 use LifeRuss\Core\Content\ServiceSeed;
@@ -78,16 +83,21 @@ class Plugin {
 		Hardening::hooks();
 		RankMath::hooks();
 		Polylang::hooks();
+		Routes::hooks();
+		Api::hooks();
+		Indexer::hooks();
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			CrmCli::hooks();
 			CatalogCli::hooks();
+			SearchCli::hooks();
 		}
 
 		if ( is_admin() ) {
 			Menu::hooks();
 			RedirectScreen::hooks();
 			NotFoundScreen::hooks();
+			CompareScreen::hooks();
 			LeadAdmin::hooks();
 			SettingsPage::hooks();
 			Assets::hooks();

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.6.0' );
+define( 'LIFERUSS_VERSION', '1.7.0' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -29,6 +29,7 @@ require_once LIFERUSS_DIR . '/inc/catalog.php';
 require_once LIFERUSS_DIR . '/inc/paths.php';
 require_once LIFERUSS_DIR . '/inc/magazine.php';
 require_once LIFERUSS_DIR . '/inc/home-sections.php';
+require_once LIFERUSS_DIR . '/inc/compare.php';
 require_once LIFERUSS_DIR . '/inc/admin-landings.php';
 require_once LIFERUSS_DIR . '/inc/admin-options.php';
 
@@ -93,6 +94,28 @@ function liferuss_assets() {
 		array(),
 		LIFERUSS_VERSION,
 		true
+	);
+	wp_enqueue_script(
+		'liferuss-finder',
+		LIFERUSS_URI . '/assets/js/finder.js',
+		array(),
+		LIFERUSS_VERSION,
+		true
+	);
+	wp_localize_script(
+		'liferuss-finder',
+		'liferussFinder',
+		array(
+			'suggestUrl'  => rest_url( 'liferuss/v1/search/suggest' ),
+			'compareBase' => liferuss_url( '/compare/' ),
+			'strings'     => array(
+				'add'    => 'مقایسه',
+				'remove' => 'حذف از مقایسه',
+				'need'   => 'حداقل دو دانشگاه',
+				'full'   => 'حداکثر ۴ دانشگاه',
+				'open'   => 'مشاهده مقایسه',
+			),
+		)
 	);
 	$lead_url  = '';
 	$turnstile = '';

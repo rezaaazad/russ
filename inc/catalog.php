@@ -211,6 +211,9 @@ function liferuss_catalog_cards( $items ) {
 		if ( $bits ) {
 			echo '<p class="lr-meta">' . esc_html( implode( ' · ', $bits ) ) . '</p>';
 		}
+		if ( ! empty( $item['slug'] ) ) {
+			echo '<button type="button" class="btn btn-ghost lr-compare-add" data-slug="' . esc_attr( (string) $item['slug'] ) . '" data-name="' . esc_attr( (string) $name ) . '" aria-pressed="false">مقایسه</button>';
+		}
 		echo '</div></article>';
 	}
 	echo '</div>';

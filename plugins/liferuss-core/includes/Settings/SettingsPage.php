@@ -70,6 +70,10 @@ class SettingsPage {
 				'label' => 'پشتیبان',
 				'cap'   => 'lr_manage_backup',
 			),
+			'search'        => array(
+				'label' => 'جستجو',
+				'cap'   => 'lr_manage_settings',
+			),
 		);
 	}
 
@@ -371,6 +375,47 @@ class SettingsPage {
 		echo esc_html__( 'روسی، انگلیسی و عربی حتی قبل از علامت «ترجمه کامل» ایندکس شوند. پیش‌فرض خاموش است.', 'liferuss-core' );
 		echo '</label></td></tr>';
 		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'فارسی زبان پیش‌فرض است. اگر Polylang فعال باشد، نوع‌های نوشته و رشته‌های قالب در آن ثبت می‌شوند. ردیف‌های کاتالوگ زبان‌خنثی می‌مانند.', 'liferuss-core' ) . '</p></td></tr>';
+	}
+
+	/**
+	 * Meilisearch connection. An empty host keeps the MySQL fallback.
+	 */
+	private static function fields_search(): void {
+		$v = Settings::get( 'search' );
+		self::text_row( 'search_host', __( 'آدرس Meilisearch', 'liferuss-core' ), (string) $v['host'] );
+		self::text_row( 'search_api_key', __( 'کلید API', 'liferuss-core' ), '', 'password' );
+		self::text_row( 'search_index_prefix', __( 'پیشوند نمایه', 'liferuss-core' ), (string) $v['index_prefix'] );
+		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'اگر آدرس یا کلید خالی باشد، یا سرویس جواب ندهد، جستجو با جدول محلی MySQL ادامه پیدا می‌کند. کلید ذخیره‌شده اینجا نمایش داده نمی‌شود؛ برای عوض کردنش مقدار جدید بنویسید.', 'liferuss-core' ) . '</p>';
+		$url = wp_nonce_url( admin_url( 'admin-post.php?action=lr_search_reindex' ), 'lr_search_reindex' );
+		echo '<p><a class="button" href="' . esc_url( $url ) . '">' . esc_html__( 'بازسازی نمایه', 'liferuss-core' ) . '</a></p>';
+		if ( isset( $_GET['reindex'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$count = absint( wp_unslash( $_GET['reindex'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			echo '<p>' . esc_html( sprintf( /* translators: %d: document count */ __( '%d سند در نمایهٔ محلی نوشته شد.', 'liferuss-core' ), $count ) ) . '</p>';
+		}
+		echo '</td></tr>';
+	}
+
+	/**
+	 * Save search settings. A blank key keeps the stored key.
+	 */
+	private static function save_search(): void {
+		$current = Settings::get( 'search' );
+		$key     = self::posted_text( 'search_api_key' );
+		if ( '' === $key ) {
+			$key = (string) $current['api_key'];
+		}
+		$prefix = sanitize_key( self::posted_text( 'search_index_prefix' ) );
+		if ( '' === $prefix ) {
+			$prefix = 'liferuss';
+		}
+		Settings::update(
+			'search',
+			array(
+				'host'         => untrailingslashit( esc_url_raw( self::posted_text( 'search_host' ) ) ),
+				'api_key'      => $key,
+				'index_prefix' => $prefix,
+			)
+		);
 	}
 
 	/**

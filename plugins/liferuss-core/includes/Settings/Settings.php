@@ -263,6 +263,11 @@ class Settings {
 			'backup'        => array(
 				'retention_days' => '30',
 			),
+			'search'        => array(
+				'host'         => '',
+				'api_key'      => '',
+				'index_prefix' => 'liferuss',
+			),
 		);
 
 		return $map[ $group ] ?? array();
