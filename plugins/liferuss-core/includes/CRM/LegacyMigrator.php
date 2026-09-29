@@ -46,8 +46,9 @@ class LegacyMigrator {
 		$cursor = (int) get_option( 'lr_leads_migration_cursor', 0 );
 		foreach ( $ids as $post_id ) {
 			$post_id  = (int) $post_id;
+			$post_row = get_post( $post_id );
 			$existing = Repository::for( 'leads' )->find_by( 'legacy_post_id', $post_id );
-			$title    = get_the_title( $post_id );
+			$title    = $post_row ? (string) $post_row->post_title : '';
 			if ( count( $report['sample'] ) < 8 ) {
 				$report['sample'][] = array(
 					'post_id' => $post_id,
