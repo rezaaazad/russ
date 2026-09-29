@@ -4,14 +4,51 @@
   var body = document.body;
   var toggle = document.querySelector(".nav-toggle");
   var nav = document.getElementById("site-nav");
+  var searchToggle = document.querySelector(".header-search-toggle");
+  var searchClose = document.querySelector(".header-search-close");
+  var searchBox = document.getElementById("header-search");
+
+  function setSearch(open) {
+    if (!searchBox) {
+      return;
+    }
+    searchBox.classList.toggle("is-open", open);
+    body.classList.toggle("search-open", open);
+    if (searchToggle) {
+      searchToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    if (open) {
+      var input = searchBox.querySelector("input");
+      if (input) {
+        input.focus();
+      }
+    }
+  }
 
   function setNav(open) {
     body.classList.toggle("nav-open", open);
+    if (open) {
+      setSearch(false);
+    }
     if (toggle) {
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
       var labels = window.liferussTheme && window.liferussTheme.strings ? window.liferussTheme.strings : {};
       toggle.setAttribute("aria-label", open ? (labels.closeMenu || "Close menu") : (labels.openMenu || "Open menu"));
     }
+  }
+
+  if (searchToggle && searchBox) {
+    searchToggle.addEventListener("click", function () {
+      setSearch(!searchBox.classList.contains("is-open"));
+    });
+  }
+  if (searchClose) {
+    searchClose.addEventListener("click", function () {
+      setSearch(false);
+      if (searchToggle) {
+        searchToggle.focus();
+      }
+    });
   }
 
   if (toggle && nav) {
@@ -27,6 +64,10 @@
 
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape") {
+        if (searchBox && searchBox.classList.contains("is-open")) {
+          setSearch(false);
+          return;
+        }
         setNav(false);
       }
     });

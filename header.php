@@ -76,16 +76,24 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 		</nav>
 
 		<div class="header-actions">
-			<?php liferuss_header_search(); ?>
+			<button class="header-search-toggle" type="button" aria-expanded="false" aria-controls="header-search" aria-label="<?php echo esc_attr( liferuss_t( 'search_open' ) ); ?>">
+				<?php echo liferuss_icon( 'search' ); ?>
+			</button>
+			<div class="header-search" id="header-search">
+				<?php liferuss_header_search(); ?>
+				<button class="header-search-close" type="button" aria-label="<?php echo esc_attr( liferuss_t( 'search_close' ) ); ?>">
+					<?php echo liferuss_icon( 'close' ); ?>
+				</button>
+			</div>
 			<a class="header-account" href="<?php echo esc_url( liferuss_url( '/account/' ) ); ?>"><?php echo is_user_logged_in() ? 'حساب من' : 'ورود'; ?></a>
 			<?php liferuss_language_switcher( 'header' ); ?>
 			<?php if ( $show_phone && $phone ) : ?>
 				<a class="header-phone" href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>">
 					<?php echo liferuss_icon( 'phone' ); ?>
-					<span><?php echo esc_html( $phone ); ?></span>
+					<span dir="ltr"><?php echo esc_html( $phone ); ?></span>
 				</a>
 			<?php endif; ?>
-			<a class="btn btn-gold js-scroll-consult" href="<?php echo esc_url( $cta_link ); ?>">
+			<a class="btn btn-gold header-cta js-scroll-consult" href="<?php echo esc_url( $cta_link ); ?>">
 				<?php echo esc_html( $cta_text ); ?>
 				<?php echo liferuss_icon( 'arrow' ); ?>
 			</a>
