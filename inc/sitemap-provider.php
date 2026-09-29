@@ -52,15 +52,17 @@ class LifeRuss_Sitemap_Provider extends WP_Sitemaps_Provider {
 	public function get_url_list( $page_num, $object_subtype = '' ) {
 		unset( $page_num, $object_subtype );
 		$entries = array();
-		foreach ( liferuss_languages() as $code => $info ) {
-			foreach ( $this->paths() as $path ) {
-				$alternates = array();
-				foreach ( liferuss_languages() as $alt => $alt_info ) {
-					$alternates[] = array(
-						'hreflang' => $alt_info['hreflang'],
-						'loc'      => liferuss_url( $path, $alt ),
-					);
-				}
+		foreach ( $this->paths() as $path ) {
+			$langs = $this->complete_langs( $path );
+			$alternates = array();
+			foreach ( $langs as $alt ) {
+				$info         = liferuss_languages()[ $alt ];
+				$alternates[] = array(
+					'hreflang' => $info['hreflang'],
+					'loc'      => liferuss_url( $path, $alt ),
+				);
+			}
+			foreach ( $langs as $code ) {
 				$entries[] = array(
 					'loc'        => liferuss_url( $path, $code ),
 					'alternates' => $alternates,
@@ -68,6 +70,34 @@ class LifeRuss_Sitemap_Provider extends WP_Sitemaps_Provider {
 			}
 		}
 		return $entries;
+	}
+
+	/**
+	 * Persian plus any language marked complete for the page behind this path.
+	 *
+	 * @param string $path Public path.
+	 * @return string[]
+	 */
+	protected function complete_langs( $path ) {
+		$langs = array( 'fa' );
+		if ( function_exists( 'liferuss_index_incomplete' ) && liferuss_index_incomplete() ) {
+			return array_keys( liferuss_languages() );
+		}
+		$page_id = 0;
+		if ( '/' !== $path ) {
+			$page = get_page_by_path( trim( $path, '/' ) );
+			if ( $page instanceof WP_Post ) {
+				$page_id = (int) $page->ID;
+			}
+		} else {
+			$page_id = (int) get_option( 'page_on_front' );
+		}
+		foreach ( array( 'en', 'ru', 'ar' ) as $code ) {
+			if ( function_exists( 'liferuss_translation_complete' ) && liferuss_translation_complete( $code, $page_id ) ) {
+				$langs[] = $code;
+			}
+		}
+		return $langs;
 	}
 
 	/**

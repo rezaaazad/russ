@@ -55,7 +55,8 @@ class Query {
 		$list_sql  = "SELECT u.*, c.name_fa AS city_name, c.slug AS city_slug FROM `{$unis}` u {$join} WHERE {$sql_where} ORDER BY u.is_featured DESC, u.best_world_rank IS NULL, u.best_world_rank ASC, u.name_fa ASC LIMIT %d OFFSET %d";
 		$list_args = array_merge( $params, array( self::PER_PAGE, $offset ) );
 		$rows      = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_args ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$items     = array();
+		self::prime_posts( (array) $rows );
+		$items = array();
 		foreach ( (array) $rows as $row ) {
 			$items[] = self::university_card( $row );
 		}
@@ -361,6 +362,23 @@ class Query {
 	}
 
 	/**
+	 * Load posts and thumbnails once for a page of rows.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Rows with post_id.
+	 */
+	private static function prime_posts( array $rows ): void {
+		$ids = array();
+		foreach ( $rows as $row ) {
+			if ( ! empty( $row['post_id'] ) ) {
+				$ids[] = (int) $row['post_id'];
+			}
+		}
+		if ( $ids ) {
+			_prime_post_caches( $ids, false, true );
+		}
+	}
+
+	/**
 	 * Card payload for JSON and templates.
 	 *
 	 * @param array<string, mixed> $row University row.
@@ -554,8 +572,10 @@ class Query {
 			),
 			ARRAY_A
 		);
+		$rows  = is_array( $rows ) ? $rows : array();
+		self::prime_posts( $rows );
 		$items = array();
-		foreach ( (array) $rows as $row ) {
+		foreach ( $rows as $row ) {
 			$row['url'] = get_permalink( (int) $row['post_id'] );
 			$items[]    = $row;
 		}

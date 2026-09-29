@@ -136,6 +136,24 @@ class Tables {
 				),
 				'fks'     => array(),
 			),
+			'not_found'        => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'          => $id,
+					'path'        => 'varchar(500) NOT NULL',
+					'path_hash'   => 'char(40) NOT NULL',
+					'hits'        => 'int(10) unsigned NOT NULL DEFAULT 1',
+					'referrer'    => 'varchar(500) NOT NULL DEFAULT \'\'',
+					'last_hit_at' => $dt,
+					'created_at'  => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'UNIQUE KEY path_hash (path_hash)',
+					'KEY last_hit_at (last_hit_at)',
+				),
+				'fks'     => array(),
+			),
 			'translations'     => array(
 				'soft'    => false,
 				'columns' => array(

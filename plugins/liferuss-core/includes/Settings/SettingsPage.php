@@ -346,7 +346,7 @@ class SettingsPage {
 	}
 
 	/**
-	 * Security flags. Two-factor login is deferred.
+	 * Security flags, login limit, and the authenticator grace window.
 	 */
 	private static function fields_security(): void {
 		$v = Settings::get( 'security' );
@@ -354,16 +354,23 @@ class SettingsPage {
 		echo '<label><input type="checkbox" name="delete_data_on_uninstall" value="1" ' . checked( '1', (string) $v['delete_data_on_uninstall'], false ) . '> ';
 		echo esc_html__( 'با حذف افزونه، جدول‌ها، نقش‌های lr_* و تنظیمات پاک شوند. پیش‌فرض خاموش است.', 'liferuss-core' );
 		echo '</label></td></tr>';
-		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'ورود دومرحله‌ای در این نسخه پیاده نشده است. متای lr_2fa_enabled برای مرحلهٔ بعد نگه داشته می‌شود.', 'liferuss-core' ) . '</p></td></tr>';
+		self::text_row( 'totp_grace_days', __( 'مهلت فعال‌سازی ورود دومرحله‌ای (روز)', 'liferuss-core' ), (string) $v['totp_grace_days'], 'number' );
+		self::text_row( 'login_limit', __( 'سقف تلاش ناموفق ورود', 'liferuss-core' ), (string) $v['login_limit'], 'number' );
+		self::text_row( 'not_found_days', __( 'نگهداری گزارش ۴۰۴ (روز)', 'liferuss-core' ), (string) $v['not_found_days'], 'number' );
+		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'ورود دومرحله‌ای برای مدیر ارشد، ادمین، مدیر محتوا، مدیر سئو و مشاور اجباری است. رمز برنامه و REST از این مرحله رد نمی‌شوند.', 'liferuss-core' ) . '</p></td></tr>';
 	}
 
 	/**
-	 * Language placeholder. Polylang stays out of this release.
+	 * Default language and whether incomplete translations may be indexed.
 	 */
 	private static function fields_languages(): void {
 		$v = Settings::get( 'languages' );
 		self::text_row( 'default_language', __( 'زبان پیش‌فرض', 'liferuss-core' ), (string) $v['default_language'] );
-		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'اتصال Polylang و جدول ترجمه‌ها در نسخهٔ بعدی است.', 'liferuss-core' ) . '</p></td></tr>';
+		echo '<tr><th scope="row">' . esc_html__( 'نمایهٔ ترجمه‌های ناقص', 'liferuss-core' ) . '</th><td>';
+		echo '<label><input type="checkbox" name="index_incomplete" value="1" ' . checked( '1', (string) $v['index_incomplete'], false ) . '> ';
+		echo esc_html__( 'روسی، انگلیسی و عربی حتی قبل از علامت «ترجمه کامل» ایندکس شوند. پیش‌فرض خاموش است.', 'liferuss-core' );
+		echo '</label></td></tr>';
+		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'فارسی زبان پیش‌فرض است. اگر Polylang فعال باشد، نوع‌های نوشته و رشته‌های قالب در آن ثبت می‌شوند. ردیف‌های کاتالوگ زبان‌خنثی می‌مانند.', 'liferuss-core' ) . '</p></td></tr>';
 	}
 
 	/**
@@ -495,10 +502,16 @@ class SettingsPage {
 	private static function save_security(): void {
 		$flag = isset( $_POST['delete_data_on_uninstall'] ) ? '1' : '0'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		update_option( 'lr_delete_data_on_uninstall', $flag, false );
+		$grace = absint( self::posted_text( 'totp_grace_days' ) );
+		$limit = absint( self::posted_text( 'login_limit' ) );
+		$days  = absint( self::posted_text( 'not_found_days' ) );
 		Settings::update(
 			'security',
 			array(
 				'delete_data_on_uninstall' => $flag,
+				'totp_grace_days'          => (string) $grace,
+				'login_limit'              => (string) ( $limit > 0 ? $limit : 10 ),
+				'not_found_days'           => (string) ( $days > 0 ? $days : 90 ),
 			)
 		);
 	}
@@ -515,6 +528,7 @@ class SettingsPage {
 			'languages',
 			array(
 				'default_language' => $code,
+				'index_incomplete' => isset( $_POST['index_incomplete'] ) ? '1' : '0', // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			)
 		);
 	}

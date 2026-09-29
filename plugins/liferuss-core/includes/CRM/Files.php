@@ -41,14 +41,30 @@ class Files {
 	 * Private directory, created on demand.
 	 */
 	public static function dir(): string {
-		$upload = wp_upload_dir();
-		$base   = trailingslashit( dirname( $upload['basedir'] ) ) . 'liferuss-private';
+		$base = trailingslashit( dirname( ABSPATH ) ) . 'liferuss-private';
 		if ( ! is_dir( $base ) ) {
 			wp_mkdir_p( $base );
-			file_put_contents( $base . '/index.php', "<?php\n// Silence.\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
-			file_put_contents( $base . '/.htaccess', "Deny from all\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+			self::guard( $base );
+		}
+		$legacy = trailingslashit( dirname( wp_upload_dir()['basedir'] ) ) . 'liferuss-private';
+		if ( is_dir( $legacy ) ) {
+			self::guard( $legacy );
 		}
 		return $base;
+	}
+
+	/**
+	 * Block directory listing and direct HTTP access where the server honors it.
+	 *
+	 * @param string $base Directory.
+	 */
+	private static function guard( string $base ): void {
+		if ( ! is_file( $base . '/index.php' ) ) {
+			file_put_contents( $base . '/index.php', "<?php\n// Silence.\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		}
+		if ( ! is_file( $base . '/.htaccess' ) ) {
+			file_put_contents( $base . '/.htaccess', "Require all denied\nDeny from all\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		}
 	}
 
 	/**
@@ -119,7 +135,7 @@ class Files {
 		if ( ! LeadWriter::can_view( (int) $file['lead_id'] ) ) {
 			wp_die( esc_html__( 'به این فایل دسترسی ندارید.', 'liferuss-core' ), '', array( 'response' => 403 ) );
 		}
-		$path = self::dir() . '/' . basename( (string) $file['stored_path'] );
+		$path = self::locate( (string) $file['stored_path'] );
 		if ( ! is_readable( $path ) ) {
 			wp_die( esc_html__( 'فایل روی دیسک نیست.', 'liferuss-core' ), '', array( 'response' => 404 ) );
 		}
@@ -137,7 +153,7 @@ class Files {
 	 * @param array<string, mixed> $file File row.
 	 */
 	public static function purge_row( array $file ): void {
-		$path = self::dir() . '/' . basename( (string) ( $file['stored_path'] ?? '' ) );
+		$path = self::locate( (string) ( $file['stored_path'] ?? '' ) );
 		if ( is_file( $path ) ) {
 			wp_delete_file( $path );
 		}
@@ -147,6 +163,21 @@ class Files {
 				'purged_at' => gmdate( 'Y-m-d H:i:s' ),
 			)
 		);
+	}
+
+	/**
+	 * New files live outside the web root. Older rows may still sit under wp-content.
+	 *
+	 * @param string $stored Stored file name.
+	 */
+	private static function locate( string $stored ): string {
+		$name = basename( $stored );
+		$new  = self::dir() . '/' . $name;
+		if ( is_file( $new ) ) {
+			return $new;
+		}
+		$legacy = trailingslashit( dirname( wp_upload_dir()['basedir'] ) ) . 'liferuss-private/' . $name;
+		return is_file( $legacy ) ? $legacy : $new;
 	}
 
 	/**

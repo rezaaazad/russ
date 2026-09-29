@@ -252,9 +252,13 @@ class Settings {
 			),
 			'security'      => array(
 				'delete_data_on_uninstall' => '0',
+				'totp_grace_days'          => '7',
+				'login_limit'              => '10',
+				'not_found_days'           => '90',
 			),
 			'languages'     => array(
 				'default_language' => 'fa',
+				'index_incomplete' => '0',
 			),
 			'backup'        => array(
 				'retention_days' => '30',

@@ -61,7 +61,7 @@ class Menu {
 			array( 'lr-stale', 'دانشگاه‌ها — نیازمند بررسی', 'lr_manage_university_data', array( Screens::class, 'stale' ) ),
 			array( 'lr-services', 'خدمات و فرم‌ها', 'lr_manage_services', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-redirects', 'سئو — ریدایرکت‌ها', 'lr_view_redirects', array( RedirectScreen::class, 'render' ) ),
-			array( 'lr-404', 'سئو — پایش ۴۰۴', 'lr_manage_redirects', array( Screens::class, 'placeholder' ) ),
+			array( 'lr-404', 'سئو — پایش ۴۰۴', 'lr_manage_redirects', array( NotFoundScreen::class, 'render' ) ),
 			array( 'lr-activity', 'گزارش فعالیت', 'lr_view_activity_log', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-roles', 'نقش‌ها و مجوزها', 'lr_manage_roles', array( Screens::class, 'placeholder' ) ),
 		);

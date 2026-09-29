@@ -74,16 +74,140 @@ function liferuss_document_title( $parts ) {
 add_filter( 'document_title_parts', 'liferuss_document_title' );
 
 /**
- * Meta, OG, Twitter, hreflang, per-language canonical.
+ * Rank Math owns the generic tags when it is loaded.
  */
-function liferuss_head_meta() {
+function liferuss_rank_math_active() {
+	return defined( 'RANK_MATH_VERSION' );
+}
+
+/**
+ * Global switch: index RU/EN/AR even before a translation is marked complete.
+ */
+function liferuss_index_incomplete() {
+	if ( ! class_exists( '\LifeRuss\Core\Settings\Settings' ) ) {
+		return false;
+	}
+	$languages = \LifeRuss\Core\Settings\Settings::get( 'languages' );
+	return '1' === (string) ( $languages['index_incomplete'] ?? '0' );
+}
+
+/**
+ * Whether a language version of this post may be indexed.
+ *
+ * Persian is always complete. Other languages need the per-post flag.
+ *
+ * @param string $lang    Language code.
+ * @param int    $post_id Post id. Zero uses the queried object.
+ */
+function liferuss_translation_complete( $lang, $post_id = 0 ) {
+	if ( 'fa' === $lang || '' === (string) $lang ) {
+		return true;
+	}
+	if ( liferuss_index_incomplete() ) {
+		return true;
+	}
+	$post_id = $post_id ? (int) $post_id : (int) get_queried_object_id();
+	if ( function_exists( 'pll_get_post_language' ) && $post_id ) {
+		$target = $post_id;
+		$own    = (string) pll_get_post_language( $post_id, 'slug' );
+		if ( $own && $own !== $lang && function_exists( 'pll_get_post' ) ) {
+			$target = (int) pll_get_post( $post_id, $lang );
+		}
+		return $target && '1' === (string) get_post_meta( $target, '_lr_translation_complete', true );
+	}
+	$ready = array_filter( array_map( 'sanitize_key', explode( ',', (string) get_post_meta( $post_id, '_lr_lang_ready', true ) ) ) );
+	return in_array( $lang, $ready, true );
+}
+
+/**
+ * Languages that should receive hreflang for the current view.
+ *
+ * @return string[]
+ */
+function liferuss_complete_langs() {
+	$langs   = array( 'fa' );
+	$post_id = (int) get_queried_object_id();
+	foreach ( array_keys( liferuss_languages() ) as $code ) {
+		if ( 'fa' !== $code && liferuss_translation_complete( $code, $post_id ) ) {
+			$langs[] = $code;
+		}
+	}
+	return $langs;
+}
+
+/**
+ * noindex for filtered archives, paginated archives, explicit flags, and incomplete translations.
+ */
+function liferuss_should_noindex() {
+	if ( function_exists( 'liferuss_catalog_is_filtered' ) && liferuss_catalog_is_filtered() ) {
+		return true;
+	}
+	if ( is_paged() && ( is_archive() || is_home() || is_search() ) ) {
+		return true;
+	}
+	if ( is_singular() && '1' === (string) get_post_meta( get_queried_object_id(), '_lr_noindex', true ) ) {
+		return true;
+	}
 	$lang = liferuss_current_lang();
-	$meta = liferuss_languages()[ $lang ];
-	$desc = liferuss_opt( 'seo_description' );
+	if ( 'fa' !== $lang && ! liferuss_translation_complete( $lang, get_queried_object_id() ) ) {
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Drop drafts, noindex rows, and incomplete translations from sitemaps.
+ *
+ * @param int $post_id Post id.
+ */
+function liferuss_post_excluded_from_sitemap( $post_id ) {
+	$post = get_post( $post_id );
+	if ( ! $post || 'publish' !== $post->post_status ) {
+		return true;
+	}
+	if ( '1' === (string) get_post_meta( $post_id, '_lr_noindex', true ) ) {
+		return true;
+	}
+	if ( function_exists( 'pll_get_post_language' ) ) {
+		$lang = (string) pll_get_post_language( $post_id, 'slug' );
+		if ( $lang && 'fa' !== $lang && ! liferuss_translation_complete( $lang, $post_id ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Title override from our SEO fields. Empty means leave the default.
+ */
+function liferuss_seo_title() {
+	if ( is_front_page() ) {
+		return (string) liferuss_opt( 'seo_title', '' );
+	}
+	if ( is_page_template( 'templates/freight.php' ) && liferuss_opt( 'freight_seo_title' ) ) {
+		return (string) liferuss_opt( 'freight_seo_title' );
+	}
+	if ( is_page_template( 'templates/trade.php' ) && liferuss_opt( 'trade_seo_title' ) ) {
+		return (string) liferuss_opt( 'trade_seo_title' );
+	}
+	if ( is_singular() ) {
+		$custom = (string) get_post_meta( get_queried_object_id(), '_lr_seo_title', true );
+		if ( $custom ) {
+			return $custom;
+		}
+	}
+	return '';
+}
+
+/**
+ * Description used by our tags and by Rank Math.
+ */
+function liferuss_seo_description() {
+	$desc = (string) liferuss_opt( 'seo_description' );
 	if ( is_page_template( 'templates/freight.php' ) && liferuss_opt( 'freight_seo_description' ) ) {
-		$desc = liferuss_opt( 'freight_seo_description' );
+		$desc = (string) liferuss_opt( 'freight_seo_description' );
 	} elseif ( is_page_template( 'templates/trade.php' ) && liferuss_opt( 'trade_seo_description' ) ) {
-		$desc = liferuss_opt( 'trade_seo_description' );
+		$desc = (string) liferuss_opt( 'trade_seo_description' );
 	} elseif ( is_page_template( 'templates/path.php' ) || is_singular( 'lr_scholarship' ) ) {
 		$custom = (string) get_post_meta( get_queried_object_id(), '_lr_seo_description', true );
 		$lead   = (string) get_post_meta( get_queried_object_id(), '_lr_lead', true );
@@ -103,8 +227,28 @@ function liferuss_head_meta() {
 			$desc = wp_strip_all_tags( $excerpt );
 		}
 	}
+	return (string) $desc;
+}
+
+/**
+ * Canonical URL, unfiltered for catalog filters.
+ */
+function liferuss_seo_canonical() {
+	if ( function_exists( 'liferuss_catalog_is_filtered' ) && liferuss_catalog_is_filtered() ) {
+		return liferuss_catalog_canonical();
+	}
+	return liferuss_current_canonical();
+}
+
+/**
+ * Meta, OG, Twitter, hreflang, per-language canonical.
+ */
+function liferuss_head_meta() {
+	$lang = liferuss_current_lang();
+	$meta = liferuss_languages()[ $lang ];
+	$desc = liferuss_seo_description();
 	$og_desc = liferuss_opt( 'seo_og_description', $desc );
-	$url     = liferuss_current_canonical();
+	$url     = liferuss_seo_canonical();
 	$title   = wp_get_document_title();
 	$og_title = liferuss_opt( 'seo_og_title', $title );
 	if ( ! is_front_page() ) {
@@ -114,20 +258,26 @@ function liferuss_head_meta() {
 	$og_id = absint( liferuss_opt( 'og_image_id', 0 ) );
 	$image = $og_id ? wp_get_attachment_image_url( $og_id, 'liferuss-wide' ) : liferuss_img( 'st-basil.jpg' );
 	$brand = liferuss_brand();
+	$rank  = liferuss_rank_math_active();
 
-	$robots = 'index, follow';
-	if ( function_exists( 'liferuss_catalog_is_filtered' ) && liferuss_catalog_is_filtered() ) {
-		$robots = 'noindex, follow';
-		$url    = liferuss_catalog_canonical();
+	if ( ! $rank ) {
+		$robots = liferuss_should_noindex() ? 'noindex, follow' : 'index, follow';
+		echo '<meta name="description" content="' . esc_attr( $desc ) . '">' . "\n";
+		echo '<meta name="robots" content="' . esc_attr( $robots ) . '">' . "\n";
+		echo '<link rel="canonical" href="' . esc_url( $url ) . '">' . "\n";
 	}
-	echo '<meta name="description" content="' . esc_attr( $desc ) . '">' . "\n";
-	echo '<meta name="robots" content="' . esc_attr( $robots ) . '">' . "\n";
-	echo '<link rel="canonical" href="' . esc_url( $url ) . '">' . "\n";
 
-	foreach ( liferuss_languages() as $code => $info ) {
-		echo '<link rel="alternate" hreflang="' . esc_attr( $info['hreflang'] ) . '" href="' . esc_url( liferuss_current_canonical( $code ) ) . '">' . "\n";
+	if ( ! function_exists( 'pll_current_language' ) ) {
+		foreach ( liferuss_complete_langs() as $code ) {
+			$info = liferuss_languages()[ $code ];
+			echo '<link rel="alternate" hreflang="' . esc_attr( $info['hreflang'] ) . '" href="' . esc_url( liferuss_current_canonical( $code ) ) . '">' . "\n";
+		}
+		echo '<link rel="alternate" hreflang="x-default" href="' . esc_url( liferuss_current_canonical( 'fa' ) ) . '">' . "\n";
 	}
-	echo '<link rel="alternate" hreflang="x-default" href="' . esc_url( liferuss_current_canonical( 'fa' ) ) . '">' . "\n";
+
+	if ( $rank ) {
+		return;
+	}
 
 	echo '<meta property="og:locale" content="' . esc_attr( $meta['og_locale'] ) . '">' . "\n";
 	foreach ( liferuss_languages() as $code => $info ) {
@@ -161,6 +311,9 @@ add_action( 'wp', 'liferuss_disable_core_canonical' );
  * JSON-LD graphs in the active language.
  */
 function liferuss_json_ld() {
+	if ( liferuss_rank_math_active() && ! is_front_page() ) {
+		return;
+	}
 	$lang    = liferuss_current_lang();
 	$meta    = liferuss_languages()[ $lang ];
 	$brand   = liferuss_opt( 'org_name', liferuss_brand() );
@@ -225,7 +378,7 @@ function liferuss_json_ld() {
 		),
 	);
 
-	$graph = array( $org, $website );
+	$graph = liferuss_rank_math_active() ? array() : array( $org, $website );
 
 	if ( is_front_page() ) {
 		$offers = array();
@@ -366,6 +519,9 @@ function liferuss_breadcrumbs() {
 	}
 	echo '</ol></nav>';
 
+	if ( liferuss_rank_math_active() ) {
+		return;
+	}
 	$list = array();
 	foreach ( $items as $i => $item ) {
 		$list[] = array(
@@ -478,6 +634,9 @@ add_action( 'template_redirect', 'liferuss_llms_txt', 0 );
  * @param WP_Sitemaps $wp_sitemaps Server.
  */
 function liferuss_register_sitemap_provider( $wp_sitemaps ) {
+	if ( liferuss_rank_math_active() || function_exists( 'pll_current_language' ) ) {
+		return;
+	}
 	require_once LIFERUSS_DIR . '/inc/sitemap-provider.php';
 	$wp_sitemaps->registry->add_provider( 'langs', new LifeRuss_Sitemap_Provider() );
 }
@@ -502,7 +661,8 @@ function liferuss_sitemap_page_entry( $entry, $post ) {
 		$path = '/';
 	}
 	$alternates = array();
-	foreach ( liferuss_languages() as $code => $info ) {
+	foreach ( liferuss_complete_langs() as $code ) {
+		$info         = liferuss_languages()[ $code ];
 		$alternates[] = array(
 			'hreflang' => $info['hreflang'],
 			'loc'      => liferuss_url( $path, $code ),
@@ -511,4 +671,63 @@ function liferuss_sitemap_page_entry( $entry, $post ) {
 	$entry['alternates'] = $alternates;
 	return $entry;
 }
+
+/**
+ * Published posts only, and not rows flagged noindex.
+ *
+ * @param array<string, mixed> $args      Query args.
+ * @param string               $post_type Post type.
+ * @return array<string, mixed>
+ */
+function liferuss_sitemap_query_args( $args, $post_type ) {
+	unset( $post_type );
+	$args['post_status'] = 'publish';
+	$exclude             = liferuss_sitemap_excluded_ids();
+	if ( $exclude ) {
+		$args['post__not_in'] = array_values( array_unique( array_merge( (array) ( $args['post__not_in'] ?? array() ), $exclude ) ) );
+	}
+	return $args;
+}
+
+/**
+ * Published noindex rows and incomplete Polylang translations.
+ *
+ * Soft-deleted catalog rows are trashed posts, which the publish query already drops.
+ *
+ * @return int[]
+ */
+function liferuss_sitemap_excluded_ids() {
+	global $wpdb;
+	$ids = $wpdb->get_col( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_lr_noindex' AND meta_value = '1'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	$ids = is_array( $ids ) ? $ids : array();
+	if ( function_exists( 'pll_languages_list' ) && ! liferuss_index_incomplete() ) {
+		$more = $wpdb->get_col(
+			"SELECT p.ID FROM {$wpdb->posts} p
+			INNER JOIN {$wpdb->term_relationships} tr ON tr.object_id = p.ID
+			INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id AND tt.taxonomy = 'language'
+			INNER JOIN {$wpdb->terms} t ON t.term_id = tt.term_id AND t.slug <> 'fa'
+			LEFT JOIN {$wpdb->postmeta} m ON m.post_id = p.ID AND m.meta_key = '_lr_translation_complete' AND m.meta_value = '1'
+			WHERE p.post_status = 'publish' AND m.meta_id IS NULL"
+		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		if ( is_array( $more ) ) {
+			$ids = array_merge( $ids, $more );
+		}
+	}
+	return array_map( 'absint', array_unique( $ids ) );
+}
+add_filter( 'wp_sitemaps_posts_query_args', 'liferuss_sitemap_query_args', 10, 2 );
+
+/**
+ * Point robots.txt at the core sitemap when Rank Math is not providing one.
+ *
+ * @param string $output Existing robots.
+ * @param bool   $public Whether the site is public.
+ */
+function liferuss_robots_txt( $output, $public ) {
+	if ( ! $public || liferuss_rank_math_active() || str_contains( $output, 'Sitemap:' ) ) {
+		return $output;
+	}
+	return trim( $output ) . "\nSitemap: " . esc_url_raw( home_url( '/wp-sitemap.xml' ) ) . "\n";
+}
+add_filter( 'robots_txt', 'liferuss_robots_txt', 20, 2 );
 add_filter( 'wp_sitemaps_posts_entry', 'liferuss_sitemap_page_entry', 10, 2 );

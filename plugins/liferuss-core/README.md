@@ -1,8 +1,8 @@
 # لایف‌روس — هسته / LifeRuss Core
 
-نسخهٔ ۱.۴.۰. هسته جدول‌ها، کاتالوگ، CRM، مسیر تحصیل، و اجرای ریدایرکت فرانت را دارد. اسکیمای پایگاه همان ۱.۰.۰ است.
+نسخهٔ ۱.۵.۰. هسته جدول‌ها، کاتالوگ، CRM، مسیر تحصیل، ریدایرکت، پایش ۴۰۴، ورود دومرحله‌ای، و پل Rank Math / Polylang را دارد. اسکیمای پایگاه ۱.۱.۰ است (`lr_not_found`).
 
-Version 1.4.0. Core ships the tables, catalog, CRM, study-path fields, and the front-end redirect runner. The database schema stays at 1.0.0.
+Version 1.5.0. Core ships the tables, catalog, CRM, study paths, redirects, the 404 monitor, TOTP login, and the Rank Math / Polylang bridges. The database schema is 1.1.0 (`lr_not_found`).
 
 ## نصب / Install
 
@@ -34,6 +34,7 @@ All use the `{wpdb prefix}lr_` prefix, InnoDB. Physical foreign keys exist only 
 
 - `lr_activity_logs` (فقط افزودنی، بدون `deleted_at`)
 - `lr_redirects`
+- `lr_not_found` (بدون `deleted_at`؛ پاک‌سازی با کرون)
 - `lr_translations` (بدون `deleted_at`)
 - `lr_relations` (بدون `deleted_at`)
 - `lr_view_stats_daily` (کلید مرکب، بدون حذف نرم)

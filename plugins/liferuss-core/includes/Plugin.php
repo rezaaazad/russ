@@ -10,6 +10,7 @@ namespace LifeRuss\Core;
 use LifeRuss\Core\Admin\Assets;
 use LifeRuss\Core\Admin\LeadAdmin;
 use LifeRuss\Core\Admin\Menu;
+use LifeRuss\Core\Admin\NotFoundScreen;
 use LifeRuss\Core\Admin\RedirectScreen;
 use LifeRuss\Core\Catalog\Demo;
 use LifeRuss\Core\Catalog\Editor;
@@ -25,12 +26,17 @@ use LifeRuss\Core\CRM\Intake;
 use LifeRuss\Core\CRM\Notifier;
 use LifeRuss\Core\CRM\Purge;
 use LifeRuss\Core\Database\Migrator;
+use LifeRuss\Core\I18n\Polylang;
+use LifeRuss\Core\Monitor\NotFound;
 use LifeRuss\Core\PostTypes\PostTypeRegistrar;
 use LifeRuss\Core\PostTypes\RequestGuard;
 use LifeRuss\Core\PostTypes\ShadowSync;
 use LifeRuss\Core\PostTypes\TaxonomyRegistrar;
 use LifeRuss\Core\Roles\LimitedAdmin;
 use LifeRuss\Core\Roles\RoleRegistrar;
+use LifeRuss\Core\Security\Hardening;
+use LifeRuss\Core\Security\TwoFactor;
+use LifeRuss\Core\Seo\RankMath;
 use LifeRuss\Core\Settings\SettingsPage;
 use LifeRuss\Core\Users\Profile;
 
@@ -67,6 +73,11 @@ class Plugin {
 		ContentSeed::hooks();
 		ServiceSeed::hooks();
 		Runner::hooks();
+		NotFound::hooks();
+		TwoFactor::hooks();
+		Hardening::hooks();
+		RankMath::hooks();
+		Polylang::hooks();
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			CrmCli::hooks();
@@ -76,6 +87,7 @@ class Plugin {
 		if ( is_admin() ) {
 			Menu::hooks();
 			RedirectScreen::hooks();
+			NotFoundScreen::hooks();
 			LeadAdmin::hooks();
 			SettingsPage::hooks();
 			Assets::hooks();

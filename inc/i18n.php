@@ -80,7 +80,26 @@ function liferuss_is_valid_lang( $lang ) {
 }
 
 /**
+ * Copy the Polylang language into the theme helpers without rewriting the request.
+ *
+ * @param string $slug Language slug.
+ * @param mixed  $lang Language object, unused.
+ */
+function liferuss_apply_polylang( $slug = '', $lang = null ) {
+	unset( $lang );
+	$code = is_string( $slug ) ? $slug : '';
+	if ( '' === $code && function_exists( 'pll_current_language' ) ) {
+		$code = (string) pll_current_language( 'slug' );
+	}
+	if ( liferuss_is_valid_lang( $code ) ) {
+		$GLOBALS['liferuss_lang'] = $code;
+	}
+}
+
+/**
  * Detect and strip /en|/ru|/ar prefixes before WordPress routes the request.
+ *
+ * Polylang owns the URL when it is active, so the request is left intact.
  */
 function liferuss_boot_language() {
 	static $booted = false;
@@ -129,6 +148,20 @@ function liferuss_boot_language() {
 		if ( '' === $rel ) {
 			$rel = '/';
 		}
+	}
+
+	if ( function_exists( 'pll_current_language' ) ) {
+		liferuss_apply_polylang();
+		if ( ! has_action( 'pll_language_defined', 'liferuss_apply_polylang' ) ) {
+			add_action( 'pll_language_defined', 'liferuss_apply_polylang', 1, 2 );
+		}
+		if ( preg_match( '#^/(en|ru|ar)(/.*)?$#', $rel, $pll_match ) ) {
+			$rest                     = isset( $pll_match[2] ) && '' !== $pll_match[2] ? $pll_match[2] : '/';
+			$GLOBALS['liferuss_path'] = $rest;
+		} else {
+			$GLOBALS['liferuss_path'] = $rel ? $rel : '/';
+		}
+		return;
 	}
 
 	if ( preg_match( '#^/(en|ru|ar)(/.*)?$#', $rel, $match ) ) {
@@ -226,6 +259,12 @@ function liferuss_url( $path = '/', $lang = null ) {
 	}
 	if ( '' === $path || '/index.php' === $path ) {
 		$path = '/';
+	}
+	if ( function_exists( 'pll_home_url' ) ) {
+		$base = untrailingslashit( (string) pll_home_url( $lang ) );
+		if ( $base ) {
+			return $base . ( '/' === $path ? '/' : $path );
+		}
 	}
 	$home   = untrailingslashit( home_url( '/' ) );
 	$prefix = liferuss_languages()[ $lang ]['prefix'];

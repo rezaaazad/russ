@@ -3,7 +3,7 @@
  * Plugin Name: لایف‌روس — هسته
  * Plugin URI: https://liferuss.com
  * Description: هستهٔ پلتفرم LifeRuss: جداول سفارشی، کاتالوگ دانشگاه، نقش‌ها، CRM لیدها و دریافت فرم.
- * Version: 1.4.0
+ * Version: 1.5.0
  * Requires at least: 6.4
  * Requires PHP: 8.1
  * Author: LifeRuss
@@ -16,8 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_CORE_VERSION', '1.4.0' );
-define( 'LIFERUSS_CORE_DB_VERSION', '1.0.0' );
+define( 'LIFERUSS_CORE_VERSION', '1.5.0' );
+define( 'LIFERUSS_CORE_DB_VERSION', '1.1.0' );
 define( 'LIFERUSS_CORE_FILE', __FILE__ );
 define( 'LIFERUSS_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'LIFERUSS_CORE_URL', plugin_dir_url( __FILE__ ) );
