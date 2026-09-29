@@ -74,10 +74,17 @@ function liferuss_document_title( $parts ) {
 add_filter( 'document_title_parts', 'liferuss_document_title' );
 
 /**
- * Rank Math owns the generic tags when it is loaded.
+ * Rank Math is printing the front-end head on this request.
+ *
+ * The plugin constant alone is not enough: until registration is skipped or
+ * the site is connected, Rank Math does not boot its head, and our tags stay.
  */
 function liferuss_rank_math_active() {
-	return defined( 'RANK_MATH_VERSION' );
+	if ( ! defined( 'RANK_MATH_VERSION' ) || ! function_exists( 'rank_math' ) ) {
+		return false;
+	}
+	$plugin = rank_math();
+	return is_object( $plugin ) && ! empty( $plugin->head );
 }
 
 /**
@@ -519,9 +526,6 @@ function liferuss_breadcrumbs() {
 	}
 	echo '</ol></nav>';
 
-	if ( liferuss_rank_math_active() ) {
-		return;
-	}
 	$list = array();
 	foreach ( $items as $i => $item ) {
 		$list[] = array(
@@ -643,36 +647,6 @@ function liferuss_register_sitemap_provider( $wp_sitemaps ) {
 add_action( 'wp_sitemaps_init', 'liferuss_register_sitemap_provider' );
 
 /**
- * Also add hreflang-style alternates onto core page sitemap entries.
- *
- * @param array  $entry Entry.
- * @param object $post  Post.
- * @return array
- */
-function liferuss_sitemap_page_entry( $entry, $post ) {
-	if ( empty( $entry['loc'] ) ) {
-		return $entry;
-	}
-	$path = (string) wp_parse_url( $entry['loc'], PHP_URL_PATH );
-	if ( preg_match( '#^/(en|ru|ar)(/.*)?$#', $path, $match ) ) {
-		$path = isset( $match[2] ) && '' !== $match[2] ? $match[2] : '/';
-	}
-	if ( ! $path ) {
-		$path = '/';
-	}
-	$alternates = array();
-	foreach ( liferuss_complete_langs() as $code ) {
-		$info         = liferuss_languages()[ $code ];
-		$alternates[] = array(
-			'hreflang' => $info['hreflang'],
-			'loc'      => liferuss_url( $path, $code ),
-		);
-	}
-	$entry['alternates'] = $alternates;
-	return $entry;
-}
-
-/**
  * Published posts only, and not rows flagged noindex.
  *
  * @param array<string, mixed> $args      Query args.
@@ -730,4 +704,3 @@ function liferuss_robots_txt( $output, $public ) {
 	return trim( $output ) . "\nSitemap: " . esc_url_raw( home_url( '/wp-sitemap.xml' ) ) . "\n";
 }
 add_filter( 'robots_txt', 'liferuss_robots_txt', 20, 2 );
-add_filter( 'wp_sitemaps_posts_entry', 'liferuss_sitemap_page_entry', 10, 2 );

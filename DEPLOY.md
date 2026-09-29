@@ -20,10 +20,10 @@ Theme 1.6.0 and core plugin 1.5.0 (database 1.1.0). Rank Math and Polylang are o
 
 ## Rank Math
 
-- عنوان، توضیح، canonical، robots و OG از فیلدهای لایف‌روس به Rank Math می‌روند. قالب همان برچسب‌ها را دوباره چاپ نمی‌کند.
-- JSON-LD تخصصی (مقاله، خدمت، FAQ، دانشگاه) مال قالب می‌ماند و کپی Rank Math برای همان نوع‌ها حذف می‌شود. BreadcrumbList را Rank Math چاپ می‌کند و قالب فقط ردپای HTML را نگه می‌دارد.
+- عنوان، توضیح، canonical، robots و OG از فیلدهای لایف‌روس به Rank Math می‌روند. وقتی هد Rank Math واقعاً بالا آمده باشد، قالب همان برچسب‌ها را دوباره چاپ نمی‌کند.
+- JSON-LD تخصصی (مقاله، خدمت، FAQ، دانشگاه، BreadcrumbList) مال قالب می‌ماند و کپی Rank Math برای همان نوع‌ها حذف می‌شود. ردپای HTML هم مال قالب است. تا وقتی نصب Rank Math تمام نشده (اتصال یا رد شدن از ثبت)، برچسب‌های خودمان چاپ می‌شوند.
 - نوع‌های عمومی `lr_university`، `lr_field`، `lr_city`، `lr_guide`، `lr_course`، `lr_lesson` و `lr_scholarship` در نقشهٔ Rank Math هستند. `lr_faq` و `lr_testimonial` نیستند. نوشتهٔ noindex، پیش‌نویس، و آرشیو فیلترشده یا صفحه‌بندی‌شده حذف می‌شوند.
-- وقتی Rank Math فعال است، نقشهٔ هستهٔ وردپرس خاموش است و خط Sitemap در robots.txt را Rank Math می‌نویسد.
+- وقتی Rank Math فعال است، نقشهٔ هستهٔ وردپرس خاموش است و خط Sitemap در robots.txt را Rank Math می‌نویسد. بعد از فعال‌سازی، پیوندهای یکتا را یک‌بار ذخیره کنید تا `sitemap_index.xml` به جای ۳۰۱ به خانه، XML برگرداند.
 
 ## Polylang
 

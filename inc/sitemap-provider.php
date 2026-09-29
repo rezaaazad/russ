@@ -53,19 +53,9 @@ class LifeRuss_Sitemap_Provider extends WP_Sitemaps_Provider {
 		unset( $page_num, $object_subtype );
 		$entries = array();
 		foreach ( $this->paths() as $path ) {
-			$langs = $this->complete_langs( $path );
-			$alternates = array();
-			foreach ( $langs as $alt ) {
-				$info         = liferuss_languages()[ $alt ];
-				$alternates[] = array(
-					'hreflang' => $info['hreflang'],
-					'loc'      => liferuss_url( $path, $alt ),
-				);
-			}
-			foreach ( $langs as $code ) {
+			foreach ( $this->complete_langs( $path ) as $code ) {
 				$entries[] = array(
-					'loc'        => liferuss_url( $path, $code ),
-					'alternates' => $alternates,
+					'loc' => liferuss_url( $path, $code ),
 				);
 			}
 		}

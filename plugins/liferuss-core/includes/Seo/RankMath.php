@@ -120,7 +120,7 @@ class RankMath {
 			}
 			$type = $node['@type'] ?? '';
 			$type = is_array( $type ) ? implode( ',', $type ) : (string) $type;
-			if ( preg_match( '/Article|BlogPosting|Course|FAQPage|Service|CollegeOrUniversity|MonetaryGrant|ItemList/', $type ) ) {
+			if ( preg_match( '/Article|BlogPosting|Course|FAQPage|Service|CollegeOrUniversity|MonetaryGrant|ItemList|BreadcrumbList/', $type ) ) {
 				unset( $data[ $key ] );
 			}
 		}
@@ -140,13 +140,17 @@ class RankMath {
 		if ( ! is_array( $url ) ) {
 			return $url;
 		}
+		$post_id = 0;
 		if ( $entry instanceof \WP_Post ) {
 			if ( 'publish' !== $entry->post_status ) {
 				return false;
 			}
-			if ( function_exists( 'liferuss_post_excluded_from_sitemap' ) && liferuss_post_excluded_from_sitemap( $entry->ID ) ) {
-				return false;
-			}
+			$post_id = (int) $entry->ID;
+		} elseif ( is_object( $entry ) && isset( $entry->ID ) ) {
+			$post_id = (int) $entry->ID;
+		}
+		if ( $post_id && function_exists( 'liferuss_post_excluded_from_sitemap' ) && liferuss_post_excluded_from_sitemap( $post_id ) ) {
+			return false;
 		}
 		return $url;
 	}
