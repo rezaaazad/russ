@@ -13,18 +13,24 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Put posts under /blog/ and move the three seeded titles to English slugs.
  */
 function liferuss_magazine_base() {
-	if ( get_option( 'liferuss_blog_base' ) ) {
+	if ( '2' === (string) get_option( 'liferuss_blog_base' ) ) {
 		return;
 	}
-	if ( '/blog/%postname%/' !== get_option( 'permalink_structure' ) ) {
-		update_option( 'permalink_structure', '/blog/%postname%/' );
-		update_option( 'category_base', 'blog/category' );
-		update_option( 'tag_base', 'blog/tag' );
-		flush_rewrite_rules( false );
+	global $wp_rewrite;
+	update_option( 'permalink_structure', '/blog/%postname%/' );
+	update_option( 'category_base', 'blog/category' );
+	update_option( 'tag_base', 'blog/tag' );
+	if ( $wp_rewrite instanceof WP_Rewrite ) {
+		$wp_rewrite->set_permalink_structure( '/blog/%postname%/' );
+		$wp_rewrite->set_category_base( 'blog/category' );
+		$wp_rewrite->set_tag_base( 'blog/tag' );
 	}
-	liferuss_magazine_terms();
-	liferuss_magazine_slugs();
-	update_option( 'liferuss_blog_base', '1', false );
+	flush_rewrite_rules( false );
+	if ( '1' !== (string) get_option( 'liferuss_blog_base' ) ) {
+		liferuss_magazine_terms();
+		liferuss_magazine_slugs();
+	}
+	update_option( 'liferuss_blog_base', '2', false );
 }
 add_action( 'init', 'liferuss_magazine_base', 42 );
 
@@ -200,7 +206,7 @@ function liferuss_toc_items() {
 			$items[] = array(
 				'level' => (int) $match[1],
 				'id'    => 'section-' . $count,
-				'text'  => wp_strip_all_tags( $match[3] ),
+				'text'  => wp_strip_all_tags( $match[2] ),
 			);
 		}
 	}
