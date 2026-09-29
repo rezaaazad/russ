@@ -78,6 +78,10 @@ class SettingsPage {
 				'label' => 'اتوماسیون CRM',
 				'cap'   => 'lr_manage_settings',
 			),
+			'account'       => array(
+				'label' => 'حساب مراجع',
+				'cap'   => 'lr_manage_settings',
+			),
 		);
 	}
 
@@ -458,6 +462,32 @@ class SettingsPage {
 				'followup_documents' => (string) absint( self::posted_text( 'followup_documents' ) ),
 				'followup_qualified' => (string) absint( self::posted_text( 'followup_qualified' ) ),
 				'daily_digest'       => isset( $_POST['daily_digest'] ) ? '1' : '0', // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			)
+		);
+	}
+
+	/**
+	 * Client account delivery.
+	 */
+	private static function fields_account(): void {
+		$v = Settings::get( 'account' );
+		echo '<tr><th scope="row"><label for="sms_provider">' . esc_html__( 'ارسال پیامک', 'liferuss-core' ) . '</label></th><td>';
+		echo '<select id="sms_provider" name="sms_provider">';
+		echo '<option value="stub"' . selected( 'stub', (string) $v['sms_provider'], false ) . '>' . esc_html__( 'آزمایشی — ثبت در گزارش، بدون اپراتور', 'liferuss-core' ) . '</option>';
+		echo '</select>';
+		echo '<p class="description">' . esc_html__( 'ورود با ایمیل از نامهٔ سایت استفاده می‌کند. پیامک از فیلتر liferuss_sms_send می‌گذرد و در غیر این صورت به این ارائه‌دهنده می‌رسد.', 'liferuss-core' ) . '</p>';
+		echo '</td></tr>';
+	}
+
+	/**
+	 * Save the SMS provider. Only the stub is built in.
+	 */
+	private static function save_account(): void {
+		$provider = sanitize_key( self::posted_text( 'sms_provider' ) );
+		Settings::update(
+			'account',
+			array(
+				'sms_provider' => 'stub' === $provider ? 'stub' : 'stub',
 			)
 		);
 	}

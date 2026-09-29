@@ -22,7 +22,19 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 		<p class="eyebrow"><?php echo esc_html( $row && ! empty( $row['city']['name_fa'] ) ? $row['city']['name_fa'] : liferuss_brand() ); ?></p>
 		<h1><?php the_title(); ?></h1>
 		<?php if ( $row ) : ?>
-			<p><button type="button" class="btn btn-ghost lr-compare-add" data-slug="<?php echo esc_attr( (string) $row['slug'] ); ?>" data-name="<?php echo esc_attr( (string) $row['name_fa'] ); ?>" aria-pressed="false">مقایسه</button></p>
+			<p class="lr-uni-actions">
+				<button type="button" class="btn btn-ghost lr-compare-add" data-slug="<?php echo esc_attr( (string) $row['slug'] ); ?>" data-name="<?php echo esc_attr( (string) $row['name_fa'] ); ?>" aria-pressed="false">مقایسه</button>
+				<?php if ( is_user_logged_in() ) : ?>
+					<form method="post" action="<?php echo esc_url( liferuss_url( '/account/saved/' ) ); ?>">
+						<?php wp_nonce_field( 'lr_account', 'lr_account_nonce' ); ?>
+						<input type="hidden" name="lr_account_action" value="save_uni">
+						<input type="hidden" name="slug" value="<?php echo esc_attr( (string) $row['slug'] ); ?>">
+						<button class="btn btn-ghost" type="submit">ذخیره در حساب</button>
+					</form>
+				<?php else : ?>
+					<a class="btn btn-ghost" href="<?php echo esc_url( liferuss_url( '/account/' ) ); ?>">ذخیره در حساب</a>
+				<?php endif; ?>
+			</p>
 		<?php endif; ?>
 		<?php liferuss_breadcrumbs(); ?>
 	</div>

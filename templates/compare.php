@@ -20,6 +20,14 @@ if ( ! empty( $data['slugs'] ) && is_array( $data['slugs'] ) ) {
 	<div class="container">
 		<p class="eyebrow"><?php echo esc_html( liferuss_brand() ); ?></p>
 		<h1><?php echo esc_html( (string) ( $data['title'] ?? 'مقایسه دانشگاه‌ها' ) ); ?></h1>
+		<?php if ( is_user_logged_in() && $slug ) : ?>
+			<form method="post" action="<?php echo esc_url( liferuss_url( '/account/saved/' ) ); ?>">
+				<?php wp_nonce_field( 'lr_account', 'lr_account_nonce' ); ?>
+				<input type="hidden" name="lr_account_action" value="save_uni">
+				<input type="hidden" name="slugs" value="<?php echo esc_attr( $slug ); ?>">
+				<button class="btn btn-ghost" type="submit">ذخیره در حساب</button>
+			</form>
+		<?php endif; ?>
 	</div>
 </header>
 <article class="section">

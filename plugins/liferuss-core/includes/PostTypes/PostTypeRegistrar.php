@@ -42,11 +42,12 @@ class PostTypeRegistrar {
 	 * Flush permalinks once per plugin version.
 	 */
 	public static function maybe_flush(): void {
-		if ( get_option( 'lr_rewrite_version' ) === LIFERUSS_CORE_VERSION ) {
+		$stamp = LIFERUSS_CORE_VERSION . '+' . LIFERUSS_CORE_DB_VERSION;
+		if ( get_option( 'lr_rewrite_version' ) === $stamp ) {
 			return;
 		}
 		flush_rewrite_rules( false );
-		update_option( 'lr_rewrite_version', LIFERUSS_CORE_VERSION, false );
+		update_option( 'lr_rewrite_version', $stamp, false );
 	}
 
 	/**

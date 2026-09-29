@@ -12,6 +12,7 @@ use LifeRuss\Core\Admin\LeadAdmin;
 use LifeRuss\Core\Admin\Menu;
 use LifeRuss\Core\Admin\NotFoundScreen;
 use LifeRuss\Core\Admin\RedirectScreen;
+use LifeRuss\Core\Account\Portal;
 use LifeRuss\Core\Admin\CompareScreen;
 use LifeRuss\Core\Catalog\Demo;
 use LifeRuss\Core\Catalog\Editor;
@@ -70,6 +71,7 @@ class Plugin {
 		Profile::hooks();
 		Intake::hooks();
 		Automation::hooks();
+		Portal::hooks();
 		Notifier::hooks();
 		Purge::hooks();
 		Files::hooks();

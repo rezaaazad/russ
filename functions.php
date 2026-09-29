@@ -108,6 +108,7 @@ function liferuss_assets() {
 		array(
 			'suggestUrl'  => rest_url( 'liferuss/v1/search/suggest' ),
 			'compareBase' => liferuss_url( '/compare/' ),
+			'uniBase'     => liferuss_url( '/universities/' ),
 			'strings'     => array(
 				'add'    => 'مقایسه',
 				'remove' => 'حذف از مقایسه',

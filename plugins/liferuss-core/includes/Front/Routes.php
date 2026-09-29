@@ -34,6 +34,11 @@ class Routes {
 		add_rewrite_rule( '^compare/?$', 'index.php?lr_compare=1', 'top' );
 		add_rewrite_rule( '^compare/([^/]+)/?$', 'index.php?lr_compare=1&lr_compare_slug=$matches[1]', 'top' );
 		add_rewrite_rule( '^search/?$', 'index.php?lr_find=1', 'top' );
+		add_rewrite_rule( '^account/?$', 'index.php?lr_account=dashboard', 'top' );
+		add_rewrite_rule( '^account/requests/?$', 'index.php?lr_account=requests', 'top' );
+		add_rewrite_rule( '^account/request/([0-9]+)/?$', 'index.php?lr_account=request&lr_account_id=$matches[1]', 'top' );
+		add_rewrite_rule( '^account/saved/?$', 'index.php?lr_account=saved', 'top' );
+		add_rewrite_rule( '^account/profile/?$', 'index.php?lr_account=profile', 'top' );
 	}
 
 	/**
@@ -46,6 +51,8 @@ class Routes {
 		$vars[] = 'lr_compare';
 		$vars[] = 'lr_compare_slug';
 		$vars[] = 'lr_find';
+		$vars[] = 'lr_account';
+		$vars[] = 'lr_account_id';
 		return $vars;
 	}
 
@@ -57,7 +64,7 @@ class Routes {
 	 */
 	public static function keep( $preempt, $query ) {
 		unset( $query );
-		if ( get_query_var( 'lr_compare' ) || get_query_var( 'lr_find' ) ) {
+		if ( get_query_var( 'lr_compare' ) || get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) ) {
 			return true;
 		}
 		return $preempt;
@@ -67,7 +74,7 @@ class Routes {
 	 * Send 200, or 404 when a curated slug does not exist.
 	 */
 	public static function status(): void {
-		if ( ! get_query_var( 'lr_compare' ) && ! get_query_var( 'lr_find' ) ) {
+		if ( ! get_query_var( 'lr_compare' ) && ! get_query_var( 'lr_find' ) && ! get_query_var( 'lr_account' ) ) {
 			return;
 		}
 		if ( get_query_var( 'lr_compare' ) && class_exists( '\LifeRuss\Core\Compare\Set' ) ) {
@@ -92,7 +99,7 @@ class Routes {
 	 * @return array<string, string>
 	 */
 	public static function cache_headers( array $headers ): array {
-		if ( get_query_var( 'lr_find' ) ) {
+		if ( get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) ) {
 			return array();
 		}
 		if ( get_query_var( 'lr_compare' ) && class_exists( '\LifeRuss\Core\Compare\Set' ) ) {

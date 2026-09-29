@@ -268,6 +268,9 @@ class Settings {
 				'api_key'      => '',
 				'index_prefix' => 'liferuss',
 			),
+			'account'       => array(
+				'sms_provider' => 'stub',
+			),
 			'crm'           => array(
 				'auto_assign'        => '1',
 				'sla_hours'          => '4',

@@ -146,7 +146,7 @@ function liferuss_complete_langs() {
  * noindex for filtered archives, paginated archives, explicit flags, and incomplete translations.
  */
 function liferuss_should_noindex() {
-	if ( get_query_var( 'lr_find' ) ) {
+	if ( get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) ) {
 		return true;
 	}
 	if ( get_query_var( 'lr_compare' ) && class_exists( '\LifeRuss\Core\Compare\Set' ) ) {
@@ -228,6 +228,9 @@ function liferuss_seo_description() {
 	if ( get_query_var( 'lr_find' ) ) {
 		return 'جستجو در دانشگاه‌ها، رشته‌ها، شهرها، بورسیه‌ها، دانستنی‌ها و مجله.';
 	}
+	if ( get_query_var( 'lr_account' ) ) {
+		return 'پیگیری درخواست، مدارک و گفتگو با مشاور.';
+	}
 	$desc = (string) liferuss_opt( 'seo_description' );
 	if ( is_page_template( 'templates/freight.php' ) && liferuss_opt( 'freight_seo_description' ) ) {
 		$desc = (string) liferuss_opt( 'freight_seo_description' );
@@ -264,6 +267,19 @@ function liferuss_seo_canonical() {
 		if ( ! empty( $data['canonical'] ) ) {
 			return (string) $data['canonical'];
 		}
+	}
+	if ( get_query_var( 'lr_account' ) ) {
+		$screen = (string) get_query_var( 'lr_account' );
+		$id     = absint( get_query_var( 'lr_account_id' ) );
+		if ( 'request' === $screen && $id ) {
+			return liferuss_url( '/account/request/' . $id . '/' );
+		}
+		$map = array(
+			'requests' => '/account/requests/',
+			'saved'    => '/account/saved/',
+			'profile'  => '/account/profile/',
+		);
+		return liferuss_url( $map[ $screen ] ?? '/account/' );
 	}
 	if ( get_query_var( 'lr_find' ) ) {
 		$url = liferuss_url( '/search/' );

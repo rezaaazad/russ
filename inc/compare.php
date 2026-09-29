@@ -24,6 +24,10 @@ function liferuss_front_template( $template ) {
 		$custom = locate_template( 'templates/find.php' );
 		return $custom ? $custom : $template;
 	}
+	if ( get_query_var( 'lr_account' ) ) {
+		$custom = locate_template( 'templates/account.php' );
+		return $custom ? $custom : $template;
+	}
 	return $template;
 }
 add_filter( 'template_include', 'liferuss_front_template' );
@@ -43,6 +47,9 @@ function liferuss_front_title( $parts ) {
 	}
 	if ( get_query_var( 'lr_find' ) ) {
 		$parts['title'] = 'جستجو';
+	}
+	if ( get_query_var( 'lr_account' ) ) {
+		$parts['title'] = 'حساب من';
 	}
 	return $parts;
 }

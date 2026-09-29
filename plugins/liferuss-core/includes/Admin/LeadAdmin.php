@@ -7,6 +7,7 @@
 
 namespace LifeRuss\Core\Admin;
 
+use LifeRuss\Core\Account\Portal;
 use LifeRuss\Core\CRM\Catalog;
 use LifeRuss\Core\CRM\Files;
 use LifeRuss\Core\CRM\Jalali;
@@ -255,6 +256,17 @@ class LeadAdmin {
 		submit_button( __( 'افزودن یادداشت', 'liferuss-core' ) );
 		echo '</form>';
 
+		echo '<h2>' . esc_html__( 'گفتگو با مراجع', 'liferuss-core' ) . '</h2><ul>';
+		foreach ( Portal::messages( $id ) as $message ) {
+			$author = get_userdata( (int) $message['author_id'] );
+			echo '<li><strong>' . esc_html( $author ? $author->display_name : __( 'مراجع', 'liferuss-core' ) ) . '</strong> ' . Jalali::html( (string) $message['created_at'] ) . '<br>' . esc_html( (string) $message['body'] ) . '</li>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Jalali::html() returns escaped markup.
+		}
+		echo '</ul><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		self::save_fields( $id, 'message' );
+		echo '<textarea name="message" rows="3" class="large-text"></textarea>';
+		submit_button( __( 'ارسال به مراجع', 'liferuss-core' ) );
+		echo '</form>';
+
 		echo '<h2>' . esc_html__( 'وظایف', 'liferuss-core' ) . '</h2><ul>';
 		foreach ( $tasks['items'] as $task ) {
 			echo '<li>' . esc_html( (string) $task['title'] ) . ' — ' . esc_html( (string) $task['status'] ) . ' — ' . Jalali::html( (string) $task['due_at'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Jalali::html() returns escaped markup.
@@ -341,6 +353,8 @@ class LeadAdmin {
 			LeadWriter::assign( $id, absint( self::posted( 'consultant_id' ) ) );
 		} elseif ( 'note' === $do ) {
 			LeadWriter::add_note( $id, self::posted_area( 'note' ) );
+		} elseif ( 'message' === $do ) {
+			Portal::add_message( $id, get_current_user_id(), self::posted_area( 'message' ) );
 		} elseif ( 'task' === $do ) {
 			$due = self::posted( 'task_due' );
 			$due = $due ? gmdate( 'Y-m-d H:i:s', strtotime( $due . ' UTC' ) ) : '';

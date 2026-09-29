@@ -290,6 +290,21 @@ class Tables {
 				),
 				'fks'     => array(),
 			),
+			'lead_messages'    => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'         => $id,
+					'lead_id'    => 'bigint(20) unsigned NOT NULL',
+					'author_id'  => 'bigint(20) unsigned NOT NULL DEFAULT 0',
+					'body'       => 'text NOT NULL',
+					'created_at' => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'KEY lead_created (lead_id, created_at)',
+				),
+				'fks'     => array(),
+			),
 		);
 	}
 

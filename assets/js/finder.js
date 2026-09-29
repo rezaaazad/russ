@@ -18,6 +18,41 @@
 		paint();
 	}
 
+	function paintAccount(items) {
+		var box = document.getElementById('lr-account-compare');
+		if (!box) {
+			return;
+		}
+		box.textContent = '';
+		if (!items.length) {
+			var empty = document.createElement('p');
+			empty.className = 'lr-empty';
+			empty.textContent = 'هنوز دانشگاهی برای مقایسه انتخاب نشده است.';
+			box.appendChild(empty);
+			return;
+		}
+		var list = document.createElement('ul');
+		list.className = 'lr-account-list';
+		items.forEach(function (item) {
+			var li = document.createElement('li');
+			var link = document.createElement('a');
+			var base = cfg.uniBase || '/universities/';
+			link.href = base + encodeURIComponent(item.slug) + '/';
+			link.textContent = item.name || item.slug;
+			li.appendChild(link);
+			list.appendChild(li);
+		});
+		box.appendChild(list);
+		if (items.length >= 2) {
+			var open = document.createElement('a');
+			open.className = 'btn btn-gold';
+			var compare = cfg.compareBase || '/compare/';
+			open.href = compare + (compare.indexOf('?') === -1 ? '?' : '&') + 'u=' + encodeURIComponent(items.map(function (item) { return item.slug; }).join(','));
+			open.textContent = 'مشاهده مقایسه';
+			box.appendChild(open);
+		}
+	}
+
 	function paint() {
 		var items = read();
 		var bar = document.getElementById('lr-compare-bar');
@@ -35,11 +70,13 @@
 		if (!items.length) {
 			bar.hidden = true;
 			document.body.classList.remove('has-compare-bar');
+			paintAccount(items);
 			return;
 		}
 		bar.hidden = false;
 		document.body.classList.add('has-compare-bar');
 		text.textContent = items.map(function (item) { return item.name; }).join('، ');
+		paintAccount(items);
 		if (items.length < 2) {
 			open.setAttribute('aria-disabled', 'true');
 			open.setAttribute('href', '#');

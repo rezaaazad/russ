@@ -62,6 +62,10 @@ class RoleCatalog {
 				'label' => 'اپراتور تجارت',
 				'caps'  => self::grant( self::operator( 'lr_manage_trade_requests' ) ),
 			),
+			'lr_client'            => array(
+				'label' => 'مراجع',
+				'caps'  => self::grant( array() ),
+			),
 		);
 	}
 
