@@ -51,6 +51,14 @@ class RequestGuard {
 		if ( '' === $path ) {
 			return $vars;
 		}
+		$parts = explode( '/', $path );
+		$head  = $parts[0];
+		if ( in_array( $head, array( 'en', 'ru', 'ar' ), true ) ) {
+			$head = $parts[1] ?? '';
+		}
+		if ( in_array( $head, array( 'universities', 'fields', 'cities' ), true ) ) {
+			return $vars;
+		}
 		$page = get_page_by_path( $path );
 		if ( $page instanceof \WP_Post && 'publish' === $page->post_status ) {
 			return array( 'page_id' => (int) $page->ID );

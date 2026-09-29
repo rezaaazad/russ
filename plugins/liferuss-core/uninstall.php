@@ -48,6 +48,9 @@ $lr_options = array(
 	'lr_leads_migration_cursor',
 	'lr_leads_migration_report',
 	'lr_last_notice',
+	'lr_catalog_gen',
+	'lr_import_report',
+	'lr_demo_catalog',
 );
 
 foreach ( $lr_options as $lr_option ) {

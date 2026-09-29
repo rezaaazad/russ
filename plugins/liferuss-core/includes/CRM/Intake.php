@@ -301,17 +301,18 @@ class Intake {
 			$lines[] = 'مقطع: ' . $level;
 		}
 		$map = array(
-			'consult_message' => 'پیام',
-			'consult_notes'   => 'توضیحات',
-			'consult_origin'  => 'مبدأ',
-			'consult_dest'    => 'مقصد',
-			'consult_product' => 'کالا',
-			'consult_qty'     => 'حجم',
-			'consult_specs'   => 'مشخصات',
-			'consult_weight'  => 'وزن',
-			'consult_dims'    => 'ابعاد',
-			'consult_value'   => 'ارزش',
-			'consult_amount'  => 'مبلغ',
+			'consult_university' => 'دانشگاه',
+			'consult_message'    => 'پیام',
+			'consult_notes'      => 'توضیحات',
+			'consult_origin'     => 'مبدأ',
+			'consult_dest'       => 'مقصد',
+			'consult_product'    => 'کالا',
+			'consult_qty'        => 'حجم',
+			'consult_specs'      => 'مشخصات',
+			'consult_weight'     => 'وزن',
+			'consult_dims'       => 'ابعاد',
+			'consult_value'      => 'ارزش',
+			'consult_amount'     => 'مبلغ',
 		);
 		foreach ( $map as $key => $label ) {
 			$value = 'consult_message' === $key || 'consult_notes' === $key ? self::area( $key ) : self::text( $key );

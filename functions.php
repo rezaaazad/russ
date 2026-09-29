@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.4.8' );
+define( 'LIFERUSS_VERSION', '1.4.9' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -25,6 +25,7 @@ require_once LIFERUSS_DIR . '/inc/customizer.php';
 require_once LIFERUSS_DIR . '/inc/consultation.php';
 require_once LIFERUSS_DIR . '/inc/setup.php';
 require_once LIFERUSS_DIR . '/inc/seo.php';
+require_once LIFERUSS_DIR . '/inc/catalog.php';
 require_once LIFERUSS_DIR . '/inc/admin-landings.php';
 require_once LIFERUSS_DIR . '/inc/admin-options.php';
 

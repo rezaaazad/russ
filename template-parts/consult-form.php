@@ -59,6 +59,9 @@ $heading   = is_front_page() ? 'h2' : 'h2';
 			<form class="consult-form" id="consult-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" novalidate>
 				<input type="hidden" name="action" value="liferuss_consult">
 				<input type="hidden" name="consult_type" value="consult">
+				<?php if ( ! empty( $GLOBALS['liferuss_consult_university'] ) ) : ?>
+					<input type="hidden" name="consult_university" value="<?php echo esc_attr( $GLOBALS['liferuss_consult_university'] ); ?>">
+				<?php endif; ?>
 				<input type="hidden" name="consult_lang" value="<?php echo esc_attr( liferuss_current_lang() ); ?>">
 				<input type="hidden" name="liferuss_nonce" value="<?php echo esc_attr( wp_create_nonce( 'liferuss_consult' ) ); ?>">
 				<div class="hp" aria-hidden="true">

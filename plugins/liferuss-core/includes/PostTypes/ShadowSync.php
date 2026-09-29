@@ -7,6 +7,7 @@
 
 namespace LifeRuss\Core\PostTypes;
 
+use LifeRuss\Core\Catalog\Store;
 use LifeRuss\Core\Repositories\Repository;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -210,6 +211,7 @@ class ShadowSync {
 				$data['last_verified_at'] = $now;
 			}
 			$repo->insert( $data );
+			Store::bump();
 			return;
 		}
 
@@ -222,6 +224,7 @@ class ShadowSync {
 				'deleted_at' => $trashed ? ( $row['deleted_at'] ? $row['deleted_at'] : $now ) : null,
 			)
 		);
+		Store::bump();
 	}
 
 	/**

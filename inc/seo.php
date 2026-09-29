@@ -71,6 +71,9 @@ function liferuss_head_meta() {
 		$desc = liferuss_opt( 'freight_seo_description' );
 	} elseif ( is_page_template( 'templates/trade.php' ) && liferuss_opt( 'trade_seo_description' ) ) {
 		$desc = liferuss_opt( 'trade_seo_description' );
+	} elseif ( is_singular( array( 'lr_university', 'lr_field', 'lr_city' ) ) ) {
+		$custom = get_post_meta( get_queried_object_id(), '_lr_seo_description', true );
+		$desc   = $custom ? $custom : wp_strip_all_tags( get_the_excerpt() );
 	} elseif ( is_singular() && ! is_front_page() ) {
 		$excerpt = get_the_excerpt();
 		if ( $excerpt ) {
@@ -89,8 +92,13 @@ function liferuss_head_meta() {
 	$image = $og_id ? wp_get_attachment_image_url( $og_id, 'liferuss-wide' ) : liferuss_img( 'st-basil.jpg' );
 	$brand = liferuss_brand();
 
+	$robots = 'index, follow';
+	if ( function_exists( 'liferuss_catalog_is_filtered' ) && liferuss_catalog_is_filtered() ) {
+		$robots = 'noindex, follow';
+		$url    = liferuss_catalog_canonical();
+	}
 	echo '<meta name="description" content="' . esc_attr( $desc ) . '">' . "\n";
-	echo '<meta name="robots" content="index, follow">' . "\n";
+	echo '<meta name="robots" content="' . esc_attr( $robots ) . '">' . "\n";
 	echo '<link rel="canonical" href="' . esc_url( $url ) . '">' . "\n";
 
 	foreach ( liferuss_languages() as $code => $info ) {
@@ -266,6 +274,20 @@ function liferuss_breadcrumbs() {
 		$items[] = array( 'label' => liferuss_t( 'crumb_search' ), 'url' => '' );
 	} elseif ( is_404() ) {
 		$items[] = array( 'label' => liferuss_t( 'crumb_404' ), 'url' => '' );
+	} else {
+		$catalog = array(
+			'lr_university' => array( 'دانشگاه‌ها', '/universities/' ),
+			'lr_field'      => array( 'رشته‌ها', '/fields/' ),
+			'lr_city'       => array( 'شهرها', '/cities/' ),
+		);
+		foreach ( $catalog as $type => $meta ) {
+			if ( is_post_type_archive( $type ) ) {
+				$items[] = array( 'label' => $meta[0], 'url' => '' );
+			} elseif ( is_singular( $type ) ) {
+				$items[] = array( 'label' => $meta[0], 'url' => liferuss_url( $meta[1] ) );
+				$items[] = array( 'label' => get_the_title(), 'url' => '' );
+			}
+		}
 	}
 
 	echo '<nav class="breadcrumbs" aria-label="' . esc_attr( liferuss_t( 'crumb_aria' ) ) . '"><ol>';

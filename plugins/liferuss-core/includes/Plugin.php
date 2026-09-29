@@ -10,7 +10,11 @@ namespace LifeRuss\Core;
 use LifeRuss\Core\Admin\Assets;
 use LifeRuss\Core\Admin\LeadAdmin;
 use LifeRuss\Core\Admin\Menu;
-use LifeRuss\Core\CRM\Cli;
+use LifeRuss\Core\Catalog\Demo;
+use LifeRuss\Core\Catalog\Editor;
+use LifeRuss\Core\Catalog\Rest;
+use LifeRuss\Core\CRM\Cli as CrmCli;
+use LifeRuss\Core\Catalog\Cli as CatalogCli;
 use LifeRuss\Core\CRM\Files;
 use LifeRuss\Core\CRM\Intake;
 use LifeRuss\Core\CRM\Notifier;
@@ -51,9 +55,13 @@ class Plugin {
 		Notifier::hooks();
 		Purge::hooks();
 		Files::hooks();
+		Rest::hooks();
+		Editor::hooks();
+		Demo::hooks();
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			Cli::hooks();
+			CrmCli::hooks();
+			CatalogCli::hooks();
 		}
 
 		if ( is_admin() ) {

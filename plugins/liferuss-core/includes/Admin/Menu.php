@@ -7,6 +7,8 @@
 
 namespace LifeRuss\Core\Admin;
 
+use LifeRuss\Core\Catalog\ImportScreen;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -55,7 +57,7 @@ class Menu {
 			array( 'lr-rankings', 'دانشگاه‌ها — رتبه‌بندی', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-prep', 'دانشگاه‌ها — پادفک و کورس', 'lr_manage_academic_data', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-intakes', 'دانشگاه‌ها — ورودی‌ها', 'lr_manage_academic_data', array( Screens::class, 'placeholder' ) ),
-			array( 'lr-uni-csv', 'دانشگاه‌ها — ورود/خروج CSV', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
+			array( 'lr-uni-csv', 'دانشگاه‌ها — ورود/خروج CSV', 'lr_manage_university_data', array( ImportScreen::class, 'render' ) ),
 			array( 'lr-stale', 'دانشگاه‌ها — نیازمند بررسی', 'lr_manage_university_data', array( Screens::class, 'stale' ) ),
 			array( 'lr-services', 'خدمات و فرم‌ها', 'lr_manage_services', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-redirects', 'سئو — ریدایرکت‌ها', 'lr_view_redirects', array( Screens::class, 'placeholder' ) ),
