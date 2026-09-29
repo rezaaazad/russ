@@ -143,7 +143,9 @@ class Editor {
 	 * @param int $post_id Post id.
 	 */
 	public static function save_page( int $post_id ): void {
-		check_admin_referer( 'lr_path_save', 'lr_path_nonce' );
+		if ( ! isset( $_POST['lr_path_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['lr_path_nonce'] ) ), 'lr_path_save' ) ) {
+			return;
+		}
 		if ( ! self::authorized( $post_id ) || empty( $_POST['lr_path_present'] ) ) {
 			return;
 		}
@@ -185,7 +187,9 @@ class Editor {
 	 * @param int $post_id Post id.
 	 */
 	public static function save_scholarship( int $post_id ): void {
-		check_admin_referer( 'lr_path_save', 'lr_path_nonce' );
+		if ( ! isset( $_POST['lr_path_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['lr_path_nonce'] ) ), 'lr_path_save' ) ) {
+			return;
+		}
 		if ( ! self::authorized( $post_id ) || empty( $_POST['lr_scholarship_present'] ) ) {
 			return;
 		}
@@ -273,7 +277,9 @@ class Editor {
 	 * @param int $post_id Post id.
 	 */
 	private static function save_links( int $post_id ): void {
-		check_admin_referer( 'lr_path_save', 'lr_path_nonce' );
+		if ( ! isset( $_POST['lr_path_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['lr_path_nonce'] ) ), 'lr_path_save' ) ) {
+			return;
+		}
 		foreach ( array( 'lr_faq_ids', 'lr_testimonial_ids', 'lr_guide_ids', 'lr_post_ids' ) as $key ) {
 			$raw = sanitize_text_field( wp_unslash( $_POST[ $key ] ?? '' ) );
 			$ids = array();
@@ -293,7 +299,9 @@ class Editor {
 	 * @param int $post_id Post id.
 	 */
 	private static function save_seo( int $post_id ): void {
-		check_admin_referer( 'lr_path_save', 'lr_path_nonce' );
+		if ( ! isset( $_POST['lr_path_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['lr_path_nonce'] ) ), 'lr_path_save' ) ) {
+			return;
+		}
 		if ( empty( $_POST['lr_seo_present'] ) || ! current_user_can( 'lr_edit_seo' ) ) {
 			return;
 		}

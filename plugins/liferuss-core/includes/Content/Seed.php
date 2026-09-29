@@ -29,7 +29,7 @@ class Seed {
 	 * Create draft pages, scholarships, and non-public FAQ rows.
 	 */
 	public static function maybe_seed(): void {
-		if ( get_option( 'lr_path_seed' ) ) {
+		if ( '2' === (string) get_option( 'lr_path_seed' ) ) {
 			return;
 		}
 		$faq     = self::note(
@@ -57,7 +57,7 @@ class Seed {
 		self::scholarship( 'university-grant', 'گرنت دانشگاه (نمونه)', 'پایان فروردین', 'تخفیف شهریه', 'پذیرش همان دانشگاه', $faq );
 		self::scholarship( 'open-doors', 'المپیاد درهای باز (نمونه)', 'آبان', 'شهریه رایگان', 'رتبه المپیاد', $faq );
 		self::prep();
-		update_option( 'lr_path_seed', '1', false );
+		update_option( 'lr_path_seed', '2', false );
 	}
 
 	/**
@@ -297,19 +297,22 @@ class Seed {
 	 */
 	private static function page( array $page, int $parent_id, int $faq, int $quote ): int {
 		$found = self::find_page( $page['slug'], $parent_id );
-		if ( $found ) {
+		if ( $found && 'templates/path.php' === get_post_meta( $found, '_wp_page_template', true ) ) {
 			return $found;
 		}
-		$id = (int) wp_insert_post(
-			array(
-				'post_type'    => 'page',
-				'post_status'  => 'draft',
-				'post_title'   => $page['title'],
-				'post_name'    => $page['slug'],
-				'post_parent'  => $parent_id,
-				'post_content' => '<p>محتوای نمونه. مدیر محتوا بخش‌ها، سؤال‌ها و فرم را از همین صفحه ویرایش می‌کند.</p>',
-			)
-		);
+		$id = $found;
+		if ( ! $id ) {
+			$id = (int) wp_insert_post(
+				array(
+					'post_type'    => 'page',
+					'post_status'  => 'draft',
+					'post_title'   => $page['title'],
+					'post_name'    => $page['slug'],
+					'post_parent'  => $parent_id,
+					'post_content' => '<p>محتوای نمونه. مدیر محتوا بخش‌ها، سؤال‌ها و فرم را از همین صفحه ویرایش می‌کند.</p>',
+				)
+			);
+		}
 		if ( $id < 1 ) {
 			return 0;
 		}
