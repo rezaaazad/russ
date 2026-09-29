@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<ruleset name="LifeRuss Core">
+	<description>WordPress coding standards for the LifeRuss core plugin.</description>
+
+	<file>.</file>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+
+	<arg value="s"/>
+	<arg name="extensions" value="php"/>
+
+	<config name="minimum_supported_wp_version" value="6.4"/>
+	<config name="testVersion" value="8.1-"/>
+
+	<rule ref="WordPress">
+		<exclude name="WordPress.Files.FileName"/>
+		<!-- Caps are granted through RoleCatalog::add_role(), which this sniff cannot see. -->
+		<exclude name="WordPress.WP.Capabilities"/>
+		<!-- Custom lr_* tables are queried with $wpdb->prepare(); object cache does not apply. -->
+		<exclude name="WordPress.DB.DirectDatabaseQuery"/>
+	</rule>
+</ruleset>

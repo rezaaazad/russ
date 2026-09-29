@@ -1,0 +1,49 @@
+.lr-wrap {
+	direction: rtl;
+	text-align: right;
+	font-family: Vazirmatn, Tahoma, sans-serif;
+}
+
+.lr-wrap h1,
+.lr-wrap .nav-tab,
+.lr-wrap .form-table th,
+.lr-wrap .widefat th,
+.lr-wrap .widefat td {
+	text-align: right;
+}
+
+.lr-kpis {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-top: 16px;
+}
+
+.lr-kpi {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	min-width: 160px;
+	padding: 16px 20px;
+}
+
+.lr-kpi span {
+	color: #50575e;
+	display: block;
+}
+
+.lr-kpi strong {
+	display: block;
+	font-size: 28px;
+	line-height: 1.3;
+	margin-top: 4px;
+}
+
+.lr-tabs {
+	margin: 16px 0;
+}
+
+.lr-wrap .tablenav .actions,
+.lr-wrap .search-box {
+	float: none;
+}
