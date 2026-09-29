@@ -301,8 +301,100 @@ p {
 }
 
 .nav-list a:hover,
-.nav-list .current-menu-item a {
+.nav-list .current-menu-item > a,
+.nav-list .menu-item-has-children:hover > a,
+.nav-list .menu-item-has-children:focus-within > a {
   color: var(--gold);
+}
+
+.nav-list .sub-menu {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  min-width: 220px;
+}
+
+@media (min-width: 861px) {
+  .menu-item--home {
+    display: none;
+  }
+
+  .nav-list > .menu-item {
+    position: relative;
+  }
+
+  .nav-list .sub-menu {
+    position: absolute;
+    z-index: 70;
+    top: calc(100% - 2px);
+    inset-inline-start: 0;
+    background: #fff;
+    color: var(--navy);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    padding: 8px;
+  }
+
+  .nav-list > .menu-item:hover > .sub-menu,
+  .nav-list > .menu-item:focus-within > .sub-menu {
+    display: block;
+  }
+
+  .nav-list .sub-menu a {
+    color: var(--navy);
+    padding: 8px 12px;
+    border-radius: 10px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-list .sub-menu a:hover,
+  .nav-list .sub-menu a:focus-visible {
+    background: var(--navy-soft);
+    color: var(--navy);
+  }
+
+  .nav-list > .menu-item > a {
+    font-size: 0.88rem;
+    padding: 8px 4px;
+  }
+}
+
+@media (max-width: 1280px) and (min-width: 861px) {
+  .header-search {
+    display: none;
+    position: absolute;
+    z-index: 60;
+    inset-inline: 0;
+    top: 100%;
+    padding: 12px 16px;
+    background: var(--navy-deep);
+  }
+
+  .header-search.is-open {
+    display: flex;
+  }
+
+  .header-search .lr-finder,
+  .header-search .lr-finder input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .header-search-toggle,
+  .header-search-close {
+    display: inline-flex;
+  }
+
+  .header-cta {
+    display: none;
+  }
+
+  .lr-finder {
+    min-width: 0;
+  }
 }
 
 .header-actions {
@@ -1790,6 +1882,26 @@ body.nav-open .nav-toggle-bars::after {
     min-height: 44px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     color: #fff;
+  }
+
+  .nav-list .sub-menu {
+    display: block;
+    position: static;
+    min-width: 0;
+    padding: 0 0 8px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .nav-list .sub-menu a {
+    font-weight: 500;
+    font-size: 0.92rem;
+    padding-inline-start: 16px;
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  .menu-item--home {
+    display: list-item;
   }
 
   .header-inner {

@@ -58,20 +58,8 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 
 		<nav class="site-nav" id="site-nav" aria-label="<?php echo esc_attr( liferuss_t( 'nav_aria' ) ); ?>">
 			<?php
-			// Assigned WP menu OR fallback — never both (avoids duplicate nav lists).
-			if ( has_nav_menu( 'primary' ) ) {
-				wp_nav_menu(
-					array(
-						'theme_location' => 'primary',
-						'container'      => false,
-						'menu_class'     => 'nav-list',
-						'fallback_cb'    => false,
-						'depth'          => 1,
-					)
-				);
-			} else {
-				liferuss_fallback_menu();
-			}
+			// Designed mega menu. A saved flat menu of 13 items overlaps the header at 1024–1440.
+			liferuss_fallback_menu();
 			?>
 		</nav>
 

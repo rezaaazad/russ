@@ -224,22 +224,96 @@ function liferuss_social_url( $value, $network ) {
  * @return array<int, array<string, string>>
  */
 function liferuss_default_nav_items() {
-	$blog = get_option( 'page_for_posts' ) ? get_permalink( get_option( 'page_for_posts' ) ) : liferuss_url( '/blog/' );
+	$flat = array();
+	foreach ( liferuss_nav_tree() as $item ) {
+		$flat[] = array(
+			'title' => $item['title'],
+			'url'   => $item['url'],
+		);
+		foreach ( $item['children'] as $child ) {
+			$flat[] = $child;
+		}
+	}
+	return $flat;
+}
+
+/**
+ * Grouped primary navigation. Top-level labels stay short so 1024px still fits.
+ *
+ * @return array<int, array{title: string, url: string, class: string, children: array<int, array{title: string, url: string}>}>
+ */
+function liferuss_nav_tree() {
+	$blog = get_option( 'page_for_posts' ) ? get_permalink( (int) get_option( 'page_for_posts' ) ) : liferuss_url( '/blog/' );
 	return array(
-		array( 'title' => liferuss_t( 'nav_home' ), 'url' => liferuss_home() ),
-		array( 'title' => liferuss_t( 'nav_about' ), 'url' => liferuss_url( '/about/' ) ),
-		array( 'title' => liferuss_t( 'nav_universities' ), 'url' => liferuss_url( '/universities/' ) ),
-		array( 'title' => liferuss_t( 'nav_study' ), 'url' => liferuss_url( '/study/' ) ),
-		array( 'title' => liferuss_t( 'nav_scholarships' ), 'url' => liferuss_url( '/scholarships/' ) ),
-		array( 'title' => liferuss_t( 'nav_podfak' ), 'url' => liferuss_url( '/podfak/' ) ),
-		array( 'title' => liferuss_t( 'nav_immigration' ), 'url' => liferuss_url( '/immigration/' ) ),
-		array( 'title' => liferuss_t( 'nav_services' ), 'url' => liferuss_url( '/services/' ) ),
-		array( 'title' => liferuss_t( 'nav_costs' ), 'url' => liferuss_url( '/costs/' ) ),
-		array( 'title' => liferuss_t( 'nav_blog' ), 'url' => $blog ),
-		array( 'title' => liferuss_t( 'nav_cargo' ), 'url' => liferuss_url( '/cargo/' ) ),
-		array( 'title' => liferuss_t( 'nav_guide' ), 'url' => liferuss_url( '/russia-guide/' ) ),
-		array( 'title' => liferuss_t( 'nav_trade' ), 'url' => liferuss_url( '/trade/' ) ),
-		array( 'title' => liferuss_t( 'nav_contact' ), 'url' => liferuss_url( '/contact/' ) ),
+		array(
+			'title'    => liferuss_t( 'nav_home' ),
+			'url'      => liferuss_home(),
+			'class'    => 'menu-item--home',
+			'children' => array(),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_study_menu' ),
+			'url'      => liferuss_url( '/study-russia/' ),
+			'class'    => '',
+			'children' => array(
+				array( 'title' => liferuss_t( 'nav_study' ), 'url' => liferuss_url( '/study-russia/' ) ),
+				array( 'title' => liferuss_t( 'nav_universities' ), 'url' => liferuss_url( '/universities/' ) ),
+				array( 'title' => liferuss_t( 'nav_fields' ), 'url' => liferuss_url( '/fields/' ) ),
+				array( 'title' => liferuss_t( 'nav_cities' ), 'url' => liferuss_url( '/cities/' ) ),
+				array( 'title' => liferuss_t( 'nav_compare' ), 'url' => liferuss_url( '/compare/' ) ),
+				array( 'title' => liferuss_t( 'nav_scholarships' ), 'url' => liferuss_url( '/scholarships/' ) ),
+				array( 'title' => liferuss_t( 'nav_podfak' ), 'url' => liferuss_url( '/padfak/' ) ),
+				array( 'title' => liferuss_t( 'nav_direct' ), 'url' => liferuss_url( '/direct-course/' ) ),
+				array( 'title' => liferuss_t( 'nav_costs' ), 'url' => liferuss_url( '/costs/' ) ),
+				array( 'title' => liferuss_t( 'nav_admission' ), 'url' => liferuss_url( '/admission/' ) ),
+			),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_services' ),
+			'url'      => liferuss_url( '/services/' ),
+			'class'    => '',
+			'children' => array(
+				array( 'title' => liferuss_t( 'nav_services' ), 'url' => liferuss_url( '/services/' ) ),
+				array( 'title' => liferuss_t( 'nav_exchange' ), 'url' => liferuss_url( '/exchange/' ) ),
+				array( 'title' => liferuss_t( 'nav_cargo' ), 'url' => liferuss_url( '/cargo/' ) ),
+				array( 'title' => liferuss_t( 'nav_trade' ), 'url' => liferuss_url( '/trade/' ) ),
+			),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_language' ),
+			'url'      => liferuss_url( '/russian-language/' ),
+			'class'    => '',
+			'children' => array(
+				array( 'title' => liferuss_t( 'nav_language_course' ), 'url' => liferuss_url( '/russian-language/' ) ),
+			),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_migration' ),
+			'url'      => liferuss_url( '/migration-russia/' ),
+			'class'    => '',
+			'children' => array(
+				array( 'title' => liferuss_t( 'nav_immigration' ), 'url' => liferuss_url( '/migration-russia/' ) ),
+				array( 'title' => liferuss_t( 'nav_guide' ), 'url' => liferuss_url( '/russia-guide/' ) ),
+			),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_magazine' ),
+			'url'      => $blog,
+			'class'    => '',
+			'children' => array(),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_about' ),
+			'url'      => liferuss_url( '/about/' ),
+			'class'    => '',
+			'children' => array(),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_contact' ),
+			'url'      => liferuss_url( '/contact/' ),
+			'class'    => '',
+			'children' => array(),
+		),
 	);
 }
 
@@ -338,12 +412,33 @@ function liferuss_icon( $name ) {
  */
 function liferuss_fallback_menu() {
 	echo '<ul class="nav-list">';
-	foreach ( liferuss_default_nav_items() as $item ) {
+	foreach ( liferuss_nav_tree() as $item ) {
+		$children = $item['children'];
+		$classes  = 'menu-item';
+		if ( $item['class'] ) {
+			$classes .= ' ' . $item['class'];
+		}
+		if ( $children ) {
+			$classes .= ' menu-item-has-children';
+		}
+		echo '<li class="' . esc_attr( $classes ) . '">';
 		printf(
-			'<li class="menu-item"><a href="%s">%s</a></li>',
+			'<a href="%s">%s</a>',
 			esc_url( $item['url'] ),
 			esc_html( $item['title'] )
 		);
+		if ( $children ) {
+			echo '<ul class="sub-menu">';
+			foreach ( $children as $child ) {
+				printf(
+					'<li class="menu-item"><a href="%s">%s</a></li>',
+					esc_url( $child['url'] ),
+					esc_html( $child['title'] )
+				);
+			}
+			echo '</ul>';
+		}
+		echo '</li>';
 	}
 	echo '</ul>';
 }
