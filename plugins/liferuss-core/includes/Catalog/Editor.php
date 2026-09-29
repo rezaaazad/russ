@@ -358,55 +358,19 @@ class Editor {
 	}
 
 	/**
-	 * Program repeater. Rows beyond 40 stay in the database and are edited by CSV.
+	 * Link to the unlimited program screen.
 	 *
 	 * @param int                             $university_id University id.
-	 * @param array<int, array<string,mixed>> $fields        Field choices.
+	 * @param array<int, array<string,mixed>> $fields        Unused. The screen loads fields itself.
 	 */
 	private static function program_table( int $university_id, array $fields ): void {
+		unset( $fields );
 		global $wpdb;
 		$table = $wpdb->prefix . 'lr_university_fields';
-		$rows  = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM `{$table}` WHERE university_id = %d AND deleted_at IS NULL ORDER BY id ASC LIMIT 40",
-				$university_id
-			),
-			ARRAY_A
-		); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows  = is_array( $rows ) ? $rows : array();
 		$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$table}` WHERE university_id = %d AND deleted_at IS NULL", $university_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$url   = admin_url( 'admin.php?page=lr-programs&university=' . $university_id );
 		echo '<h3>رشته‌های ارائه‌شده</h3>';
-		if ( $total > 40 ) {
-			echo '<p>' . esc_html( (string) ( $total - 40 ) ) . ' رشتهٔ دیگر فقط از CSV ویرایش می‌شود.</p>';
-		}
-		echo '<table class="widefat"><thead><tr><th>رشته</th><th>مقطع</th><th>زبان</th><th>مدت</th><th>شهریه</th><th>ارز</th><th>سال</th></tr></thead><tbody>';
-		$rows[] = array();
-		foreach ( $rows as $index => $program ) {
-			echo '<tr><td><input type="hidden" name="lr_programs[' . (int) $index . '][id]" value="' . esc_attr( (string) ( $program['id'] ?? '' ) ) . '">';
-			echo '<select name="lr_programs[' . (int) $index . '][field_id]"><option value="">—</option>';
-			foreach ( $fields as $field ) {
-				printf(
-					'<option value="%d" %s>%s</option>',
-					(int) $field['id'],
-					selected( (int) ( $program['field_id'] ?? 0 ), (int) $field['id'], false ),
-					esc_html( $field['name_fa'] )
-				);
-			}
-			echo '</select></td><td><select name="lr_programs[' . (int) $index . '][degree]"><option value="">—</option>';
-			foreach ( self::degrees() as $value => $label ) {
-				printf( '<option value="%s" %s>%s</option>', esc_attr( $value ), selected( (string) ( $program['degree'] ?? '' ), $value, false ), esc_html( $label ) );
-			}
-			echo '</select></td><td><select name="lr_programs[' . (int) $index . '][language]">';
-			foreach ( self::languages() as $value => $label ) {
-				printf( '<option value="%s" %s>%s</option>', esc_attr( $value ), selected( (string) ( $program['language'] ?? 'ru' ), $value, false ), esc_html( $label ) );
-			}
-			echo '</select></td>';
-			echo '<td><input type="number" step="0.1" name="lr_programs[' . (int) $index . '][duration]" value="' . esc_attr( (string) ( $program['duration_years'] ?? '' ) ) . '"></td>';
-			echo '<td><input type="number" step="0.01" name="lr_programs[' . (int) $index . '][tuition]" value="' . esc_attr( (string) ( $program['tuition'] ?? '' ) ) . '"></td>';
-			echo '<td><input name="lr_programs[' . (int) $index . '][currency]" maxlength="3" value="' . esc_attr( (string) ( $program['currency'] ?? 'RUB' ) ) . '"></td>';
-			echo '<td><input name="lr_programs[' . (int) $index . '][year]" maxlength="9" value="' . esc_attr( (string) ( $program['academic_year'] ?? '' ) ) . '"></td></tr>';
-		}
-		echo '</tbody></table>';
+		echo '<p><a class="button" href="' . esc_url( $url ) . '">' . esc_html( sprintf( 'ویرایش %d رشته', $total ) ) . '</a></p>';
 	}
 
 	/**
@@ -536,19 +500,20 @@ class Editor {
 	}
 
 	/**
-	 * Upsert the displayed program rows. Programs past the first 40 are left alone.
+	 * Upsert posted program rows. There is no row cap.
 	 *
 	 * @param int $university_id University id.
 	 */
 	private static function save_programs( int $university_id ): void {
 		check_admin_referer( 'lr_catalog_save', 'lr_catalog_nonce' );
+		if ( ! isset( $_POST['lr_programs'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return;
+		}
 		$posted = self::posted_array( 'lr_programs' );
-		$seen   = 0;
 		foreach ( $posted as $item ) {
-			if ( $seen >= 40 || ! is_array( $item ) ) {
+			if ( ! is_array( $item ) ) {
 				continue;
 			}
-			++$seen;
 			$field_id = absint( $item['field_id'] ?? 0 );
 			$degree   = sanitize_key( (string) ( $item['degree'] ?? '' ) );
 			$existing = absint( $item['id'] ?? 0 );

@@ -20,6 +20,7 @@ use LifeRuss\Core\Course\Seed as CourseSeed;
 use LifeRuss\Core\Admin\CompareScreen;
 use LifeRuss\Core\Catalog\Demo;
 use LifeRuss\Core\Catalog\Editor;
+use LifeRuss\Core\Catalog\ProgramsScreen;
 use LifeRuss\Core\Catalog\Rest;
 use LifeRuss\Core\Front\Api;
 use LifeRuss\Core\Front\Routes;
@@ -118,6 +119,7 @@ class Plugin {
 			CompareScreen::hooks();
 			LeadAdmin::hooks();
 			PaymentAdmin::hooks();
+			ProgramsScreen::hooks();
 			Kanban::hooks();
 			SettingsPage::hooks();
 			Assets::hooks();

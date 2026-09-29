@@ -56,6 +56,7 @@ class Menu {
 			array( 'lr-req-immigration', 'درخواست‌ها — مهاجرت', 'lr_manage_immigration_requests', array( LeadAdmin::class, 'immigration' ) ),
 			array( 'lr-universities', 'دانشگاه‌ها — داده‌ها', 'lr_view_university_data', array( Screens::class, 'universities' ) ),
 			array( 'lr-tuition', 'دانشگاه‌ها — شهریه‌ها', 'lr_view_university_data', array( Screens::class, 'tuition' ) ),
+			array( 'lr-programs', 'دانشگاه‌ها — رشته‌ها', 'lr_manage_university_data', array( \LifeRuss\Core\Catalog\ProgramsScreen::class, 'render' ) ),
 			array( 'lr-approvals', 'دانشگاه‌ها — تأییدیه‌ها', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-rankings', 'دانشگاه‌ها — رتبه‌بندی', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-prep', 'دانشگاه‌ها — پادفک و کورس', 'lr_manage_academic_data', array( Screens::class, 'placeholder' ) ),
