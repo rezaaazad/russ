@@ -1,8 +1,16 @@
-# استقرار فاز ۳ / Phase 3 deployment
+# استقرار فاز ۴ / Phase 4 deployment
 
-قالب ۱.۹.۰ و افزونهٔ هسته ۱.۸.۰ (پایگاه ۱.۹.۰). Rank Math و Polylang اختیاری‌اند و داخل بسته نیستند. لایف‌روس فروشگاه نیست و کالا نمی‌فروشد؛ ووکامرس و کاتالوگ محصول ندارد.
+قالب ۱.۱۰.۰ و افزونهٔ هسته ۱.۸.۱ (پایگاه ۱.۹.۰). Rank Math و Polylang اختیاری‌اند و داخل بسته نیستند. لایف‌روس فروشگاه نیست و کالا نمی‌فروشد؛ ووکامرس و کاتالوگ محصول ندارد.
 
-Theme 1.9.0 and core plugin 1.8.0 (database 1.9.0). Rank Math and Polylang are optional and are not bundled. LifeRuss is not a store and sells no goods.
+Theme 1.10.0 and core plugin 1.8.1 (database 1.9.0). Rank Math and Polylang are optional and are not bundled. LifeRuss is not a store and sells no goods.
+
+## فاز ۴ / Phase 4 UI
+
+- هدر موبایل یک ردیف است (لوگو، جستجو، منو) و جستجو روی آیکون باز می‌شود. منوی دسکتاپ گروه‌بندی شده است.
+- آدرس‌های `/study/`، `/podfak/`، `/direct-admission/` و `/immigration/` با ۳۰۱ به `/study-russia/`، `/padfak/`، `/direct-course/` و `/migration-russia/` می‌روند. فعال‌سازی همان صفحه‌ها را می‌سازد یا منتشر می‌کند.
+- اگر کاتالوگ خالی باشد، اسلایدر دانشگاه خانه پنهان است و آرشیوها حالت خالی دارند. «انتشار کاتالوگ نمونه» در پیشخوان پیش‌نویس‌های نمونه را منتشر می‌کند.
+- بستهٔ هسته `README.md` و `composer.json` را ندارد. `.htaccess` داخل افزونه خواندن فایل‌های غیر PHP و `uninstall.php` را روی Apache می‌بندد. روی nginx همان مسیرها را در `location` ببندید.
+- `/` باید بدون اسکرول افقی در ۳۲۰، ۳۶۰، ۳۹۰ و ۴۱۴ باشد.
 
 ## ترتیب نصب / Install order
 
@@ -15,7 +23,7 @@ Theme 1.9.0 and core plugin 1.8.0 (database 1.9.0). Rank Math and Polylang are o
 ## مهاجرت / Migration
 
 - گزینهٔ `lr_db_version` باید به `1.9.0` برسد. اولین درخواست جدول‌های مقایسه، جستجو، پیام مراجع، درس، تاریخچهٔ نرخ، پرداخت خدمات، بورسیه و درخواست مهاجرت را با `dbDelta` می‌سازد.
-- ریدایرکت `/freight/` → `/cargo/` و اسلاگ‌های قدیمی مجله از قبل در `lr_redirects` هستند. آن ردیف‌ها را پاک نکنید.
+- ریدایرکت `/freight/` → `/cargo/`، اسلاگ‌های قدیمی مجله، و مسیرهای `/study/` `/podfak/` `/direct-admission/` `/immigration/` در `lr_redirects` هستند. آن ردیف‌ها را پاک نکنید.
 - فایل‌های جدید لید بیرون از ریشهٔ وب در `liferuss-private` (کنار پوشهٔ وردپرس) ذخیره می‌شوند. اگر پوشهٔ قدیمی `wp-content/liferuss-private` هنوز هست، در nginx/Apache دسترسی مستقیم را ببندید. دانلود فقط از پیشخوان و با مجوز است.
 
 ## Rank Math
