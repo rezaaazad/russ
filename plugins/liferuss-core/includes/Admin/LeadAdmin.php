@@ -564,12 +564,14 @@ class LeadAdmin {
 			}
 		}
 		$after = isset( $_GET['lr_after'] ) ? sanitize_text_field( wp_unslash( $_GET['lr_after'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $after ) ) {
-			$args['created_after'] = $after . ' 00:00:00';
+		$from  = Jalali::filter_utc( $after, false );
+		if ( $from ) {
+			$args['created_after'] = $from;
 		}
 		$before = isset( $_GET['lr_before'] ) ? sanitize_text_field( wp_unslash( $_GET['lr_before'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $before ) ) {
-			$args['created_before'] = $before . ' 23:59:59';
+		$until  = Jalali::filter_utc( $before, true );
+		if ( $until ) {
+			$args['created_before'] = $until;
 		}
 		return $args;
 	}
@@ -617,8 +619,8 @@ class LeadAdmin {
 		}
 		$after  = isset( $_GET['lr_after'] ) ? sanitize_text_field( wp_unslash( $_GET['lr_after'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$before = isset( $_GET['lr_before'] ) ? sanitize_text_field( wp_unslash( $_GET['lr_before'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		echo '<input type="date" name="lr_after" value="' . esc_attr( $after ) . '" title="' . esc_attr__( 'از تاریخ میلادی', 'liferuss-core' ) . '"> ';
-		echo '<input type="date" name="lr_before" value="' . esc_attr( $before ) . '" title="' . esc_attr__( 'تا تاریخ میلادی', 'liferuss-core' ) . '"> ';
+		echo '<input type="text" name="lr_after" value="' . esc_attr( $after ) . '" placeholder="' . esc_attr__( 'از ۱۴۰۴/۰۱/۰۱', 'liferuss-core' ) . '" inputmode="numeric"> ';
+		echo '<input type="text" name="lr_before" value="' . esc_attr( $before ) . '" placeholder="' . esc_attr__( 'تا ۱۴۰۴/۱۲/۲۹', 'liferuss-core' ) . '" inputmode="numeric"> ';
 		submit_button( __( 'فیلتر', 'liferuss-core' ), 'secondary', '', false );
 		echo '</form>';
 	}

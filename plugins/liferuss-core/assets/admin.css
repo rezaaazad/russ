@@ -91,3 +91,48 @@
 .lr-breakdown {
 	margin: 0 0 16px;
 }
+
+.lr-kanban {
+	display: flex;
+	gap: 12px;
+	overflow-x: auto;
+	align-items: flex-start;
+	padding-bottom: 16px;
+}
+
+.lr-kanban-col {
+	background: #f0f0f1;
+	border-radius: 6px;
+	flex: 0 0 220px;
+	min-height: 240px;
+	padding: 8px;
+}
+
+.lr-kanban-col h2 {
+	font-size: 13px;
+	margin: 4px 4px 8px;
+}
+
+.lr-kanban-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-height: 160px;
+}
+
+.lr-kanban-card {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	cursor: grab;
+	padding: 8px 10px;
+}
+
+.lr-kanban-card.is-dragging {
+	opacity: 0.45;
+}
+
+.lr-kanban-card a {
+	font-weight: 700;
+	text-decoration: none;
+}

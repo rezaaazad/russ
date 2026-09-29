@@ -8,6 +8,7 @@
 namespace LifeRuss\Core;
 
 use LifeRuss\Core\Admin\Assets;
+use LifeRuss\Core\Admin\Kanban;
 use LifeRuss\Core\Admin\LeadAdmin;
 use LifeRuss\Core\Admin\Menu;
 use LifeRuss\Core\Admin\NotFoundScreen;
@@ -109,6 +110,7 @@ class Plugin {
 			NotFoundScreen::hooks();
 			CompareScreen::hooks();
 			LeadAdmin::hooks();
+			Kanban::hooks();
 			SettingsPage::hooks();
 			Assets::hooks();
 		}

@@ -44,6 +44,7 @@ class Menu {
 			array( 'lr-leads-queue', 'CRM — صف مشترک', 'lr_assign_leads', array( LeadAdmin::class, 'queue' ) ),
 			array( 'lr-leads', 'CRM — همه لیدها', 'lr_manage_leads', array( LeadAdmin::class, 'all' ) ),
 			array( 'lr-my-leads', 'CRM — لیدهای من', 'lr_view_own_leads', array( LeadAdmin::class, 'mine' ) ),
+			array( 'lr-kanban', 'CRM — کانبان', 'lr_access_crm', array( Kanban::class, 'render' ) ),
 			array( 'lr-tasks', 'CRM — وظایف و پیگیری', 'lr_access_crm', array( LeadAdmin::class, 'tasks' ) ),
 			array( 'lr-funnel', 'CRM — گزارش قیف', 'lr_manage_leads', array( LeadAdmin::class, 'funnel' ) ),
 			array( 'lr-export', 'CRM — خروجی', 'lr_export_leads', array( LeadAdmin::class, 'export_screen' ) ),
