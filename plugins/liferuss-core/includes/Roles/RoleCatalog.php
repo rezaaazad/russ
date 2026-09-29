@@ -130,6 +130,7 @@ class RoleCatalog {
 			self::crm_full(),
 			array(
 				'lr_manage_services',
+				'lr_manage_redirects',
 				'lr_manage_settings',
 				'lr_access_settings',
 				'lr_view_activity_log',
