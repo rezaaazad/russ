@@ -68,31 +68,35 @@ class Catalog {
 	 */
 	public static function forms(): array {
 		return array(
-			'consult'   => array(
+			'consult'     => array(
 				'service' => 'admission',
 				'request' => 'admission_requests',
 			),
-			'admission' => array(
+			'admission'   => array(
 				'service' => 'admission',
 				'request' => 'admission_requests',
 			),
-			'freight'   => array(
+			'freight'     => array(
 				'service' => 'cargo',
 				'request' => 'cargo_requests',
 			),
-			'cargo'     => array(
+			'cargo'       => array(
 				'service' => 'cargo',
 				'request' => 'cargo_requests',
 			),
-			'trade'     => array(
+			'trade'       => array(
 				'service' => 'trade',
 				'request' => 'trade_requests',
 			),
-			'exchange'  => array(
+			'exchange'    => array(
 				'service' => 'exchange',
 				'request' => 'exchange_requests',
 			),
-			'contact'   => array(
+			'immigration' => array(
+				'service' => 'migration',
+				'request' => '',
+			),
+			'contact'     => array(
 				'service' => 'contact',
 				'request' => '',
 			),

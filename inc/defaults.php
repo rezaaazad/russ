@@ -155,6 +155,13 @@ function liferuss_default_options() {
 			array( 'label' => 'باربری و ارسال', 'url' => '/freight/' ),
 			array( 'label' => 'تجارت و تأمین', 'url' => '/trade/' ),
 			array( 'label' => 'هزینه‌ها', 'url' => '/costs/' ),
+			array( 'label' => 'تحصیل در روسیه', 'url' => '/study/' ),
+			array( 'label' => 'بورسیه‌ها', 'url' => '/scholarships/' ),
+			array( 'label' => 'پادفک', 'url' => '/podfak/' ),
+			array( 'label' => 'پذیرش مستقیم', 'url' => '/direct-admission/' ),
+			array( 'label' => 'مهاجرت', 'url' => '/immigration/' ),
+			array( 'label' => 'درخواست پذیرش', 'url' => '/admission/' ),
+			array( 'label' => 'استعلام نرخ', 'url' => '/exchange/' ),
 			array( 'label' => 'تماس با ما', 'url' => '/contact/' ),
 		),
 

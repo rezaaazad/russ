@@ -55,6 +55,13 @@ function liferuss_document_title( $parts ) {
 		$parts['title']   = liferuss_opt( 'trade_seo_title' );
 		$parts['site']    = '';
 		$parts['tagline'] = '';
+	} elseif ( is_page_template( 'templates/path.php' ) || is_singular( 'lr_scholarship' ) ) {
+		$custom = (string) get_post_meta( get_queried_object_id(), '_lr_seo_title', true );
+		if ( $custom ) {
+			$parts['title'] = $custom;
+		}
+	} elseif ( is_post_type_archive( 'lr_scholarship' ) ) {
+		$parts['title'] = liferuss_t( 'nav_scholarships' );
 	}
 	return $parts;
 }
@@ -71,6 +78,12 @@ function liferuss_head_meta() {
 		$desc = liferuss_opt( 'freight_seo_description' );
 	} elseif ( is_page_template( 'templates/trade.php' ) && liferuss_opt( 'trade_seo_description' ) ) {
 		$desc = liferuss_opt( 'trade_seo_description' );
+	} elseif ( is_page_template( 'templates/path.php' ) || is_singular( 'lr_scholarship' ) ) {
+		$custom = (string) get_post_meta( get_queried_object_id(), '_lr_seo_description', true );
+		$lead   = (string) get_post_meta( get_queried_object_id(), '_lr_lead', true );
+		$desc   = $custom ? $custom : ( $lead ? $lead : wp_strip_all_tags( get_the_excerpt() ) );
+	} elseif ( is_post_type_archive( 'lr_scholarship' ) ) {
+		$desc = liferuss_t( 'path_scholarship_lead' );
 	} elseif ( is_singular( array( 'lr_university', 'lr_field', 'lr_city' ) ) ) {
 		$custom = get_post_meta( get_queried_object_id(), '_lr_seo_description', true );
 		$desc   = $custom ? $custom : wp_strip_all_tags( get_the_excerpt() );
@@ -269,6 +282,21 @@ function liferuss_breadcrumbs() {
 		$items[] = array( 'label' => liferuss_t( 'crumb_blog' ), 'url' => liferuss_url( '/blog/' ) );
 		$items[] = array( 'label' => get_the_title(), 'url' => '' );
 	} elseif ( is_page() ) {
+		$ancestors = array_reverse( get_post_ancestors( get_queried_object_id() ) );
+		foreach ( $ancestors as $ancestor ) {
+			$items[] = array(
+				'label' => get_the_title( $ancestor ),
+				'url'   => get_permalink( $ancestor ),
+			);
+		}
+		$items[] = array( 'label' => get_the_title(), 'url' => '' );
+	} elseif ( is_post_type_archive( 'lr_scholarship' ) ) {
+		$items[] = array( 'label' => liferuss_t( 'nav_scholarships' ), 'url' => '' );
+	} elseif ( is_singular( 'lr_scholarship' ) ) {
+		$items[] = array(
+			'label' => liferuss_t( 'nav_scholarships' ),
+			'url'   => get_post_type_archive_link( 'lr_scholarship' ),
+		);
 		$items[] = array( 'label' => get_the_title(), 'url' => '' );
 	} elseif ( is_search() ) {
 		$items[] = array( 'label' => liferuss_t( 'crumb_search' ), 'url' => '' );
@@ -365,8 +393,15 @@ function liferuss_llms_txt() {
 		'/about/'        => 'About',
 		'/universities/' => 'Universities',
 		'/services/'     => 'Services',
-		'/costs/'        => 'Costs',
-		'/freight/'      => 'Freight and shipping',
+		'/costs/'             => 'Costs',
+		'/study/'             => 'Study in Russia',
+		'/scholarships/'      => 'Scholarships',
+		'/podfak/'            => 'Preparatory faculty',
+		'/direct-admission/'  => 'Direct admission',
+		'/immigration/'       => 'Immigration',
+		'/admission/'         => 'Admission request',
+		'/exchange/'          => 'Exchange rate inquiry',
+		'/freight/'           => 'Freight and shipping',
 		'/trade/'        => 'Trade and sourcing',
 		'/contact/'      => 'Contact',
 		'/blog/'         => 'Blog',

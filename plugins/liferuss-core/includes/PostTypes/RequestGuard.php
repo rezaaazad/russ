@@ -56,7 +56,7 @@ class RequestGuard {
 		if ( in_array( $head, array( 'en', 'ru', 'ar' ), true ) ) {
 			$head = $parts[1] ?? '';
 		}
-		if ( in_array( $head, array( 'universities', 'fields', 'cities' ), true ) ) {
+		if ( in_array( $head, array( 'universities', 'fields', 'cities', 'scholarships' ), true ) ) {
 			return $vars;
 		}
 		$page = get_page_by_path( $path );

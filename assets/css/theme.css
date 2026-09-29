@@ -2997,6 +2997,73 @@ body.ltr .lr-float__row-label {
   }
 }
 
+.path-children {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.path-child {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 44px;
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: inherit;
+  text-decoration: none;
+}
+
+.path-child span,
+.path-prose,
+.path-quotes cite {
+  color: var(--muted);
+}
+
+.path-section,
+.path-quotes blockquote {
+  margin: 0 0 28px;
+}
+
+.path-quotes blockquote {
+  margin: 0;
+  padding: 16px;
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+}
+
+.path-quotes {
+  display: grid;
+  gap: 12px;
+}
+
+.lr-faq details {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 0;
+}
+
+.lr-faq summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.consult-form textarea {
+  width: 100%;
+  min-height: 96px;
+}
+
+@media (min-width: 720px) {
+  .path-children {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

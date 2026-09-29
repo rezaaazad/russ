@@ -179,6 +179,21 @@ class PostTypeRegistrar {
 					'supports'            => array( 'title', 'editor', 'revisions', 'page-attributes' ),
 				)
 			),
+			'lr_scholarship' => self::args(
+				'بورسیه',
+				'بورسیه‌ها',
+				'lr_scholarship',
+				'lr_scholarships',
+				array(
+					'public'      => true,
+					'has_archive' => 'scholarships',
+					'rewrite'     => array(
+						'slug'       => 'scholarships',
+						'with_front' => false,
+					),
+					'supports'    => array( 'title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'custom-fields' ),
+				)
+			),
 			'lr_testimonial' => self::args(
 				'نظر',
 				'نظرات مشتریان',

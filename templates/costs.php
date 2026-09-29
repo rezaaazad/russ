@@ -21,6 +21,8 @@ get_header();
 	</div>
 </header>
 
+<?php liferuss_path_tuition_block(); ?>
+
 <section class="section">
 	<div class="container costs-grid">
 		<?php foreach ( liferuss_costs() as $cost ) : ?>

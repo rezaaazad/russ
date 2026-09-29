@@ -301,18 +301,19 @@ class Intake {
 			$lines[] = 'مقطع: ' . $level;
 		}
 		$map = array(
-			'consult_university' => 'دانشگاه',
-			'consult_message'    => 'پیام',
-			'consult_notes'      => 'توضیحات',
-			'consult_origin'     => 'مبدأ',
-			'consult_dest'       => 'مقصد',
-			'consult_product'    => 'کالا',
-			'consult_qty'        => 'حجم',
-			'consult_specs'      => 'مشخصات',
-			'consult_weight'     => 'وزن',
-			'consult_dims'       => 'ابعاد',
-			'consult_value'      => 'ارزش',
-			'consult_amount'     => 'مبلغ',
+			'consult_university'  => 'دانشگاه',
+			'consult_scholarship' => 'بورسیه',
+			'consult_message'     => 'پیام',
+			'consult_notes'       => 'توضیحات',
+			'consult_origin'      => 'مبدأ',
+			'consult_dest'        => 'مقصد',
+			'consult_product'     => 'کالا',
+			'consult_qty'         => 'حجم',
+			'consult_specs'       => 'مشخصات',
+			'consult_weight'      => 'وزن',
+			'consult_dims'        => 'ابعاد',
+			'consult_value'       => 'ارزش',
+			'consult_amount'      => 'مبلغ',
 		);
 		foreach ( $map as $key => $label ) {
 			$value = 'consult_message' === $key || 'consult_notes' === $key ? self::area( $key ) : self::text( $key );
@@ -333,11 +334,20 @@ class Intake {
 	 */
 	private static function request_fields( string $type, string $level ): array {
 		if ( 'consult' === $type || 'admission' === $type ) {
-			return array(
-				'program_type'      => 'degree',
+			$program = sanitize_key( self::text( 'consult_program' ) );
+			if ( ! in_array( $program, array( 'degree', 'padfak', 'direct_course', 'scholarship' ), true ) ) {
+				$program = 'degree';
+			}
+			$degree = sanitize_key( self::text( 'consult_degree' ) );
+			$fields = array(
+				'program_type'      => $program,
 				'current_education' => substr( $level, 0, 60 ),
 				'stage'             => 'new',
 			);
+			if ( in_array( $degree, array( 'bachelor', 'specialist', 'master', 'phd', 'residency' ), true ) ) {
+				$fields['degree'] = $degree;
+			}
+			return $fields;
 		}
 		if ( 'exchange' === $type ) {
 			$amount = self::text( 'consult_amount' );
@@ -442,13 +452,14 @@ class Intake {
 	 */
 	private static function success_message( string $type ): string {
 		$keys = array(
-			'consult'   => 'form_success',
-			'admission' => 'form_success',
-			'freight'   => 'freight_form_success',
-			'cargo'     => 'freight_form_success',
-			'trade'     => 'trade_form_success',
-			'contact'   => 'contact_form_success',
-			'exchange'  => 'form_success',
+			'consult'     => 'form_success',
+			'admission'   => 'form_success',
+			'freight'     => 'freight_form_success',
+			'cargo'       => 'freight_form_success',
+			'trade'       => 'trade_form_success',
+			'contact'     => 'contact_form_success',
+			'exchange'    => 'form_success',
+			'immigration' => 'form_success',
 		);
 		$key  = $keys[ $type ] ?? 'form_success';
 		if ( function_exists( 'liferuss_opt' ) ) {

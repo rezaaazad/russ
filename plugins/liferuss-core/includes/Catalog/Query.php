@@ -569,6 +569,100 @@ class Query {
 	}
 
 	/**
+	 * Counts, USD tuition range, and the best-ranked universities for a filter.
+	 *
+	 * @param array<string, mixed> $filters Same filters as universities().
+	 * @return array{total: int, min_usd: float, max_usd: float, items: array<int, array<string, mixed>>}
+	 */
+	public static function snapshot( array $filters ): array {
+		$key = self::cache_key( 'snap', $filters, 1 );
+		$hit = get_transient( $key );
+		if ( is_array( $hit ) ) {
+			return $hit;
+		}
+		global $wpdb;
+		$unis   = $wpdb->prefix . 'lr_universities';
+		$cities = $wpdb->prefix . 'lr_cities';
+		$where  = array( 'u.deleted_at IS NULL', "u.status = 'published'" );
+		$params = array();
+		self::university_filters( $where, $params, $filters );
+		$sql_where = implode( ' AND ', $where );
+		$join      = "LEFT JOIN `{$cities}` c ON c.id = u.city_id AND c.deleted_at IS NULL";
+		$sql       = "SELECT COUNT(*) AS total, MIN(CASE WHEN u.min_tuition_usd > 0 THEN u.min_tuition_usd END) AS min_usd, MAX(u.min_tuition_usd) AS max_usd FROM `{$unis}` u {$join} WHERE {$sql_where}";
+		$row       = $params ? $wpdb->get_row( $wpdb->prepare( $sql, $params ), ARRAY_A ) : $wpdb->get_row( $sql, ARRAY_A );
+		$list_sql  = "SELECT u.*, c.name_fa AS city_name, c.slug AS city_slug FROM `{$unis}` u {$join} WHERE {$sql_where} AND u.best_world_rank IS NOT NULL ORDER BY u.best_world_rank ASC LIMIT 6";
+		$rows      = $params ? $wpdb->get_results( $wpdb->prepare( $list_sql, $params ), ARRAY_A ) : $wpdb->get_results( $list_sql, ARRAY_A );
+		$items     = array();
+		foreach ( (array) $rows as $item ) {
+			$items[] = self::university_card( $item );
+		}
+		$result = array(
+			'total'   => (int) ( $row['total'] ?? 0 ),
+			'min_usd' => (float) ( $row['min_usd'] ?? 0 ),
+			'max_usd' => (float) ( $row['max_usd'] ?? 0 ),
+			'items'   => $items,
+		);
+		set_transient( $key, $result, 10 * MINUTE_IN_SECONDS );
+		return $result;
+	}
+
+	/**
+	 * Published universities that offer padfak or a direct course, with price and duration.
+	 *
+	 * @param string $type padfak or direct_course.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function prep( string $type ): array {
+		if ( ! in_array( $type, array( 'padfak', 'direct_course' ), true ) ) {
+			return array();
+		}
+		$key = self::cache_key( 'prep_' . $type, array(), 1 );
+		$hit = get_transient( $key );
+		if ( is_array( $hit ) ) {
+			return $hit;
+		}
+		global $wpdb;
+		$prep   = $wpdb->prefix . 'lr_prep_programs';
+		$unis   = $wpdb->prefix . 'lr_universities';
+		$cities = $wpdb->prefix . 'lr_cities';
+		$sql    = "SELECT p.duration_months, p.tuition, p.currency, p.track, p.format, u.id AS university_id, u.post_id, u.name_fa, u.slug, c.name_fa AS city_name
+			FROM `{$prep}` p
+			INNER JOIN `{$unis}` u ON u.id = p.university_id AND u.deleted_at IS NULL AND u.status = 'published'
+			LEFT JOIN `{$cities}` c ON c.id = u.city_id
+			WHERE p.program_type = %s AND p.status = 'active' AND p.deleted_at IS NULL
+			ORDER BY u.name_fa ASC
+			LIMIT 100";
+		$rows   = $wpdb->get_results( $wpdb->prepare( $sql, $type ), ARRAY_A );
+		$seen   = array();
+		$items  = array();
+		foreach ( (array) $rows as $row ) {
+			$seen[ (int) $row['university_id'] ] = true;
+			$row['url']                          = get_permalink( (int) $row['post_id'] );
+			$row['usd']                          = Store::usd( (string) $row['currency'], (float) $row['tuition'] );
+			$items[]                             = $row;
+		}
+		$flag = 'padfak' === $type ? 'has_padfak' : 'has_direct_course';
+		$more = $wpdb->get_results(
+			"SELECT u.post_id, u.name_fa, u.slug, c.name_fa AS city_name, u.id AS university_id FROM `{$unis}` u LEFT JOIN `{$cities}` c ON c.id = u.city_id WHERE u.deleted_at IS NULL AND u.status = 'published' AND u.{$flag} = 1 ORDER BY u.name_fa ASC LIMIT 100",
+			ARRAY_A
+		);
+		foreach ( (array) $more as $row ) {
+			if ( isset( $seen[ (int) $row['university_id'] ] ) ) {
+				continue;
+			}
+			$row['url']             = get_permalink( (int) $row['post_id'] );
+			$row['duration_months'] = null;
+			$row['tuition']         = null;
+			$row['currency']        = '';
+			$row['usd']             = 0;
+			$row['track']           = '';
+			$items[]                = $row;
+		}
+		set_transient( $key, $items, 10 * MINUTE_IN_SECONDS );
+		return $items;
+	}
+
+	/**
 	 * Transient key tied to the catalog generation.
 	 *
 	 * @param string               $kind    Kind.

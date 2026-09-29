@@ -59,6 +59,9 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 					?>
 					<li><a href="<?php echo esc_url( $href ); ?>"><?php echo esc_html( $item['label'] ); ?></a></li>
 				<?php endforeach; ?>
+				<?php foreach ( liferuss_path_footer_extra() as $extra ) : ?>
+					<li><a href="<?php echo esc_url( liferuss_url( $extra['url'] ) ); ?>"><?php echo esc_html( $extra['title'] ); ?></a></li>
+				<?php endforeach; ?>
 			</ul>
 		</div>
 

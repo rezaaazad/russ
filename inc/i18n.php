@@ -396,6 +396,41 @@ function liferuss_ui_strings() {
 			'nav_freight'        => 'باربری و ارسال',
 			'nav_trade'          => 'تجارت و تأمین',
 			'nav_contact'        => 'تماس با ما',
+			'nav_study'          => 'تحصیل در روسیه',
+			'nav_scholarships'   => 'بورسیه‌ها',
+			'nav_podfak'         => 'پادفک',
+			'nav_direct'         => 'پذیرش مستقیم',
+			'nav_immigration'    => 'مهاجرت',
+			'nav_admission'      => 'درخواست پذیرش',
+			'nav_exchange'       => 'استعلام نرخ',
+			'path_home_title'    => 'مسیرهای تحصیل و مهاجرت',
+			'path_live_title'    => 'از کاتالوگ دانشگاه',
+			'path_prep_title'    => 'دانشگاه‌ها، مدت و شهریه',
+			'path_empty'         => 'موردی در کاتالوگ منتشر نشده است.',
+			'path_count'         => 'دانشگاه',
+			'path_tuition'       => 'شهریه (دلار)',
+			'path_months'        => 'ماه',
+			'path_all_unis'      => 'فهرست دانشگاه‌ها',
+			'path_faq'           => 'پرسش‌های متداول',
+			'path_quotes'        => 'تجربه دانشجویان',
+			'path_guides'        => 'دانستنی‌های روسیه',
+			'path_posts'         => 'از مجله',
+			'path_scholarship_lead' => 'بورسیه‌ها و سهمیه‌های نمونه. مهلت، پوشش و منبع را مدیر محتوا به‌روز می‌کند.',
+			'path_deadline'      => 'مهلت',
+			'path_coverage'      => 'پوشش',
+			'path_eligibility'   => 'شرایط',
+			'path_source'        => 'منبع',
+			'path_verified'      => 'آخرین بررسی',
+			'form_admission_title' => 'درخواست پذیرش',
+			'form_admission_intro' => 'نام، شماره و مقطع را بفرستید تا درخواست پذیرش ثبت شود.',
+			'form_exchange_title'  => 'استعلام نرخ',
+			'form_exchange_intro'  => 'فقط استعلام نرخ. مبلغ و ارز مبدأ و مقصد را بنویسید.',
+			'form_immigration_title' => 'مشاوره مهاجرت',
+			'form_immigration_intro' => 'نام و شماره را بفرستید تا درخواست مهاجرت ثبت شود.',
+			'form_amount'        => 'مبلغ',
+			'form_currency_from' => 'از ارز',
+			'form_currency_to'   => 'به ارز',
+			'form_notes'         => 'توضیح',
 			'footer_quick'       => 'دسترسی سریع',
 			'footer_services'    => 'خدمات',
 			'footer_contact'     => 'تماس با ما',
@@ -898,6 +933,17 @@ function liferuss_filter_menu_title( $title, $item ) {
 	}
 	if ( 'page' === $item->object ) {
 		return liferuss_filter_the_title( $title, (int) $item->object_id );
+	}
+	if ( 'custom' === $item->type && function_exists( 'liferuss_path_links' ) ) {
+		$path = untrailingslashit( (string) wp_parse_url( $item->url, PHP_URL_PATH ) );
+		if ( preg_match( '#^/(en|ru|ar)(/.*)?$#', $path, $match ) ) {
+			$path = isset( $match[2] ) && '' !== $match[2] ? untrailingslashit( $match[2] ) : '';
+		}
+		foreach ( liferuss_path_links() as $link ) {
+			if ( untrailingslashit( $link['url'] ) === $path ) {
+				return $link['title'];
+			}
+		}
 	}
 	return $title;
 }

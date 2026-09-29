@@ -1,8 +1,8 @@
 # لایف‌روس — هسته / LifeRuss Core
 
-نسخهٔ ۱.۰.۰. این افزونه اسکلت پلتفرم است: جداول، نوع‌های محتوا، نقش‌ها، و منوی مدیریت. قالب صفحه و فرم‌های کامل در نسخه‌های بعدی می‌آیند.
+نسخهٔ ۱.۳.۰. هسته جدول‌ها، کاتالوگ، CRM، و فیلدهای ساختاری مسیر تحصیل و بورسیه را دارد. اسکیمای پایگاه همان ۱.۰.۰ است.
 
-Version 1.0.0. This plugin is the platform skeleton: tables, content types, roles, and the admin menu. Front-end templates and full editors come later.
+Version 1.3.0. Core ships the tables, catalog, CRM, and structured study-path and scholarship fields. The database schema stays at 1.0.0.
 
 ## نصب / Install
 
@@ -79,6 +79,7 @@ All use the `{wpdb prefix}lr_` prefix, InnoDB. Physical foreign keys exist only 
 | `lr_course` | `/russian-language/` و `/russian-language/{دوره}/` |
 | `lr_lesson` | `/russian-language/{دوره}/{درس}/` |
 | `lr_faq` | عمومی نیست، REST و بازبینی دارد |
+| `lr_scholarship` | `/scholarships/` و `/scholarships/{نامک}/` |
 | `lr_testimonial` | عمومی نیست، REST و بازبینی دارد |
 
 طبقه‌بندی‌ها: `lr_field_group`، `lr_guide_cat`، `lr_faq_group`، `lr_level`.
@@ -150,7 +151,9 @@ Migration is resumable. `wp liferuss migrate-leads` copies `liferuss_lead` posts
 - دادهٔ نمونه پیش‌نویس است (`lr_demo_catalog`). تا منتشر نشود در سایت دیده نمی‌شود.
 - `health_ministry_status` پیش‌فرض `unknown` دارد.
 - اجرای ریدایرکت فرانت، Rank Math، Polylang، و سازندهٔ بخش خارج از این نسخه است.
-- فرم‌های قالب consult، freight، trade، و contact به `POST /wp-json/liferuss/v1/leads` می‌روند و اگر جاوااسکریپت نباشد همان `admin-post.php` قبلی را دارند. فرم مشاوره روی درخواست پذیرش می‌نشیند. برگهٔ جداگانه‌ای برای صرافی و پذیرش در قالب نیست؛ همان endpoint نوع `exchange` و `admission` را هم می‌پذیرد.
+- فرم‌های قالب consult، admission، freight، trade، exchange، immigration، و contact به `POST /wp-json/liferuss/v1/leads` می‌روند و اگر جاوااسکریپت نباشد همان `admin-post.php` قبلی را دارند. مشاوره و پذیرش روی `admission_requests` می‌نشینند (`program_type`: degree، padfak، direct_course، scholarship). مهاجرت روی سرویس `migration` است و ردیف درخواست جدا ندارد چون ERD جدول مهاجرت ندارد. استعلام نرخ فقط مبلغ و ارز را در `exchange_requests` می‌نویسد.
+- بورسیه جدول ERD ندارد. نوع `lr_scholarship` به‌همراه متای مهلت، پوشش، شرایط، منبع، و `last_verified_at` است. برگه‌های مسیر تحصیل و مهاجرت قالب `templates/path.php` و متای ساختاری دارند؛ سازندهٔ آزاد بخش هنوز نیست.
+- دادهٔ نمونهٔ مسیرها و بورسیه‌ها پیش‌نویس است (`lr_path_seed`). تا منتشر نشود در سایت دیده نمی‌شود. پرسش و نظر نمونه عمومی نیستند و فقط بعد از انتشار صفحهٔ مادر دیده می‌شوند.
 - فیلتر تاریخ در فهرست لید میلادی است (`input type="date"`). نمایش تاریخ در جدول و جزئیات شمسی است و tooltip میلادی UTC دارد.
 - نوتیفیکیشن ایمیل و تلگرام با `lr_notify_lead` حدود ۱۵ ثانیه بعد از ثبت، از wp-cron ارسال می‌شود. خطای ارسال به بازدیدکننده برنمی‌گردد.
 - فایل لید بیرون از `uploads` در `wp-content/liferuss-private` است. پاک‌سازی روزانه فایل‌هایی را حذف می‌کند که `purge_after`شان گذشته و `purged_at` خالی است. بستن لید (`completed` یا `lost`) این تاریخ را ۱۲ ماه بعد می‌گذارد.

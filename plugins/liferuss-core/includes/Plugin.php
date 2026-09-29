@@ -13,6 +13,8 @@ use LifeRuss\Core\Admin\Menu;
 use LifeRuss\Core\Catalog\Demo;
 use LifeRuss\Core\Catalog\Editor;
 use LifeRuss\Core\Catalog\Rest;
+use LifeRuss\Core\Content\Editor as ContentEditor;
+use LifeRuss\Core\Content\Seed as ContentSeed;
 use LifeRuss\Core\CRM\Cli as CrmCli;
 use LifeRuss\Core\Catalog\Cli as CatalogCli;
 use LifeRuss\Core\CRM\Files;
@@ -58,6 +60,8 @@ class Plugin {
 		Rest::hooks();
 		Editor::hooks();
 		Demo::hooks();
+		ContentEditor::hooks();
+		ContentSeed::hooks();
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			CrmCli::hooks();
