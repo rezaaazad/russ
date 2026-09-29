@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'LIFERUSS_CORE_VERSION', '1.7.0' );
-define( 'LIFERUSS_CORE_DB_VERSION', '1.7.0' );
+define( 'LIFERUSS_CORE_DB_VERSION', '1.8.0' );
 define( 'LIFERUSS_CORE_FILE', __FILE__ );
 define( 'LIFERUSS_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'LIFERUSS_CORE_URL', plugin_dir_url( __FILE__ ) );

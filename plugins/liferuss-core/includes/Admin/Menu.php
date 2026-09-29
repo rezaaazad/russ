@@ -80,6 +80,7 @@ class Menu {
 		self::link( 'گروه‌های رشته', 'manage_lr_field_groups', 'edit-tags.php?taxonomy=lr_field_group&post_type=lr_field' );
 		self::link( 'شهرها', 'edit_lr_cities', 'edit.php?post_type=lr_city' );
 		self::link( 'بورسیه‌ها', 'edit_lr_scholarships', 'edit.php?post_type=lr_scholarship' );
+		add_submenu_page( 'liferuss', 'انتقال بورسیه‌ها', 'بورسیه‌ها — انتقال جدول', 'edit_lr_scholarships', 'lr-scholarship-migrate', array( \LifeRuss\Core\Scholarships\Admin::class, 'screen' ) );
 		self::link( 'برگه‌ها', 'edit_pages', 'edit.php?post_type=page' );
 		self::link( 'مجله — نوشته‌ها', 'edit_posts', 'edit.php' );
 		self::link( 'مجله — دسته‌ها', 'manage_categories', 'edit-tags.php?taxonomy=category' );

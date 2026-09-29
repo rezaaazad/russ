@@ -32,6 +32,7 @@ use LifeRuss\Core\Redirects\Runner;
 use LifeRuss\Core\Currency\Rates;
 use LifeRuss\Core\Payments\Admin as PaymentAdmin;
 use LifeRuss\Core\Payments\Checkout;
+use LifeRuss\Core\Scholarships\Admin as ScholarshipAdmin;
 use LifeRuss\Core\CRM\Automation;
 use LifeRuss\Core\CRM\Cli as CrmCli;
 use LifeRuss\Core\Catalog\Cli as CatalogCli;
@@ -80,6 +81,7 @@ class Plugin {
 		Automation::hooks();
 		Rates::hooks();
 		Checkout::hooks();
+		ScholarshipAdmin::hooks();
 		Portal::hooks();
 		CourseEditor::hooks();
 		CourseFront::hooks();

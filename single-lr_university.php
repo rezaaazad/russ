@@ -91,6 +91,21 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 					</tbody>
 				</table>
 			<?php endif; ?>
+			<?php if ( $row && class_exists( '\LifeRuss\Core\Scholarships\Store' ) ) : ?>
+				<?php $scholarships = \LifeRuss\Core\Scholarships\Store::for_university( (int) $row['id'] ); ?>
+				<?php if ( $scholarships ) : ?>
+					<h2>بورسیه‌ها</h2>
+					<ul class="lr-facts">
+						<?php foreach ( $scholarships as $scholarship ) : ?>
+							<li><a href="<?php echo esc_url( (string) get_permalink( (int) $scholarship['post_id'] ) ); ?>"><?php echo esc_html( get_the_title( (int) $scholarship['post_id'] ) ); ?></a>
+								<?php if ( '' !== (string) $scholarship['deadline'] ) : ?>
+									— <?php echo esc_html( (string) $scholarship['deadline'] ); ?>
+								<?php endif; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
+			<?php endif; ?>
 			<?php if ( ! empty( $row['city'] ) ) : ?>
 				<h2>شهر</h2>
 				<p><a href="<?php echo esc_url( get_permalink( (int) $row['city']['post_id'] ) ); ?>"><?php echo esc_html( (string) $row['city']['name_fa'] ); ?></a>

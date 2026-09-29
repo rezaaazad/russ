@@ -29,15 +29,24 @@ $post_id = (int) get_the_ID();
 	<div class="container">
 		<ul class="lr-facts">
 			<?php
-			$facts = array(
-				'_lr_deadline'          => liferuss_t( 'path_deadline' ),
-				'_lr_coverage'          => liferuss_t( 'path_coverage' ),
-				'_lr_source'            => liferuss_t( 'path_source' ),
-				'_lr_last_verified_at'  => liferuss_t( 'path_verified' ),
-			);
-			foreach ( $facts as $key => $label ) {
-				$value = (string) get_post_meta( $post_id, $key, true );
-				if ( '' === $value ) {
+			$row   = \LifeRuss\Core\Scholarships\Store::for_post( $post_id );
+			$facts = array();
+			if ( $row ) {
+				$types = \LifeRuss\Core\Scholarships\Store::coverage_types();
+				$degs  = \LifeRuss\Core\Scholarships\Store::degrees();
+				$facts[ liferuss_t( 'path_deadline' ) ] = (string) $row['deadline'];
+				$facts['رشته']                         = (string) $row['field_name'];
+				$facts['مقطع']                         = $degs[ (string) $row['degree'] ] ?? '';
+				$cover                                 = $types[ (string) $row['coverage_type'] ] ?? '';
+				if ( $row['coverage_percent'] ) {
+					$cover .= ' ' . (int) $row['coverage_percent'] . '%';
+				}
+				$facts[ liferuss_t( 'path_coverage' ) ] = $cover;
+				$facts[ liferuss_t( 'path_source' ) ]   = (string) $row['source'];
+				$facts[ liferuss_t( 'path_verified' ) ] = \LifeRuss\Core\CRM\Jalali::plain( (string) $row['last_updated'] );
+			}
+			foreach ( $facts as $label => $value ) {
+				if ( '' === $value || '—' === $value ) {
 					continue;
 				}
 				echo '<li>' . esc_html( $label ) . ': ' . esc_html( $value ) . '</li>';
@@ -49,7 +58,7 @@ $post_id = (int) get_the_ID();
 			?>
 		</ul>
 		<?php
-		$eligibility = (string) get_post_meta( $post_id, '_lr_eligibility', true );
+		$eligibility = $row ? (string) $row['requirements'] : (string) get_post_meta( $post_id, '_lr_eligibility', true );
 		if ( $eligibility ) {
 			echo '<h2>' . esc_html( liferuss_t( 'path_eligibility' ) ) . '</h2>';
 			echo '<div class="path-prose"><p>' . esc_html( $eligibility ) . '</p></div>';

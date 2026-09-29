@@ -340,6 +340,31 @@ class Tables {
 				),
 				'fks'     => array(),
 			),
+			'scholarships'     => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'               => $id,
+					'post_id'          => 'bigint(20) unsigned NOT NULL',
+					'university_id'    => $fkn,
+					'field_name'       => 'varchar(120) NOT NULL DEFAULT \'\'',
+					'degree'           => 'varchar(40) NOT NULL DEFAULT \'\'',
+					'coverage_type'    => 'varchar(40) NOT NULL DEFAULT \'\'',
+					'coverage_percent' => 'smallint(5) unsigned DEFAULT NULL',
+					'quota'            => 'int(10) unsigned DEFAULT NULL',
+					'deadline'         => 'varchar(40) NOT NULL DEFAULT \'\'',
+					'language'         => 'varchar(20) NOT NULL DEFAULT \'\'',
+					'requirements'     => 'text',
+					'source'           => 'varchar(255) NOT NULL DEFAULT \'\'',
+					'last_updated'     => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'UNIQUE KEY post_id (post_id)',
+					'KEY university_id (university_id)',
+					'KEY degree_lang (degree, language)',
+				),
+				'fks'     => array(),
+			),
 			'payments'         => array(
 				'soft'    => false,
 				'columns' => array(
