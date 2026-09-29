@@ -268,6 +268,15 @@ class Settings {
 				'api_key'      => '',
 				'index_prefix' => 'liferuss',
 			),
+			'crm'           => array(
+				'auto_assign'        => '1',
+				'sla_hours'          => '4',
+				'dedupe_days'        => '30',
+				'followup_contacted' => '2',
+				'followup_documents' => '1',
+				'followup_qualified' => '1',
+				'daily_digest'       => '1',
+			),
 		);
 
 		return $map[ $group ] ?? array();

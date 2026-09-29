@@ -70,12 +70,19 @@ class LeadWriter {
 			$row['closed_at'] = $now;
 		}
 
+		$duplicate = Automation::find_duplicate( $phone, $email );
+		if ( $duplicate && empty( $data['skip_dedupe'] ) ) {
+			Automation::merge( $duplicate, $data );
+			return (int) $duplicate['id'];
+		}
+
 		$id = Repository::for( 'leads' )->insert( $row );
 		if ( ! $id ) {
 			return new \WP_Error( 'lr_lead', __( 'ثبت لید ممکن نشد.', 'liferuss-core' ) );
 		}
 		self::store_ip( $id, (string) ( $data['ip'] ?? '' ) );
 		self::history( $id, '', $row['status'], (string) ( $data['history_reason'] ?? 'create' ) );
+		Automation::after_create( $id );
 		if ( $map['request'] ) {
 			self::request( $map['request'], $id, is_array( $data['request'] ?? null ) ? $data['request'] : array(), (int) ( $data['operator_id'] ?? 0 ) );
 		}
@@ -126,7 +133,75 @@ class LeadWriter {
 		if ( in_array( $status, Catalog::closed_statuses(), true ) ) {
 			self::arm_purge( $lead_id );
 		}
+		Automation::after_status( $lead_id, (string) $lead['status'], $status );
 		return true;
+	}
+
+	/**
+	 * Assign without the manager capability. Used by round-robin.
+	 *
+	 * @param int $lead_id Lead id.
+	 * @param int $user_id User id.
+	 */
+	public static function assign_system( int $lead_id, int $user_id ): bool {
+		if ( $user_id < 1 || ! Repository::for( 'leads' )->find( $lead_id ) ) {
+			return false;
+		}
+		return Repository::for( 'leads' )->update(
+			$lead_id,
+			array(
+				'consultant_id' => $user_id,
+				'assigned_by'   => null,
+				'assigned_at'   => gmdate( 'Y-m-d H:i:s' ),
+			)
+		);
+	}
+
+	/**
+	 * History row that does not require a logged-in editor.
+	 *
+	 * @param int    $lead_id Lead id.
+	 * @param string $from    Previous status.
+	 * @param string $to      New status.
+	 * @param string $reason  Reason.
+	 */
+	public static function log( int $lead_id, string $from, string $to, string $reason ): void {
+		self::history( $lead_id, $from, $to, $reason );
+	}
+
+	/**
+	 * Follow-up task created by a rule, not by the current user.
+	 *
+	 * @param int    $lead_id Lead id.
+	 * @param string $title   Title.
+	 * @param string $due     UTC datetime.
+	 * @param int    $user_id Assignee.
+	 * @param string $type    Task type.
+	 */
+	public static function add_system_task( int $lead_id, string $title, string $due, int $user_id, string $type = 'other' ): int {
+		$title = trim( $title );
+		if ( '' === $title || $user_id < 1 || ! Repository::for( 'leads' )->find( $lead_id ) ) {
+			return 0;
+		}
+		$allowed = array( 'call', 'whatsapp', 'email', 'meeting', 'document', 'other' );
+		if ( ! in_array( $type, $allowed, true ) ) {
+			$type = 'other';
+		}
+		$id = Repository::for( 'lead_tasks' )->insert(
+			array(
+				'lead_id'     => $lead_id,
+				'title'       => $title,
+				'task_type'   => $type,
+				'assigned_to' => $user_id,
+				'due_at'      => $due,
+				'status'      => 'open',
+				'created_by'  => null,
+			)
+		);
+		if ( $id ) {
+			Repository::for( 'leads' )->update( $lead_id, array( 'next_follow_up_at' => $due ) );
+		}
+		return $id;
 	}
 
 	/**

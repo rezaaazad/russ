@@ -24,6 +24,7 @@ use LifeRuss\Core\Content\Editor as ContentEditor;
 use LifeRuss\Core\Content\Seed as ContentSeed;
 use LifeRuss\Core\Content\ServiceSeed;
 use LifeRuss\Core\Redirects\Runner;
+use LifeRuss\Core\CRM\Automation;
 use LifeRuss\Core\CRM\Cli as CrmCli;
 use LifeRuss\Core\Catalog\Cli as CatalogCli;
 use LifeRuss\Core\CRM\Files;
@@ -68,6 +69,7 @@ class Plugin {
 		LimitedAdmin::hooks();
 		Profile::hooks();
 		Intake::hooks();
+		Automation::hooks();
 		Notifier::hooks();
 		Purge::hooks();
 		Files::hooks();

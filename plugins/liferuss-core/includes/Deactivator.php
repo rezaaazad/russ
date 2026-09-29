@@ -21,6 +21,8 @@ class Deactivator {
 	 */
 	public static function deactivate(): void {
 		wp_clear_scheduled_hook( 'lr_search_queue' );
+		wp_clear_scheduled_hook( 'lr_crm_sla' );
+		wp_clear_scheduled_hook( 'lr_crm_digest' );
 		flush_rewrite_rules( false );
 	}
 }

@@ -74,6 +74,10 @@ class SettingsPage {
 				'label' => 'جستجو',
 				'cap'   => 'lr_manage_settings',
 			),
+			'crm'           => array(
+				'label' => 'اتوماسیون CRM',
+				'cap'   => 'lr_manage_settings',
+			),
 		);
 	}
 
@@ -414,6 +418,46 @@ class SettingsPage {
 				'host'         => untrailingslashit( esc_url_raw( self::posted_text( 'search_host' ) ) ),
 				'api_key'      => $key,
 				'index_prefix' => $prefix,
+			)
+		);
+	}
+
+	/**
+	 * CRM automation rules.
+	 */
+	private static function fields_crm(): void {
+		$v = Settings::get( 'crm' );
+		echo '<tr><th scope="row">' . esc_html__( 'ارجاع خودکار', 'liferuss-core' ) . '</th><td>';
+		echo '<label><input type="checkbox" name="auto_assign" value="1" ' . checked( '1', (string) $v['auto_assign'], false ) . '> ';
+		echo esc_html__( 'لید جدید بین مشاوران و اپراتورهای فعال همان سرویس، به‌نوبت، تقسیم شود. فقط کسانی که lr_allowed_services همان گروه را دارند.', 'liferuss-core' );
+		echo '</label></td></tr>';
+		self::text_row( 'sla_hours', __( 'مهلت اولین تماس (ساعت)', 'liferuss-core' ), (string) $v['sla_hours'], 'number' );
+		self::text_row( 'dedupe_days', __( 'پنجرهٔ تکرار (روز)', 'liferuss-core' ), (string) $v['dedupe_days'], 'number' );
+		self::text_row( 'followup_contacted', __( 'پیگیری پس از «تماس» (روز)', 'liferuss-core' ), (string) $v['followup_contacted'], 'number' );
+		self::text_row( 'followup_documents', __( 'یادآوری پس از «مدارک» (روز)', 'liferuss-core' ), (string) $v['followup_documents'], 'number' );
+		self::text_row( 'followup_qualified', __( 'پیگیری پس از «واجد شرایط» (روز)', 'liferuss-core' ), (string) $v['followup_qualified'], 'number' );
+		echo '<tr><th scope="row">' . esc_html__( 'خلاصهٔ روزانه', 'liferuss-core' ) . '</th><td>';
+		echo '<label><input type="checkbox" name="daily_digest" value="1" ' . checked( '1', (string) $v['daily_digest'], false ) . '> ';
+		echo esc_html__( 'هر روز وظایف سررسیدشده برای هر مشاور ایمیل شود. تأخیر SLA به مدیر و، اگر روشن باشد، تلگرام می‌رود.', 'liferuss-core' );
+		echo '</label></td></tr>';
+	}
+
+	/**
+	 * Save CRM rules.
+	 */
+	private static function save_crm(): void {
+		$hours = absint( self::posted_text( 'sla_hours' ) );
+		$days  = absint( self::posted_text( 'dedupe_days' ) );
+		Settings::update(
+			'crm',
+			array(
+				'auto_assign'        => isset( $_POST['auto_assign'] ) ? '1' : '0', // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				'sla_hours'          => (string) ( $hours > 0 ? $hours : 4 ),
+				'dedupe_days'        => (string) ( $days > 0 ? $days : 30 ),
+				'followup_contacted' => (string) absint( self::posted_text( 'followup_contacted' ) ),
+				'followup_documents' => (string) absint( self::posted_text( 'followup_documents' ) ),
+				'followup_qualified' => (string) absint( self::posted_text( 'followup_qualified' ) ),
+				'daily_digest'       => isset( $_POST['daily_digest'] ) ? '1' : '0', // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			)
 		);
 	}

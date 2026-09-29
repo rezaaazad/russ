@@ -154,6 +154,79 @@ class Notifier {
 	}
 
 	/**
+	 * Email every administrator and the shared Telegram channel.
+	 *
+	 * @param string $subject Subject.
+	 * @param string $body    Body.
+	 */
+	public static function notify_admins( string $subject, string $body ): void {
+		$admins = get_users(
+			array(
+				'role'   => 'administrator',
+				'fields' => array( 'user_email' ),
+				'number' => 20,
+			)
+		);
+		foreach ( $admins as $admin ) {
+			if ( is_email( $admin->user_email ) ) {
+				self::mail_to( $admin->user_email, $subject, $body );
+			}
+		}
+		self::telegram_text( $body );
+	}
+
+	/**
+	 * One plain email. Failures stay inside the mailer.
+	 *
+	 * @param string $to      Recipient.
+	 * @param string $subject Subject.
+	 * @param string $body    Body.
+	 */
+	public static function mail_to( string $to, string $subject, string $body ): void {
+		$to = sanitize_email( $to );
+		if ( ! is_email( $to ) ) {
+			return;
+		}
+		if ( apply_filters( 'lr_notice_mock', false ) ) {
+			return;
+		}
+		$settings = Settings::get( 'notifications' );
+		$headers  = array();
+		$from     = sanitize_email( (string) $settings['from_email'] );
+		if ( is_email( $from ) ) {
+			$headers[] = 'From: ' . (string) $settings['from_name'] . ' <' . $from . '>';
+		}
+		wp_mail( $to, $subject, $body, $headers );
+	}
+
+	/**
+	 * Telegram text when the bot is configured.
+	 *
+	 * @param string $text Message.
+	 */
+	private static function telegram_text( string $text ): void {
+		$settings = Settings::get( 'notifications' );
+		if ( '1' !== (string) $settings['telegram_enabled'] ) {
+			return;
+		}
+		$token = (string) $settings['bot_token'];
+		$chat  = (string) $settings['chat_id'];
+		if ( '' === $token || '' === $chat || apply_filters( 'lr_notice_mock', false ) ) {
+			return;
+		}
+		wp_remote_post(
+			'https://api.telegram.org/bot' . rawurlencode( $token ) . '/sendMessage',
+			array(
+				'timeout' => 8,
+				'body'    => array(
+					'chat_id' => $chat,
+					'text'    => $text,
+				),
+			)
+		);
+	}
+
+	/**
 	 * Plain-text notice. No secrets.
 	 *
 	 * @param array<string, mixed> $lead Lead row.
