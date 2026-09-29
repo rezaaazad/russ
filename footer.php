@@ -49,18 +49,36 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 		<div class="footer-col">
 			<h2><?php echo esc_html( liferuss_t( 'footer_quick' ) ); ?></h2>
 			<ul class="footer-links">
-				<?php foreach ( (array) liferuss_opt( 'footer_links', array() ) as $item ) : ?>
-					<?php
+				<?php
+				$footer_seen = array();
+				$footer_rows = array();
+				foreach ( (array) liferuss_opt( 'footer_links', array() ) as $item ) {
 					if ( empty( $item['label'] ) ) {
 						continue;
 					}
-					$link = $item['url'] ?? '';
+					$footer_rows[] = array(
+						'label' => (string) $item['label'],
+						'url'   => (string) ( $item['url'] ?? '' ),
+					);
+				}
+				foreach ( liferuss_path_footer_extra() as $extra ) {
+					$footer_rows[] = array(
+						'label' => (string) $extra['title'],
+						'url'   => (string) $extra['url'],
+					);
+				}
+				foreach ( $footer_rows as $item ) :
+					$link = $item['url'];
+					$path = untrailingslashit( (string) ( preg_match( '#^https?://#i', $link ) ? (string) wp_parse_url( $link, PHP_URL_PATH ) : $link ) );
+					$key  = $path . '|' . $item['label'];
+					if ( isset( $footer_seen[ $path ] ) || isset( $footer_seen[ 'label:' . $item['label'] ] ) ) {
+						continue;
+					}
+					$footer_seen[ $path ]                      = true;
+					$footer_seen[ 'label:' . $item['label'] ] = true;
 					$href = preg_match( '#^https?://#i', $link ) ? liferuss_localize_url( $link ) : liferuss_url( $link );
 					?>
 					<li><a href="<?php echo esc_url( $href ); ?>"><?php echo esc_html( $item['label'] ); ?></a></li>
-				<?php endforeach; ?>
-				<?php foreach ( liferuss_path_footer_extra() as $extra ) : ?>
-					<li><a href="<?php echo esc_url( liferuss_url( $extra['url'] ) ); ?>"><?php echo esc_html( $extra['title'] ); ?></a></li>
 				<?php endforeach; ?>
 			</ul>
 		</div>
@@ -78,10 +96,10 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 			<h2><?php echo esc_html( liferuss_t( 'footer_contact' ) ); ?></h2>
 			<ul class="footer-contact">
 				<?php if ( $phone ) : ?>
-					<li><?php echo liferuss_icon( 'phone' ); ?><a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>"><?php echo esc_html( $phone ); ?></a></li>
+					<li><?php echo liferuss_icon( 'phone' ); ?><a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>"><bdi dir="ltr"><?php echo esc_html( $phone ); ?></bdi></a></li>
 				<?php endif; ?>
 				<?php if ( $phone_alt ) : ?>
-					<li><?php echo liferuss_icon( 'phone' ); ?><a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone_alt ) ); ?>"><?php echo esc_html( $phone_alt ); ?></a></li>
+					<li><?php echo liferuss_icon( 'phone' ); ?><a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone_alt ) ); ?>"><bdi dir="ltr"><?php echo esc_html( $phone_alt ); ?></bdi></a></li>
 				<?php endif; ?>
 				<?php if ( $email ) : ?>
 					<li><?php echo liferuss_icon( 'mail' ); ?><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></li>
