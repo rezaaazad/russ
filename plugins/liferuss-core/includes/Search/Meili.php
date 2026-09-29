@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * One index, `{prefix}_content`, keyed by type:postId.
+ * One index, `{prefix}_content`, keyed by type_postId.
  */
 class Meili {
 

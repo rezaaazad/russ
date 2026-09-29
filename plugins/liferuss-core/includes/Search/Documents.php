@@ -56,7 +56,7 @@ class Documents {
 		if ( '' === $kind ) {
 			return '';
 		}
-		return $kind . ':' . $post_id;
+		return $kind . '_' . $post_id;
 	}
 
 	/**
@@ -181,7 +181,7 @@ class Documents {
 		}
 		$excerpt = $city ? $city : wp_trim_words( wp_strip_all_tags( $post->post_excerpt ? $post->post_excerpt : $post->post_content ), 22, '…' );
 		return array(
-			'id'        => $kind . ':' . $post->ID,
+			'id'        => $kind . '_' . $post->ID,
 			'type'      => $kind,
 			'title'     => $title,
 			'text'      => $text,
