@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( defined( 'LIFERUSS_LEADS_ACTIVE' ) && LIFERUSS_LEADS_ACTIVE ) {
+if ( ( defined( 'LIFERUSS_LEADS_ACTIVE' ) && LIFERUSS_LEADS_ACTIVE ) || defined( 'LIFERUSS_CORE_VERSION' ) ) {
 	return;
 }
 

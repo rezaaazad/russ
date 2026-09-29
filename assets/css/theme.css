@@ -2832,6 +2832,287 @@ body.ltr .lr-float__row-label {
   text-align: start;
 }
 
+.lr-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.lr-filters label {
+  display: grid;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.lr-filters input,
+.lr-filters select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font: inherit;
+  background: var(--white);
+}
+
+.lr-check {
+  align-items: center;
+  grid-template-columns: auto 1fr;
+}
+
+.lr-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.lr-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.lr-card img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.lr-card-body {
+  padding: 16px;
+}
+
+.lr-card h2 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+}
+
+.lr-meta,
+.lr-count,
+.lr-empty {
+  color: var(--muted);
+  margin: 0;
+}
+
+.lr-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 0 0 24px;
+  list-style: none;
+}
+
+.lr-facts li {
+  background: var(--navy-soft);
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+.lr-table {
+  width: 100%;
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  margin: 0 0 28px;
+}
+
+.lr-table th,
+.lr-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 8px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.lr-gallery {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.lr-faq {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 0;
+}
+
+.lr-living {
+  background: var(--gold-soft);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.lr-pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.lr-pager a,
+.lr-pager span {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.lr-pager span {
+  background: var(--navy);
+  color: #fff;
+}
+
+.lr-single h2 {
+  margin-top: 32px;
+}
+
+@media (min-width: 720px) {
+  .lr-filters {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: end;
+  }
+
+  .lr-cards,
+  .lr-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lr-table {
+    display: table;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lr-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.path-children {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.path-child {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 44px;
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: inherit;
+  text-decoration: none;
+}
+
+.path-child span,
+.path-prose,
+.path-quotes cite {
+  color: var(--muted);
+}
+
+.path-section,
+.path-quotes blockquote {
+  margin: 0 0 28px;
+}
+
+.path-quotes blockquote {
+  margin: 0;
+  padding: 16px;
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+}
+
+.path-quotes {
+  display: grid;
+  gap: 12px;
+}
+
+.lr-faq details {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 0;
+}
+
+.lr-faq summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.consult-form textarea {
+  width: 100%;
+  min-height: 96px;
+}
+
+.lr-toc,
+.lr-author,
+.lr-related,
+.lr-inline-cta {
+  margin: 24px 0;
+}
+
+.lr-toc {
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.lr-toc ol {
+  margin: 8px 0 0;
+  padding-inline-start: 20px;
+}
+
+.lr-toc-3 {
+  margin-inline-start: 16px;
+}
+
+.lr-author {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.lr-author img {
+  border-radius: 50%;
+}
+
+.lr-related ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lr-related a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+@media (min-width: 720px) {
+  .path-children {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

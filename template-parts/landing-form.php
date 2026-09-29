@@ -40,6 +40,7 @@ $choices     = (array) liferuss_opt( $choices_key, array() );
 				<div class="hp" aria-hidden="true">
 					<label>شرکت<input type="text" name="liferuss_company" tabindex="-1" autocomplete="off"></label>
 				</div>
+				<?php liferuss_form_tracking_fields(); ?>
 
 				<div class="landing-form-grid">
 					<label>

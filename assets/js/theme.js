@@ -264,9 +264,60 @@
     });
   });
 
+  function rememberCampaign() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach(function (key) {
+        var value = params.get(key);
+        if (value) {
+          window.sessionStorage.setItem("lr_" + key, value);
+        }
+      });
+    } catch (err) {
+      return;
+    }
+  }
+
+  function applyTracking(form) {
+    var params = new URLSearchParams(window.location.search);
+    ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach(function (key) {
+      var input = form.querySelector("[name='" + key + "']");
+      if (!input) {
+        return;
+      }
+      var value = params.get(key) || "";
+      if (!value) {
+        try {
+          value = window.sessionStorage.getItem("lr_" + key) || "";
+        } catch (err) {
+          value = "";
+        }
+      }
+      if (value) {
+        input.value = value;
+      }
+    });
+    var landing = form.querySelector("[name='landing_page']");
+    if (landing && !landing.value) {
+      landing.value = window.location.href;
+    }
+    var referrer = form.querySelector("[name='referrer']");
+    if (referrer && !referrer.value) {
+      referrer.value = document.referrer || "";
+    }
+  }
+
+  function pushAnalytics(payload) {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(payload);
+  }
+
+  rememberCampaign();
+
   if (typeof window.liferussTheme !== "undefined") {
     document.querySelectorAll(".consult-form").forEach(function (form) {
       var status = form.parentElement ? form.parentElement.querySelector(".form-status") : document.querySelector(".form-status");
+      var started = false;
 
       function showStatus(ok, message) {
         if (!status) {
@@ -278,8 +329,21 @@
         status.classList.toggle("is-err", !ok);
       }
 
+      form.addEventListener("focusin", function () {
+        if (started) {
+          return;
+        }
+        started = true;
+        var typeInput = form.querySelector("[name='consult_type']");
+        pushAnalytics({
+          event: "form_start",
+          form_type: typeInput ? typeInput.value : ""
+        });
+      });
+
       form.addEventListener("submit", function (event) {
         event.preventDefault();
+        applyTracking(form);
         var data = new FormData(form);
         data.set("action", "liferuss_consult");
         if (!data.get("liferuss_nonce")) {
@@ -291,9 +355,16 @@
           button.disabled = true;
         }
 
-        fetch(window.liferussTheme.ajaxUrl, {
+        var endpoint = window.liferussTheme.leadUrl || window.liferussTheme.ajaxUrl;
+        var headers = {};
+        if (window.liferussTheme.leadUrl && window.liferussTheme.restNonce) {
+          headers["X-WP-Nonce"] = window.liferussTheme.restNonce;
+        }
+
+        fetch(endpoint, {
           method: "POST",
           credentials: "same-origin",
+          headers: headers,
           body: data
         })
           .then(function (response) {
@@ -303,14 +374,32 @@
             var payload = json.data || {};
             var ok = Boolean(json.success);
             var labels = window.liferussTheme.strings || {};
+            var typeInput = form.querySelector("[name='consult_type']");
+            var formType = typeInput ? typeInput.value : "";
             showStatus(ok, payload.message || (ok ? (labels.formOk || "OK") : (labels.formErr || "Error")));
             if (ok) {
+              pushAnalytics(payload.analytics || {
+                event: "form_submit",
+                form_type: formType,
+                lead_id: payload.lead_id || ""
+              });
               form.reset();
+              applyTracking(form);
+            } else {
+              pushAnalytics({
+                event: "form_error",
+                form_type: formType
+              });
             }
           })
           .catch(function () {
             var labels = window.liferussTheme.strings || {};
+            var typeInput = form.querySelector("[name='consult_type']");
             showStatus(false, labels.formNet || "Network error");
+            pushAnalytics({
+              event: "form_error",
+              form_type: typeInput ? typeInput.value : ""
+            });
           })
           .finally(function () {
             if (button) {

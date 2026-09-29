@@ -80,7 +80,26 @@ function liferuss_is_valid_lang( $lang ) {
 }
 
 /**
+ * Copy the Polylang language into the theme helpers without rewriting the request.
+ *
+ * @param string $slug Language slug.
+ * @param mixed  $lang Language object, unused.
+ */
+function liferuss_apply_polylang( $slug = '', $lang = null ) {
+	unset( $lang );
+	$code = is_string( $slug ) ? $slug : '';
+	if ( '' === $code && function_exists( 'pll_current_language' ) ) {
+		$code = (string) pll_current_language( 'slug' );
+	}
+	if ( liferuss_is_valid_lang( $code ) ) {
+		$GLOBALS['liferuss_lang'] = $code;
+	}
+}
+
+/**
  * Detect and strip /en|/ru|/ar prefixes before WordPress routes the request.
+ *
+ * Polylang owns the URL when it is active, so the request is left intact.
  */
 function liferuss_boot_language() {
 	static $booted = false;
@@ -129,6 +148,20 @@ function liferuss_boot_language() {
 		if ( '' === $rel ) {
 			$rel = '/';
 		}
+	}
+
+	if ( function_exists( 'pll_current_language' ) ) {
+		liferuss_apply_polylang();
+		if ( ! has_action( 'pll_language_defined', 'liferuss_apply_polylang' ) ) {
+			add_action( 'pll_language_defined', 'liferuss_apply_polylang', 1, 2 );
+		}
+		if ( preg_match( '#^/(en|ru|ar)(/.*)?$#', $rel, $pll_match ) ) {
+			$rest                     = isset( $pll_match[2] ) && '' !== $pll_match[2] ? $pll_match[2] : '/';
+			$GLOBALS['liferuss_path'] = $rest;
+		} else {
+			$GLOBALS['liferuss_path'] = $rel ? $rel : '/';
+		}
+		return;
 	}
 
 	if ( preg_match( '#^/(en|ru|ar)(/.*)?$#', $rel, $match ) ) {
@@ -221,8 +254,17 @@ function liferuss_url( $path = '/', $lang = null ) {
 		$lang = 'fa';
 	}
 	$path = '/' . ltrim( (string) $path, '/' );
+	if ( '/freight' === untrailingslashit( $path ) ) {
+		$path = '/cargo/';
+	}
 	if ( '' === $path || '/index.php' === $path ) {
 		$path = '/';
+	}
+	if ( function_exists( 'pll_home_url' ) ) {
+		$base = untrailingslashit( (string) pll_home_url( $lang ) );
+		if ( $base ) {
+			return $base . ( '/' === $path ? '/' : $path );
+		}
 	}
 	$home   = untrailingslashit( home_url( '/' ) );
 	$prefix = liferuss_languages()[ $lang ]['prefix'];
@@ -396,6 +438,49 @@ function liferuss_ui_strings() {
 			'nav_freight'        => 'باربری و ارسال',
 			'nav_trade'          => 'تجارت و تأمین',
 			'nav_contact'        => 'تماس با ما',
+			'nav_study'          => 'تحصیل در روسیه',
+			'nav_scholarships'   => 'بورسیه‌ها',
+			'nav_podfak'         => 'پادفک',
+			'nav_direct'         => 'پذیرش مستقیم',
+			'nav_immigration'    => 'مهاجرت',
+			'nav_admission'      => 'درخواست پذیرش',
+			'nav_exchange'       => 'استعلام نرخ',
+			'nav_cargo'          => 'کارگو',
+			'nav_guide'          => 'راهنمای روسیه',
+			'nav_cities'         => 'شهرها',
+			'reading_min'        => 'دقیقه',
+			'toc'                => 'فهرست',
+			'author_fallback'    => 'تیم محتوای لایف روس',
+			'related_posts'      => 'نوشته‌های مرتبط',
+			'magazine_cta'       => 'ثبت درخواست',
+			'path_home_title'    => 'مسیرهای تحصیل و مهاجرت',
+			'path_live_title'    => 'از کاتالوگ دانشگاه',
+			'path_prep_title'    => 'دانشگاه‌ها، مدت و شهریه',
+			'path_empty'         => 'موردی در کاتالوگ منتشر نشده است.',
+			'path_count'         => 'دانشگاه',
+			'path_tuition'       => 'شهریه (دلار)',
+			'path_months'        => 'ماه',
+			'path_all_unis'      => 'فهرست دانشگاه‌ها',
+			'path_faq'           => 'پرسش‌های متداول',
+			'path_quotes'        => 'تجربه دانشجویان',
+			'path_guides'        => 'دانستنی‌های روسیه',
+			'path_posts'         => 'از مجله',
+			'path_scholarship_lead' => 'بورسیه‌ها و سهمیه‌های نمونه. مهلت، پوشش و منبع را مدیر محتوا به‌روز می‌کند.',
+			'path_deadline'      => 'مهلت',
+			'path_coverage'      => 'پوشش',
+			'path_eligibility'   => 'شرایط',
+			'path_source'        => 'منبع',
+			'path_verified'      => 'آخرین بررسی',
+			'form_admission_title' => 'درخواست پذیرش',
+			'form_admission_intro' => 'نام، شماره و مقطع را بفرستید تا درخواست پذیرش ثبت شود.',
+			'form_exchange_title'  => 'استعلام نرخ',
+			'form_exchange_intro'  => 'فقط استعلام نرخ. مبلغ و ارز مبدأ و مقصد را بنویسید.',
+			'form_immigration_title' => 'مشاوره مهاجرت',
+			'form_immigration_intro' => 'نام و شماره را بفرستید تا درخواست مهاجرت ثبت شود.',
+			'form_amount'        => 'مبلغ',
+			'form_currency_from' => 'از ارز',
+			'form_currency_to'   => 'به ارز',
+			'form_notes'         => 'توضیح',
 			'footer_quick'       => 'دسترسی سریع',
 			'footer_services'    => 'خدمات',
 			'footer_contact'     => 'تماس با ما',
@@ -501,6 +586,14 @@ function liferuss_ui_strings() {
 			'nav_costs'          => 'Costs',
 			'nav_blog'           => 'Blog',
 			'nav_freight'        => 'Freight',
+			'nav_cargo'          => 'Cargo',
+			'nav_guide'          => 'Russia guide',
+			'nav_cities'         => 'Cities',
+			'reading_min'        => 'min',
+			'toc'                => 'On this page',
+			'author_fallback'    => 'LifeRuss editorial team',
+			'related_posts'      => 'Related posts',
+			'magazine_cta'       => 'Send a request',
 			'nav_trade'          => 'Trade',
 			'nav_contact'        => 'Contact',
 			'footer_quick'       => 'Quick links',
@@ -608,6 +701,14 @@ function liferuss_ui_strings() {
 			'nav_costs'          => 'Стоимость',
 			'nav_blog'           => 'Блог',
 			'nav_freight'        => 'Грузы',
+			'nav_cargo'          => 'Карго',
+			'nav_guide'          => 'Гид по России',
+			'nav_cities'         => 'Города',
+			'reading_min'        => 'мин',
+			'toc'                => 'Содержание',
+			'author_fallback'    => 'Редакция LifeRuss',
+			'related_posts'      => 'Похожие записи',
+			'magazine_cta'       => 'Оставить заявку',
 			'nav_trade'          => 'Торговля',
 			'nav_contact'        => 'Контакты',
 			'footer_quick'       => 'Быстрые ссылки',
@@ -715,6 +816,14 @@ function liferuss_ui_strings() {
 			'nav_costs'          => 'التكاليف',
 			'nav_blog'           => 'المدونة',
 			'nav_freight'        => 'الشحن',
+			'nav_cargo'          => 'الشحن',
+			'nav_guide'          => 'دليل روسيا',
+			'nav_cities'         => 'المدن',
+			'reading_min'        => 'دقيقة',
+			'toc'                => 'المحتويات',
+			'author_fallback'    => 'فريق تحرير لایف روس',
+			'related_posts'      => 'مقالات ذات صلة',
+			'magazine_cta'       => 'إرسال طلب',
 			'nav_trade'          => 'التجارة',
 			'nav_contact'        => 'اتصل بنا',
 			'footer_quick'       => 'روابط سريعة',
@@ -852,6 +961,7 @@ function liferuss_page_nav_keys() {
 		'universities'  => 'nav_universities',
 		'services'      => 'nav_services',
 		'freight'       => 'nav_freight',
+		'cargo'         => 'nav_cargo',
 		'trade'         => 'nav_trade',
 		'costs'         => 'nav_costs',
 		'blog'          => 'nav_blog',
@@ -898,6 +1008,21 @@ function liferuss_filter_menu_title( $title, $item ) {
 	}
 	if ( 'page' === $item->object ) {
 		return liferuss_filter_the_title( $title, (int) $item->object_id );
+	}
+	if ( 'custom' === $item->type && function_exists( 'liferuss_path_links' ) ) {
+		$path = untrailingslashit( (string) wp_parse_url( $item->url, PHP_URL_PATH ) );
+		if ( preg_match( '#^/(en|ru|ar)(/.*)?$#', $path, $match ) ) {
+			$path = isset( $match[2] ) && '' !== $match[2] ? untrailingslashit( $match[2] ) : '';
+		}
+		$known = liferuss_path_links();
+		if ( function_exists( 'liferuss_service_home_links' ) ) {
+			$known = array_merge( $known, liferuss_service_home_links() );
+		}
+		foreach ( $known as $link ) {
+			if ( untrailingslashit( $link['url'] ) === $path ) {
+				return $link['title'];
+			}
+		}
 	}
 	return $title;
 }
