@@ -23,6 +23,7 @@ class Deactivator {
 		wp_clear_scheduled_hook( 'lr_search_queue' );
 		wp_clear_scheduled_hook( 'lr_crm_sla' );
 		wp_clear_scheduled_hook( 'lr_crm_digest' );
+		wp_clear_scheduled_hook( 'lr_fx_update' );
 		flush_rewrite_rules( false );
 	}
 }

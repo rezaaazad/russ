@@ -414,8 +414,21 @@ class Set {
 		}
 		return array(
 			'native' => $native,
-			'usd'    => null === $usd ? '—' : number_format_i18n( $usd ) . ' USD',
+			'usd'    => null === $usd ? '—' : number_format_i18n( $usd ) . ' USD' . self::fx_note( $currency ),
 		);
+	}
+
+	/**
+	 * Jalali note beside a USD tuition cell.
+	 *
+	 * @param string $currency ISO code.
+	 */
+	private static function fx_note( string $currency ): string {
+		if ( ! class_exists( '\LifeRuss\Core\Currency\Rates' ) ) {
+			return '';
+		}
+		$text = \LifeRuss\Core\Currency\Rates::stamp_text( $currency );
+		return '' === $text ? '' : ' (' . $text . ')';
 	}
 
 	/**

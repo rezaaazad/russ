@@ -45,6 +45,9 @@ if ( 'admission' === $type ) {
 			<p class="eyebrow"><?php echo esc_html( liferuss_opt( 'form_eyebrow' ) ); ?></p>
 			<<?php echo $heading; ?>><?php echo esc_html( $form_title ); ?></<?php echo $heading; ?>>
 			<p><?php echo esc_html( $form_intro ); ?></p>
+			<?php if ( 'exchange' === $type && function_exists( 'liferuss_fx_panel' ) ) : ?>
+				<?php liferuss_fx_panel(); ?>
+			<?php endif; ?>
 			<div class="consult-channels">
 				<p class="screen-reader-text"><?php echo esc_html( liferuss_t( 'channels_aria' ) ); ?></p>
 				<?php if ( $whatsapp ) : ?>

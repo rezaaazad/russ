@@ -340,6 +340,21 @@ class Tables {
 				),
 				'fks'     => array(),
 			),
+			'rate_history'     => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'           => $id,
+					'currency'     => 'varchar(8) NOT NULL',
+					'usd_per_unit' => 'varchar(32) NOT NULL',
+					'source'       => "varchar(12) NOT NULL DEFAULT 'manual'",
+					'created_at'   => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'KEY currency_created (currency, created_at)',
+				),
+				'fks'     => array(),
+			),
 		);
 	}
 

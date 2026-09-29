@@ -22,19 +22,35 @@ class Jalali {
 	 * @param string $utc MySQL datetime in UTC.
 	 */
 	public static function html( string $utc ): string {
+		$label = self::plain( $utc );
+		if ( '—' === $label ) {
+			return '—';
+		}
+		$stamp = strtotime( trim( $utc ) . ' UTC' );
+		if ( ! $stamp ) {
+			return esc_html( $utc );
+		}
+		$tip = gmdate( 'Y-m-d H:i', $stamp ) . ' UTC';
+		return '<time datetime="' . esc_attr( gmdate( 'c', $stamp ) ) . '" title="' . esc_attr( $tip ) . '">' . esc_html( $label ) . '</time>';
+	}
+
+	/**
+	 * Plain Jalali label for text that will be escaped by the caller.
+	 *
+	 * @param string $utc MySQL datetime in UTC.
+	 */
+	public static function plain( string $utc ): string {
 		$utc = trim( $utc );
 		if ( '' === $utc || '0000-00-00 00:00:00' === $utc ) {
 			return '—';
 		}
 		$stamp = strtotime( $utc . ' UTC' );
 		if ( ! $stamp ) {
-			return esc_html( $utc );
+			return $utc;
 		}
 		$local = $stamp + (int) ( 3.5 * HOUR_IN_SECONDS );
 		$parts = self::to_jalali( (int) gmdate( 'Y', $local ), (int) gmdate( 'n', $local ), (int) gmdate( 'j', $local ) );
-		$label = sprintf( '%04d/%02d/%02d %s', $parts[0], $parts[1], $parts[2], gmdate( 'H:i', $local ) );
-		$tip   = gmdate( 'Y-m-d H:i', $stamp ) . ' UTC';
-		return '<time datetime="' . esc_attr( gmdate( 'c', $stamp ) ) . '" title="' . esc_attr( $tip ) . '">' . esc_html( $label ) . '</time>';
+		return sprintf( '%04d/%02d/%02d %s', $parts[0], $parts[1], $parts[2], gmdate( 'H:i', $local ) );
 	}
 
 	/**

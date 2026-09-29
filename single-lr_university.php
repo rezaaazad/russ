@@ -48,7 +48,7 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 				<?php if ( ! empty( $row['founded_year'] ) ) : ?><li>تأسیس <?php echo esc_html( (string) $row['founded_year'] ); ?></li><?php endif; ?>
 				<?php if ( 'state' === $row['ownership'] ) : ?><li>دولتی</li><?php elseif ( 'private' === $row['ownership'] ) : ?><li>خصوصی</li><?php endif; ?>
 				<?php if ( (int) get_post_meta( $post_id, '_lr_students_total', true ) ) : ?><li><?php echo esc_html( number_format_i18n( (int) get_post_meta( $post_id, '_lr_students_total', true ) ) ); ?> دانشجو</li><?php endif; ?>
-				<?php $usd = liferuss_catalog_usd( $row['min_tuition_usd'] ); if ( $usd ) : ?><li>شهریه از <?php echo esc_html( $usd ); ?></li><?php endif; ?>
+				<?php $usd = liferuss_catalog_usd( $row['min_tuition_usd'], true ); if ( $usd ) : ?><li>شهریه از <?php echo esc_html( $usd ); ?></li><?php endif; ?>
 				<?php if ( ! empty( $row['best_world_rank'] ) ) : ?><li>بهترین رتبه جهانی <?php echo esc_html( (string) $row['best_world_rank'] ); ?></li><?php endif; ?>
 				<?php if ( 'approved' === $row['health_ministry_status'] ) : ?><li>تأیید وزارت بهداشت</li><?php endif; ?>
 				<?php if ( 'approved' === $row['science_ministry_status'] ) : ?><li>تأیید وزارت علوم</li><?php endif; ?>
@@ -85,7 +85,7 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 							<td><?php echo esc_html( liferuss_catalog_lang( (string) $program['language'] ) ); ?></td>
 							<td><?php echo esc_html( (string) $program['duration_years'] ); ?></td>
 							<td><?php echo esc_html( number_format_i18n( (float) $program['tuition'] ) . ' ' . (string) $program['currency'] ); ?></td>
-							<td><?php echo esc_html( liferuss_catalog_usd( $program['amount_usd'] ) ); ?></td>
+							<td><?php echo esc_html( liferuss_catalog_usd( $program['amount_usd'], true ) ); ?></td>
 						</tr>
 					<?php endforeach; ?>
 					</tbody>

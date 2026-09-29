@@ -279,20 +279,40 @@ class SettingsPage {
 	 */
 	private static function fields_currency(): void {
 		$v = Settings::get( 'currency' );
-		echo '<tr><td colspan="2"><p>' . esc_html__( 'نرخ دستی: چند دلار آمریکا برابر یک واحد از ارز است. با ذخیره، amount_usd شهریه‌های همان ارز دوباره حساب می‌شود.', 'liferuss-core' ) . '</p></td></tr>';
+		echo '<tr><td colspan="2"><p>' . esc_html__( 'نرخ دستی منبع حقیقت است: چند دلار آمریکا برابر یک واحد از ارز است. قفل دستی همیشه بر به‌روزرسانی خودکار مقدم است. IRT روی جفت IRR ذخیره می‌شود.', 'liferuss-core' ) . '</p></td></tr>';
+		echo '<tr><th scope="row"><label for="fx_provider">' . esc_html__( 'منبع', 'liferuss-core' ) . '</label></th><td><select id="fx_provider" name="fx_provider">';
+		foreach ( array(
+			'manual' => 'دستی',
+			'json'   => 'نشانی JSON',
+		) as $key => $label ) {
+			echo '<option value="' . esc_attr( $key ) . '" ' . selected( (string) $v['provider'], $key, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></td></tr>';
+		self::text_row( 'fx_json_url', __( 'نشانی JSON', 'liferuss-core' ), (string) $v['json_url'], 'url' );
+		self::text_row( 'fx_path_usd_rub', __( 'مسیر JSON برای USD به RUB', 'liferuss-core' ), (string) $v['path_usd_rub'] );
+		self::text_row( 'fx_path_usd_irt', __( 'مسیر JSON برای USD به IRT', 'liferuss-core' ), (string) $v['path_usd_irt'] );
+		self::text_row( 'fx_path_rub_irt', __( 'مسیر JSON برای RUB به IRT', 'liferuss-core' ), (string) $v['path_rub_irt'] );
+		echo '<tr><th scope="row"><label for="fx_interval">' . esc_html__( 'بازه', 'liferuss-core' ) . '</label></th><td><select id="fx_interval" name="fx_interval">';
+		foreach ( array(
+			'hourly' => 'ساعتی',
+			'6h'     => 'هر ۶ ساعت',
+			'daily'  => 'روزانه',
+		) as $key => $label ) {
+			echo '<option value="' . esc_attr( $key ) . '" ' . selected( (string) $v['interval'], $key, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></td></tr>';
+		if ( (int) $v['fail_count'] > 0 ) {
+			echo '<tr><th scope="row">' . esc_html__( 'خطای واکشی', 'liferuss-core' ) . '</th><td>' . esc_html( (string) $v['fail_count'] . ' — ' . (string) $v['last_error'] ) . '</td></tr>';
+		}
 		foreach ( Settings::CURRENCIES as $code ) {
 			$rate = $v['rates'][ $code ];
 			$meta = '';
 			if ( ! empty( $rate['updated_at'] ) ) {
-				$meta = sprintf(
-					/* translators: 1: datetime UTC, 2: user id */
-					__( 'آخرین به‌روزرسانی: %1$s (کاربر %2$d)', 'liferuss-core' ),
-					(string) $rate['updated_at'],
-					(int) $rate['updated_by']
-				);
+				$meta = 'آخرین به‌روزرسانی: ' . \LifeRuss\Core\CRM\Jalali::plain( (string) $rate['updated_at'] );
 			}
 			echo '<tr><th scope="row"><label for="rate_' . esc_attr( $code ) . '">' . esc_html( $code ) . '</label></th><td>';
-			echo '<input class="regular-text" type="text" inputmode="decimal" id="rate_' . esc_attr( $code ) . '" name="rates[' . esc_attr( $code ) . ']" value="' . esc_attr( (string) $rate['usd_per_unit'] ) . '">';
+			echo '<input class="regular-text" type="text" inputmode="decimal" id="rate_' . esc_attr( $code ) . '" name="rates[' . esc_attr( $code ) . ']" value="' . esc_attr( (string) $rate['usd_per_unit'] ) . '"> ';
+			echo '<label><input type="checkbox" name="locks[' . esc_attr( $code ) . ']" value="1" ' . checked( '1', (string) ( $rate['manual_lock'] ?? '0' ), false ) . '> ' . esc_html__( 'قفل دستی', 'liferuss-core' ) . '</label>';
 			if ( $meta ) {
 				echo '<p class="description">' . esc_html( $meta ) . '</p>';
 			}
@@ -550,11 +570,25 @@ class SettingsPage {
 	 */
 	private static function save_currency(): void {
 		$incoming = array();
+		$locks    = array();
 		$posted   = isset( $_POST['rates'] ) && is_array( $_POST['rates'] ) ? wp_unslash( $_POST['rates'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$locked   = isset( $_POST['locks'] ) && is_array( $_POST['locks'] ) ? wp_unslash( $_POST['locks'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		foreach ( Settings::CURRENCIES as $code ) {
 			$incoming[ $code ] = isset( $posted[ $code ] ) ? sanitize_text_field( (string) $posted[ $code ] ) : '';
+			$locks[ $code ]    = ! empty( $locked[ $code ] );
 		}
-		Settings::save_currency( $incoming );
+		Settings::save_fx(
+			array(
+				'provider'     => self::posted_text( 'fx_provider' ),
+				'json_url'     => self::posted_text( 'fx_json_url' ),
+				'path_usd_rub' => self::posted_text( 'fx_path_usd_rub' ),
+				'path_usd_irt' => self::posted_text( 'fx_path_usd_irt' ),
+				'path_rub_irt' => self::posted_text( 'fx_path_rub_irt' ),
+				'interval'     => self::posted_text( 'fx_interval' ),
+			)
+		);
+		Settings::save_currency( $incoming, $locks );
+		\LifeRuss\Core\Currency\Rates::reschedule();
 	}
 
 	/**

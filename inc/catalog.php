@@ -136,11 +136,52 @@ function liferuss_catalog_paged() {
  * @param mixed $amount Amount.
  * @return string
  */
-function liferuss_catalog_usd( $amount ) {
+function liferuss_catalog_usd( $amount, $with_stamp = false ) {
 	if ( null === $amount || '' === (string) $amount || (float) $amount <= 0 ) {
 		return '';
 	}
-	return '$' . number_format_i18n( (float) $amount, 0 );
+	$text = '$' . number_format_i18n( (float) $amount, 0 );
+	if ( $with_stamp && function_exists( 'liferuss_fx_stamp_text' ) ) {
+		$stamp = liferuss_fx_stamp_text();
+		if ( '' !== $stamp ) {
+			$text .= ' (' . $stamp . ')';
+		}
+	}
+	return $text;
+}
+
+/**
+ * Plain Jalali stamp for a tuition USD figure.
+ *
+ * @return string
+ */
+function liferuss_fx_stamp_text() {
+	if ( ! class_exists( '\LifeRuss\Core\Currency\Rates' ) ) {
+		return '';
+	}
+	return \LifeRuss\Core\Currency\Rates::stamp_text();
+}
+
+/**
+ * Rate lines and the Jalali stamp on the exchange inquiry page.
+ */
+function liferuss_fx_panel() {
+	if ( ! class_exists( '\LifeRuss\Core\Currency\Rates' ) ) {
+		return;
+	}
+	$lines = \LifeRuss\Core\Currency\Rates::pair_lines();
+	$stamp = \LifeRuss\Core\Currency\Rates::stamp_html();
+	if ( ! $lines && '' === $stamp ) {
+		return;
+	}
+	echo '<div class="lr-fx">';
+	foreach ( $lines as $line ) {
+		echo '<p>' . esc_html( $line ) . '</p>';
+	}
+	if ( '' !== $stamp ) {
+		echo '<p class="lr-meta">' . $stamp . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Rates::stamp_html() returns escaped markup.
+	}
+	echo '</div>';
 }
 
 /**
