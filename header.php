@@ -60,6 +60,7 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 			<?php
 			// Designed mega menu. A saved flat menu of 13 items overlaps the header at 1024–1440.
 			liferuss_fallback_menu();
+			liferuss_language_switcher( 'drawer' );
 			?>
 		</nav>
 

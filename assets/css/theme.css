@@ -53,7 +53,7 @@
   --radius-sm: 12px;
   --header: 64px;
   --max: 1180px;
-  --lr-nav-h: 64px;
+  --lr-nav-h: 52px;
   --lr-fab-clearance: 32px;
 }
 
@@ -474,15 +474,19 @@ p {
 .lang-switch a {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  padding: 5px 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 10px;
   border-radius: 999px;
   border: 1px solid var(--line);
   color: var(--navy);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1.2;
+  box-sizing: border-box;
 }
 
 .lang-switch a:hover,
@@ -495,6 +499,10 @@ p {
 .lang-switch .lang-name {
   font-weight: 600;
   letter-spacing: 0;
+}
+
+.lang-switch--drawer {
+  display: none;
 }
 
 /*
@@ -1866,8 +1874,25 @@ body.nav-open .nav-toggle-bars::after {
 
   body.nav-open .lr-float,
   body.nav-open .lr-bottom-nav {
-    visibility: hidden;
-    pointer-events: none;
+    display: none;
+  }
+
+  .lang-switch--drawer {
+    display: block;
+    margin-top: 16px;
+  }
+
+  .lang-switch--drawer a {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .lang-switch--drawer a.is-active,
+  .lang-switch--drawer a:hover {
+    background: var(--gold);
+    color: var(--navy);
+    border-color: var(--gold);
   }
 
   .nav-list {
@@ -2958,28 +2983,33 @@ body.dir-rtl .lr-float__panel {
     direction: rtl;
   }
 
+  .has-bottom-nav .lr-float {
+    display: none;
+  }
+
   .lr-bottom-nav__item {
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 2px;
-    min-width: 0;
+    min-width: 44px;
+    min-height: 44px;
     max-width: 100%;
     color: rgba(255, 255, 255, 0.72);
     text-decoration: none;
-    font-size: 0.62rem;
+    font-size: 0.72rem;
     font-weight: 600;
     line-height: 1.15;
-    padding: 4px 1px 2px;
+    padding: 4px 2px;
     border-radius: 14px;
     box-sizing: border-box;
   }
 
   html[lang="ru"] .lr-bottom-nav__item,
   body.lang-ru .lr-bottom-nav__item {
-    font-size: 0.58rem;
+    font-size: 0.7rem;
   }
 
   .lr-bottom-nav__icon {
