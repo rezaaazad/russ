@@ -73,6 +73,19 @@
     });
   }
 
+  document.querySelectorAll(".story-avatar img").forEach(function (img) {
+    function drop() {
+      if (img.parentNode) {
+        img.parentNode.removeChild(img);
+      }
+    }
+    if (img.complete && img.naturalWidth === 0) {
+      drop();
+    } else {
+      img.addEventListener("error", drop);
+    }
+  });
+
   document.querySelectorAll(".js-scroll-consult").forEach(function (link) {
     link.addEventListener("click", function (event) {
       var target = document.getElementById("consultation");

@@ -29,7 +29,7 @@ function liferuss_default_options() {
 		'header_phone'     => '+98 21 9100 2450',
 		'header_show_phone'=> '0',
 
-		'hero_eyebrow'      => 'Higher Education · A Brighter Tomorrow',
+		'hero_eyebrow'      => 'تحصیل عالی · آینده‌ای روشن',
 		'hero_headline'     => 'تحصیل در روسیه، شروع آینده‌ای روشن',
 		'hero_subheadline'  => 'از پذیرش تخصصی تا ویزا، خوابگاه و مشاوره استقرار در کنار شما هستیم تا مسیر تحصیل در دانشگاه‌های برتر روسیه را با اطمینان طی کنید.',
 		'hero_cta1_text'    => 'دریافت مشاوره رایگان',
@@ -37,7 +37,7 @@ function liferuss_default_options() {
 		'hero_cta2_text'    => 'خدمات ما',
 		'hero_cta2_link'    => '#services',
 		'hero_quote'        => 'آینده‌ای روشن از همین‌جا شروع می‌شود.',
-		'hero_quote_cite'   => 'Knowledge Bridge',
+		'hero_quote_cite'   => 'لایف روس',
 		'hero_bg_id'        => 0,
 		'hero_image_id'     => 0,
 		'hero_student_id'   => 0,
@@ -61,7 +61,7 @@ function liferuss_default_options() {
 			array( 'enabled' => '1', 'title' => 'استقبال فرودگاه', 'text' => 'استقبال در فرودگاه، ترانسفر، افتتاح حساب و همراهی روزهای اول استقرار.', 'icon' => 'plane', 'image_id' => 0 ),
 		),
 
-		'universities_eyebrow'  => 'Knowledge · Opportunity',
+		'universities_eyebrow'  => 'دانش و فرصت',
 		'universities_title'    => 'دانشگاه‌های برتر روسیه',
 		'universities_subtitle' => 'پذیرش از دانشگاه‌های دولتی و پزشکی معتبر برای متقاضیان ایرانی.',
 		'universities_link_text'=> 'مشاهده همه دانشگاه‌ها',
@@ -146,7 +146,7 @@ function liferuss_default_options() {
 
 		'footer_about'     => 'مشاوره تحصیل در روسیه؛ از انتخاب دانشگاه تا پذیرش، ویزا و استقرار. مسیر روشن برای آینده‌ای مطمئن.',
 		'footer_copyright' => '© {year} لایف روس · liferuss.com — همه حقوق محفوظ است.',
-		'footer_en'        => 'Knowledge Bridge · Higher Education · A Brighter Tomorrow',
+		'footer_en'        => 'مشاوره تحصیل در روسیه',
 		'footer_links'     => array(
 			array( 'label' => 'خانه', 'url' => '/' ),
 			array( 'label' => 'درباره ما', 'url' => '/about/' ),

@@ -221,6 +221,40 @@ function liferuss_migrate_canonical_urls() {
 add_action( 'init', 'liferuss_migrate_canonical_urls', 46 );
 
 /**
+ * Replace the old English homepage slogans when they are still stored.
+ */
+function liferuss_migrate_persian_copy() {
+	if ( get_option( 'liferuss_copy_fa' ) ) {
+		return;
+	}
+	$map  = array(
+		'hero_eyebrow'         => array(
+			'Higher Education · A Brighter Tomorrow' => 'تحصیل عالی · آینده‌ای روشن',
+		),
+		'hero_quote_cite'      => array(
+			'Knowledge Bridge' => 'لایف روس',
+		),
+		'universities_eyebrow' => array(
+			'Knowledge · Opportunity' => 'دانش و فرصت',
+		),
+		'footer_en'            => array(
+			'Knowledge Bridge · Higher Education · A Brighter Tomorrow' => 'مشاوره تحصیل در روسیه',
+		),
+	);
+	$opts = get_option( 'liferuss_options', array() );
+	if ( is_array( $opts ) ) {
+		foreach ( $map as $key => $pairs ) {
+			if ( isset( $opts[ $key ] ) && isset( $pairs[ $opts[ $key ] ] ) ) {
+				$opts[ $key ] = $pairs[ $opts[ $key ] ];
+			}
+		}
+		update_option( 'liferuss_options', $opts );
+	}
+	update_option( 'liferuss_copy_fa', '1', false );
+}
+add_action( 'init', 'liferuss_migrate_persian_copy', 47 );
+
+/**
  * Flush rewrite rules once after multilingual 1.2.0.
  */
 function liferuss_maybe_flush_i18n() {

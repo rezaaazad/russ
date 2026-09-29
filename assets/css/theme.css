@@ -1274,22 +1274,22 @@ body.nav-open .nav-toggle-bars::after {
   height: 36px;
 }
 
-/* Costs — dark 5-column strip */
+/* Costs — light band; universities stay the single navy accent */
 .costs-section {
-  background: var(--navy);
-  color: #fff;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .costs-section .section-head h2 {
-  color: #fff;
+  color: var(--navy);
 }
 
 .costs-section .section-head p:last-child {
-  color: rgba(213, 222, 234, 0.85);
+  color: var(--muted);
 }
 
 .costs-section .eyebrow {
-  color: var(--gold);
+  color: var(--gold-ink);
 }
 
 .costs-grid {
@@ -1314,19 +1314,6 @@ body.nav-open .nav-toggle-bars::after {
   color: var(--muted);
 }
 
-.costs-section .cost-card {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-}
-
-.costs-section .cost-card h3 {
-  color: #fff;
-}
-
-.costs-section .cost-card .cost-note {
-  color: rgba(213, 222, 234, 0.88);
-}
 
 .cost-card .icon-circle {
   margin-bottom: 12px;
@@ -1341,9 +1328,6 @@ body.nav-open .nav-toggle-bars::after {
   margin: 0 0 6px;
 }
 
-.costs-section .cost-value {
-  color: var(--gold);
-}
 
 /* Roadmap */
 .roadmap {
@@ -3716,5 +3700,165 @@ body.has-compare-bar {
   .no-print,
   .lr-compare-bar {
     display: none !important;
+  }
+}
+
+/* Shared card rhythm */
+:root {
+  --h2: clamp(1.45rem, 2.2vw, 2rem);
+}
+
+.section-head h2,
+.page-hero h1,
+.footer-col h2,
+.lr-empty-state h2 {
+  font-size: var(--h2);
+  line-height: 1.35;
+}
+
+.section {
+  padding: 64px 0;
+}
+
+.service-card,
+.cost-card,
+.story-card,
+.major-card,
+.path-tile,
+.home-landing-card,
+.lr-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px 18px;
+}
+
+.service-card h3,
+.cost-card h3,
+.major-card h3,
+.path-tile strong,
+.home-landing-card h3,
+.story-name {
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.services-grid,
+.majors-grid,
+.costs-grid,
+.stories-grid,
+.path-grid,
+.home-landings-grid {
+  align-items: stretch;
+}
+
+.service-card p,
+.home-landing-card p,
+.story-card blockquote {
+  flex: 1 1 auto;
+}
+
+.path-home {
+  background: var(--white);
+}
+
+.path-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.path-tile {
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  text-align: center;
+  background: var(--white);
+  border: 1px solid var(--line);
+  color: var(--navy);
+  text-decoration: none;
+  min-height: 148px;
+}
+
+.path-tile .icon-circle {
+  margin: 0;
+}
+
+.path-tile:hover {
+  border-color: var(--navy);
+}
+
+.hero-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  position: relative;
+}
+
+.hero-quote {
+  position: static;
+  width: min(280px, 100%);
+}
+
+.story-avatar {
+  display: grid;
+  place-items: center;
+  background: var(--navy);
+  color: #fff;
+  font-weight: 700;
+}
+
+.story-fallback,
+.story-avatar img,
+.story-avatar picture {
+  grid-area: 1 / 1;
+}
+
+.story-avatar picture,
+.story-avatar img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.home-landing-card .btn {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+@media (max-width: 860px) {
+  .path-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .costs-grid,
+  .services-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .trust-grid {
+    grid-template-columns: 1fr 1fr !important;
+    align-items: start;
+  }
+
+  .trust-item {
+    align-items: flex-start;
+  }
+
+  .roadmap {
+    border-inline-start: 2px solid var(--gold);
+    padding-inline-start: 18px;
+    margin-inline-start: 8px;
+  }
+}
+
+@media (max-width: 420px) {
+  .path-grid,
+  .costs-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
