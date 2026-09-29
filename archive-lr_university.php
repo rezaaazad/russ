@@ -19,7 +19,7 @@ $fields  = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::options( 'lr
 ?>
 <header class="page-hero">
 	<div class="container">
-		<p class="eyebrow"><?php echo esc_html( liferuss_brand() ); ?></p>
+		<p class="eyebrow"><?php echo esc_html( liferuss_t( 'nav_universities' ) ); ?></p>
 		<h1>دانشگاه‌های روسیه</h1>
 		<?php liferuss_breadcrumbs(); ?>
 	</div>

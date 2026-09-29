@@ -19,7 +19,7 @@ $max   = isset( $_GET['max'] ) ? absint( $_GET['max'] ) : 0; // phpcs:ignore Wor
 ?>
 <header class="page-hero">
 	<div class="container">
-		<p class="eyebrow"><?php echo esc_html( liferuss_brand() ); ?></p>
+		<p class="eyebrow"><?php echo esc_html( liferuss_t( 'nav_language_course' ) ); ?></p>
 		<h1>
 			<?php
 			if ( 'index' === $mode ) {
@@ -33,9 +33,7 @@ $max   = isset( $_GET['max'] ) ? absint( $_GET['max'] ) : 0; // phpcs:ignore Wor
 			}
 			?>
 		</h1>
-		<?php if ( is_singular() ) : ?>
-			<?php liferuss_breadcrumbs(); ?>
-		<?php endif; ?>
+		<?php liferuss_breadcrumbs(); ?>
 	</div>
 </header>
 <article class="section">
@@ -92,7 +90,16 @@ $max   = isset( $_GET['max'] ) ? absint( $_GET['max'] ) : 0; // phpcs:ignore Wor
 			$done      = is_user_logged_in() && in_array( (int) $lesson_id, \LifeRuss\Core\Course\Store::completed_ids( get_current_user_id() ), true );
 			$latest    = is_user_logged_in() ? \LifeRuss\Core\Course\Store::latest( get_current_user_id(), (int) $lesson_id, 'lesson' ) : null;
 			?>
-			<div class="prose"><?php the_content(); ?></div>
+			<div class="prose">
+				<?php
+				$lesson_html = (string) get_post_field( 'post_content', $lesson_id );
+				if ( get_post_meta( $lesson_id, '_lr_placement', true ) || str_contains( wp_strip_all_tags( $lesson_html ), 'این درس در فهرست دوره نیست' ) ) {
+					echo '<p>این آزمون جدا از فهرست درس‌هاست و فقط سطح پیشنهادی را نشان می‌دهد.</p>';
+				} else {
+					the_content();
+				}
+				?>
+			</div>
 			<?php if ( $audio ) : ?>
 				<audio controls src="<?php echo esc_url( $audio ); ?>"></audio>
 			<?php endif; ?>

@@ -32,7 +32,7 @@ $current = 'request' === $screen ? 'requests' : $screen;
 ?>
 <header class="page-hero">
 	<div class="container">
-		<p class="eyebrow"><?php echo esc_html( liferuss_brand() ); ?></p>
+		<p class="eyebrow"><?php echo esc_html( liferuss_t( 'nav_account' ) ); ?></p>
 		<h1>حساب من</h1>
 	</div>
 </header>

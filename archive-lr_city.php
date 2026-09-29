@@ -15,7 +15,7 @@ $result = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::cities( $page
 ?>
 <header class="page-hero">
 	<div class="container">
-		<p class="eyebrow"><?php echo esc_html( liferuss_brand() ); ?></p>
+		<p class="eyebrow"><?php echo esc_html( liferuss_t( 'nav_cities' ) ); ?></p>
 		<h1>شهرها</h1>
 		<?php liferuss_breadcrumbs(); ?>
 	</div>

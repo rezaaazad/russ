@@ -15,7 +15,7 @@ $result = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::fields( $page
 ?>
 <header class="page-hero">
 	<div class="container">
-		<p class="eyebrow"><?php echo esc_html( liferuss_brand() ); ?></p>
+		<p class="eyebrow"><?php echo esc_html( liferuss_t( 'nav_fields' ) ); ?></p>
 		<h1>رشته‌ها</h1>
 		<?php liferuss_breadcrumbs(); ?>
 	</div>

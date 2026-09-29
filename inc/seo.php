@@ -558,6 +558,12 @@ function liferuss_breadcrumbs() {
 			'url'   => get_post_type_archive_link( 'lr_scholarship' ),
 		);
 		$items[] = array( 'label' => get_the_title(), 'url' => '' );
+	} elseif ( is_singular( array( 'lr_lesson', 'lr_course' ) ) ) {
+		$items[] = array(
+			'label' => liferuss_t( 'nav_language_course' ),
+			'url'   => liferuss_url( '/russian-language/' ),
+		);
+		$items[] = array( 'label' => get_the_title(), 'url' => '' );
 	} elseif ( is_search() ) {
 		$items[] = array( 'label' => liferuss_t( 'crumb_search' ), 'url' => '' );
 	} elseif ( is_404() ) {

@@ -3873,3 +3873,142 @@ body.has-compare-bar {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.lr-account-form input,
+.lr-account-form select,
+.lr-account-form textarea,
+.lr-find-form input,
+.lr-find-form select,
+.search-form input,
+.lr-quiz input,
+.lr-quiz select,
+.lr-quiz textarea,
+.lr-filters input,
+.lr-filters select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.lr-account-form,
+.lr-find-form,
+.search-form,
+.lr-quiz {
+  display: grid;
+  gap: 12px;
+}
+
+.lr-find-form,
+.search-form {
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  margin: 0 0 24px;
+}
+
+.lr-account-form .btn,
+.lr-find-form .btn,
+.search-form .btn,
+.lr-quiz .btn {
+  min-height: 48px;
+}
+
+.lr-quiz label,
+.lr-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.lr-quiz fieldset {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  background: #fff;
+}
+
+.breadcrumbs a,
+.breadcrumbs span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.landing-trust .screen-reader-text,
+.hero-trust .screen-reader-text,
+.trust-bar .screen-reader-text {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.lr-author {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin: 28px 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.lr-author-mark,
+.lr-author img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  flex: 0 0 64px;
+}
+
+.lr-author-mark {
+  display: grid;
+  place-items: center;
+  background: var(--navy);
+  color: #fff;
+  font-weight: 700;
+}
+
+.lr-author p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.lr-inline-cta {
+  margin: 8px 0 24px;
+}
+
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 8px 0 0;
+}
+
+.post-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 0;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+@media (max-width: 640px) {
+  .lr-find-form,
+  .search-form {
+    grid-template-columns: 1fr;
+  }
+}

@@ -41,9 +41,28 @@ get_header();
 					<?php endif; ?>
 					<?php the_content(); ?>
 					<aside class="lr-author">
-						<?php echo get_avatar( get_the_author_meta( 'ID' ), 64 ); ?>
+						<?php
+						$author_id   = (int) get_the_author_meta( 'ID' );
+						$author_name = get_the_author();
+						$avatar_data = get_avatar_data( $author_id, array( 'size' => 64 ) );
+						if ( $author_name === get_the_author_meta( 'user_login' ) ) {
+							$author_name = liferuss_t( 'author_fallback' );
+						}
+						$author_bits = preg_split( '/\s+/u', trim( (string) $author_name ) );
+						$author_mark = '';
+						if ( is_array( $author_bits ) ) {
+							foreach ( array_slice( $author_bits, 0, 2 ) as $bit ) {
+								$author_mark .= mb_substr( $bit, 0, 1 );
+							}
+						}
+						?>
+						<?php if ( ! empty( $avatar_data['found_avatar'] ) ) : ?>
+							<?php echo get_avatar( $author_id, 64 ); ?>
+						<?php else : ?>
+							<span class="lr-author-mark" aria-hidden="true"><?php echo esc_html( $author_mark ); ?></span>
+						<?php endif; ?>
 						<div>
-							<strong><?php the_author(); ?></strong>
+							<strong><?php echo esc_html( $author_name ); ?></strong>
 							<p><?php echo esc_html( get_the_author_meta( 'description' ) ? get_the_author_meta( 'description' ) : liferuss_t( 'author_fallback' ) ); ?></p>
 						</div>
 					</aside>

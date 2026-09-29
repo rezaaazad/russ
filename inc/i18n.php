@@ -440,6 +440,7 @@ function liferuss_ui_strings() {
 			'nav_freight'        => 'باربری و ارسال',
 			'nav_trade'          => 'تجارت و تأمین',
 			'nav_contact'        => 'تماس با ما',
+			'nav_account'        => 'حساب من',
 			'nav_study'          => 'تحصیل در روسیه',
 			'nav_scholarships'   => 'بورسیه‌ها',
 			'nav_podfak'         => 'پادفک',

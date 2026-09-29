@@ -18,7 +18,7 @@ if ( ! empty( $data['slugs'] ) && is_array( $data['slugs'] ) ) {
 ?>
 <header class="page-hero">
 	<div class="container">
-		<p class="eyebrow"><?php echo esc_html( liferuss_brand() ); ?></p>
+		<p class="eyebrow"><?php echo esc_html( liferuss_t( 'nav_compare' ) ); ?></p>
 		<h1><?php echo esc_html( (string) ( $data['title'] ?? 'مقایسه دانشگاه‌ها' ) ); ?></h1>
 		<?php if ( is_user_logged_in() && $slug ) : ?>
 			<form method="post" action="<?php echo esc_url( liferuss_url( '/account/saved/' ) ); ?>">

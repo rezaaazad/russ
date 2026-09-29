@@ -20,7 +20,7 @@ $base  = liferuss_url( '/search/' );
 ?>
 <header class="page-hero">
 	<div class="container">
-		<p class="eyebrow"><?php echo esc_html( liferuss_brand() ); ?></p>
+		<p class="eyebrow"><?php echo esc_html( liferuss_t( 'search_open' ) ); ?></p>
 		<h1>جستجو</h1>
 	</div>
 </header>
