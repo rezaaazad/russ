@@ -52,6 +52,7 @@ $lr_options = array(
 	'lr_import_report',
 	'lr_demo_catalog',
 	'lr_path_seed',
+	'lr_service_seed',
 );
 
 foreach ( $lr_options as $lr_option ) {

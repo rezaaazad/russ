@@ -236,7 +236,8 @@ function liferuss_default_nav_items() {
 		array( 'title' => liferuss_t( 'nav_services' ), 'url' => liferuss_url( '/services/' ) ),
 		array( 'title' => liferuss_t( 'nav_costs' ), 'url' => liferuss_url( '/costs/' ) ),
 		array( 'title' => liferuss_t( 'nav_blog' ), 'url' => $blog ),
-		array( 'title' => liferuss_t( 'nav_freight' ), 'url' => liferuss_url( '/freight/' ) ),
+		array( 'title' => liferuss_t( 'nav_cargo' ), 'url' => liferuss_url( '/cargo/' ) ),
+		array( 'title' => liferuss_t( 'nav_guide' ), 'url' => liferuss_url( '/russia-guide/' ) ),
 		array( 'title' => liferuss_t( 'nav_trade' ), 'url' => liferuss_url( '/trade/' ) ),
 		array( 'title' => liferuss_t( 'nav_contact' ), 'url' => liferuss_url( '/contact/' ) ),
 	);

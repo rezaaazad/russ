@@ -164,6 +164,10 @@ function liferuss_path_level( $degree, $field, $program ) {
  * @param string $scholarship Scholarship title.
  */
 function liferuss_path_form( $type, $program, $degree, $level, $scholarship ) {
+	if ( in_array( $type, array( 'freight', 'trade' ), true ) ) {
+		get_template_part( 'template-parts/landing-form', null, array( 'prefix' => $type ) );
+		return;
+	}
 	$allowed = array( 'consult', 'admission', 'exchange', 'immigration' );
 	if ( ! in_array( $type, $allowed, true ) ) {
 		return;
@@ -411,6 +415,12 @@ function liferuss_path_json_ld() {
 		if ( 'grant' === $schema ) {
 			$graph[] = liferuss_path_grant( $post_id );
 		}
+		if ( 'service' === $schema ) {
+			$graph[] = liferuss_path_service( $post_id, $lead );
+		}
+	} elseif ( is_page_template( array( 'templates/freight.php', 'templates/trade.php' ) ) ) {
+		$post_id = (int) get_queried_object_id();
+		$graph[] = liferuss_path_service( $post_id, wp_strip_all_tags( get_the_excerpt( $post_id ) ) );
 	} elseif ( is_singular( 'lr_scholarship' ) ) {
 		$post_id = (int) get_queried_object_id();
 		$graph[] = liferuss_path_grant( $post_id );
@@ -499,4 +509,46 @@ function liferuss_path_grant( $post_id ) {
 		$grant['disambiguatingDescription'] = $deadline;
 	}
 	return $grant;
+}
+
+/**
+ * Service node for exchange, cargo, and trade screens.
+ *
+ * @param int    $post_id Post id.
+ * @param string $lead    Description.
+ * @return array<string, mixed>
+ */
+function liferuss_path_service( $post_id, $lead ) {
+	return array(
+		'@type'       => 'Service',
+		'name'        => get_the_title( $post_id ),
+		'description' => $lead ? $lead : wp_strip_all_tags( get_post_field( 'post_content', $post_id ) ),
+		'url'         => get_permalink( $post_id ),
+		'provider'    => array(
+			'@type' => 'Organization',
+			'name'  => liferuss_brand(),
+			'url'   => liferuss_home(),
+		),
+	);
+}
+
+/**
+ * Published child pages of the current hub.
+ */
+function liferuss_hub_children() {
+	$children = get_pages(
+		array(
+			'parent'      => get_queried_object_id(),
+			'post_status' => 'publish',
+			'sort_column' => 'menu_order,post_title',
+		)
+	);
+	if ( ! $children ) {
+		return;
+	}
+	echo '<section class="section"><div class="container path-children">';
+	foreach ( $children as $child ) {
+		echo '<a class="path-child" href="' . esc_url( get_permalink( $child ) ) . '"><strong>' . esc_html( get_the_title( $child ) ) . '</strong></a>';
+	}
+	echo '</div></section>';
 }

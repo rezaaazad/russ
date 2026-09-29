@@ -22,6 +22,9 @@ class PostTypeRegistrar {
 	public static function hooks(): void {
 		add_action( 'init', array( self::class, 'register' ) );
 		add_action( 'init', array( self::class, 'maybe_flush' ), 99 );
+		add_filter( 'post_type_link', array( self::class, 'guide_link' ), 9, 2 );
+		add_filter( 'term_link', array( self::class, 'guide_term_link' ), 9, 3 );
+		add_filter( 'post_type_archive_link', array( self::class, 'guide_archive_link' ), 9, 2 );
 	}
 
 	/**
@@ -64,6 +67,49 @@ class PostTypeRegistrar {
 				'label_count'               => $archived_label,
 			)
 		);
+	}
+
+	/**
+	 * Guide singles live at /russia-guide/{category}/{slug}/.
+	 *
+	 * @param string       $url  Generated URL.
+	 * @param \WP_Post|int $post Post.
+	 */
+	public static function guide_link( string $url, $post ): string {
+		$post = get_post( $post );
+		if ( ! $post instanceof \WP_Post || 'lr_guide' !== $post->post_type ) {
+			return $url;
+		}
+		$terms = get_the_terms( $post, 'lr_guide_cat' );
+		$cat   = ( is_array( $terms ) && isset( $terms[0]->slug ) ) ? $terms[0]->slug : 'guide';
+		return home_url( user_trailingslashit( 'russia-guide/' . $cat . '/' . $post->post_name ) );
+	}
+
+	/**
+	 * Pretty archive URL. The CPT rewrite stays off so the custom rule owns the path.
+	 *
+	 * @param string $link      Generated link.
+	 * @param string $post_type Post type.
+	 */
+	public static function guide_archive_link( string $link, string $post_type ): string {
+		if ( 'lr_guide' !== $post_type ) {
+			return $link;
+		}
+		return home_url( user_trailingslashit( 'russia-guide' ) );
+	}
+
+	/**
+	 * Guide categories live at /russia-guide/{slug}/.
+	 *
+	 * @param string   $url      Term URL.
+	 * @param \WP_Term $term     Term.
+	 * @param string   $taxonomy Taxonomy.
+	 */
+	public static function guide_term_link( string $url, $term, string $taxonomy ): string {
+		if ( 'lr_guide_cat' !== $taxonomy || ! $term instanceof \WP_Term ) {
+			return $url;
+		}
+		return home_url( user_trailingslashit( 'russia-guide/' . $term->slug ) );
 	}
 
 	/**
@@ -137,7 +183,7 @@ class PostTypeRegistrar {
 				'lr_guides',
 				array(
 					'public'      => true,
-					'has_archive' => false,
+					'has_archive' => true,
 					'rewrite'     => false,
 					'supports'    => array( 'title', 'editor', 'thumbnail', 'excerpt', 'author', 'revisions', 'custom-fields' ),
 				)

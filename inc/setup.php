@@ -55,7 +55,7 @@ function liferuss_maybe_seed() {
 	);
 	$freight_id = liferuss_ensure_page(
 		'باربری و ارسال',
-		'freight',
+		'cargo',
 		'<p>ارسال کارگو، نمونه کالا، وسایل شخصی و مدارک دانشجویی بین ایران و روسیه.</p>',
 		'templates/freight.php'
 	);

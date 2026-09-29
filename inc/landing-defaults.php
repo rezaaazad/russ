@@ -26,7 +26,7 @@ function liferuss_landing_default_options() {
 				'title'   => 'باربری، کارگو و ارسال',
 				'text'    => 'ارسال محموله‌های تجاری، نمونه کالا، وسایل شخصی و مدارک دانشجویی بین ایران و روسیه.',
 				'cta'     => 'درخواست ارسال بار',
-				'link'    => '/freight/',
+				'link'    => '/cargo/',
 				'icon'    => 'cargo',
 			),
 			array(

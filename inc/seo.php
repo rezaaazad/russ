@@ -62,6 +62,12 @@ function liferuss_document_title( $parts ) {
 		}
 	} elseif ( is_post_type_archive( 'lr_scholarship' ) ) {
 		$parts['title'] = liferuss_t( 'nav_scholarships' );
+	} elseif ( is_post_type_archive( 'lr_guide' ) || is_tax( 'lr_guide_cat' ) ) {
+		$parts['title'] = is_tax() ? single_term_title( '', false ) : liferuss_t( 'nav_guide' );
+	} elseif ( is_home() ) {
+		$parts['title'] = liferuss_t( 'blog_title' );
+	} elseif ( is_category() || is_tag() ) {
+		$parts['title'] = single_term_title( '', false );
 	}
 	return $parts;
 }
@@ -84,6 +90,10 @@ function liferuss_head_meta() {
 		$desc   = $custom ? $custom : ( $lead ? $lead : wp_strip_all_tags( get_the_excerpt() ) );
 	} elseif ( is_post_type_archive( 'lr_scholarship' ) ) {
 		$desc = liferuss_t( 'path_scholarship_lead' );
+	} elseif ( is_singular( 'lr_guide' ) || is_post_type_archive( 'lr_guide' ) || is_tax( 'lr_guide_cat' ) ) {
+		$desc = is_singular() ? wp_strip_all_tags( get_the_excerpt() ) : liferuss_t( 'nav_guide' );
+	} elseif ( is_home() || is_category() || is_tag() ) {
+		$desc = liferuss_t( 'blog_intro' );
 	} elseif ( is_singular( array( 'lr_university', 'lr_field', 'lr_city' ) ) ) {
 		$custom = get_post_meta( get_queried_object_id(), '_lr_seo_description', true );
 		$desc   = $custom ? $custom : wp_strip_all_tags( get_the_excerpt() );
@@ -280,6 +290,31 @@ function liferuss_breadcrumbs() {
 		$items[] = array( 'label' => liferuss_t( 'crumb_blog' ), 'url' => '' );
 	} elseif ( is_singular( 'post' ) ) {
 		$items[] = array( 'label' => liferuss_t( 'crumb_blog' ), 'url' => liferuss_url( '/blog/' ) );
+		$cats    = get_the_category();
+		if ( $cats ) {
+			$items[] = array(
+				'label' => $cats[0]->name,
+				'url'   => get_category_link( $cats[0] ),
+			);
+		}
+		$items[] = array( 'label' => get_the_title(), 'url' => '' );
+	} elseif ( is_category() || is_tag() ) {
+		$items[] = array( 'label' => liferuss_t( 'crumb_blog' ), 'url' => liferuss_url( '/blog/' ) );
+		$items[] = array( 'label' => single_term_title( '', false ), 'url' => '' );
+	} elseif ( is_post_type_archive( 'lr_guide' ) ) {
+		$items[] = array( 'label' => liferuss_t( 'nav_guide' ), 'url' => '' );
+	} elseif ( is_tax( 'lr_guide_cat' ) ) {
+		$items[] = array( 'label' => liferuss_t( 'nav_guide' ), 'url' => liferuss_url( '/russia-guide/' ) );
+		$items[] = array( 'label' => single_term_title( '', false ), 'url' => '' );
+	} elseif ( is_singular( 'lr_guide' ) ) {
+		$items[] = array( 'label' => liferuss_t( 'nav_guide' ), 'url' => liferuss_url( '/russia-guide/' ) );
+		$terms   = get_the_terms( get_queried_object_id(), 'lr_guide_cat' );
+		if ( is_array( $terms ) && isset( $terms[0] ) && ! is_wp_error( $terms[0] ) ) {
+			$items[] = array(
+				'label' => $terms[0]->name,
+				'url'   => get_term_link( $terms[0] ),
+			);
+		}
 		$items[] = array( 'label' => get_the_title(), 'url' => '' );
 	} elseif ( is_page() ) {
 		$ancestors = array_reverse( get_post_ancestors( get_queried_object_id() ) );
@@ -401,7 +436,8 @@ function liferuss_llms_txt() {
 		'/immigration/'       => 'Immigration',
 		'/admission/'         => 'Admission request',
 		'/exchange/'          => 'Exchange rate inquiry',
-		'/freight/'           => 'Freight and shipping',
+		'/cargo/'             => 'Freight and shipping',
+		'/russia-guide/'      => 'Russia guide',
 		'/trade/'        => 'Trade and sourcing',
 		'/contact/'      => 'Contact',
 		'/blog/'         => 'Blog',

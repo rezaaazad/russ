@@ -221,6 +221,9 @@ function liferuss_url( $path = '/', $lang = null ) {
 		$lang = 'fa';
 	}
 	$path = '/' . ltrim( (string) $path, '/' );
+	if ( '/freight' === untrailingslashit( $path ) ) {
+		$path = '/cargo/';
+	}
 	if ( '' === $path || '/index.php' === $path ) {
 		$path = '/';
 	}
@@ -403,6 +406,14 @@ function liferuss_ui_strings() {
 			'nav_immigration'    => 'مهاجرت',
 			'nav_admission'      => 'درخواست پذیرش',
 			'nav_exchange'       => 'استعلام نرخ',
+			'nav_cargo'          => 'کارگو',
+			'nav_guide'          => 'راهنمای روسیه',
+			'nav_cities'         => 'شهرها',
+			'reading_min'        => 'دقیقه',
+			'toc'                => 'فهرست',
+			'author_fallback'    => 'تیم محتوای لایف روس',
+			'related_posts'      => 'نوشته‌های مرتبط',
+			'magazine_cta'       => 'ثبت درخواست',
 			'path_home_title'    => 'مسیرهای تحصیل و مهاجرت',
 			'path_live_title'    => 'از کاتالوگ دانشگاه',
 			'path_prep_title'    => 'دانشگاه‌ها، مدت و شهریه',
@@ -536,6 +547,14 @@ function liferuss_ui_strings() {
 			'nav_costs'          => 'Costs',
 			'nav_blog'           => 'Blog',
 			'nav_freight'        => 'Freight',
+			'nav_cargo'          => 'Cargo',
+			'nav_guide'          => 'Russia guide',
+			'nav_cities'         => 'Cities',
+			'reading_min'        => 'min',
+			'toc'                => 'On this page',
+			'author_fallback'    => 'LifeRuss editorial team',
+			'related_posts'      => 'Related posts',
+			'magazine_cta'       => 'Send a request',
 			'nav_trade'          => 'Trade',
 			'nav_contact'        => 'Contact',
 			'footer_quick'       => 'Quick links',
@@ -643,6 +662,14 @@ function liferuss_ui_strings() {
 			'nav_costs'          => 'Стоимость',
 			'nav_blog'           => 'Блог',
 			'nav_freight'        => 'Грузы',
+			'nav_cargo'          => 'Карго',
+			'nav_guide'          => 'Гид по России',
+			'nav_cities'         => 'Города',
+			'reading_min'        => 'мин',
+			'toc'                => 'Содержание',
+			'author_fallback'    => 'Редакция LifeRuss',
+			'related_posts'      => 'Похожие записи',
+			'magazine_cta'       => 'Оставить заявку',
 			'nav_trade'          => 'Торговля',
 			'nav_contact'        => 'Контакты',
 			'footer_quick'       => 'Быстрые ссылки',
@@ -750,6 +777,14 @@ function liferuss_ui_strings() {
 			'nav_costs'          => 'التكاليف',
 			'nav_blog'           => 'المدونة',
 			'nav_freight'        => 'الشحن',
+			'nav_cargo'          => 'الشحن',
+			'nav_guide'          => 'دليل روسيا',
+			'nav_cities'         => 'المدن',
+			'reading_min'        => 'دقيقة',
+			'toc'                => 'المحتويات',
+			'author_fallback'    => 'فريق تحرير لایف روس',
+			'related_posts'      => 'مقالات ذات صلة',
+			'magazine_cta'       => 'إرسال طلب',
 			'nav_trade'          => 'التجارة',
 			'nav_contact'        => 'اتصل بنا',
 			'footer_quick'       => 'روابط سريعة',
@@ -887,6 +922,7 @@ function liferuss_page_nav_keys() {
 		'universities'  => 'nav_universities',
 		'services'      => 'nav_services',
 		'freight'       => 'nav_freight',
+		'cargo'         => 'nav_cargo',
 		'trade'         => 'nav_trade',
 		'costs'         => 'nav_costs',
 		'blog'          => 'nav_blog',
@@ -939,7 +975,11 @@ function liferuss_filter_menu_title( $title, $item ) {
 		if ( preg_match( '#^/(en|ru|ar)(/.*)?$#', $path, $match ) ) {
 			$path = isset( $match[2] ) && '' !== $match[2] ? untrailingslashit( $match[2] ) : '';
 		}
-		foreach ( liferuss_path_links() as $link ) {
+		$known = liferuss_path_links();
+		if ( function_exists( 'liferuss_service_home_links' ) ) {
+			$known = array_merge( $known, liferuss_service_home_links() );
+		}
+		foreach ( $known as $link ) {
 			if ( untrailingslashit( $link['url'] ) === $path ) {
 				return $link['title'];
 			}

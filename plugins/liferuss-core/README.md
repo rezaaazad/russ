@@ -1,8 +1,8 @@
 # لایف‌روس — هسته / LifeRuss Core
 
-نسخهٔ ۱.۳.۰. هسته جدول‌ها، کاتالوگ، CRM، و فیلدهای ساختاری مسیر تحصیل و بورسیه را دارد. اسکیمای پایگاه همان ۱.۰.۰ است.
+نسخهٔ ۱.۴.۰. هسته جدول‌ها، کاتالوگ، CRM، مسیر تحصیل، و اجرای ریدایرکت فرانت را دارد. اسکیمای پایگاه همان ۱.۰.۰ است.
 
-Version 1.3.0. Core ships the tables, catalog, CRM, and structured study-path and scholarship fields. The database schema stays at 1.0.0.
+Version 1.4.0. Core ships the tables, catalog, CRM, study-path fields, and the front-end redirect runner. The database schema stays at 1.0.0.
 
 ## نصب / Install
 
@@ -84,7 +84,7 @@ All use the `{wpdb prefix}lr_` prefix, InnoDB. Physical foreign keys exist only 
 
 طبقه‌بندی‌ها: `lr_field_group`، `lr_guide_cat`، `lr_faq_group`، `lr_level`.
 
-دانشگاه، رشته، و شهر یک ردیف سایهٔ ۱:۱ در `lr_universities` / `lr_fields` / `lr_cities` دارند. ذخیره، زباله‌دان، و حذف دائمی نوشته این ردیف را همگام می‌کند. تغییر نامک یک ریدایرکت ۳۰۱ در `lr_redirects` می‌نویسد؛ اجرای ریدایرکت در فرانت در این نسخه نیست. اگر یک برگهٔ منتشرشده از قبل همان مسیر را داشته باشد (مثلاً برگهٔ قالب `/universities/`)، برگه بر بازنویسی نوع محتوا مقدم است.
+دانشگاه، رشته، و شهر یک ردیف سایهٔ ۱:۱ در `lr_universities` / `lr_fields` / `lr_cities` دارند. ذخیره، زباله‌دان، و حذف دائمی نوشته این ردیف را همگام می‌کند. تغییر نامک یک ریدایرکت ۳۰۱ در `lr_redirects` می‌نویسد و رانر فرانت همان ردیف را پیش از قالب اجرا می‌کند. اگر یک برگهٔ منتشرشده از قبل همان مسیر را داشته باشد (مثلاً برگهٔ قالب `/universities/`)، برگه بر بازنویسی نوع محتوا مقدم است.
 
 وضعیت سفارشی `lr_archived` معادل `archived` در ردیف سایه است.
 
@@ -150,7 +150,9 @@ Migration is resumable. `wp liferuss migrate-leads` copies `liferuss_lead` posts
 - آرشیو `/universities/`، `/fields/` و `/cities/` حتی اگر برگه‌ای با همین نام منتشر شده باشد، آرشیو نوع محتوا است. فیلترها و صفحهٔ دوم `noindex,follow` هستند و canonical به آرشیو بدون فیلتر برمی‌گردد.
 - دادهٔ نمونه پیش‌نویس است (`lr_demo_catalog`). تا منتشر نشود در سایت دیده نمی‌شود.
 - `health_ministry_status` پیش‌فرض `unknown` دارد.
-- اجرای ریدایرکت فرانت، Rank Math، Polylang، و سازندهٔ بخش خارج از این نسخه است.
+- Rank Math، Polylang، و سازندهٔ بخش خارج از این نسخه است. ریدایرکت فرانت از `lr_redirects` اجرا می‌شود (۳۰۱، ۳۰۲، ۴۱۰)، بازدید را می‌شمارد، زنجیره را تا پنج گام جمع می‌کند، و چرخه را دنبال نمی‌کند. فهرست مدیریت در **لایف‌روس ← ریدایرکت‌ها** است.
+- نشانی عمومی خدمات از نمونه‌های نقشهٔ سایت است (حالت حمل و نوع پرداخت)، نه از هر فرزند درخت خدمات ERD. `/cargo/` همان لندینگ باربری است و `/freight/` با ۳۰۱ به آن می‌رود. استعلام نرخ پرداخت و نرخ زنده ندارد. فروشگاه نیست.
+- زیرصفحه‌های صرافی، کارگو، و تجارت، و دانستنی نمونه، پیش‌نویس‌اند (`lr_service_seed`). مجله در `/blog/` است و سه نوشتهٔ اولیه نامک انگلیسی گرفته‌اند.
 - فرم‌های قالب consult، admission، freight، trade، exchange، immigration، و contact به `POST /wp-json/liferuss/v1/leads` می‌روند و اگر جاوااسکریپت نباشد همان `admin-post.php` قبلی را دارند. مشاوره و پذیرش روی `admission_requests` می‌نشینند (`program_type`: degree، padfak، direct_course، scholarship). مهاجرت روی سرویس `migration` است و ردیف درخواست جدا ندارد چون ERD جدول مهاجرت ندارد. استعلام نرخ فقط مبلغ و ارز را در `exchange_requests` می‌نویسد.
 - بورسیه جدول ERD ندارد. نوع `lr_scholarship` به‌همراه متای مهلت، پوشش، شرایط، منبع، و `last_verified_at` است. برگه‌های مسیر تحصیل و مهاجرت قالب `templates/path.php` و متای ساختاری دارند؛ سازندهٔ آزاد بخش هنوز نیست.
 - دادهٔ نمونهٔ مسیرها و بورسیه‌ها پیش‌نویس است (`lr_path_seed`). تا منتشر نشود در سایت دیده نمی‌شود. پرسش و نظر نمونه عمومی نیستند و فقط بعد از انتشار صفحهٔ مادر دیده می‌شوند.

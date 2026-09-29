@@ -152,7 +152,7 @@ function liferuss_default_options() {
 			array( 'label' => 'درباره ما', 'url' => '/about/' ),
 			array( 'label' => 'دانشگاه‌ها', 'url' => '/universities/' ),
 			array( 'label' => 'خدمات', 'url' => '/services/' ),
-			array( 'label' => 'باربری و ارسال', 'url' => '/freight/' ),
+			array( 'label' => 'باربری و ارسال', 'url' => '/cargo/' ),
 			array( 'label' => 'تجارت و تأمین', 'url' => '/trade/' ),
 			array( 'label' => 'هزینه‌ها', 'url' => '/costs/' ),
 			array( 'label' => 'تحصیل در روسیه', 'url' => '/study/' ),
@@ -162,6 +162,8 @@ function liferuss_default_options() {
 			array( 'label' => 'مهاجرت', 'url' => '/immigration/' ),
 			array( 'label' => 'درخواست پذیرش', 'url' => '/admission/' ),
 			array( 'label' => 'استعلام نرخ', 'url' => '/exchange/' ),
+			array( 'label' => 'راهنمای روسیه', 'url' => '/russia-guide/' ),
+			array( 'label' => 'مجله', 'url' => '/blog/' ),
 			array( 'label' => 'تماس با ما', 'url' => '/contact/' ),
 		),
 

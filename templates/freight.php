@@ -21,6 +21,7 @@ get_header();
 			<?php endif; ?>
 			<h1><?php echo liferuss_accent_headline( liferuss_opt( 'freight_hero_headline' ), liferuss_opt( 'freight_hero_accent' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>
 			<p class="hero-lead landing-lead"><?php echo esc_html( liferuss_opt( 'freight_hero_lead' ) ); ?></p>
+			<?php liferuss_breadcrumbs(); ?>
 			<div class="hero-actions">
 				<a class="btn btn-gold js-scroll-consult" href="<?php echo esc_url( liferuss_cta_url( liferuss_opt( 'freight_hero_cta_link' ) ) ); ?>">
 					<?php echo esc_html( liferuss_opt( 'freight_hero_cta_text' ) ); ?>
@@ -174,4 +175,5 @@ if ( liferuss_section_on( 'freight_cta_enabled' ) ) {
 ?>
 
 <?php
+liferuss_hub_children();
 get_footer();

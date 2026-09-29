@@ -10,11 +10,14 @@ namespace LifeRuss\Core;
 use LifeRuss\Core\Admin\Assets;
 use LifeRuss\Core\Admin\LeadAdmin;
 use LifeRuss\Core\Admin\Menu;
+use LifeRuss\Core\Admin\RedirectScreen;
 use LifeRuss\Core\Catalog\Demo;
 use LifeRuss\Core\Catalog\Editor;
 use LifeRuss\Core\Catalog\Rest;
 use LifeRuss\Core\Content\Editor as ContentEditor;
 use LifeRuss\Core\Content\Seed as ContentSeed;
+use LifeRuss\Core\Content\ServiceSeed;
+use LifeRuss\Core\Redirects\Runner;
 use LifeRuss\Core\CRM\Cli as CrmCli;
 use LifeRuss\Core\Catalog\Cli as CatalogCli;
 use LifeRuss\Core\CRM\Files;
@@ -62,6 +65,8 @@ class Plugin {
 		Demo::hooks();
 		ContentEditor::hooks();
 		ContentSeed::hooks();
+		ServiceSeed::hooks();
+		Runner::hooks();
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			CrmCli::hooks();
@@ -70,6 +75,7 @@ class Plugin {
 
 		if ( is_admin() ) {
 			Menu::hooks();
+			RedirectScreen::hooks();
 			LeadAdmin::hooks();
 			SettingsPage::hooks();
 			Assets::hooks();

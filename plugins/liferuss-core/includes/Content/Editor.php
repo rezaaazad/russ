@@ -91,6 +91,8 @@ class Editor {
 				'consult'     => 'مشاوره',
 				'exchange'    => 'استعلام نرخ',
 				'immigration' => 'مهاجرت',
+				'freight'     => 'استعلام بار',
+				'trade'       => 'درخواست تجارت',
 				''            => 'بدون فرم',
 			)
 		);
@@ -110,9 +112,10 @@ class Editor {
 			'lr_schema',
 			(string) get_post_meta( $post->ID, '_lr_schema', true ),
 			array(
-				''       => 'ندارد',
-				'course' => 'Course',
-				'grant'  => 'MonetaryGrant',
+				''        => 'ندارد',
+				'course'  => 'Course',
+				'grant'   => 'MonetaryGrant',
+				'service' => 'Service',
 			)
 		);
 		self::links( $post->ID );
@@ -172,11 +175,11 @@ class Editor {
 		update_post_meta( $post_id, '_lr_degree', in_array( $degree, array( 'bachelor', 'master', 'phd', 'specialist', 'residency' ), true ) ? $degree : '' );
 		update_post_meta( $post_id, '_lr_field', sanitize_title( wp_unslash( $_POST['lr_field'] ?? '' ) ) );
 		$form = sanitize_key( wp_unslash( $_POST['lr_form'] ?? '' ) );
-		update_post_meta( $post_id, '_lr_form', in_array( $form, array( 'admission', 'consult', 'exchange', 'immigration' ), true ) ? $form : '' );
+		update_post_meta( $post_id, '_lr_form', in_array( $form, array( 'admission', 'consult', 'exchange', 'immigration', 'freight', 'trade' ), true ) ? $form : '' );
 		$program = sanitize_key( wp_unslash( $_POST['lr_program'] ?? '' ) );
 		update_post_meta( $post_id, '_lr_program', in_array( $program, array( 'degree', 'padfak', 'direct_course', 'scholarship' ), true ) ? $program : 'degree' );
 		$schema = sanitize_key( wp_unslash( $_POST['lr_schema'] ?? '' ) );
-		update_post_meta( $post_id, '_lr_schema', in_array( $schema, array( 'course', 'grant' ), true ) ? $schema : '' );
+		update_post_meta( $post_id, '_lr_schema', in_array( $schema, array( 'course', 'grant', 'service' ), true ) ? $schema : '' );
 		self::save_links( $post_id );
 		self::save_seo( $post_id );
 	}

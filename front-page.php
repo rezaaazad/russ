@@ -111,7 +111,7 @@ if ( ! $hero_bg_id ) {
 			<h2><?php echo esc_html( liferuss_t( 'path_home_title' ) ); ?></h2>
 		</header>
 		<div class="path-children">
-			<?php foreach ( liferuss_path_links() as $link ) : ?>
+			<?php foreach ( array_merge( liferuss_path_links(), liferuss_service_home_links() ) as $link ) : ?>
 				<a class="path-child" href="<?php echo esc_url( liferuss_url( $link['url'] ) ); ?>">
 					<strong><?php echo esc_html( $link['title'] ); ?></strong>
 				</a>
