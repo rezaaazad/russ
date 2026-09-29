@@ -150,6 +150,37 @@ if ( 'admission' === $type ) {
 				<?php endif; ?>
 				<?php if ( 'immigration' === $type ) : ?>
 				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_imm_type' ) ); ?></span>
+					<select name="consult_imm_type">
+						<option value="visa">ویزا</option>
+						<option value="residency">اقامت</option>
+						<option value="registration">ثبت‌نام</option>
+						<option value="work">کار</option>
+						<option value="deportation">دیپورت</option>
+						<option value="entry-ban">ممنوعیت ورود</option>
+					</select>
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_nationality' ) ); ?></span>
+					<input type="text" name="consult_nationality">
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_current_city' ) ); ?></span>
+					<input type="text" name="consult_city">
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_visa_status' ) ); ?></span>
+					<input type="text" name="consult_visa_status">
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_visa_expiry' ) ); ?></span>
+					<input type="text" name="consult_visa_expiry" placeholder="1405/07/01">
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_documents' ) ); ?></span>
+					<textarea name="consult_documents" rows="3"></textarea>
+				</label>
+				<label>
 					<span><?php echo esc_html( liferuss_t( 'form_notes' ) ); ?></span>
 					<textarea name="consult_message" rows="3"></textarea>
 				</label>

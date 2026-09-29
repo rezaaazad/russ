@@ -53,6 +53,7 @@ class Menu {
 			array( 'lr-req-exchange', 'درخواست‌ها — صرافی', 'lr_manage_exchange_requests', array( LeadAdmin::class, 'exchange' ) ),
 			array( 'lr-req-cargo', 'درخواست‌ها — کارگو', 'lr_manage_cargo_requests', array( LeadAdmin::class, 'cargo' ) ),
 			array( 'lr-req-trade', 'درخواست‌ها — تجارت', 'lr_manage_trade_requests', array( LeadAdmin::class, 'trade' ) ),
+			array( 'lr-req-immigration', 'درخواست‌ها — مهاجرت', 'lr_manage_immigration_requests', array( LeadAdmin::class, 'immigration' ) ),
 			array( 'lr-universities', 'دانشگاه‌ها — داده‌ها', 'lr_view_university_data', array( Screens::class, 'universities' ) ),
 			array( 'lr-tuition', 'دانشگاه‌ها — شهریه‌ها', 'lr_view_university_data', array( Screens::class, 'tuition' ) ),
 			array( 'lr-approvals', 'دانشگاه‌ها — تأییدیه‌ها', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),

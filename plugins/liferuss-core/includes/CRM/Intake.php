@@ -372,6 +372,20 @@ class Intake {
 				'stage'            => 'new',
 			);
 		}
+		if ( 'immigration' === $type ) {
+			$type_key = sanitize_key( self::text( 'consult_imm_type' ) );
+			$allowed  = array( 'visa', 'residency', 'registration', 'work', 'deportation', 'entry-ban' );
+			$expiry   = Jalali::filter_utc( self::text( 'consult_visa_expiry' ), false );
+			return array(
+				'request_type' => in_array( $type_key, $allowed, true ) ? $type_key : 'visa',
+				'nationality'  => self::text( 'consult_nationality' ),
+				'current_city' => self::text( 'consult_city' ),
+				'visa_status'  => self::text( 'consult_visa_status' ),
+				'expiry_date'  => '' !== $expiry ? substr( $expiry, 0, 10 ) : null,
+				'documents'    => self::area( 'consult_documents' ),
+				'stage'        => 'new',
+			);
+		}
 		if ( 'trade' === $type ) {
 			return array(
 				'direction'           => self::direction(),

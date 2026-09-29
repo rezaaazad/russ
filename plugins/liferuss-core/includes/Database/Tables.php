@@ -1038,7 +1038,7 @@ class Tables {
 		$degree = "enum('bachelor','specialist','master','phd','residency') DEFAULT NULL";
 
 		return array(
-			'services'            => array(
+			'services'             => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'              => $id,
@@ -1073,7 +1073,7 @@ class Tables {
 					),
 				),
 			),
-			'leads'               => array(
+			'leads'                => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'                  => $id,
@@ -1164,7 +1164,7 @@ class Tables {
 					),
 				),
 			),
-			'lead_notes'          => array(
+			'lead_notes'           => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'         => $id,
@@ -1191,7 +1191,7 @@ class Tables {
 					),
 				),
 			),
-			'lead_tasks'          => array(
+			'lead_tasks'           => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'           => $id,
@@ -1226,7 +1226,7 @@ class Tables {
 					),
 				),
 			),
-			'lead_files'          => array(
+			'lead_files'           => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'            => $id,
@@ -1258,7 +1258,7 @@ class Tables {
 					),
 				),
 			),
-			'lead_status_history' => array(
+			'lead_status_history'  => array(
 				'soft'    => false,
 				'columns' => array(
 					'id'          => $id,
@@ -1283,7 +1283,7 @@ class Tables {
 					),
 				),
 			),
-			'admission_requests'  => array(
+			'admission_requests'   => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'                => $id,
@@ -1353,7 +1353,7 @@ class Tables {
 					),
 				),
 			),
-			'exchange_requests'   => array(
+			'exchange_requests'    => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'                => $id,
@@ -1391,7 +1391,7 @@ class Tables {
 					),
 				),
 			),
-			'cargo_requests'      => array(
+			'cargo_requests'       => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'                  => $id,
@@ -1437,7 +1437,42 @@ class Tables {
 					),
 				),
 			),
-			'trade_requests'      => array(
+			'immigration_requests' => array(
+				'soft'    => true,
+				'columns' => array(
+					'id'           => $id,
+					'lead_id'      => $fk,
+					'request_type' => "enum('visa','residency','registration','work','deportation','entry-ban') NOT NULL DEFAULT 'visa'",
+					'nationality'  => 'varchar(80) NOT NULL DEFAULT \'\'',
+					'current_city' => 'varchar(100) NOT NULL DEFAULT \'\'',
+					'visa_status'  => 'varchar(80) NOT NULL DEFAULT \'\'',
+					'expiry_date'  => 'date DEFAULT NULL',
+					'documents'    => 'text',
+					'operator_id'  => $fkn,
+					'stage'        => "enum('new','reviewing','documents','in_progress','done','cancelled') NOT NULL DEFAULT 'new'",
+					'created_at'   => $dt,
+					'updated_at'   => $dt,
+					'deleted_at'   => $dtn,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'KEY lead_id (lead_id)',
+					'KEY stage_created (stage, created_at)',
+					'KEY operator_stage (operator_id, stage)',
+					'KEY request_type (request_type)',
+					'KEY created_at (created_at)',
+					'KEY deleted_at (deleted_at)',
+				),
+				'fks'     => array(
+					array(
+						'column'     => 'lead_id',
+						'ref_table'  => 'leads',
+						'ref_column' => 'id',
+						'name'       => 'imm_lead',
+					),
+				),
+			),
+			'trade_requests'       => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'                  => $id,

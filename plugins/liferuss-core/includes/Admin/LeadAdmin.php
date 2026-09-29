@@ -157,6 +157,13 @@ class LeadAdmin {
 	}
 
 	/**
+	 * Immigration queue.
+	 */
+	public static function immigration(): void {
+		self::request_screen( 'immigration_requests', 'lr_manage_immigration_requests', 'درخواست‌های مهاجرت' );
+	}
+
+	/**
 	 * Lead detail.
 	 */
 	public static function detail(): void {

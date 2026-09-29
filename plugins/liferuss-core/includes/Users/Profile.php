@@ -180,6 +180,7 @@ class Profile {
 			'exchange_requests'    => array( 'operator_id' ),
 			'cargo_requests'       => array( 'operator_id' ),
 			'trade_requests'       => array( 'operator_id' ),
+			'immigration_requests' => array( 'operator_id' ),
 		);
 		foreach ( $nulls as $suffix => $columns ) {
 			$table = $wpdb->prefix . 'lr_' . $suffix;

@@ -73,6 +73,14 @@ class Automation {
 		if ( '1' === (string) $rules['auto_assign'] && empty( $lead['consultant_id'] ) ) {
 			self::assign_next( $lead_id, (int) $lead['service_id'] );
 		}
+		$fresh = Repository::for( 'leads' )->find( $lead_id );
+		$owner = (int) ( $fresh['consultant_id'] ?? 0 );
+		if ( $owner ) {
+			$request = Repository::for( 'immigration_requests' )->find_by( 'lead_id', $lead_id );
+			if ( $request && empty( $request['operator_id'] ) ) {
+				Repository::for( 'immigration_requests' )->update( (int) $request['id'], array( 'operator_id' => $owner ) );
+			}
+		}
 	}
 
 	/**

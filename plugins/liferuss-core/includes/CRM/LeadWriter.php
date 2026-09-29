@@ -328,7 +328,7 @@ class LeadWriter {
 	 */
 	public static function requests_for( int $lead_id ): array {
 		$out = array();
-		foreach ( array( 'admission_requests', 'exchange_requests', 'cargo_requests', 'trade_requests' ) as $suffix ) {
+		foreach ( array( 'admission_requests', 'exchange_requests', 'cargo_requests', 'trade_requests', 'immigration_requests' ) as $suffix ) {
 			$out[ $suffix ] = Repository::for( $suffix )->find_by( 'lead_id', $lead_id );
 		}
 		return $out;
@@ -453,10 +453,11 @@ class LeadWriter {
 	 */
 	private static function can_touch_request( string $suffix, array $row ): bool {
 		$cap    = array(
-			'admission_requests' => 'lr_manage_admission_requests',
-			'exchange_requests'  => 'lr_manage_exchange_requests',
-			'cargo_requests'     => 'lr_manage_cargo_requests',
-			'trade_requests'     => 'lr_manage_trade_requests',
+			'admission_requests'   => 'lr_manage_admission_requests',
+			'exchange_requests'    => 'lr_manage_exchange_requests',
+			'cargo_requests'       => 'lr_manage_cargo_requests',
+			'trade_requests'       => 'lr_manage_trade_requests',
+			'immigration_requests' => 'lr_manage_immigration_requests',
 		);
 		$needed = $cap[ $suffix ] ?? '';
 		if ( 'admission_requests' === $suffix && current_user_can( 'lr_view_own_admission_requests' ) ) {

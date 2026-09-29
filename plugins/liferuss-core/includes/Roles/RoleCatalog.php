@@ -282,6 +282,7 @@ class RoleCatalog {
 			self::scoped_crm(),
 			array(
 				'lr_view_own_admission_requests',
+				'lr_manage_immigration_requests',
 				'lr_access_admission',
 				'lr_access_requests',
 				'read_lr_university',
@@ -342,6 +343,7 @@ class RoleCatalog {
 			'lr_manage_exchange_requests',
 			'lr_manage_cargo_requests',
 			'lr_manage_trade_requests',
+			'lr_manage_immigration_requests',
 			'lr_access_requests',
 			'lr_access_admission',
 		);

@@ -7,6 +7,7 @@
 
 namespace LifeRuss\Core\Account;
 
+use LifeRuss\Core\CRM\Catalog;
 use LifeRuss\Core\CRM\Files;
 use LifeRuss\Core\CRM\LeadWriter;
 use LifeRuss\Core\CRM\Notifier;
@@ -179,6 +180,23 @@ class Portal {
 				'label' => self::statuses()[ (string) $row['to_status'] ] ?? 'به‌روزرسانی',
 				'at'    => (string) $row['created_at'],
 				'note'  => self::public_note( (string) $row['reason'] ),
+			);
+		}
+		$immigration = Repository::for( 'immigration_requests' )->find_by( 'lead_id', $lead_id );
+		if ( $immigration ) {
+			$types = array(
+				'visa'         => 'ویزا',
+				'residency'    => 'اقامت',
+				'registration' => 'ثبت‌نام مهاجرتی',
+				'work'         => 'کار',
+				'deportation'  => 'خروج',
+				'entry-ban'    => 'ممنوعیت ورود',
+			);
+			$stage = Catalog::stages( 'immigration_requests' )[ (string) $immigration['stage'] ] ?? '';
+			$out[] = array(
+				'label' => 'درخواست مهاجرت: ' . ( $types[ (string) $immigration['request_type'] ] ?? 'مهاجرت' ),
+				'at'    => (string) ( $immigration['updated_at'] ?? $immigration['created_at'] ),
+				'note'  => $stage,
 			);
 		}
 		return $out;
