@@ -347,6 +347,10 @@ class Settings {
 			'account'       => array(
 				'sms_provider' => 'stub',
 			),
+			'payments'      => array(
+				'merchant_id' => '',
+				'sandbox'     => '1',
+			),
 			'crm'           => array(
 				'auto_assign'        => '1',
 				'sla_hours'          => '4',

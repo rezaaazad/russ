@@ -39,6 +39,7 @@ class Routes {
 		add_rewrite_rule( '^account/request/([0-9]+)/?$', 'index.php?lr_account=request&lr_account_id=$matches[1]', 'top' );
 		add_rewrite_rule( '^account/saved/?$', 'index.php?lr_account=saved', 'top' );
 		add_rewrite_rule( '^account/profile/?$', 'index.php?lr_account=profile', 'top' );
+		add_rewrite_rule( '^pay/([a-f0-9]{32})/?$', 'index.php?lr_pay=$matches[1]', 'top' );
 	}
 
 	/**
@@ -55,6 +56,7 @@ class Routes {
 		$vars[] = 'lr_account_id';
 		$vars[] = 'lr_learn';
 		$vars[] = 'lr_course_slug';
+		$vars[] = 'lr_pay';
 		return $vars;
 	}
 
@@ -66,7 +68,7 @@ class Routes {
 	 */
 	public static function keep( $preempt, $query ) {
 		unset( $query );
-		if ( get_query_var( 'lr_compare' ) || get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) || get_query_var( 'lr_learn' ) ) {
+		if ( get_query_var( 'lr_compare' ) || get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) || get_query_var( 'lr_learn' ) || get_query_var( 'lr_pay' ) ) {
 			return true;
 		}
 		return $preempt;
@@ -76,8 +78,18 @@ class Routes {
 	 * Send 200, or 404 when a curated slug does not exist.
 	 */
 	public static function status(): void {
-		if ( ! get_query_var( 'lr_compare' ) && ! get_query_var( 'lr_find' ) && ! get_query_var( 'lr_account' ) && ! get_query_var( 'lr_learn' ) ) {
+		if ( ! get_query_var( 'lr_compare' ) && ! get_query_var( 'lr_find' ) && ! get_query_var( 'lr_account' ) && ! get_query_var( 'lr_learn' ) && ! get_query_var( 'lr_pay' ) ) {
 			return;
+		}
+		if ( get_query_var( 'lr_pay' ) && class_exists( '\LifeRuss\Core\Payments\Checkout' ) ) {
+			$payment = \LifeRuss\Core\Payments\Checkout::by_token( (string) get_query_var( 'lr_pay' ) );
+			if ( ! $payment ) {
+				global $wp_query;
+				$wp_query->set_404();
+				status_header( 404 );
+				nocache_headers();
+				return;
+			}
 		}
 		if ( get_query_var( 'lr_compare' ) && class_exists( '\LifeRuss\Core\Compare\Set' ) ) {
 			$data = \LifeRuss\Core\Compare\Set::current();
@@ -101,7 +113,7 @@ class Routes {
 	 * @return array<string, string>
 	 */
 	public static function cache_headers( array $headers ): array {
-		if ( get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) ) {
+		if ( get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) || get_query_var( 'lr_pay' ) ) {
 			return array();
 		}
 		$learn = (string) get_query_var( 'lr_learn' );

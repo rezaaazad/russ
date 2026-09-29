@@ -319,6 +319,8 @@ class LeadAdmin {
 		}
 		echo '</ul>';
 
+		\LifeRuss\Core\Payments\Checkout::box( $id );
+
 		echo '<h2>UTM</h2><ul>';
 		foreach ( array( 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'landing_page', 'referrer', 'source' ) as $key ) {
 			echo '<li><strong>' . esc_html( $key ) . ':</strong> ' . esc_html( (string) $lead[ $key ] ) . '</li>';

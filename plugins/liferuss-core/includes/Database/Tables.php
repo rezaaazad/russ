@@ -340,6 +340,32 @@ class Tables {
 				),
 				'fks'     => array(),
 			),
+			'payments'         => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'           => $id,
+					'lead_id'      => 'bigint(20) unsigned NOT NULL',
+					'token'        => 'char(32) NOT NULL',
+					'amount_toman' => 'bigint(20) unsigned NOT NULL',
+					'description'  => 'varchar(255) NOT NULL',
+					'status'       => "enum('pending','paid','failed','expired','cancelled') NOT NULL DEFAULT 'pending'",
+					'expires_at'   => $dtn,
+					'gateway'      => "varchar(20) NOT NULL DEFAULT 'zarinpal'",
+					'authority'    => 'varchar(64) NOT NULL DEFAULT \'\'',
+					'ref_id'       => 'varchar(64) NOT NULL DEFAULT \'\'',
+					'paid_at'      => $dtn,
+					'created_by'   => 'bigint(20) unsigned NOT NULL DEFAULT 0',
+					'created_at'   => $dt,
+					'updated_at'   => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'UNIQUE KEY token (token)',
+					'KEY lead_status (lead_id, status)',
+					'KEY status_created (status, created_at)',
+				),
+				'fks'     => array(),
+			),
 			'rate_history'     => array(
 				'soft'    => false,
 				'columns' => array(

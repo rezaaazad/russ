@@ -127,6 +127,16 @@ $current = 'request' === $screen ? 'requests' : $screen;
 							</li>
 						<?php endforeach; ?>
 					</ol>
+					<h3>صورتحساب‌ها</h3>
+					<ul class="lr-account-list">
+						<?php foreach ( \LifeRuss\Core\Payments\Checkout::for_lead( $lead_id ) as $invoice ) : ?>
+							<?php $pay_label = \LifeRuss\Core\Payments\Checkout::statuses()[ (string) $invoice['status'] ] ?? ''; ?>
+							<li>
+								<a href="<?php echo esc_url( \LifeRuss\Core\Payments\Checkout::url( $invoice ) ); ?>"><?php echo esc_html( number_format_i18n( (int) $invoice['amount_toman'] ) . ' تومان' ); ?></a>
+								<span><?php echo esc_html( $pay_label . ' — ' . (string) $invoice['description'] ); ?></span>
+							</li>
+						<?php endforeach; ?>
+					</ul>
 					<h3>مدارک</h3>
 					<ul class="lr-account-list">
 						<?php foreach ( \LifeRuss\Core\Account\Portal::files( $lead_id ) as $file ) : ?>

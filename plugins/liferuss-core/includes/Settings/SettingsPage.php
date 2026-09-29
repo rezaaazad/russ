@@ -82,6 +82,10 @@ class SettingsPage {
 				'label' => 'حساب مراجع',
 				'cap'   => 'lr_manage_settings',
 			),
+			'payments'      => array(
+				'label' => 'پرداخت خدمات',
+				'cap'   => 'lr_manage_settings',
+			),
 		);
 	}
 
@@ -497,6 +501,31 @@ class SettingsPage {
 		echo '</select>';
 		echo '<p class="description">' . esc_html__( 'ورود با ایمیل از نامهٔ سایت استفاده می‌کند. پیامک از فیلتر liferuss_sms_send می‌گذرد و در غیر این صورت به این ارائه‌دهنده می‌رسد.', 'liferuss-core' ) . '</p>';
 		echo '</td></tr>';
+	}
+
+	/**
+	 * Save the SMS provider. Only the stub is built in.
+	 */
+	private static function fields_payments(): void {
+		$v = Settings::get( 'payments' );
+		self::text_row( 'merchant_id', __( 'مرچنت زرین‌پال', 'liferuss-core' ), (string) $v['merchant_id'] );
+		echo '<tr><th scope="row">' . esc_html__( 'سندباکس', 'liferuss-core' ) . '</th><td>';
+		echo '<label><input type="checkbox" name="pay_sandbox" value="1" ' . checked( '1', (string) $v['sandbox'], false ) . '> ' . esc_html__( 'استفاده از sandbox.zarinpal.com', 'liferuss-core' ) . '</label>';
+		echo '<p class="description">' . esc_html__( 'مبلغ صورتحساب به تومان (IRT) به درگاه می‌رود. درگاه‌های دیگر با فیلتر liferuss_payment_gateway جایگزین می‌شوند.', 'liferuss-core' ) . '</p>';
+		echo '</td></tr>';
+	}
+
+	/**
+	 * Save Zarinpal credentials.
+	 */
+	private static function save_payments(): void {
+		Settings::update(
+			'payments',
+			array(
+				'merchant_id' => self::posted_text( 'merchant_id' ),
+				'sandbox'     => isset( $_POST['pay_sandbox'] ) ? '1' : '0', // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			)
+		);
 	}
 
 	/**

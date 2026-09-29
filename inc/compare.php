@@ -28,6 +28,10 @@ function liferuss_front_template( $template ) {
 		$custom = locate_template( 'templates/account.php' );
 		return $custom ? $custom : $template;
 	}
+	if ( get_query_var( 'lr_pay' ) ) {
+		$custom = locate_template( 'templates/pay.php' );
+		return $custom ? $custom : $template;
+	}
 	if ( get_query_var( 'lr_learn' ) || is_singular( array( 'lr_course', 'lr_lesson' ) ) ) {
 		$custom = locate_template( 'templates/language.php' );
 		return $custom ? $custom : $template;
@@ -54,6 +58,9 @@ function liferuss_front_title( $parts ) {
 	}
 	if ( get_query_var( 'lr_account' ) ) {
 		$parts['title'] = 'حساب من';
+	}
+	if ( get_query_var( 'lr_pay' ) ) {
+		$parts['title'] = 'پرداخت';
 	}
 	$learn = (string) get_query_var( 'lr_learn' );
 	if ( 'index' === $learn ) {

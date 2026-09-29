@@ -178,10 +178,25 @@ class Portal {
 			$out[] = array(
 				'label' => self::statuses()[ (string) $row['to_status'] ] ?? 'به‌روزرسانی',
 				'at'    => (string) $row['created_at'],
-				'note'  => str_starts_with( (string) $row['reason'], 'ادغام' ) ? 'درخواست تکراری به همین پرونده اضافه شد.' : '',
+				'note'  => self::public_note( (string) $row['reason'] ),
 			);
 		}
 		return $out;
+	}
+
+	/**
+	 * Public timeline note. Internal reasons stay hidden.
+	 *
+	 * @param string $reason History reason.
+	 */
+	private static function public_note( string $reason ): string {
+		if ( str_starts_with( $reason, 'ادغام' ) ) {
+			return 'درخواست تکراری به همین پرونده اضافه شد.';
+		}
+		if ( str_starts_with( $reason, 'پرداخت' ) ) {
+			return 'پرداخت ثبت شد.';
+		}
+		return '';
 	}
 
 	/**

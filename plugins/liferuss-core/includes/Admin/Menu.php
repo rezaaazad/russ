@@ -48,6 +48,7 @@ class Menu {
 			array( 'lr-tasks', 'CRM — وظایف و پیگیری', 'lr_access_crm', array( LeadAdmin::class, 'tasks' ) ),
 			array( 'lr-funnel', 'CRM — گزارش قیف', 'lr_manage_leads', array( LeadAdmin::class, 'funnel' ) ),
 			array( 'lr-export', 'CRM — خروجی', 'lr_export_leads', array( LeadAdmin::class, 'export_screen' ) ),
+			array( 'lr-payments', 'پرداخت‌های خدمات', 'lr_manage_leads', array( \LifeRuss\Core\Payments\Admin::class, 'screen' ) ),
 			array( 'lr-req-admission', 'درخواست‌ها — پذیرش', 'lr_access_admission', array( LeadAdmin::class, 'admission' ) ),
 			array( 'lr-req-exchange', 'درخواست‌ها — صرافی', 'lr_manage_exchange_requests', array( LeadAdmin::class, 'exchange' ) ),
 			array( 'lr-req-cargo', 'درخواست‌ها — کارگو', 'lr_manage_cargo_requests', array( LeadAdmin::class, 'cargo' ) ),

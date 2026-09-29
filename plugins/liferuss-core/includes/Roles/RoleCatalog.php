@@ -137,6 +137,7 @@ class RoleCatalog {
 				'lr_manage_redirects',
 				'lr_manage_settings',
 				'lr_access_settings',
+				'lr_export_payments',
 				'lr_view_activity_log',
 				'lr_view_all_dashboard',
 				'list_users',

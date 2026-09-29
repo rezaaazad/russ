@@ -146,7 +146,7 @@ function liferuss_complete_langs() {
  * noindex for filtered archives, paginated archives, explicit flags, and incomplete translations.
  */
 function liferuss_should_noindex() {
-	if ( get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) ) {
+	if ( get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) || get_query_var( 'lr_pay' ) ) {
 		return true;
 	}
 	$learn = (string) get_query_var( 'lr_learn' );
