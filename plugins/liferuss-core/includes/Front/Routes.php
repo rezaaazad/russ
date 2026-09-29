@@ -53,6 +53,8 @@ class Routes {
 		$vars[] = 'lr_find';
 		$vars[] = 'lr_account';
 		$vars[] = 'lr_account_id';
+		$vars[] = 'lr_learn';
+		$vars[] = 'lr_course_slug';
 		return $vars;
 	}
 
@@ -64,7 +66,7 @@ class Routes {
 	 */
 	public static function keep( $preempt, $query ) {
 		unset( $query );
-		if ( get_query_var( 'lr_compare' ) || get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) ) {
+		if ( get_query_var( 'lr_compare' ) || get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) || get_query_var( 'lr_learn' ) ) {
 			return true;
 		}
 		return $preempt;
@@ -74,7 +76,7 @@ class Routes {
 	 * Send 200, or 404 when a curated slug does not exist.
 	 */
 	public static function status(): void {
-		if ( ! get_query_var( 'lr_compare' ) && ! get_query_var( 'lr_find' ) && ! get_query_var( 'lr_account' ) ) {
+		if ( ! get_query_var( 'lr_compare' ) && ! get_query_var( 'lr_find' ) && ! get_query_var( 'lr_account' ) && ! get_query_var( 'lr_learn' ) ) {
 			return;
 		}
 		if ( get_query_var( 'lr_compare' ) && class_exists( '\LifeRuss\Core\Compare\Set' ) ) {
@@ -100,6 +102,10 @@ class Routes {
 	 */
 	public static function cache_headers( array $headers ): array {
 		if ( get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) ) {
+			return array();
+		}
+		$learn = (string) get_query_var( 'lr_learn' );
+		if ( 'placement' === $learn || 'certificate' === $learn ) {
 			return array();
 		}
 		if ( get_query_var( 'lr_compare' ) && class_exists( '\LifeRuss\Core\Compare\Set' ) ) {

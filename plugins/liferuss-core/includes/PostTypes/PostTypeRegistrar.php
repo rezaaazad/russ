@@ -78,7 +78,18 @@ class PostTypeRegistrar {
 	 */
 	public static function guide_link( string $url, $post ): string {
 		$post = get_post( $post );
-		if ( ! $post instanceof \WP_Post || 'lr_guide' !== $post->post_type ) {
+		if ( ! $post instanceof \WP_Post ) {
+			return $url;
+		}
+		if ( 'lr_course' === $post->post_type ) {
+			return home_url( user_trailingslashit( 'russian-language/' . $post->post_name ) );
+		}
+		if ( 'lr_lesson' === $post->post_type ) {
+			$parent = $post->post_parent ? get_post( (int) $post->post_parent ) : null;
+			$course = ( $parent instanceof \WP_Post && 'lr_course' === $parent->post_type ) ? $parent->post_name : 'course';
+			return home_url( user_trailingslashit( 'russian-language/' . $course . '/' . $post->post_name ) );
+		}
+		if ( 'lr_guide' !== $post->post_type ) {
 			return $url;
 		}
 		$terms = get_the_terms( $post, 'lr_guide_cat' );
@@ -93,6 +104,9 @@ class PostTypeRegistrar {
 	 * @param string $post_type Post type.
 	 */
 	public static function guide_archive_link( string $link, string $post_type ): string {
+		if ( 'lr_course' === $post_type ) {
+			return home_url( user_trailingslashit( 'russian-language' ) );
+		}
 		if ( 'lr_guide' !== $post_type ) {
 			return $link;
 		}
@@ -120,9 +134,11 @@ class PostTypeRegistrar {
 		add_rewrite_rule( 'russia-guide/?$', 'index.php?post_type=lr_guide', 'top' );
 		add_rewrite_rule( 'russia-guide/([^/]+)/?$', 'index.php?lr_guide_cat=$matches[1]', 'top' );
 		add_rewrite_rule( 'russia-guide/([^/]+)/([^/]+)/?$', 'index.php?post_type=lr_guide&name=$matches[2]', 'top' );
-		add_rewrite_rule( 'russian-language/?$', 'index.php?post_type=lr_course', 'top' );
+		add_rewrite_rule( 'russian-language/placement/?$', 'index.php?lr_learn=placement', 'top' );
+		add_rewrite_rule( 'russian-language/certificate/?$', 'index.php?lr_learn=certificate', 'top' );
+		add_rewrite_rule( 'russian-language/?$', 'index.php?lr_learn=index', 'top' );
 		add_rewrite_rule( 'russian-language/([^/]+)/?$', 'index.php?lr_course=$matches[1]', 'top' );
-		add_rewrite_rule( 'russian-language/([^/]+)/([^/]+)/?$', 'index.php?post_type=lr_lesson&name=$matches[2]', 'top' );
+		add_rewrite_rule( 'russian-language/([^/]+)/([^/]+)/?$', 'index.php?post_type=lr_lesson&name=$matches[2]&lr_course_slug=$matches[1]', 'top' );
 	}
 
 	/**

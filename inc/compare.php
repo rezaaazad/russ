@@ -28,6 +28,10 @@ function liferuss_front_template( $template ) {
 		$custom = locate_template( 'templates/account.php' );
 		return $custom ? $custom : $template;
 	}
+	if ( get_query_var( 'lr_learn' ) || is_singular( array( 'lr_course', 'lr_lesson' ) ) ) {
+		$custom = locate_template( 'templates/language.php' );
+		return $custom ? $custom : $template;
+	}
 	return $template;
 }
 add_filter( 'template_include', 'liferuss_front_template' );
@@ -50,6 +54,14 @@ function liferuss_front_title( $parts ) {
 	}
 	if ( get_query_var( 'lr_account' ) ) {
 		$parts['title'] = 'حساب من';
+	}
+	$learn = (string) get_query_var( 'lr_learn' );
+	if ( 'index' === $learn ) {
+		$parts['title'] = 'آموزش زبان روسی';
+	} elseif ( 'placement' === $learn ) {
+		$parts['title'] = 'تعیین سطح زبان روسی';
+	} elseif ( 'certificate' === $learn ) {
+		$parts['title'] = 'گواهی دوره';
 	}
 	return $parts;
 }

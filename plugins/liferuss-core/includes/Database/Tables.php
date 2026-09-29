@@ -305,6 +305,41 @@ class Tables {
 				),
 				'fks'     => array(),
 			),
+			'lesson_progress'  => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'         => $id,
+					'user_id'    => 'bigint(20) unsigned NOT NULL',
+					'lesson_id'  => 'bigint(20) unsigned NOT NULL',
+					'completed'  => 'tinyint(1) NOT NULL DEFAULT 0',
+					'updated_at' => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'UNIQUE KEY user_lesson (user_id, lesson_id)',
+					'KEY lesson_id (lesson_id)',
+				),
+				'fks'     => array(),
+			),
+			'quiz_attempts'    => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'         => $id,
+					'user_id'    => 'bigint(20) unsigned NOT NULL',
+					'lesson_id'  => 'bigint(20) unsigned NOT NULL DEFAULT 0',
+					'kind'       => "varchar(20) NOT NULL DEFAULT 'lesson'",
+					'score'      => 'smallint(5) unsigned NOT NULL DEFAULT 0',
+					'max_score'  => 'smallint(5) unsigned NOT NULL DEFAULT 0',
+					'detail'     => 'text',
+					'created_at' => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'KEY user_kind (user_id, kind)',
+					'KEY lesson_id (lesson_id)',
+				),
+				'fks'     => array(),
+			),
 		);
 	}
 

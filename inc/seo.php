@@ -149,6 +149,10 @@ function liferuss_should_noindex() {
 	if ( get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) ) {
 		return true;
 	}
+	$learn = (string) get_query_var( 'lr_learn' );
+	if ( 'placement' === $learn || 'certificate' === $learn ) {
+		return true;
+	}
 	if ( get_query_var( 'lr_compare' ) && class_exists( '\LifeRuss\Core\Compare\Set' ) ) {
 		$data = \LifeRuss\Core\Compare\Set::current();
 		if ( empty( $data['indexable'] ) ) {
@@ -231,6 +235,9 @@ function liferuss_seo_description() {
 	if ( get_query_var( 'lr_account' ) ) {
 		return 'پیگیری درخواست، مدارک و گفتگو با مشاور.';
 	}
+	if ( 'index' === (string) get_query_var( 'lr_learn' ) ) {
+		return 'دوره‌های زبان روسی از A1 تا B2، با درس، تمرین و تعیین سطح.';
+	}
 	$desc = (string) liferuss_opt( 'seo_description' );
 	if ( is_page_template( 'templates/freight.php' ) && liferuss_opt( 'freight_seo_description' ) ) {
 		$desc = (string) liferuss_opt( 'freight_seo_description' );
@@ -267,6 +274,16 @@ function liferuss_seo_canonical() {
 		if ( ! empty( $data['canonical'] ) ) {
 			return (string) $data['canonical'];
 		}
+	}
+	$learn = (string) get_query_var( 'lr_learn' );
+	if ( 'index' === $learn ) {
+		return liferuss_url( '/russian-language/' );
+	}
+	if ( 'placement' === $learn ) {
+		return liferuss_url( '/russian-language/placement/' );
+	}
+	if ( 'certificate' === $learn ) {
+		return liferuss_url( '/russian-language/certificate/' );
 	}
 	if ( get_query_var( 'lr_account' ) ) {
 		$screen = (string) get_query_var( 'lr_account' );
