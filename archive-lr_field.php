@@ -22,6 +22,9 @@ $result = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::fields( $page
 </header>
 <div class="section">
 	<div class="container">
+		<?php if ( empty( $result['items'] ) ) : ?>
+			<?php liferuss_empty_catalog( 'رشته‌ای منتشر نشده است' ); ?>
+		<?php else : ?>
 		<div class="lr-cards">
 			<?php foreach ( $result['items'] as $item ) : ?>
 				<article class="lr-card"><div class="lr-card-body">
@@ -32,6 +35,7 @@ $result = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::fields( $page
 				</div></article>
 			<?php endforeach; ?>
 		</div>
+		<?php endif; ?>
 		<?php liferuss_catalog_pager( $page, (int) $result['pages'] ); ?>
 	</div>
 </div>

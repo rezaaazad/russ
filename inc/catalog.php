@@ -217,6 +217,34 @@ function liferuss_catalog_lang( $lang ) {
 }
 
 /**
+ * Tidy empty catalog panel with a consultation link.
+ *
+ * @param string $title Heading.
+ */
+function liferuss_empty_catalog( $title ) {
+	echo '<div class="lr-empty-state">';
+	echo '<h2>' . esc_html( $title ) . '</h2>';
+	echo '<p>هنوز موردی اینجا منتشر نشده است. برای انتخاب دانشگاه و مسیر، مشاوره رایگان بگیرید.</p>';
+	echo '<a class="btn btn-gold" href="' . esc_url( liferuss_url( '/contact/' ) ) . '">درخواست مشاوره</a>';
+	echo '</div>';
+}
+
+/**
+ * Published universities for the homepage slider.
+ *
+ * @param int $limit Max cards.
+ * @return array<int, array<string, mixed>>
+ */
+function liferuss_home_universities( $limit = 8 ) {
+	if ( ! function_exists( 'liferuss_catalog_ready' ) || ! liferuss_catalog_ready() ) {
+		return array();
+	}
+	$result = \LifeRuss\Core\Catalog\Query::universities( array(), 1 );
+	$items  = isset( $result['items'] ) && is_array( $result['items'] ) ? $result['items'] : array();
+	return array_slice( $items, 0, max( 1, (int) $limit ) );
+}
+
+/**
  * Card grid.
  *
  * @param array $items Cards.
@@ -224,7 +252,7 @@ function liferuss_catalog_lang( $lang ) {
 function liferuss_catalog_cards( $items ) {
 	echo '<div class="lr-cards" id="lr-catalog-results">';
 	if ( ! $items ) {
-		echo '<p class="lr-empty">موردی با این فیلتر پیدا نشد.</p>';
+		liferuss_empty_catalog( 'موردی در این فهرست نیست' );
 	}
 	foreach ( $items as $item ) {
 		$url  = $item['url'] ?? '';

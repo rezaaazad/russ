@@ -71,7 +71,9 @@ $fields  = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::options( 'lr
 			<label class="lr-check"><input type="checkbox" name="ministry" value="approved" <?php checked( ( $filters['ministry'] ?? '' ), 'approved' ); ?>> تأیید وزارتخانه</label>
 			<button class="btn btn-gold" type="submit">اعمال فیلتر</button>
 		</form>
-		<p class="lr-count"><?php echo esc_html( (string) (int) $result['total'] ); ?> دانشگاه</p>
+		<?php if ( (int) $result['total'] > 0 ) : ?>
+			<p class="lr-count"><?php echo esc_html( (string) (int) $result['total'] ); ?> دانشگاه</p>
+		<?php endif; ?>
 		<?php liferuss_catalog_cards( $result['items'] ); ?>
 		<?php liferuss_catalog_pager( $page, (int) $result['pages'] ); ?>
 	</div>

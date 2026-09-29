@@ -3152,6 +3152,25 @@ body.ltr .lr-float__row-label {
   margin: 0;
 }
 
+.lr-empty-state {
+  margin: 8px 0 24px;
+  padding: 36px 24px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+  text-align: center;
+}
+
+.lr-empty-state h2 {
+  margin: 0 0 8px;
+  font-size: var(--h2, 1.6rem);
+}
+
+.lr-empty-state p {
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+
 .lr-facts {
   display: flex;
   flex-wrap: wrap;

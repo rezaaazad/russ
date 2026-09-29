@@ -32,8 +32,21 @@ if ( ! empty( $data['slugs'] ) && is_array( $data['slugs'] ) ) {
 </header>
 <article class="section">
 	<div class="container" id="lr-compare-root" data-slugs="<?php echo esc_attr( $slug ); ?>" data-names="<?php echo esc_attr( (string) ( $data['names'] ?? '' ) ); ?>">
-		<?php if ( empty( $data['ok'] ) ) : ?>
-			<p class="lr-empty"><?php echo esc_html( (string) ( $data['error'] ?? '' ) ); ?></p>
+		<?php
+		$catalog_total = 0;
+		if ( function_exists( 'liferuss_catalog_ready' ) && liferuss_catalog_ready() ) {
+			$catalog_list  = \LifeRuss\Core\Catalog\Query::universities( array(), 1 );
+			$catalog_total = (int) ( $catalog_list['total'] ?? 0 );
+		}
+		?>
+		<?php if ( $catalog_total < 1 ) : ?>
+			<?php liferuss_empty_catalog( 'دانشگاهی برای مقایسه منتشر نشده' ); ?>
+		<?php elseif ( empty( $data['ok'] ) ) : ?>
+			<div class="lr-empty-state">
+				<h2>مقایسه دانشگاه</h2>
+				<p><?php echo esc_html( (string) ( $data['error'] ?? 'دو تا چهار دانشگاه را انتخاب کنید.' ) ); ?></p>
+				<p><a class="btn btn-gold" href="<?php echo esc_url( get_post_type_archive_link( 'lr_university' ) ); ?>">انتخاب از فهرست دانشگاه‌ها</a></p>
+			</div>
 		<?php else : ?>
 			<?php if ( ! empty( $data['intro'] ) ) : ?>
 				<div class="prose"><?php echo wp_kses_post( wpautop( (string) $data['intro'] ) ); ?></div>

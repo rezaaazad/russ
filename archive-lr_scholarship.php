@@ -87,7 +87,7 @@ get_header();
 					</article>
 				<?php endwhile; ?>
 			<?php else : ?>
-				<p class="lr-empty"><?php echo esc_html( liferuss_t( 'path_empty' ) ); ?></p>
+				<?php liferuss_empty_catalog( 'بورسیه‌ای منتشر نشده است' ); ?>
 			<?php endif; ?>
 		</div>
 	</div>

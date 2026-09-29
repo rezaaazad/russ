@@ -24,6 +24,87 @@ class Demo {
 	 */
 	public static function hooks(): void {
 		add_action( 'init', array( self::class, 'maybe_seed' ), 30 );
+		add_action( 'admin_menu', array( self::class, 'menu' ) );
+		add_action( 'admin_post_lr_publish_demo', array( self::class, 'handle_publish' ) );
+	}
+
+	/**
+	 * One-click screen under the LifeRuss menu.
+	 */
+	public static function menu(): void {
+		add_submenu_page(
+			'liferuss',
+			'انتشار کاتالوگ نمونه',
+			'انتشار کاتالوگ نمونه',
+			'lr_manage_university_data',
+			'lr-publish-demo',
+			array( self::class, 'screen' )
+		);
+	}
+
+	/**
+	 * Confirm before publishing demo drafts.
+	 */
+	public static function screen(): void {
+		if ( ! current_user_can( 'lr_manage_university_data' ) ) {
+			wp_die( esc_html__( 'اجازه این کار را ندارید.', 'liferuss-core' ) );
+		}
+		$done = isset( $_GET['lr_demo_published'] ) ? absint( wp_unslash( $_GET['lr_demo_published'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		echo '<div class="wrap">';
+		echo '<h1>انتشار کاتالوگ نمونه</h1>';
+		if ( $done ) {
+			echo '<div class="notice notice-success"><p>' . esc_html( (string) $done ) . ' پیش‌نویس نمونه منتشر شد.</p></div>';
+		}
+		echo '<p>دانشگاه، شهر، رشته و بورسیهٔ پیش‌نویس که با برچسب نمونه ذخیره شده‌اند منتشر می‌شوند و در سایت دیده می‌شوند.</p>';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		wp_nonce_field( 'lr_publish_demo' );
+		echo '<input type="hidden" name="action" value="lr_publish_demo">';
+		submit_button( 'انتشار کاتالوگ نمونه' );
+		echo '</form></div>';
+	}
+
+	/**
+	 * Publish demo drafts after a nonce check.
+	 */
+	public static function handle_publish(): void {
+		if ( ! current_user_can( 'lr_manage_university_data' ) ) {
+			wp_die( esc_html__( 'اجازه این کار را ندارید.', 'liferuss-core' ) );
+		}
+		check_admin_referer( 'lr_publish_demo' );
+		$count = self::publish();
+		wp_safe_redirect( add_query_arg( 'lr_demo_published', $count, admin_url( 'admin.php?page=lr-publish-demo' ) ) );
+		exit;
+	}
+
+	/**
+	 * Publish catalog drafts marked as demo.
+	 */
+	public static function publish(): int {
+		$ids   = get_posts(
+			array(
+				'post_type'      => array( 'lr_university', 'lr_city', 'lr_field', 'lr_scholarship' ),
+				'post_status'    => array( 'draft', 'pending' ),
+				'posts_per_page' => 50,
+				'fields'         => 'ids',
+				'meta_key'       => '_lr_demo', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value'     => '1', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+			)
+		);
+		$count = 0;
+		foreach ( $ids as $id ) {
+			$result = wp_update_post(
+				array(
+					'ID'          => (int) $id,
+					'post_status' => 'publish',
+				),
+				true
+			);
+			if ( ! is_wp_error( $result ) ) {
+				++$count;
+			}
+		}
+		Store::bump();
+		return $count;
 	}
 
 	/**
