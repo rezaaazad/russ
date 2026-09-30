@@ -424,8 +424,8 @@ p {
   min-width: 0;
 }
 
-/* After the base display rules so 861–1280 stays a closed overlay. */
-@media (max-width: 1280px) and (min-width: 861px) {
+/* After the base display rules so desktop search stays a closed overlay behind the icon. */
+@media (min-width: 861px) {
   .site-header .header-search {
     display: none;
     position: absolute;
@@ -451,24 +451,21 @@ p {
     display: inline-flex;
   }
 
-  .site-header .header-cta {
-    display: none;
-  }
-
   .site-header .lr-finder {
     min-width: 0;
   }
 }
 
-@media (min-width: 1281px) and (max-width: 1500px) {
-  .site-header .header-actions {
-    gap: 12px;
+@media (min-width: 861px) and (max-width: 1280px) {
+  .site-header .header-cta {
+    display: none;
   }
+}
 
-  .site-header .header-search .lr-finder,
-  .site-header .header-search .lr-finder input {
-    width: 10rem;
-    min-width: 0;
+/* Narrow desktop: languages stay in the footer switcher. */
+@media (min-width: 861px) and (max-width: 1100px) {
+  .site-header .lang-switch--header {
+    display: none;
   }
 }
 
