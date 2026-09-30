@@ -1,0 +1,266 @@
+---
+title: LifeRuss ERD - University Domain
+---
+erDiagram
+  LR_UNIVERSITIES {
+    BIGINT id PK
+    BIGINT post_id FK,UK
+    VARCHAR name_fa
+    VARCHAR name_en
+    VARCHAR name_ru
+    VARCHAR short_name
+    VARCHAR slug UK
+    BIGINT city_id FK
+    BIGINT logo_id FK
+    VARCHAR website
+    SMALLINT founded_year
+    VARCHAR address
+    DECIMAL latitude
+    DECIMAL longitude
+    ENUM ownership
+    TINYINT has_dormitory
+    TINYINT has_padfak
+    TINYINT has_direct_course
+    TINYINT has_scholarship
+    SET teaching_languages
+    ENUM health_ministry_status
+    ENUM science_ministry_status
+    DECIMAL min_tuition_usd
+    INT best_world_rank
+    TINYINT is_featured
+    INT popularity_score
+    ENUM status
+    DATETIME last_verified_at
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_CITIES {
+    BIGINT id PK
+    BIGINT post_id FK,UK
+    VARCHAR name_fa
+    VARCHAR name_en
+    VARCHAR name_ru
+    VARCHAR slug UK
+    VARCHAR federal_subject
+    DECIMAL latitude
+    DECIMAL longitude
+    INT population
+    VARCHAR timezone
+    DECIMAL living_cost_min
+    DECIMAL living_cost_max
+    CHAR currency
+    VARCHAR climate_summary
+    ENUM status
+    VARCHAR source
+    VARCHAR source_url
+    DATETIME last_verified_at
+    BIGINT verified_by FK
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_FIELDS {
+    BIGINT id PK
+    BIGINT post_id FK,UK
+    VARCHAR name_fa
+    VARCHAR name_en
+    VARCHAR name_ru
+    VARCHAR slug UK
+    BIGINT field_group_id FK
+    SET degree_levels
+    DECIMAL default_duration_years
+    SET languages
+    DECIMAL avg_tuition_usd
+    SMALLINT universities_count
+    ENUM status
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_UNIVERSITY_FIELDS {
+    BIGINT id PK
+    BIGINT university_id FK
+    BIGINT field_id FK
+    ENUM degree
+    ENUM language
+    DECIMAL duration_years
+    DECIMAL tuition
+    CHAR currency
+    CHAR academic_year
+    ENUM status
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_TUITION_FEES {
+    BIGINT id PK
+    BIGINT university_id FK
+    BIGINT field_id FK
+    BIGINT university_field_id FK
+    ENUM degree
+    ENUM language
+    DECIMAL amount
+    CHAR currency
+    DECIMAL amount_usd
+    DATETIME fx_rate_at
+    ENUM fee_period
+    CHAR academic_year
+    TINYINT is_current
+    VARCHAR notes
+    VARCHAR source
+    VARCHAR source_url
+    DATETIME last_verified_at
+    BIGINT verified_by FK
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_DORMITORY_FEES {
+    BIGINT id PK
+    BIGINT university_id FK
+    ENUM room_type
+    DECIMAL amount_min
+    DECIMAL amount_max
+    CHAR currency
+    ENUM fee_period
+    CHAR academic_year
+    VARCHAR includes
+    VARCHAR source
+    VARCHAR source_url
+    DATETIME last_verified_at
+    BIGINT verified_by FK
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_UNIVERSITY_APPROVALS {
+    BIGINT id PK
+    BIGINT university_id FK
+    ENUM authority
+    BIGINT field_id FK
+    CHAR academic_year
+    ENUM status
+    BIGINT document_id FK
+    VARCHAR notes
+    VARCHAR source
+    VARCHAR source_url
+    DATETIME last_verified_at
+    BIGINT verified_by FK
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_UNIVERSITY_RANKINGS {
+    BIGINT id PK
+    BIGINT university_id FK
+    BIGINT ranking_provider_id FK
+    ENUM scope
+    VARCHAR subject
+    INT rank_value
+    VARCHAR rank_band
+    SMALLINT year
+    VARCHAR source
+    VARCHAR source_url
+    DATETIME last_verified_at
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_RANKING_PROVIDERS {
+    BIGINT id PK
+    VARCHAR code UK
+    VARCHAR name
+    VARCHAR website
+    TINYINT is_active
+    SMALLINT sort_order
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_ADMISSION_REQUIREMENTS {
+    BIGINT id PK
+    BIGINT university_id FK
+    ENUM degree
+    BIGINT field_id FK
+    ENUM requirement_type
+    VARCHAR title
+    TEXT description
+    TINYINT is_mandatory
+    SMALLINT sort_order
+    CHAR academic_year
+    VARCHAR source
+    VARCHAR source_url
+    DATETIME last_verified_at
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_INTAKES {
+    BIGINT id PK
+    BIGINT university_id FK
+    ENUM program_type
+    ENUM degree
+    BIGINT field_id FK
+    VARCHAR intake_label
+    DATE start_date
+    DATE application_open
+    DATE application_deadline
+    CHAR academic_year
+    ENUM status
+    VARCHAR source
+    VARCHAR source_url
+    DATETIME last_verified_at
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_PREP_PROGRAMS {
+    BIGINT id PK
+    BIGINT university_id FK
+    ENUM program_type
+    ENUM track
+    ENUM format
+    TINYINT duration_months
+    DECIMAL tuition
+    CHAR currency
+    CHAR academic_year
+    VARCHAR start_dates
+    TEXT requirements
+    ENUM status
+    VARCHAR source
+    VARCHAR source_url
+    DATETIME last_verified_at
+    BIGINT verified_by FK
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  WP_POSTS {
+    BIGINT ID PK
+    VARCHAR post_type
+    VARCHAR post_name
+    VARCHAR post_status
+    BIGINT post_author FK
+  }
+  WP_TERMS {
+    BIGINT term_id PK
+    VARCHAR slug
+  }
+  WP_POSTS ||--o| LR_UNIVERSITIES : "post_id"
+  WP_POSTS ||--o| LR_FIELDS : "post_id"
+  WP_POSTS ||--o| LR_CITIES : "post_id"
+  LR_CITIES ||--o{ LR_UNIVERSITIES : "city_id"
+  LR_UNIVERSITIES ||--o{ LR_UNIVERSITY_FIELDS : "university_id"
+  LR_FIELDS ||--o{ LR_UNIVERSITY_FIELDS : "field_id"
+  LR_UNIVERSITIES ||--o{ LR_TUITION_FEES : "university_id"
+  LR_FIELDS |o--o{ LR_TUITION_FEES : "field_id"
+  LR_UNIVERSITY_FIELDS |o--o{ LR_TUITION_FEES : "university_field_id"
+  LR_UNIVERSITIES ||--o{ LR_DORMITORY_FEES : "university_id"
+  LR_UNIVERSITIES ||--o{ LR_UNIVERSITY_APPROVALS : "university_id"
+  LR_UNIVERSITIES ||--o{ LR_UNIVERSITY_RANKINGS : "university_id"
+  LR_RANKING_PROVIDERS ||--o{ LR_UNIVERSITY_RANKINGS : "ranking_provider_id"
+  LR_UNIVERSITIES ||--o{ LR_ADMISSION_REQUIREMENTS : "university_id"
+  LR_UNIVERSITIES ||--o{ LR_INTAKES : "university_id"
+  LR_UNIVERSITIES ||--o{ LR_PREP_PROGRAMS : "university_id"
+  WP_TERMS |o--o{ LR_FIELDS : "field_group_id"

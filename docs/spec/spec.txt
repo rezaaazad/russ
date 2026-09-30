@@ -1,0 +1,989 @@
+‫‪ LifeRuss‬پروژه ‪ CRM‬سند کامل معماری سایت‪ ،‬دیتابیس و‬
+‫‪1 message‬‬
+
+‫>‪Amin Nesari <aminnesari4477@gmail.com‬‬                                                                                      ‫‪Tue, Sep 29, 2026 at 12:31‬‬
+‫‪To: Reza.azad70@gmail.com‬‬
+
+
+ ‫‪،‬سالم رضا جان‬
+
+ ‫و ‪ Backend‬است‪ .‬لطفًا قبل از شروع توسعه‪ ،‬معماری ‪ CRM‬و ‪، SEO‬برای طراحی فنی‪ ،‬دیتابیس‪ ،‬پنل مدیریت ‪ LifeRuss‬این سند‪ ،‬ساختار نهایی موردنیاز پروژه‬
+ ‫‪.‬بر اساس همین ساختار نهایی شود ‪Database‬‬
+
+ ‫هدف پروژه )‪1‬‬
+
+ ‫قرار نیست یک سایت شرکتی ساده یا فقط سایت اعزام دانشجو باشد‪ .‬هدف‪ ،‬ساخت یک پلتفرم جامع فارسی‌زبان درباره روسیه است که حوزه‌های زیر را در ‪LifeRuss‬‬
+ ‫‪:‬یک سیستم واحد پوشش دهد‬
+
+        ‫تحصیل در روسیه‬
+        ‫دانشگاه‌های روسیه‬
+        ‫بورسیه‬
+        ‫پادفک و کورس مستقیم‬
+        ‫آموزش زبان روسی‬
+        ‫مهاجرت و زندگی در روسیه‬
+        ‫خدمات مالی و صرافی‬
+        ‫کارگو و باربری ایران ↔ روسیه‬
+        ‫ایران ↔ روسیه ‪ B2B‬خدمات تجاری‬
+        ‫مجله و دانشنامه روسیه‬
+
+ ‫سورسینگ‪ ،‬پیدا کردن و اعتبارسنجی تأمین‌کننده‪ ،‬هماهنگی خرید‪ B2B، ،‬فروشگاه نیست و فروش مستقیم کاال ندارد‪ .‬بخش تجارت صرفًا خدمات ‪: LifeRuss‬نکته مهم‬
+ ‫‪.‬صادرات‪/‬واردات‪ ،‬بررسی اسناد و ارتباط تجار ایران و روسیه را پوشش می‌دهد‬
+
+ ‫‪ )2‬هدف معماری‬
+
+ ‫صدها دانشگاه‪ ،‬هزاران رشته و مقاله‪ Backend، ،‬و قابل مدیریت از پنل ادمین باشد و بتواند بدون تغییر اساسی ‪، SEO Friendly‬قابل توسعه ‪ Data Driven،‬سیستم باید‬
+ ‫‪.‬هزاران لید و درخواست خدمات را مدیریت کند‬
+
+ ‫‪:‬هسته پروژه‬
+ ‫‪Content + University Database + Services + CRM + SEO‬‬
+
+ ‫‪ )3‬منوی اصلی سایت‬
+
+        ‫تحصیل در روسیه‬
+        ‫دانشگاه‌ها‬
+        ‫بورسیه‬
+        ‫پادفک‬
+        ‫زبان روسی‬
+        ‫مهاجرت‬
+        ‫صرافی‬
+        ‫کارگو‬
+        ‫تجارت‬
+           ‫مجله‬
+           ‫درباره ما‬
+           ‫تماس‬
+
+‫‪.‬باشد ‪ Accordion‬به‌صورت ‪ Mobile‬و ‪ Mega Menu‬بهتر است ‪Desktop‬‬
+
+‫‪4) Homepage‬‬
+
+‫‪.‬را معرفی کند‪ ،‬نه فقط پذیرش دانشجو ‪ LifeRuss‬باید برند مادر ‪Homepage‬‬
+
+‫‪:‬بخش‌های پیشنهادی‬
+
+           ‫‪Hero + CTA‬‬
+           ‫خدمات اصلی‬
+           ‫دانشگاه‌های محبوب‬
+           ‫رشته‌های محبوب‬
+           ‫بورسیه‬
+           ‫پادفک‬
+           ‫زبان روسی‬
+           ‫مهاجرت‬
+           ‫صرافی‬
+           ‫کارگو‬
+           ‫تجارت‬
+           ‫جدیدترین مقاالت‬
+           ‫نظرات مشتریان‬
+           ‫‪FAQ‬‬
+           ‫فرم مشاوره‬
+
+‫‪5) University Database‬‬
+
+‫‪:‬مادر ‪URL‬‬
+‫‪/universities/‬‬
+
+‫‪.‬مشترک داشته باشد ‪ Template‬باشند‪ .‬هر دانشگاه یک رکورد مستقل در دیتابیس و یک ‪ Hardcoded‬دانشگاه‌ها نباید‬
+
+‫‪:‬فیلترها‬
+
+           ‫شهر‬
+           ‫رشته‬
+           ‫مقطع‬
+           ‫زبان تحصیل‬
+           ‫شهریه‬
+           ‫پزشکی‬
+           ‫دندانپزشکی‬
+           ‫داروسازی‬
+           ‫مهندسی‬
+           ‫خوابگاه‬
+           ‫پادفک‬
+           ‫کورس مستقیم‬
+           ‫بورسیه‬
+           ‫تأیید وزارت بهداشت‬
+           ‫تأیید وزارت علوم‬
+‫‪ URL:‬نمونه‬
+‫‪/universities/sechenov/‬‬
+‫‪/universities/rudn/‬‬
+‫‪/universities/kazan-federal/‬‬
+
+‫‪:‬اطالعات هر دانشگاه‬
+
+         ‫نام فارسی‪ ،‬انگلیسی و روسی‬
+         ‫‪Slug‬‬
+         ‫لوگو و تصاویر‬
+         ‫شهر و آدرس‬
+         ‫‪Location‬‬
+         ‫‪Website‬‬
+         ‫سال تأسیس‬
+         ‫توضیحات‬
+         ‫رتبه‌ها‬
+         ‫رشته‌ها‬
+         ‫زبان تحصیل‬
+         ‫شهریه‬
+         ‫خوابگاه‬
+         ‫هزینه خوابگاه‬
+         ‫پادفک‬
+         ‫شرایط پذیرش‬
+         ‫مدارک‬
+         ‫‪ Intake‬و ‪Deadline‬‬
+         ‫وضعیت وزارت بهداشت‪/‬علوم‬
+         ‫تاریخ آخرین بررسی‬
+         ‫‪FAQ‬‬
+         ‫مقاالت مرتبط‬
+         ‫دانشگاه‌های مشابه‬
+         ‫درخواست پذیرش ‪CTA‬‬
+
+‫‪.‬باشند ‪ last_verified_at‬و ‪ source، academic_year‬اطالعاتی مثل شهریه‪ ،‬رتبه و تأیید وزارتخانه حتمًا دارای‬
+
+‫رشته‌ها )‪6‬‬
+
+‫‪URL:‬‬
+‫‪/fields/‬‬
+
+‫‪:‬نمونه‬
+‫‪/fields/medicine/‬‬
+‫‪/fields/dentistry/‬‬
+‫‪/fields/pharmacy/‬‬
+‫‪/fields/computer-engineering/‬‬
+
+‫‪.‬باشد ‪ Many-to-Many‬باید ‪ Field‬و ‪ University‬ارتباط‬
+
+‫‪:‬اطالعات رشته‬
+
+         ‫‪ Slug‬نام و‬
+         ‫توضیح‬
+         ‫مقطع‬
+         ‫مدت تحصیل‬
+         ‫زبان‬
+         ‫شهریه متوسط‬
+         ‫شرایط ورود‬
+         ‫دانشگاه‌های ارائه‌دهنده‬
+         ‫بازار کار‬
+         FAQ
+
+‫) شهرهای روسیه‬7
+
+URL:
+/cities/
+
+‫نمونه‬:
+/cities/moscow/
+/cities/kazan/
+/cities/saint-petersburg/
+
+‫اطالعات‬:
+
+         ‫معرفی‬
+         ‫هزینه زندگی‬
+         ‫آب‌وهوا‬
+         ‫حمل‌ونقل‬
+         ‫دانشگاه‌ها‬
+         ‫خوابگاه‬
+         ‫زندگی دانشجویی‬
+         ‫مقاالت مرتبط‬
+
+‫) تحصیل در روسیه‬8
+
+URL ‫مادر‬:
+/study-russia/
+
+‫زیرصفحات‬:
+
+         /study-russia/medicine/
+         /study-russia/dentistry/
+         /study-russia/pharmacy/
+         /study-russia/engineering/
+         /study-russia/bachelor/
+         /study-russia/master/
+         /study-russia/phd/
+
+‫) بورسیه‬9
+
+URL:
+/scholarships/
+
+‫زیرصفحات‬:
+
+         ‫پزشکی‬
+         ‫دندانپزشکی‬
+         ‫مهندسی‬
+         ‫بورسیه دولتی روسیه‬
+
+‫) پادفک‬10
+
+URL:
+/padfak/
+
+‫زیرصفحات‬:
+         ‫پزشکی‬
+         ‫مهندسی‬
+         ‫آنالین‬
+         ‫پادفک دانشگاه‌ها‬
+
+‫ هر دانشگاه بتواند‬Relation ‫ با دوره‌های‬Padfak ‫داشته باشد‬.
+
+‫) کورس مستقیم‬11
+
+URL:
+/direct-course/
+
+‫اطالعات‬:
+
+         ‫معرفی‬
+         ‫دانشگاه‌های دارای کورس مستقیم‬
+         ‫شرایط‬
+         ‫مدارک‬
+         ‫شهریه‬
+         ‫رشته‌ها‬
+         FAQ
+
+‫) آموزش زبان روسی‬12
+
+URL:
+/russian-language/
+
+‫ ساختار‬Course Based:
+
+         Lessons
+         Grammar
+         Vocabulary
+         Conversation
+         Quiz
+
+‫نمونه‬:
+/russian-language/lessons/lesson-1/
+
+Lesson Fields:
+
+         Title
+         Slug
+         Level
+         Order
+         Video
+         Audio
+         Content
+         Vocabulary
+         Exercises
+         Quiz
+         Previous/Next Lesson
+
+‫) مهاجرت‬13
+
+URL:
+/migration-russia/
+
+‫زیرصفحات‬:
+
+         Visa
+         Residency
+         Registration
+         Work
+         Deportation
+         ‫‪Entry Ban‬‬
+
+‫‪.‬داشته باشند ‪ reviewed_by‬و ‪ source، last_updated‬مقاالت حقوقی باید‬
+
+‫‪ )14‬صرافی‬
+
+‫‪URL:‬‬
+‫‪/exchange/‬‬
+
+‫‪.‬و درخواست نرخ باشد‪ ،‬نه فروشگاه یا سیستم تبدیل خودکار ‪ Lead Generation‬در فاز اول‬
+
+‫‪:‬خدمات‬
+
+         ‫تومان به روبل‬
+         ‫روبل به تومان‬
+         ‫حواله روسیه‬
+         ‫پرداخت شهریه‬
+         ‫پرداخت خوابگاه‬
+         ‫خدمات مالی دانشجویی‬
+
+‫‪:‬فرم‬
+
+         ‫‪Name‬‬
+         ‫‪Phone‬‬
+         ‫‪WhatsApp‬‬
+         ‫‪Amount‬‬
+         ‫‪Currency From‬‬
+         ‫‪Currency To‬‬
+         ‫‪City‬‬
+         ‫‪Description‬‬
+
+‫استعالم نرخ ‪CTA:‬‬
+
+‫‪ )15‬کارگو‬
+
+‫‪.‬بخورد ‪ Redirect‬شده حفظ شود یا در صورت تغییر ‪ Index 301‬فعلی اگر ‪URL‬‬
+
+‫‪:‬زیرصفحات پیشنهادی‬
+
+         ‫ایران به روسیه‬
+         ‫روسیه به ایران‬
+         ‫ارسال مدارک‬
+         ‫وسایل شخصی‬
+         ‫نمونه کاال‬
+         ‫بار تجاری‬
+
+‫‪Cargo Request Fields:‬‬
+
+         ‫‪Name‬‬
+         ‫‪Phone‬‬
+         ‫‪Origin‬‬
+         ‫‪Destination‬‬
+         ‫‪Weight‬‬
+         ‫‪Type‬‬
+         ‫‪Dimensions‬‬
+         ‫‪Description‬‬
+         ‫‪File‬‬
+
+‫‪ )16 B2B‬تجارت‬
+
+‫‪URL:‬‬
+‫‪/trade/‬‬
+‫‪.‬فروش مستقیم کاال ندارد ‪LifeRuss‬‬
+
+‫‪:‬خدمات‬
+
+           ‫‪Sourcing‬‬
+           ‫‪Supplier Verification‬‬
+           ‫هماهنگی خرید‬
+           ‫هماهنگی صادرات‬
+           ‫هماهنگی واردات‬
+           ‫بررسی نمونه‬
+           ‫بررسی اسناد‬
+           ‫هماهنگی حمل‬
+           ‫‪ B2B‬خدمات‬
+           ‫ارتباط تجار ایران و روسیه‬
+
+‫‪:‬زیرصفحات‬
+
+           ‫‪/trade/sourcing/‬‬
+           ‫‪/trade/export-consulting/‬‬
+           ‫‪/trade/import-consulting/‬‬
+           ‫‪/trade/supplier-verification/‬‬
+           ‫‪/trade/b2b/‬‬
+
+‫‪.‬در دیتابیس فقط موضوع درخواست تجاری است‪ ،‬نه محصولی برای فروش در سایت ‪product_category‬‬
+
+‫دانستنی‌های روسیه )‪17‬‬
+
+‫‪URL:‬‬
+‫‪/russia-guide/‬‬
+
+‫‪:‬دسته‌ها‬
+
+           ‫شهرها‬
+           ‫فرهنگ‬
+           ‫غذا‬
+           ‫حمل‌ونقل‬
+           ‫مترو‬
+           ‫سیم‌کارت‬
+           ‫بانک‬
+           ‫خرید‬
+           ‫قوانین‬
+           ‫آب‌وهوا‬
+           ‫زندگی دانشجویی‬
+           ‫هزینه زندگی‬
+
+‫‪ )18‬مجله‬
+
+‫‪URL:‬‬
+‫‪/blog/‬‬
+
+‫‪.‬باشد »‪ LifeRuss‬می‌تواند «مجله ‪Frontend Label‬‬
+
+‫‪Categories:‬‬
+
+           ‫تحصیل‬
+           ‫دانشگاه‬
+           ‫بورسیه‬
+        ‫پادفک‬
+        ‫زبان روسی‬
+        ‫مهاجرت‬
+        ‫زندگی‬
+        ‫صرافی‬
+        ‫کارگو‬
+        ‫تجارت‬
+        ‫دانستنی‌ها‬
+
+19) CRM ‫مرکزی‬
+
+‫ تمام فرم‌های سایت باید در‬CRM ‫ذخیره شوند و صرفًا ایمیل ارسال نکنند‬.
+
+Table: leads
+
+Fields ‫اصلی‬:
+
+        id
+        name
+        phone
+        email
+        whatsapp
+        telegram
+        service_id
+        subservice
+        country
+        city
+        message
+        source
+        landing_page
+        referrer
+        utm_source
+        utm_medium
+        utm_campaign
+        utm_content
+        consultant_id
+        status
+        priority
+        created_at
+        updated_at
+
+Lead Status:
+
+        new
+        contacted
+        qualified
+        follow_up
+        documents
+        contract
+        paid
+        completed
+        lost
+
+Tables ‫مرتبط‬:
+
+        lead_notes
+        lead_tasks
+        lead_files
+        lead_status_history
+
+‫) جداول اصلی دیتابیس‬20
+
+Core:
+
+        users
+          roles
+          permissions
+          role_permissions
+          user_roles
+          settings
+          media
+          activity_logs
+          redirects
+
+Content:
+
+          pages
+          articles
+          categories
+          tags
+          article_tags
+          faqs
+          testimonials
+
+University:
+
+          universities
+          fields
+          cities
+          university_fields
+          tuition_fees
+          dormitory_fees
+          university_approvals
+          university_rankings
+          admission_requirements
+          intakes
+
+Education:
+
+          courses
+          lessons
+          quizzes
+          quiz_questions
+
+Services/CRM:
+
+          services
+          leads
+          lead_notes
+          lead_tasks
+          lead_files
+          lead_status_history
+          admission_requests
+          exchange_requests
+          cargo_requests
+          trade_requests
+
+‫) نمونه دانشگاه‌ها‬21 Table
+
+universities
+
+Fields:
+
+          id
+          name_fa
+          name_en
+          name_ru
+          slug
+          city_id
+          logo
+          website
+          founded_year
+          description
+          address
+          latitude
+          longitude
+          has_dormitory
+          has_padfak
+          has_direct_course
+          health_ministry_status
+          science_ministry_status
+          last_verified_at
+          status
+          created_at
+          updated_at
+
+22) ‫ارتباط دانشگاه و رشته‬
+
+university_fields
+
+Fields:
+
+          id
+          university_id
+          field_id
+          degree
+          language
+          duration
+          tuition
+          currency
+          academic_year
+          status
+
+‫) شهریه‬23
+
+tuition_fees
+
+Fields:
+
+          id
+          university_id
+          field_id
+          degree
+          amount
+          currency
+          academic_year
+          source
+          last_verified_at
+
+‫ شهریه نباید فقط یک عدد ثابت داخل‬Table ‫دانشگاه باشد‬.
+
+‫) تأیید وزارتخانه‬24
+
+university_approvals
+
+Fields:
+
+          university_id
+          authority
+          academic_year
+          status
+          source
+          last_verified_at
+
+25) Ranking
+
+university_rankings
+
+Fields:
+
+          university_id
+          ranking_provider
+          rank
+          year
+          source
+26) ‫درخواست‌های اختصاصی‬
+
+admission_requests
+exchange_requests
+cargo_requests
+trade_requests
+
+‫ هرکدام باید به‬lead_id ‫ متصل باشند تا یک‬CRM ‫مرکزی داشته باشیم‬.
+
+27) SEO
+
+‫ تمام‬Entity‫ های اصلی دارای این‬Fields ‫باشند‬:
+
+       seo_title
+       seo_description
+       canonical
+       robots
+       og_title
+       og_description
+       og_image
+
+Sitemap‫های مجزا‬:
+
+       /sitemap.xml
+       /sitemap-pages.xml
+       /sitemap-articles.xml
+       /sitemap-universities.xml
+       /sitemap-fields.xml
+
+Breadcrumb ‫روی تمام صفحات داخلی وجود داشته باشد‬.
+
+Redirect Manager ‫ در پنل ادمین الزم است‬301/302 ‫برای‬.
+
+Slug ‫ قابل ویرایش باشد و در صورت تغییر‬Slug، Redirect ‫قبلی خودکار یا قابل تعریف باشد‬.
+
+28) Schema
+
+‫در صفحات مناسب پشتیبانی شود‬:
+
+       Organization
+       WebSite
+       BreadcrumbList
+       Article
+       FAQPage
+       CollegeOrUniversity
+       Course
+       Person
+       Service
+
+29) Search
+
+‫جستجوی سایت روی موارد زیر انجام شود‬:
+
+       ‫صفحات‬
+       ‫مقاالت‬
+       ‫دانشگاه‌ها‬
+       ‫رشته‌ها‬
+       ‫شهرها‬
+       ‫درس‌های زبان‬
+
+Autocomplete ‫ترجیحًا وجود داشته باشد‬.
+30) ‫ مقایسه دانشگاه‌ها‬- Phase 2
+
+URL:
+/universities/compare/
+
+‫ دانشگاه و مقایسه‬4 ‫ تا‬2 ‫امکان انتخاب‬:
+
+          ‫شهریه‬
+          ‫شهر‬
+          ‫رشته‬
+          ‫خوابگاه‬
+          ‫زبان‬
+          ‫رتبه‬
+          ‫وزارت بهداشت‬
+          ‫پادفک‬
+          ‫کورس مستقیم‬
+
+31) ‫چندزبانه‬
+
+‫ ساختار‬Backend ‫ از ابتدا‬Translation Ready ‫باشد‬.
+
+‫ ولی آینده باید بتوانیم اضافه کنیم‬،‫فعًال فارسی زبان اصلی است‬:
+
+          ‫روسی‬
+          ‫انگلیسی‬
+          ‫عربی‬
+
+Translation Table ‫ برای‬Entity‫های مهم‬:
+
+          page_translations
+          article_translations
+          university_translations
+          service_translations
+
+32) Media Library
+
+media
+
+Fields:
+
+          id
+          file
+          file_type
+          alt
+          title
+          caption
+          width
+          height
+          size
+          uploaded_by
+          created_at
+
+Image Optimization:
+
+          WebP/AVIF
+          Thumbnail
+          Lazy Load
+          Responsive Images
+
+33) Admin Panel
+
+‫پنل باید بتواند مدیریت کند‬:
+          Leads
+          Universities
+          Fields
+          Cities
+          Tuition
+          Approval Status
+          Articles
+          Pages
+          Services
+          Cargo Requests
+          Trade Requests
+          Exchange Requests
+          FAQs
+          Testimonials
+          Users
+          Roles
+          Media
+          Redirects
+          SEO
+          Settings
+
+Dashboard:
+
+          Leads Today
+          Leads This Week
+          Leads By Service
+          Leads By Source
+          Top Landing Pages
+          Top Universities
+          Top Articles
+          Pending Follow-Ups
+          Cargo Requests
+          Trade Requests
+          Exchange Requests
+
+34) Role Based Access
+
+Role‫ها‬:
+
+          Super Admin
+          Admin
+          Content Manager
+          Writer
+          SEO Manager
+          Consultant
+          Exchange Operator
+          Cargo Operator
+          Trade Operator
+
+‫ هر‬Role ‫فقط قسمت‌های الزم را ببیند‬.
+
+35) CMS
+
+‫ برای صفحات اصلی ترجیحًا‬Section Based CMS ‫ نه‬،‫ باشد‬Page Builder ‫کامًال آزاد‬.
+
+Component‫ها‬:
+
+          Hero
+          Text
+          Cards
+          University Grid
+          Article Grid
+          FAQ
+          CTA
+          Form
+          Comparison Table
+          Statistics
+          Testimonials
+          Gallery
+           Video
+
+Content Status:
+
+           draft
+           review
+           scheduled
+           published
+           archived
+
+‫امکانات‬:
+
+           Preview
+           Scheduled Publishing
+           Revision History
+           Related Content
+
+36) Forms / Tracking
+
+‫همه فرم‌ها‬:
+
+           Save to Database
+           Admin Notification
+           CRM Integration
+           Spam Protection
+           UTM Capture
+
+UTM Fields:
+
+           utm_source
+           utm_medium
+           utm_campaign
+           utm_content
+           utm_term
+
+Analytics Events:
+
+           form_submit
+           phone_click
+           whatsapp_click
+           telegram_click
+           university_view
+           admission_request
+           exchange_request
+           cargo_request
+           trade_request
+
+37) ‫تنظیمات عمومی‬
+
+settings
+
+‫شامل‬:
+
+           Logo
+           Phone
+           WhatsApp
+           Telegram
+           Instagram
+           Email
+           Office Address
+           Map
+           Social Links
+           Footer
+           Default SEO
+           Tracking Scripts
+
+‫ تلگرام و سایر‬،‫ شماره واتساپ‬CTA‫ها از پنل قابل تغییر باشند‬.
+‫) امنیت‬38
+
+‫الزامی‬:
+
+          HTTPS
+          CSRF Protection
+          XSS Protection
+          SQL Injection Protection
+          Rate Limiting
+          Brute Force Protection
+          CAPTCHA
+          Secure Upload
+          File Validation
+          Admin 2FA
+          Audit Log
+          Backup
+          Restore
+
+activity_logs ‫باید تغییرات مهم کاربران پنل را ثبت کند‬.
+
+39) Performance
+
+Mobile First ‫ و‬Core Web Vitals ‫در نظر گرفته شود‬.
+
+          Image Optimization
+          Cache
+          Lazy Load
+          Minify Assets
+          ‫ جلوگیری از‬CLS
+          LCP ‫مناسب‬
+
+40) API Ready
+
+Backend ‫ از ابتدا‬API Ready ‫طراحی شود تا در آینده بتوانیم متصل کنیم‬:
+
+          Mobile App
+          CRM ‫خارجی‬
+          Telegram Bot
+          WhatsApp Integration
+          AI Search
+
+41) URL Structure
+
+URL‫ ها کوتاه و‬Semantic ‫باشند‬.
+
+‫نمونه خوب‬:
+/universities/sechenov/
+/study-russia/medicine/
+/padfak/
+/cargo/iran-to-russia/
+
+‫ از‬URL‫ هایی مثل‬page?id=123 ‫استفاده نشود‬.
+
+42) Soft Delete
+
+‫ برای‬Data‫ های مهم مانند‬University، Lead، User ‫ و‬Article ‫ بهتر است‬Soft Delete ‫وجود داشته باشد‬.
+
+43) ‫صفحات فعلی‬
+
+URL ‫ صفحات فعلی که در‬Google Index ‫شده‌اند بدون بررسی حذف نشوند‬.
+
+301 ،‫ یا حفظ شوند یا در صورت تغییر‬Redirect ‫بخورند‬.
+‫‪44) Game Accounts‬‬
+
+‫‪.‬یا برند جدا داشته باشد ‪ Subdomain‬قرار نگیرد‪ .‬اگر در آینده فعال شود‪ ،‬بهتر است ‪ LifeRuss‬در معماری اصلی‬
+
+‫فاز اول توسعه )‪45‬‬
+
+‫‪:‬اولویت فاز اول‬
+
+     ‫‪ Backend/Database‬معماری ‪1.‬‬
+    ‫‪2. Homepage‬‬
+    ‫‪3. University Database‬‬
+    ‫‪4. Fields‬‬
+    ‫‪5. Study Pages‬‬
+    ‫‪6. Scholarships‬‬
+    ‫‪7. Padfak‬‬
+    ‫‪8. Migration‬‬
+    ‫‪9. Exchange‬‬
+   ‫‪10. Cargo‬‬
+   ‫‪11. Trade‬‬
+   ‫‪12. Blog‬‬
+   ‫‪13. CRM‬‬
+   ‫‪14. SEO‬‬
+   ‫‪15. Admin Dashboard‬‬
+
+‫‪ )46‬فاز دوم‬
+
+        ‫‪University Comparison‬‬
+        ‫دوره کامل زبان‬
+        ‫‪Quiz‬‬
+        ‫‪Advanced Search‬‬
+        ‫‪User Dashboard‬‬
+        ‫‪Automation‬‬
+        ‫‪AI Search‬‬
+        ‫‪Mobile/API Expansion‬‬
+
+‫‪ )47‬اصل فنی مهم‬
+
+‫‪.‬شود ‪ Hardcoded‬هیچ دانشگاه‪ ،‬رشته یا سرویس اصلی نباید جداگانه‬
+
+‫‪.‬نمایش داده شوند ‪ Template + Database‬دانشگاه یک بار نوشته شود و تمام دانشگاه‌ها از همان ‪ Template‬مثًال‬
+
+‫‪ )48‬مقیاس مورد انتظار‬
+
+‫‪:‬قابلیت مدیریت حداقل این حجم را داشته باشد ‪ Backend‬معماری باید بدون بازنویسی اساسی‬
+
+        ‫دانشگاه ‪500+‬‬
+        ‫‪/Program‬رشته ‪1000+‬‬
+        ‫مقاله ‪5000+‬‬
+        ‫درس زبان ‪500+‬‬
+        ‫‪ Landing Page‬صدها‬
+        ‫‪ Lead‬ده‌ها هزار‬
+        ‫هزاران درخواست پذیرش‪ ،‬صرافی‪ ،‬کارگو و تجارت‬
+
+‫خروجی مورد انتظار قبل از شروع توسعه‬
+
+‫‪:‬لطفًا قبل از شروع کدنویسی‪ ،‬بر اساس این سند این ‪ 3‬مورد آماده و تأیید شود‬
+
+     ‫نهایی سایت ‪1. Sitemap‬‬
+     ‫ها‪ Relation‬کامل دیتابیس و ‪2. ERD‬‬
+     ‫پنل مدیریت ‪3. Wireframe / Structure‬‬
+‫‪.‬بعد از تأیید این سه مورد‪ ،‬توسعه شروع شود‬
+
+‫با تشکر‬
+

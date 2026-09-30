@@ -1,0 +1,232 @@
+---
+title: LifeRuss ERD - Overview (PK/FK only)
+---
+erDiagram
+  LR_ACTIVITY_LOGS {
+    BIGINT id PK
+    BIGINT user_id FK
+  }
+  LR_REDIRECTS {
+    BIGINT id PK
+    CHAR source_hash UK
+    BIGINT created_by FK
+  }
+  LR_TRANSLATIONS {
+    BIGINT id PK
+    VARCHAR object_type UK
+    BIGINT object_id UK
+    VARCHAR lang UK
+    VARCHAR field_key UK
+    BIGINT translated_by FK
+  }
+  LR_RELATIONS {
+    BIGINT id PK
+    VARCHAR from_type UK
+    BIGINT from_id UK
+    VARCHAR to_type UK
+    BIGINT to_id UK
+    VARCHAR relation UK
+  }
+  LR_VIEW_STATS_DAILY {
+    DATE stat_date PK
+    VARCHAR object_type PK
+    BIGINT object_id PK
+    VARCHAR lang PK
+  }
+  LR_UNIVERSITIES {
+    BIGINT id PK
+    BIGINT post_id FK,UK
+    VARCHAR slug UK
+    BIGINT city_id FK
+    BIGINT logo_id FK
+  }
+  LR_CITIES {
+    BIGINT id PK
+    BIGINT post_id FK,UK
+    VARCHAR slug UK
+    BIGINT verified_by FK
+  }
+  LR_FIELDS {
+    BIGINT id PK
+    BIGINT post_id FK,UK
+    VARCHAR slug UK
+    BIGINT field_group_id FK
+  }
+  LR_UNIVERSITY_FIELDS {
+    BIGINT id PK
+    BIGINT university_id FK
+    BIGINT field_id FK
+  }
+  LR_TUITION_FEES {
+    BIGINT id PK
+    BIGINT university_id FK
+    BIGINT field_id FK
+    BIGINT university_field_id FK
+    BIGINT verified_by FK
+  }
+  LR_DORMITORY_FEES {
+    BIGINT id PK
+    BIGINT university_id FK
+    BIGINT verified_by FK
+  }
+  LR_UNIVERSITY_APPROVALS {
+    BIGINT id PK
+    BIGINT university_id FK
+    BIGINT field_id FK
+    BIGINT document_id FK
+    BIGINT verified_by FK
+  }
+  LR_UNIVERSITY_RANKINGS {
+    BIGINT id PK
+    BIGINT university_id FK
+    BIGINT ranking_provider_id FK
+  }
+  LR_RANKING_PROVIDERS {
+    BIGINT id PK
+    VARCHAR code UK
+  }
+  LR_ADMISSION_REQUIREMENTS {
+    BIGINT id PK
+    BIGINT university_id FK
+    BIGINT field_id FK
+  }
+  LR_INTAKES {
+    BIGINT id PK
+    BIGINT university_id FK
+    BIGINT field_id FK
+  }
+  LR_PREP_PROGRAMS {
+    BIGINT id PK
+    BIGINT university_id FK
+    BIGINT verified_by FK
+  }
+  LR_LESSON_VOCAB {
+    BIGINT id PK
+    BIGINT lesson_id FK
+    BIGINT audio_id FK
+  }
+  LR_QUIZZES {
+    BIGINT id PK
+    BIGINT lesson_id FK
+    BIGINT course_id FK
+  }
+  LR_QUIZ_QUESTIONS {
+    BIGINT id PK
+    BIGINT quiz_id FK
+    BIGINT media_id FK
+  }
+  LR_SERVICES {
+    BIGINT id PK
+    BIGINT parent_id FK
+    VARCHAR slug UK
+    BIGINT landing_page_id FK
+  }
+  LR_LEADS {
+    BIGINT id PK
+    VARCHAR lead_code UK
+    BIGINT service_id FK
+    BIGINT subservice_id FK
+    BIGINT consultant_id FK
+    BIGINT assigned_by FK
+    BIGINT duplicate_of FK
+  }
+  LR_LEAD_NOTES {
+    BIGINT id PK
+    BIGINT lead_id FK
+    BIGINT user_id FK
+  }
+  LR_LEAD_TASKS {
+    BIGINT id PK
+    BIGINT lead_id FK
+    BIGINT assigned_to FK
+    BIGINT created_by FK
+  }
+  LR_LEAD_FILES {
+    BIGINT id PK
+    BIGINT lead_id FK
+    BIGINT uploaded_by FK
+  }
+  LR_LEAD_STATUS_HISTORY {
+    BIGINT id PK
+    BIGINT lead_id FK
+    BIGINT changed_by FK
+  }
+  LR_ADMISSION_REQUESTS {
+    BIGINT id PK
+    BIGINT lead_id FK
+    BIGINT university_id FK
+    BIGINT field_id FK
+    BIGINT intake_id FK
+    BIGINT preferred_city_id FK
+  }
+  LR_EXCHANGE_REQUESTS {
+    BIGINT id PK
+    BIGINT lead_id FK
+    BIGINT operator_id FK
+  }
+  LR_CARGO_REQUESTS {
+    BIGINT id PK
+    BIGINT lead_id FK
+    BIGINT operator_id FK
+  }
+  LR_TRADE_REQUESTS {
+    BIGINT id PK
+    BIGINT lead_id FK
+    BIGINT operator_id FK
+  }
+  WP_POSTS {
+    BIGINT ID PK
+    VARCHAR post_type
+    VARCHAR post_name
+    VARCHAR post_status
+    BIGINT post_author FK
+  }
+  WP_USERS {
+    BIGINT ID PK
+    VARCHAR user_login
+    VARCHAR user_email
+  }
+  WP_TERMS {
+    BIGINT term_id PK
+    VARCHAR slug
+  }
+  WP_POSTS ||--o| LR_UNIVERSITIES : "post_id"
+  WP_POSTS ||--o| LR_FIELDS : "post_id"
+  WP_POSTS ||--o| LR_CITIES : "post_id"
+  LR_CITIES ||--o{ LR_UNIVERSITIES : "city_id"
+  LR_UNIVERSITIES ||--o{ LR_UNIVERSITY_FIELDS : "university_id"
+  LR_FIELDS ||--o{ LR_UNIVERSITY_FIELDS : "field_id"
+  LR_UNIVERSITIES ||--o{ LR_TUITION_FEES : "university_id"
+  LR_FIELDS |o--o{ LR_TUITION_FEES : "field_id"
+  LR_UNIVERSITY_FIELDS |o--o{ LR_TUITION_FEES : "university_field_id"
+  LR_UNIVERSITIES ||--o{ LR_DORMITORY_FEES : "university_id"
+  LR_UNIVERSITIES ||--o{ LR_UNIVERSITY_APPROVALS : "university_id"
+  LR_UNIVERSITIES ||--o{ LR_UNIVERSITY_RANKINGS : "university_id"
+  LR_RANKING_PROVIDERS ||--o{ LR_UNIVERSITY_RANKINGS : "ranking_provider_id"
+  LR_UNIVERSITIES ||--o{ LR_ADMISSION_REQUIREMENTS : "university_id"
+  LR_UNIVERSITIES ||--o{ LR_INTAKES : "university_id"
+  LR_UNIVERSITIES ||--o{ LR_PREP_PROGRAMS : "university_id"
+  WP_TERMS |o--o{ LR_FIELDS : "field_group_id"
+  LR_SERVICES |o--o{ LR_SERVICES : "parent_id"
+  LR_SERVICES ||--o{ LR_LEADS : "service_id"
+  WP_POSTS |o--o{ LR_SERVICES : "landing_page_id"
+  WP_USERS |o--o{ LR_LEADS : "consultant_id"
+  LR_LEADS ||--o{ LR_LEAD_NOTES : "lead_id"
+  LR_LEADS ||--o{ LR_LEAD_TASKS : "lead_id"
+  LR_LEADS ||--o{ LR_LEAD_FILES : "lead_id"
+  LR_LEADS ||--o{ LR_LEAD_STATUS_HISTORY : "lead_id"
+  LR_LEADS ||--o{ LR_ADMISSION_REQUESTS : "lead_id"
+  LR_LEADS ||--o{ LR_EXCHANGE_REQUESTS : "lead_id"
+  LR_LEADS ||--o{ LR_CARGO_REQUESTS : "lead_id"
+  LR_LEADS ||--o{ LR_TRADE_REQUESTS : "lead_id"
+  LR_UNIVERSITIES |o--o{ LR_ADMISSION_REQUESTS : "university_id"
+  LR_FIELDS |o--o{ LR_ADMISSION_REQUESTS : "field_id"
+  LR_INTAKES |o--o{ LR_ADMISSION_REQUESTS : "intake_id"
+  WP_USERS ||--o{ LR_LEAD_TASKS : "assigned_to"
+  WP_USERS ||--o{ LR_LEAD_NOTES : "user_id"
+  WP_USERS |o--o{ LR_ACTIVITY_LOGS : "user_id"
+  WP_POSTS ||--o{ LR_LESSON_VOCAB : "lesson_id"
+  WP_POSTS |o--o{ LR_QUIZZES : "lesson_id"
+  LR_QUIZZES ||--o{ LR_QUIZ_QUESTIONS : "quiz_id"
+  WP_POSTS ||--o{ LR_RELATIONS : "from/to"
+  WP_POSTS ||--o{ LR_VIEW_STATS_DAILY : "object_id"
