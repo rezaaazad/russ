@@ -4172,7 +4172,6 @@ body.has-compare-bar {
     padding-bottom: 0;
   }
 
-  body.has-bottom-nav .site-header,
   body.has-bottom-nav #main {
     background: var(--white);
   }
@@ -4232,6 +4231,18 @@ body.has-compare-bar {
 
   .footer-acc > summary h2 {
     margin: 0;
+  }
+
+  .footer-acc > summary::after {
+    content: "+";
+    margin-inline-start: auto;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--gold);
+  }
+
+  .footer-acc[open] > summary::after {
+    content: "\2212";
   }
 }
 

@@ -477,3 +477,27 @@
     });
   }
 })();
+
+(function () {
+  var mq = window.matchMedia("(max-width: 860px)");
+  function syncFooter() {
+    var items = document.querySelectorAll(".footer-acc");
+    for (var i = 0; i < items.length; i++) {
+      if (mq.matches) {
+        items[i].removeAttribute("open");
+      } else {
+        items[i].setAttribute("open", "");
+      }
+    }
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", syncFooter);
+  } else {
+    syncFooter();
+  }
+  if (mq.addEventListener) {
+    mq.addEventListener("change", syncFooter);
+  } else if (mq.addListener) {
+    mq.addListener(syncFooter);
+  }
+})();

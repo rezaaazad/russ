@@ -46,7 +46,7 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 			<p><?php echo esc_html( liferuss_opt( 'footer_about' ) ); ?></p>
 		</div>
 
-		<details class="footer-col footer-acc">
+		<details class="footer-col footer-acc" open>
 			<summary><h2><?php echo esc_html( liferuss_t( 'footer_quick' ) ); ?></h2></summary>
 			<ul class="footer-links">
 				<?php
@@ -83,7 +83,7 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 			</ul>
 		</details>
 
-		<details class="footer-col footer-acc">
+		<details class="footer-col footer-acc" open>
 			<summary><h2><?php echo esc_html( liferuss_t( 'footer_services' ) ); ?></h2></summary>
 			<ul class="footer-links">
 				<?php foreach ( liferuss_services() as $service ) : ?>
@@ -92,7 +92,7 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 			</ul>
 		</details>
 
-		<details class="footer-col footer-acc">
+		<details class="footer-col footer-acc" open>
 			<summary><h2><?php echo esc_html( liferuss_t( 'footer_contact' ) ); ?></h2></summary>
 			<ul class="footer-contact">
 				<?php if ( $phone ) : ?>
