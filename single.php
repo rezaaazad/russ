@@ -45,6 +45,8 @@ get_header();
 						$author_id   = (int) get_the_author_meta( 'ID' );
 						$author_name = get_the_author();
 						$avatar_data = get_avatar_data( $author_id, array( 'size' => 64 ) );
+						$avatar_url  = isset( $avatar_data['url'] ) ? (string) $avatar_data['url'] : '';
+						$real_avatar = ! empty( $avatar_data['found_avatar'] ) && ! str_contains( $avatar_url, 'gravatar.com' );
 						if ( $author_name === get_the_author_meta( 'user_login' ) ) {
 							$author_name = liferuss_t( 'author_fallback' );
 						}
@@ -56,7 +58,7 @@ get_header();
 							}
 						}
 						?>
-						<?php if ( ! empty( $avatar_data['found_avatar'] ) ) : ?>
+						<?php if ( $real_avatar ) : ?>
 							<?php echo get_avatar( $author_id, 64 ); ?>
 						<?php else : ?>
 							<span class="lr-author-mark" aria-hidden="true"><?php echo esc_html( $author_mark ); ?></span>

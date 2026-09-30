@@ -51,6 +51,19 @@
     });
   }
 
+  document.querySelectorAll(".submenu-toggle").forEach(function (button) {
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var item = button.closest(".menu-item");
+      if (!item) {
+        return;
+      }
+      var open = item.classList.toggle("is-open");
+      button.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  });
+
   if (toggle && nav) {
     toggle.addEventListener("click", function () {
       setNav(!body.classList.contains("nav-open"));

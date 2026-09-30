@@ -46,8 +46,8 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 			<p><?php echo esc_html( liferuss_opt( 'footer_about' ) ); ?></p>
 		</div>
 
-		<div class="footer-col">
-			<h2><?php echo esc_html( liferuss_t( 'footer_quick' ) ); ?></h2>
+		<details class="footer-col footer-acc">
+			<summary><h2><?php echo esc_html( liferuss_t( 'footer_quick' ) ); ?></h2></summary>
 			<ul class="footer-links">
 				<?php
 				$footer_seen = array();
@@ -81,19 +81,19 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 					<li><a href="<?php echo esc_url( $href ); ?>"><?php echo esc_html( $item['label'] ); ?></a></li>
 				<?php endforeach; ?>
 			</ul>
-		</div>
+		</details>
 
-		<div class="footer-col">
-			<h2><?php echo esc_html( liferuss_t( 'footer_services' ) ); ?></h2>
+		<details class="footer-col footer-acc">
+			<summary><h2><?php echo esc_html( liferuss_t( 'footer_services' ) ); ?></h2></summary>
 			<ul class="footer-links">
 				<?php foreach ( liferuss_services() as $service ) : ?>
 					<li><a href="<?php echo esc_url( liferuss_url( '/services/' ) ); ?>"><?php echo esc_html( $service['title'] ); ?></a></li>
 				<?php endforeach; ?>
 			</ul>
-		</div>
+		</details>
 
-		<div class="footer-col">
-			<h2><?php echo esc_html( liferuss_t( 'footer_contact' ) ); ?></h2>
+		<details class="footer-col footer-acc">
+			<summary><h2><?php echo esc_html( liferuss_t( 'footer_contact' ) ); ?></h2></summary>
 			<ul class="footer-contact">
 				<?php if ( $phone ) : ?>
 					<li><?php echo liferuss_icon( 'phone' ); ?><a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>"><bdi dir="ltr"><?php echo esc_html( $phone ); ?></bdi></a></li>
@@ -125,7 +125,7 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 					<a class="social-btn" href="<?php echo esc_url( $youtube ); ?>" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><?php echo liferuss_icon( 'youtube' ); ?></a>
 				<?php endif; ?>
 			</div>
-		</div>
+		</details>
 	</div>
 	<div class="footer-bottom">
 		<div class="container footer-bottom-inner">

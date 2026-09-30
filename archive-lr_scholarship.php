@@ -21,7 +21,7 @@ get_header();
 </header>
 <section class="section">
 	<div class="container">
-		<form class="lr-compare-filters" method="get" action="<?php echo esc_url( get_post_type_archive_link( 'lr_scholarship' ) ); ?>">
+		<form class="lr-filters lr-compare-filters" method="get" action="<?php echo esc_url( get_post_type_archive_link( 'lr_scholarship' ) ); ?>">
 			<label>
 				<span>مقطع</span>
 				<select name="degree">
@@ -59,7 +59,7 @@ get_header();
 					<?php endforeach; ?>
 				</select>
 			</label>
-			<button class="btn btn-gold" type="submit">صافی</button>
+			<button class="btn btn-gold" type="submit">فیلتر</button>
 		</form>
 		<div class="lr-cards">
 			<?php if ( have_posts() ) : ?>

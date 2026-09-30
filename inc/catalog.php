@@ -327,6 +327,9 @@ function liferuss_catalog_faqs( $post_id ) {
 		if ( ! $faq || 'lr_faq' !== $faq->post_type ) {
 			continue;
 		}
+		if ( function_exists( 'liferuss_is_placeholder_copy' ) && liferuss_is_placeholder_copy( $faq->post_title . ' ' . $faq->post_content ) ) {
+			continue;
+		}
 		$faqs[] = array(
 			'q' => $faq->post_title,
 			'a' => wp_strip_all_tags( $faq->post_content ),

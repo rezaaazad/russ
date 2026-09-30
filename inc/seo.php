@@ -745,11 +745,9 @@ function liferuss_sitemap_excluded_ids() {
 	global $wpdb;
 	$ids = $wpdb->get_col( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_lr_noindex' AND meta_value = '1'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	$ids = is_array( $ids ) ? $ids : array();
-	foreach ( array( 'sample-page', 'برگه-نمونه' ) as $sample_slug ) {
-		$sample = get_page_by_path( $sample_slug );
-		if ( $sample ) {
-			$ids[] = (int) $sample->ID;
-		}
+	$sample_ids = $wpdb->get_col( "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'page' AND post_status IN ('publish','draft','pending','private','trash','future') AND post_name IN ('sample-page','برگه-نمونه')" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	if ( is_array( $sample_ids ) ) {
+		$ids = array_merge( $ids, $sample_ids );
 	}
 	if ( function_exists( 'pll_languages_list' ) && ! liferuss_index_incomplete() ) {
 		$more = $wpdb->get_col(

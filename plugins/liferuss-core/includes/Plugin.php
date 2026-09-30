@@ -28,6 +28,7 @@ use LifeRuss\Core\Search\Cli as SearchCli;
 use LifeRuss\Core\Search\Indexer;
 use LifeRuss\Core\Content\Editor as ContentEditor;
 use LifeRuss\Core\Content\Canonical;
+use LifeRuss\Core\Content\Copy;
 use LifeRuss\Core\Content\Seed as ContentSeed;
 use LifeRuss\Core\Content\ServiceSeed;
 use LifeRuss\Core\Redirects\Runner;
@@ -98,6 +99,7 @@ class Plugin {
 		ContentSeed::hooks();
 		Canonical::hooks();
 		ServiceSeed::hooks();
+		Copy::hooks();
 		Runner::hooks();
 		NotFound::hooks();
 		TwoFactor::hooks();

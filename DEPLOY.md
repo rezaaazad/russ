@@ -1,15 +1,21 @@
 # استقرار فاز ۴ / Phase 4 deployment
 
-قالب ۱.۱۰.۰ و افزونهٔ هسته ۱.۸.۱ (پایگاه ۱.۹.۰). Rank Math و Polylang اختیاری‌اند و داخل بسته نیستند. لایف‌روس فروشگاه نیست و کالا نمی‌فروشد؛ ووکامرس و کاتالوگ محصول ندارد.
+قالب ۱.۱۰.۱ و افزونهٔ هسته ۱.۸.۲ (پایگاه ۱.۹.۰). Rank Math و Polylang اختیاری‌اند و داخل بسته نیستند. لایف‌روس فروشگاه نیست و کالا نمی‌فروشد؛ ووکامرس و کاتالوگ محصول ندارد.
 
-Theme 1.10.0 and core plugin 1.8.1 (database 1.9.0). Rank Math and Polylang are optional and are not bundled. LifeRuss is not a store and sells no goods.
+Theme 1.10.1 and core plugin 1.8.2 (database 1.9.0). Rank Math and Polylang are optional and are not bundled. LifeRuss is not a store and sells no goods.
+
+## کش بعد از به‌روزرسانی / Purge the cache
+
+بعد از جایگزینی قالب یا افزونه، کش صفحه و آبجکت را خالی کنید. در غیر این صورت بعضی آدرس‌ها هنوز هدر یا متن نسخهٔ قبلی را نشان می‌دهند، حتی اگر `style.css` نسخهٔ جدید را بگوید. WCDN اگر `NOCACHE` برگرداند، کش روی خود سرور (افزونهٔ کش، Redis، یا nginx fastcgi) است. یک بار صفحهٔ اصلی، `/study-russia/`، `/direct-course/` و `/admission/` را بعد از پاک‌سازی با یک مرورگر ناشناس باز کنید.
+
+After replacing the theme or plugin, purge the page cache and the object cache. Otherwise some URLs keep the previous header or copy even when `style.css` already shows the new version. If WCDN answers `NOCACHE`, the stale copy is on the origin (a cache plugin, Redis, or nginx fastcgi). After the purge, open the homepage, `/study-russia/`, `/direct-course/`, and `/admission/` once in a private window.
 
 ## فاز ۴ / Phase 4 UI
 
 - هدر موبایل یک ردیف است (لوگو، جستجو، منو) و جستجو روی آیکون باز می‌شود. منوی دسکتاپ گروه‌بندی شده است.
 - آدرس‌های `/study/`، `/podfak/`، `/direct-admission/` و `/immigration/` با ۳۰۱ به `/study-russia/`، `/padfak/`، `/direct-course/` و `/migration-russia/` می‌روند. فعال‌سازی همان صفحه‌ها را می‌سازد یا منتشر می‌کند.
 - اگر کاتالوگ خالی باشد، اسلایدر دانشگاه خانه پنهان است و آرشیوها حالت خالی دارند. «انتشار کاتالوگ نمونه» در پیشخوان پیش‌نویس‌های نمونه را منتشر می‌کند.
-- بستهٔ هسته `README.md` و `composer.json` را ندارد. `.htaccess` داخل افزونه خواندن فایل‌های غیر PHP و `uninstall.php` را روی Apache می‌بندد. روی nginx همان مسیرها را در `location` ببندید.
+- بستهٔ هسته `README.md` و `composer.json` را ندارد. `.htaccess` داخل افزونه خواندن فایل‌های غیر PHP و `uninstall.php` را روی Apache می‌بندد. روی nginx همان مسیرها را در `location` ببندید. بستهٔ قالب `docs/` و `bin/` را ندارد؛ آن پوشه‌ها فقط در مخزن هستند.
 - `/` باید بدون اسکرول افقی در ۳۲۰، ۳۶۰، ۳۹۰ و ۴۱۴ باشد.
 
 ## ترتیب نصب / Install order

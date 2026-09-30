@@ -256,7 +256,6 @@ function liferuss_nav_tree() {
 			'url'      => liferuss_url( '/study-russia/' ),
 			'class'    => '',
 			'children' => array(
-				array( 'title' => liferuss_t( 'nav_study' ), 'url' => liferuss_url( '/study-russia/' ) ),
 				array( 'title' => liferuss_t( 'nav_universities' ), 'url' => liferuss_url( '/universities/' ) ),
 				array( 'title' => liferuss_t( 'nav_fields' ), 'url' => liferuss_url( '/fields/' ) ),
 				array( 'title' => liferuss_t( 'nav_cities' ), 'url' => liferuss_url( '/cities/' ) ),
@@ -273,7 +272,6 @@ function liferuss_nav_tree() {
 			'url'      => liferuss_url( '/services/' ),
 			'class'    => '',
 			'children' => array(
-				array( 'title' => liferuss_t( 'nav_services' ), 'url' => liferuss_url( '/services/' ) ),
 				array( 'title' => liferuss_t( 'nav_exchange' ), 'url' => liferuss_url( '/exchange/' ) ),
 				array( 'title' => liferuss_t( 'nav_cargo' ), 'url' => liferuss_url( '/cargo/' ) ),
 				array( 'title' => liferuss_t( 'nav_trade' ), 'url' => liferuss_url( '/trade/' ) ),
@@ -283,16 +281,13 @@ function liferuss_nav_tree() {
 			'title'    => liferuss_t( 'nav_language' ),
 			'url'      => liferuss_url( '/russian-language/' ),
 			'class'    => '',
-			'children' => array(
-				array( 'title' => liferuss_t( 'nav_language_course' ), 'url' => liferuss_url( '/russian-language/' ) ),
-			),
+			'children' => array(),
 		),
 		array(
 			'title'    => liferuss_t( 'nav_migration' ),
 			'url'      => liferuss_url( '/migration-russia/' ),
 			'class'    => '',
 			'children' => array(
-				array( 'title' => liferuss_t( 'nav_immigration' ), 'url' => liferuss_url( '/migration-russia/' ) ),
 				array( 'title' => liferuss_t( 'nav_guide' ), 'url' => liferuss_url( '/russia-guide/' ) ),
 			),
 		),
@@ -408,6 +403,38 @@ function liferuss_icon( $name ) {
 }
 
 /**
+ * True when a string is still seed or placeholder copy.
+ *
+ * @param string $text Raw text or HTML.
+ * @return bool
+ */
+function liferuss_is_placeholder_copy( $text ) {
+	$text = wp_strip_all_tags( (string) $text );
+	$needles = array(
+		'(نمونه)',
+		'متن نمونه',
+		'این بخش نمونه',
+		'بخش نمونه است',
+		'نظر نمونه',
+		'محتوای نمونه',
+		'این متن نمونه',
+		'دادهٔ نمونه',
+		'داده‌ها نمونه',
+		'راهنمای نمونه',
+		'دانستنی نمونه',
+		'این صفحه نمونه',
+		'پیش‌نویس منتشر نشود',
+		'سهمیه‌های نمونه',
+	);
+	foreach ( $needles as $needle ) {
+		if ( str_contains( $text, $needle ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * Fallback menu markup when no WP menu is assigned.
  */
 function liferuss_fallback_menu() {
@@ -422,11 +449,17 @@ function liferuss_fallback_menu() {
 			$classes .= ' menu-item-has-children';
 		}
 		echo '<li class="' . esc_attr( $classes ) . '">';
+		if ( $children ) {
+			echo '<div class="menu-row">';
+		}
 		printf(
 			'<a href="%s">%s</a>',
 			esc_url( $item['url'] ),
 			esc_html( $item['title'] )
 		);
+		if ( $children ) {
+			echo '<button type="button" class="submenu-toggle" aria-expanded="false" aria-label="' . esc_attr( liferuss_t( 'submenu_toggle' ) ) . '"></button></div>';
+		}
 		if ( $children ) {
 			echo '<ul class="sub-menu">';
 			foreach ( $children as $child ) {

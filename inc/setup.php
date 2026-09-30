@@ -56,7 +56,7 @@ function liferuss_maybe_seed() {
 	$freight_id = liferuss_ensure_page(
 		'باربری و ارسال',
 		'cargo',
-		'<p>ارسال کارگو، نمونه کالا، وسایل شخصی و مدارک دانشجویی بین ایران و روسیه.</p>',
+		'<p>ارسال کارگو، کالای معرفی، وسایل شخصی و مدارک دانشجویی بین ایران و روسیه.</p>',
 		'templates/freight.php'
 	);
 	$trade_id = liferuss_ensure_page(
@@ -253,6 +253,109 @@ function liferuss_migrate_persian_copy() {
 	update_option( 'liferuss_copy_fa', '1', false );
 }
 add_action( 'init', 'liferuss_migrate_persian_copy', 47 );
+
+/**
+ * Replace leftover English badges on the Persian tree and drop stale i18n overlays.
+ */
+function liferuss_migrate_badge_copy() {
+	if ( get_option( 'liferuss_copy_badges' ) ) {
+		return;
+	}
+	$opts = get_option( 'liferuss_options', array() );
+	if ( ! is_array( $opts ) ) {
+		$opts = array();
+	}
+	$exact = array(
+		'freight_hero_eyebrow'     => array(
+			'Iran ↔ Russia · Cargo & Delivery' => 'ایران و روسیه · باربری و ارسال',
+			'Iran — Russia · Cargo & Delivery' => 'ایران و روسیه · باربری و ارسال',
+		),
+		'trade_hero_eyebrow'       => array(
+			'Iran ↔ Russia · Trade & Sourcing' => 'ایران و روسیه · تجارت و تأمین',
+			'Iran — Russia · Trade & Sourcing' => 'ایران و روسیه · تجارت و تأمین',
+		),
+		'freight_form_banner_text' => array(
+			'More than cargo — a stronger tomorrow' => 'فراتر از حمل بار، مسیر روشن‌تری برای همکاری',
+			'a stronger tomorrow'                   => 'فراتر از حمل بار، مسیر روشن‌تری برای همکاری',
+		),
+		'trade_form_banner_text'   => array(
+			'Global connections · Real opportunities' => 'ارتباط واقعی · فرصت‌های قابل پیگیری',
+			'Global connections'                      => 'ارتباط واقعی · فرصت‌های قابل پیگیری',
+		),
+	);
+	foreach ( $exact as $key => $pairs ) {
+		if ( isset( $opts[ $key ] ) && isset( $pairs[ $opts[ $key ] ] ) ) {
+			$opts[ $key ] = $pairs[ $opts[ $key ] ];
+		}
+	}
+	if ( isset( $opts['hero_eyebrow'] ) && is_string( $opts['hero_eyebrow'] ) && str_contains( $opts['hero_eyebrow'], 'Higher Education' ) ) {
+		$opts['hero_eyebrow'] = 'تحصیل عالی · آینده‌ای روشن';
+	}
+	$opts = liferuss_replace_public_phrases( $opts );
+	if ( isset( $opts['i18n'] ) && is_array( $opts['i18n'] ) ) {
+		foreach ( $opts['i18n'] as $lang => $pack ) {
+			if ( ! is_array( $pack ) ) {
+				continue;
+			}
+			foreach ( array( 'hero_eyebrow', 'freight_hero_eyebrow', 'trade_hero_eyebrow', 'freight_form_banner_text', 'trade_form_banner_text' ) as $key ) {
+				if ( ! isset( $pack[ $key ] ) || ! is_string( $pack[ $key ] ) ) {
+					continue;
+				}
+				if ( str_contains( $pack[ $key ], 'Higher Education' ) || str_contains( $pack[ $key ], 'Iran' ) || str_contains( $pack[ $key ], 'Global connections' ) || str_contains( $pack[ $key ], 'stronger tomorrow' ) ) {
+					unset( $opts['i18n'][ $lang ][ $key ] );
+				}
+			}
+		}
+	}
+	update_option( 'liferuss_options', $opts );
+	update_option( 'liferuss_copy_badges', '1', false );
+}
+add_action( 'init', 'liferuss_migrate_badge_copy', 47 );
+
+/**
+ * Swap leftover commercial-sample wording in saved options.
+ *
+ * @param mixed $value Option tree.
+ * @return mixed
+ */
+function liferuss_replace_public_phrases( $value ) {
+	$map = array(
+		'نمونه کالا'       => 'کالای معرفی',
+		'نمونه‌های تجاری'  => 'کالاهای معرفی',
+		'نمونه‌هایی از'    => 'فهرستی از',
+		'از نمونه تا قرارداد' => 'از معرفی کالا تا قرارداد',
+	);
+	if ( is_string( $value ) ) {
+		return str_replace( array_keys( $map ), array_values( $map ), $value );
+	}
+	if ( is_array( $value ) ) {
+		foreach ( $value as $key => $item ) {
+			$value[ $key ] = liferuss_replace_public_phrases( $item );
+		}
+	}
+	return $value;
+}
+
+/**
+ * Drop the seed marker from public HTML if a demo row was published with it.
+ */
+function liferuss_strip_public_placeholders( $html ) {
+	if ( ! is_string( $html ) || '' === $html ) {
+		return $html;
+	}
+	return str_replace( array( ' (نمونه)', '(نمونه)' ), '', $html );
+}
+
+/**
+ * Buffer the front end so a published demo label cannot leak the seed marker.
+ */
+function liferuss_buffer_public_html() {
+	if ( is_admin() || wp_doing_ajax() || wp_doing_cron() ) {
+		return;
+	}
+	ob_start( 'liferuss_strip_public_placeholders' );
+}
+add_action( 'template_redirect', 'liferuss_buffer_public_html', 0 );
 
 /**
  * Flush rewrite rules once after multilingual 1.2.0.
