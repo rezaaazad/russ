@@ -92,7 +92,7 @@ class Desk {
 					'step' => 'info',
 				)
 			);
-			echo '<tr><td><a href="' . esc_url( $url ) . '"><strong>' . esc_html( (string) $row['title'] ) . '</strong></a></td>';
+			echo '<tr><td><a href="' . esc_url( $url ) . '"><strong>' . esc_html( self::title_of( $row ) ) . '</strong></a></td>';
 			echo '<td>' . Chrome::pill( $pill[0], $pill[1] ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo '<td><div class="lr-bar"><span style="width:' . esc_attr( (string) $pct ) . '%"></span></div><small>' . esc_html( Chrome::num( $pct ) ) . '٪</small></td>';
 			echo '<td>' . esc_html( Chrome::num( (int) $row['students'] ) ) . '</td>';
@@ -578,11 +578,11 @@ class Desk {
 		}
 		$show_money = ( 0 === $scope && current_user_can( 'lr_view_finance' ) ) || $scope > 0;
 		echo '<div class="lr-kpis">';
-		self::kpi_card( 'دوره‌های منتشرشده', Chrome::num( $count ), self::trend( $now_c, $prev_c ), '▣' );
-		self::kpi_card( 'دانشجوها', Chrome::num( $students ), self::trend( $now_s, $prev_s ), '☺' );
-		self::kpi_card( 'پرسش باز', Chrome::num( $questions ), self::trend( $now_q, $prev_q ), '?' );
+		self::kpi_card( 'دوره‌های منتشرشده', Chrome::num( $count ), self::trend( $now_c, $prev_c ), 'book' );
+		self::kpi_card( 'دانشجوها', Chrome::num( $students ), self::trend( $now_s, $prev_s ), 'people' );
+		self::kpi_card( 'پرسش باز', Chrome::num( $questions ), self::trend( $now_q, $prev_q ), 'chat' );
 		if ( $show_money ) {
-			self::kpi_card( $scope > 0 ? 'سهم شما' : 'درآمد پرداخت‌شده', Chrome::toman( $revenue ), self::trend( $revenue, $before ), '﷼' );
+			self::kpi_card( $scope > 0 ? 'سهم شما' : 'درآمد پرداخت‌شده', Chrome::toman( $revenue ), self::trend( $revenue, $before ), 'coin' );
 		}
 		echo '</div>';
 	}
@@ -598,7 +598,7 @@ class Desk {
 	private static function kpi_card( string $label, string $value, int $trend, string $icon ): void {
 		$class = $trend > 0 ? 'is-up' : ( $trend < 0 ? 'is-down' : '' );
 		$sign  = $trend > 0 ? '+' : '';
-		echo '<article class="lr-kpi"><div class="lr-kpi-top"><span>' . esc_html( $label ) . '</span><span class="lr-ico" aria-hidden="true">' . esc_html( $icon ) . '</span></div>';
+		echo '<article class="lr-kpi"><div class="lr-kpi-top"><span>' . esc_html( $label ) . '</span><span class="lr-ico" aria-hidden="true">' . self::icon( $icon ) . '</span></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG is a fixed set.
 		echo '<strong>' . esc_html( $value ) . '</strong>';
 		echo '<span class="lr-trend ' . esc_attr( $class ) . '">' . esc_html( $sign . Chrome::num( $trend ) . '٪ نسبت به ۳۰ روز قبل' ) . '</span></article>';
 	}
@@ -642,13 +642,17 @@ class Desk {
 		$width  = 280;
 		$height = 72;
 		$count  = count( $values );
-		$points = array();
+		$slot   = $width / $count;
+		$bars   = '';
 		foreach ( $values as $index => $value ) {
-			$x        = 1 === $count ? 0 : ( $index / ( $count - 1 ) ) * $width;
-			$y        = $height - ( ( $value / $max ) * ( $height - 8 ) ) - 4;
-			$points[] = round( $x, 1 ) . ',' . round( $y, 1 );
+			$bar_h = max( 4, ( $value / $max ) * ( $height - 6 ) );
+			$x     = ( $index * $slot ) + 6;
+			$w     = max( 8, $slot - 12 );
+			$y     = $height - $bar_h;
+			$bars .= '<rect x="' . esc_attr( (string) round( $x, 1 ) ) . '" y="' . esc_attr( (string) round( $y, 1 ) ) . '" width="' . esc_attr( (string) round( $w, 1 ) ) . '" height="' . esc_attr( (string) round( $bar_h, 1 ) ) . '" rx="3"></rect>';
 		}
-		echo '<svg class="lr-spark" viewBox="0 0 ' . esc_attr( (string) $width ) . ' ' . esc_attr( (string) $height ) . '" role="img" aria-label="نمودار فروش"><polyline points="' . esc_attr( implode( ' ', $points ) ) . '"></polyline></svg>';
+		echo '<strong class="lr-chart-total">' . esc_html( Chrome::toman( (int) array_sum( $values ) ) ) . '</strong>';
+		echo '<svg class="lr-spark" viewBox="0 0 ' . esc_attr( (string) $width ) . ' ' . esc_attr( (string) $height ) . '" role="img" aria-label="نمودار فروش">' . $bars . '</svg>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Attributes escaped above.
 		echo '</section>';
 	}
 
@@ -708,7 +712,7 @@ class Desk {
 				continue;
 			}
 			$drafts[] = array(
-				'label' => (string) $row['title'],
+				'label' => self::title_of( $row ),
 				'meta'  => Chrome::date( (string) $row['updated_at'] ) . ' — ' . Chrome::num( Flow::percent( $row ) ) . '٪',
 				'url'   => Chrome::url(
 					'lr-academy-course',
@@ -920,6 +924,32 @@ class Desk {
 		global $wpdb;
 		$rows = $wpdb->get_results( 'SELECT * FROM `' . Db::table( 'instructors' ) . "` WHERE status = 'published' ORDER BY name ASC", ARRAY_A );
 		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * Fixed icon set for KPI cards.
+	 *
+	 * @param string $name Icon key.
+	 */
+	private static function icon( string $name ): string {
+		$paths = array(
+			'book'   => '<path d="M5 5.5h9a3 3 0 0 1 3 3V19H8a3 3 0 0 0-3 3V5.5z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 19a3 3 0 0 1 3-3h9" fill="none" stroke="currentColor" stroke-width="1.7"/>',
+			'people' => '<circle cx="9" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 17.5c.6-2.2 2.4-3.3 4.5-3.3s3.9 1.1 4.5 3.3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="16" cy="9.5" r="1.8" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+			'chat'   => '<path d="M5 6.5h14v9H9l-4 3v-12z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
+			'coin'   => '<circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 8.5v7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+		);
+		$body  = $paths[ $name ] ?? $paths['book'];
+		return '<svg viewBox="0 0 24 24" width="22" height="22">' . $body . '</svg>';
+	}
+
+	/**
+	 * Course title, with a visible fallback.
+	 *
+	 * @param array<string, mixed> $row Course row.
+	 */
+	private static function title_of( array $row ): string {
+		$title = trim( (string) ( $row['title'] ?? '' ) );
+		return '' !== $title ? $title : 'بدون عنوان';
 	}
 
 	/**

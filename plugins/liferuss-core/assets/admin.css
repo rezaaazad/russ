@@ -444,7 +444,22 @@ body.lr-ui textarea {
 
 .lr-form {
 	display: grid;
+	grid-template-columns: 1fr 1fr;
 	gap: 12px;
+}
+
+.lr-form h2,
+.lr-form h3,
+.lr-form p,
+.lr-form .lr-actions,
+.lr-form .lr-inline-add,
+.lr-form label:has(textarea),
+.lr-form label:has(input[type="checkbox"]) {
+	grid-column: 1 / -1;
+}
+
+.lr-drawer .lr-form {
+	grid-template-columns: 1fr;
 }
 
 .lr-form label {
@@ -646,7 +661,8 @@ body.lr-ui textarea {
 	.lr-kpis,
 	.lr-cards,
 	.lr-pagehead-row,
-	.lr-steps {
+	.lr-steps,
+	.lr-form {
 		grid-template-columns: 1fr;
 		display: grid;
 	}
@@ -694,6 +710,21 @@ body.lr-ui textarea {
 	fill: none;
 	stroke: #0b2341;
 	stroke-width: 2.5;
+}
+
+.lr-spark rect {
+	fill: #e8b923;
+}
+
+.lr-chart-total {
+	display: block;
+	margin-top: 4px;
+	color: #0b2341;
+	font-size: 18px;
+}
+
+.lr-ico svg {
+	display: block;
 }
 
 .lr-hub-grid,
