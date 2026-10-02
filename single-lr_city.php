@@ -25,6 +25,7 @@ $row = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::city( (string) g
 <article class="section">
 	<div class="container">
 		<?php if ( $row ) : ?>
+			<?php \LifeRuss\Core\Seo\Links::freshness( 'city', (int) $row['id'] ); ?>
 			<?php if ( ! empty( $row['living_cost_min'] ) ) : ?>
 				<section class="lr-living">
 					<h2>هزینه زندگی</h2>

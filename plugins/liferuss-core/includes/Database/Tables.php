@@ -31,7 +31,8 @@ class Tables {
 				self::core(),
 				self::university(),
 				self::education(),
-				self::crm()
+				self::crm(),
+				self::seo()
 			);
 		}
 		return $tables;
@@ -522,6 +523,9 @@ class Tables {
 					'is_featured'             => 'tinyint(1) NOT NULL DEFAULT 0',
 					'popularity_score'        => 'int(10) unsigned NOT NULL DEFAULT 0',
 					'status'                  => $status,
+					'source_label'            => 'varchar(200) NOT NULL DEFAULT \'\'',
+					'source_url'              => $src_url,
+					'verified_by'             => $fkn,
 					'last_verified_at'        => $dtn,
 					'created_at'              => $dt,
 					'updated_at'              => $dt,
@@ -1515,6 +1519,83 @@ class Tables {
 						'name'       => 'trade_lead',
 					),
 				),
+			),
+		);
+	}
+
+	/**
+	 * SEO fact history, the keyword map, and article-to-entity links.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	private static function seo(): array {
+		$id  = 'bigint(20) unsigned NOT NULL AUTO_INCREMENT';
+		$fk  = 'bigint(20) unsigned NOT NULL';
+		$fkn = 'bigint(20) unsigned DEFAULT NULL';
+		$dt  = 'datetime NOT NULL';
+
+		return array(
+			'fact_versions'  => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'               => $id,
+					'entity_type'      => 'varchar(40) NOT NULL',
+					'entity_id'        => $fk,
+					'fact_key'         => 'varchar(80) NOT NULL',
+					'academic_year'    => 'varchar(20) NOT NULL DEFAULT \'\'',
+					'value_text'       => 'text',
+					'source_label'     => 'varchar(200) NOT NULL DEFAULT \'\'',
+					'source_url'       => 'varchar(500) NOT NULL DEFAULT \'\'',
+					'last_verified_at' => $dt,
+					'verified_by'      => $fkn,
+					'created_at'       => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'KEY entity_fact (entity_type, entity_id, fact_key)',
+					'KEY last_verified_at (last_verified_at)',
+					'KEY academic_year (academic_year)',
+				),
+				'fks'     => array(),
+			),
+			'seo_keywords'   => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'               => $id,
+					'keyword'          => 'varchar(200) NOT NULL',
+					'cluster'          => 'varchar(80) NOT NULL',
+					'intent'           => "varchar(40) NOT NULL DEFAULT 'informational'",
+					'target_url'       => 'varchar(500) NOT NULL DEFAULT \'\'',
+					'priority'         => 'smallint(6) NOT NULL DEFAULT 3',
+					'current_position' => 'decimal(6,2) DEFAULT NULL',
+					'clicks'           => 'int(10) unsigned DEFAULT NULL',
+					'notes'            => 'text',
+					'created_at'       => $dt,
+					'updated_at'       => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'KEY cluster (cluster)',
+					'KEY keyword_key (keyword(80))',
+				),
+				'fks'     => array(),
+			),
+			'seo_entity_links' => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'          => $id,
+					'post_id'     => $fk,
+					'entity_type' => 'varchar(40) NOT NULL',
+					'entity_id'   => $fk,
+					'label'       => 'varchar(200) NOT NULL DEFAULT \'\'',
+					'created_at'  => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'KEY post_id (post_id)',
+					'KEY entity (entity_type, entity_id)',
+				),
+				'fks'     => array(),
 			),
 		);
 	}

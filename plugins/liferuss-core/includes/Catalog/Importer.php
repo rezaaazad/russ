@@ -8,6 +8,7 @@
 namespace LifeRuss\Core\Catalog;
 
 use LifeRuss\Core\Repositories\Repository;
+use LifeRuss\Core\Seo\Facts;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -24,7 +25,7 @@ class Importer {
 	 * @return string[]
 	 */
 	public static function types(): array {
-		return array( 'universities', 'fields', 'cities', 'programs', 'rankings' );
+		return array( 'universities', 'fields', 'cities', 'programs', 'rankings', 'facts' );
 	}
 
 	/**
@@ -122,6 +123,8 @@ class Importer {
 			self::export_programs( $out );
 		} elseif ( 'rankings' === $type ) {
 			self::export_rankings( $out );
+		} elseif ( 'facts' === $type ) {
+			self::export_facts( $out );
 		} else {
 			self::export_entities( $out, $type );
 		}
@@ -145,6 +148,9 @@ class Importer {
 		}
 		if ( 'rankings' === $type ) {
 			return self::import_ranking( $row, $dry );
+		}
+		if ( 'facts' === $type ) {
+			return self::import_fact( $row, $dry );
 		}
 		$slug = sanitize_title( $row['slug'] ?? '' );
 		$name = $row['name_fa'] ?? '';
@@ -192,6 +198,7 @@ class Importer {
 			return new \WP_Error( 'lr_csv', 'shadow row missing' );
 		}
 		Store::update_row( $type, (int) $shadow['id'], self::columns_for( $type, $row, (int) $shadow['id'] ) );
+		self::record_entity_fact( $type, (int) $shadow['id'], $row );
 		if ( '1' === ( $row['demo'] ?? '' ) ) {
 			update_post_meta( $post_id, '_lr_demo', '1' );
 		}
@@ -228,6 +235,9 @@ class Importer {
 			$data['teaching_languages']      = self::set_list( $row['teaching_languages'] ?? '', array( 'ru', 'en' ) );
 			$data['health_ministry_status']  = self::approval( $row['health_ministry_status'] ?? '' );
 			$data['science_ministry_status'] = self::approval( $row['science_ministry_status'] ?? '' );
+			$data['source_label']            = sanitize_text_field( $row['source_label'] ?? '' );
+			$data['source_url']              = esc_url_raw( $row['source_url'] ?? '' );
+			$data['verified_by']             = is_numeric( $row['verified_by'] ?? '' ) ? (int) $row['verified_by'] : null;
 			$data['last_verified_at']        = self::datetime( $row['last_verified_at'] ?? '' );
 		}
 		if ( 'fields' === $type ) {
@@ -285,7 +295,141 @@ class Importer {
 			$row['academic_year'] ?? '',
 			true
 		);
+		self::record_program_fact( (int) $uni['id'], (int) $field['id'], $degree, $lang, $row, $tuition );
 		return 'updated';
+	}
+
+	/**
+	 * One versioned fact. The slug points at a university, field, city, or uni/field program.
+	 *
+	 * @param array<string, string> $row Row.
+	 * @param bool                  $dry Dry run.
+	 * @return string|\WP_Error
+	 */
+	private static function import_fact( array $row, bool $dry ) {
+		$resolved = self::fact_target( $row );
+		if ( is_wp_error( $resolved ) ) {
+			return $resolved;
+		}
+		if ( $dry ) {
+			return 'updated';
+		}
+		Facts::record(
+			$resolved['type'],
+			$resolved['id'],
+			sanitize_key( $row['fact_key'] ?? 'profile' ),
+			(string) ( $row['value_text'] ?? '' ),
+			(string) ( $row['academic_year'] ?? '' ),
+			sanitize_text_field( $row['source_label'] ?? '' ),
+			esc_url_raw( $row['source_url'] ?? '' ),
+			self::datetime( $row['last_verified_at'] ?? '' ) ? self::datetime( $row['last_verified_at'] ?? '' ) : current_time( 'mysql', true ),
+			is_numeric( $row['verified_by'] ?? '' ) ? (int) $row['verified_by'] : get_current_user_id()
+		);
+		return 'updated';
+	}
+
+	/**
+	 * Resolve a fact CSV row to a table id.
+	 *
+	 * @param array<string, string> $row Row.
+	 * @return array{type: string, id: int}|\WP_Error
+	 */
+	private static function fact_target( array $row ) {
+		$type = sanitize_key( $row['entity_type'] ?? '' );
+		$slug = sanitize_title( $row['entity_slug'] ?? '' );
+		$map  = array(
+			'university' => 'universities',
+			'field'      => 'fields',
+			'city'       => 'cities',
+		);
+		if ( isset( $map[ $type ] ) ) {
+			$found = Repository::for( $map[ $type ] )->find_by( 'slug', $slug, true );
+			if ( ! $found ) {
+				return new \WP_Error( 'lr_csv', 'entity slug was not found' );
+			}
+			return array(
+				'type' => $type,
+				'id'   => (int) $found['id'],
+			);
+		}
+		if ( 'program' === $type && str_contains( $slug, '--' ) ) {
+			$parts = explode( '--', $slug, 2 );
+			$uni   = Repository::for( 'universities' )->find_by( 'slug', $parts[0], true );
+			$field = Repository::for( 'fields' )->find_by( 'slug', $parts[1], true );
+			if ( ! $uni || ! $field ) {
+				return new \WP_Error( 'lr_csv', 'program slug was not found' );
+			}
+			global $wpdb;
+			$table = $wpdb->prefix . 'lr_university_fields';
+			$id    = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM `{$table}` WHERE university_id = %d AND field_id = %d AND deleted_at IS NULL ORDER BY id DESC LIMIT 1", (int) $uni['id'], (int) $field['id'] ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			if ( $id < 1 ) {
+				return new \WP_Error( 'lr_csv', 'program row was not found' );
+			}
+			return array(
+				'type' => 'program',
+				'id'   => $id,
+			);
+		}
+		return new \WP_Error( 'lr_csv', 'entity type was not found' );
+	}
+
+	/**
+	 * Store a profile fact when the CSV carries a source.
+	 *
+	 * @param string                $type Table suffix.
+	 * @param int                   $id   Shadow id.
+	 * @param array<string, string> $row  CSV row.
+	 */
+	private static function record_entity_fact( string $type, int $id, array $row ): void {
+		$label = sanitize_text_field( $row['source_label'] ?? '' );
+		$when  = self::datetime( $row['last_verified_at'] ?? '' );
+		if ( '' === $label && '' === (string) $when ) {
+			return;
+		}
+		$map = array(
+			'universities' => 'university',
+			'fields'       => 'field',
+			'cities'       => 'city',
+		);
+		if ( ! isset( $map[ $type ] ) ) {
+			return;
+		}
+		Facts::record(
+			$map[ $type ],
+			$id,
+			'profile',
+			(string) ( $row['name_fa'] ?? '' ),
+			Facts::academic_year(),
+			$label,
+			esc_url_raw( $row['source_url'] ?? '' ),
+			$when ? $when : current_time( 'mysql', true ),
+			is_numeric( $row['verified_by'] ?? '' ) ? (int) $row['verified_by'] : get_current_user_id()
+		);
+	}
+
+	/**
+	 * Store a tuition fact for a program import.
+	 *
+	 * @param int                   $university_id University id.
+	 * @param int                   $field_id      Field id.
+	 * @param string                $degree        Degree.
+	 * @param string                $lang          Language.
+	 * @param array<string, string> $row           CSV row.
+	 * @param float|null            $tuition       Amount.
+	 */
+	private static function record_program_fact( int $university_id, int $field_id, string $degree, string $lang, array $row, ?float $tuition ): void {
+		$label = sanitize_text_field( $row['source_label'] ?? '' );
+		$when  = self::datetime( $row['last_verified_at'] ?? '' );
+		if ( '' === $label && '' === (string) $when ) {
+			return;
+		}
+		global $wpdb;
+		$table = $wpdb->prefix . 'lr_university_fields';
+		$id    = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM `{$table}` WHERE university_id = %d AND field_id = %d AND degree = %s AND language = %s AND deleted_at IS NULL LIMIT 1", $university_id, $field_id, $degree, $lang ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( $id < 1 ) {
+			return;
+		}
+		Facts::record( 'program', $id, 'tuition', null === $tuition ? '' : (string) $tuition, (string) ( $row['academic_year'] ?? '' ), $label, esc_url_raw( $row['source_url'] ?? '' ), $when ? $when : current_time( 'mysql', true ), get_current_user_id() );
 	}
 
 	/**
@@ -333,7 +477,7 @@ class Importer {
 	 */
 	private static function export_entities( $out, string $type ): void {
 		$headers = array(
-			'universities' => array( 'slug', 'name_fa', 'name_en', 'name_ru', 'city_slug', 'ownership', 'founded_year', 'website', 'teaching_languages', 'has_dormitory', 'health_ministry_status', 'science_ministry_status', 'status' ),
+			'universities' => array( 'slug', 'name_fa', 'name_en', 'name_ru', 'city_slug', 'ownership', 'founded_year', 'website', 'teaching_languages', 'has_dormitory', 'health_ministry_status', 'science_ministry_status', 'source_label', 'source_url', 'last_verified_at', 'verified_by', 'status' ),
 			'fields'       => array( 'slug', 'name_fa', 'name_en', 'name_ru', 'degree_levels', 'languages', 'default_duration_years', 'status' ),
 			'cities'       => array( 'slug', 'name_fa', 'name_en', 'name_ru', 'federal_subject', 'population', 'living_cost_min', 'living_cost_max', 'currency', 'climate_summary', 'status' ),
 		);
@@ -366,12 +510,73 @@ class Importer {
 	}
 
 	/**
+	 * Fact-version export.
+	 *
+	 * @param resource $out Handle.
+	 */
+	private static function export_facts( $out ): void {
+		fputcsv( $out, array( 'entity_type', 'entity_slug', 'fact_key', 'academic_year', 'value_text', 'source_label', 'source_url', 'last_verified_at', 'verified_by' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fputcsv
+		global $wpdb;
+		$table = $wpdb->prefix . 'lr_fact_versions';
+		$rows  = $wpdb->get_results( "SELECT * FROM `{$table}` ORDER BY id ASC LIMIT 2000", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		foreach ( (array) $rows as $row ) {
+			fputcsv( // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fputcsv
+				$out,
+				array(
+					$row['entity_type'],
+					self::fact_slug( (string) $row['entity_type'], (int) $row['entity_id'] ),
+					$row['fact_key'],
+					$row['academic_year'],
+					$row['value_text'],
+					$row['source_label'],
+					$row['source_url'],
+					$row['last_verified_at'],
+					$row['verified_by'],
+				)
+			);
+		}
+	}
+
+	/**
+	 * Slug for a fact row, using uni--field for programs.
+	 *
+	 * @param string $type Entity type.
+	 * @param int    $id   Row id.
+	 */
+	private static function fact_slug( string $type, int $id ): string {
+		$map = array(
+			'university' => 'universities',
+			'field'      => 'fields',
+			'city'       => 'cities',
+		);
+		if ( isset( $map[ $type ] ) ) {
+			$row = Repository::for( $map[ $type ] )->find( $id );
+			return $row ? (string) $row['slug'] : '';
+		}
+		if ( 'program' !== $type ) {
+			return '';
+		}
+		global $wpdb;
+		$table = $wpdb->prefix . 'lr_university_fields';
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT university_id, field_id FROM `{$table}` WHERE id = %d", $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( ! is_array( $row ) ) {
+			return '';
+		}
+		$uni   = Repository::for( 'universities' )->find( (int) $row['university_id'] );
+		$field = Repository::for( 'fields' )->find( (int) $row['field_id'] );
+		if ( ! $uni || ! $field ) {
+			return '';
+		}
+		return $uni['slug'] . '--' . $field['slug'];
+	}
+
+	/**
 	 * Program export.
 	 *
 	 * @param resource $out Handle.
 	 */
 	private static function export_programs( $out ): void {
-		fputcsv( $out, array( 'university_slug', 'field_slug', 'degree', 'language', 'duration_years', 'tuition', 'currency', 'academic_year' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fputcsv
+		fputcsv( $out, array( 'university_slug', 'field_slug', 'degree', 'language', 'duration_years', 'tuition', 'currency', 'academic_year', 'source_label', 'source_url', 'last_verified_at', 'verified_by' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fputcsv
 		$page = 1;
 		do {
 			$batch = Repository::for( 'university_fields' )->paginate(
@@ -385,6 +590,7 @@ class Importer {
 			foreach ( $batch['items'] as $row ) {
 				$uni   = Repository::for( 'universities' )->find( (int) $row['university_id'] );
 				$field = Repository::for( 'fields' )->find( (int) $row['field_id'] );
+				$fact  = Facts::latest( 'program', (int) $row['id'], 'tuition' );
 				fputcsv( // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fputcsv
 					$out,
 					array(
@@ -396,6 +602,10 @@ class Importer {
 						$row['tuition'],
 						$row['currency'],
 						$row['academic_year'],
+						$fact['source_label'] ?? '',
+						$fact['source_url'] ?? '',
+						$fact['last_verified_at'] ?? '',
+						$fact['verified_by'] ?? '',
 					)
 				);
 			}

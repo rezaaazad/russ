@@ -199,28 +199,24 @@ class Screens {
 	}
 
 	/**
-	 * Rows whose last_verified_at is older than 12 months.
+	 * Facts older than 180 days, or tied to an earlier academic year.
 	 */
 	public static function stale(): void {
 		self::guard( 'lr_manage_university_data' );
-		$before = gmdate( 'Y-m-d H:i:s', time() - YEAR_IN_SECONDS );
-		$tables = array(
-			'tuition_fees'           => 'شهریه',
-			'university_approvals'   => 'تأییدیه',
-			'university_rankings'    => 'رتبه‌بندی',
-			'dormitory_fees'         => 'خوابگاه',
-			'cities'                 => 'شهر',
-			'prep_programs'          => 'پادفک',
-			'intakes'                => 'ورودی',
-			'admission_requirements' => 'شرایط پذیرش',
-		);
-		Chrome::open( __( 'داده‌های نیازمند بررسی', 'liferuss-core' ), 'دانشگاه‌ها' );
-		echo '<p>' . esc_html__( 'رکوردهایی که بیش از ۱۲ ماه بررسی نشده‌اند. از ورود CSV یا فهرست همان جدول آن‌ها را تازه کنید.', 'liferuss-core' ) . '</p><ul class="lr-work">';
-		foreach ( $tables as $suffix => $label ) {
-			$count = Repository::for( $suffix )->count( array( 'stale_before' => $before ) );
-			echo '<li>' . esc_html( $label ) . ': <strong>' . esc_html( (string) $count ) . '</strong></li>';
+		$rows = \LifeRuss\Core\Seo\Facts::stale();
+		Chrome::open( 'داده‌های قدیمی', 'دانشگاه‌ها' );
+		echo '<p>رکوردی که بیش از ۱۸۰ روز بررسی نشده، یا سال تحصیلی‌اش از سال جاری عقب‌تر است.</p>';
+		if ( ! $rows ) {
+			Chrome::empty( 'دادهٔ قدیمی نیست.' );
+			Chrome::close();
+			return;
 		}
-		echo '</ul></div>';
+		echo '<div class="lr-scroll"><table class="widefat lr-table"><thead><tr><th>موجودیت</th><th>داده</th><th>سال</th><th>مقدار</th><th>آخرین بررسی</th><th>علت</th><th>منبع</th></tr></thead><tbody>';
+		foreach ( array_slice( $rows, 0, 80 ) as $row ) {
+			echo '<tr><td>' . esc_html( $row['entity'] ) . '</td><td>' . esc_html( $row['fact'] ) . '</td><td>' . esc_html( $row['year'] ) . '</td><td>' . esc_html( $row['value'] ) . '</td><td>' . esc_html( $row['checked'] ) . '</td><td>' . esc_html( $row['reason'] ) . '</td><td>' . esc_html( $row['source'] ) . '</td></tr>';
+		}
+		echo '</tbody></table></div>';
+		Chrome::close();
 	}
 
 	/**

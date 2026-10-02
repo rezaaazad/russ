@@ -126,7 +126,7 @@ function liferuss_the_hero_lcp( $id, $fallback = 'saint-basil.jpg' ) {
 			array(
 				'class'         => 'hero-lcp',
 				'alt'           => '',
-				'decoding'      => 'async',
+				'decoding'      => 'sync',
 				'fetchpriority' => 'high',
 				'loading'       => 'eager',
 			)

@@ -24,6 +24,9 @@ $row = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::field( (string) 
 </header>
 <article class="section">
 	<div class="container">
+		<?php if ( $row ) : ?>
+			<?php \LifeRuss\Core\Seo\Links::freshness( 'field', (int) $row['id'] ); ?>
+		<?php endif; ?>
 		<?php if ( get_the_content() ) : ?>
 			<div class="prose"><?php the_content(); ?></div>
 		<?php endif; ?>
@@ -34,7 +37,11 @@ $row = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::field( (string) 
 				<tbody>
 				<?php foreach ( $row['universities'] as $uni ) : ?>
 					<tr>
-						<td><a href="<?php echo esc_url( $uni['url'] ); ?>"><?php echo esc_html( $uni['name_fa'] ); ?></a></td>
+						<td><a href="<?php echo esc_url( $uni['url'] ); ?>"><?php echo esc_html( $uni['name_fa'] ); ?></a>
+							<?php if ( ! empty( $uni['slug'] ) && ! empty( $row['slug'] ) ) : ?>
+								<br><a href="<?php echo esc_url( home_url( '/universities/' . rawurlencode( (string) $uni['slug'] ) . '/' . rawurlencode( (string) $row['slug'] ) . '/' ) ); ?>">رشته در این دانشگاه</a>
+							<?php endif; ?>
+						</td>
 						<td><?php echo esc_html( (string) $uni['city_name'] ); ?></td>
 						<td>
 							<?php

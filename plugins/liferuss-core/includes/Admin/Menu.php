@@ -9,6 +9,8 @@ namespace LifeRuss\Core\Admin;
 
 use LifeRuss\Core\Academy\Admin as AcademyAdmin;
 use LifeRuss\Core\Catalog\ImportScreen;
+use LifeRuss\Core\Seo\Health;
+use LifeRuss\Core\Seo\Keywords;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -49,6 +51,7 @@ class Menu {
 			array( 'lr-kanban', 'کانبان', 'lr_access_crm', array( Kanban::class, 'render' ) ),
 			array( 'lr-tasks', 'وظایف و پیگیری', 'lr_access_crm', array( LeadAdmin::class, 'tasks' ) ),
 			array( 'lr-funnel', 'گزارش قیف', 'lr_manage_leads', array( LeadAdmin::class, 'funnel' ) ),
+			array( 'lr-sources', 'منبع لیدها', 'lr_manage_leads', array( LeadAdmin::class, 'sources' ) ),
 			array( 'lr-export', 'خروجی', 'lr_export_leads', array( LeadAdmin::class, 'export_screen' ) ),
 			array( 'lr-req-admission', 'پذیرش', 'lr_access_admission', array( LeadAdmin::class, 'admission' ) ),
 			array( 'lr-req-exchange', 'صرافی', 'lr_manage_exchange_requests', array( LeadAdmin::class, 'exchange' ) ),
@@ -67,7 +70,7 @@ class Menu {
 			array( 'lr-tuition', 'شهریه‌ها', 'lr_view_university_data', array( Screens::class, 'tuition' ) ),
 			array( 'lr-programs', 'رشته‌ها', 'lr_manage_university_data', array( \LifeRuss\Core\Catalog\ProgramsScreen::class, 'render' ) ),
 			array( 'lr-uni-csv', 'ورود و خروج CSV', 'lr_manage_university_data', array( ImportScreen::class, 'render' ) ),
-			array( 'lr-stale', 'نیازمند بررسی', 'lr_manage_university_data', array( Screens::class, 'stale' ) ),
+			array( 'lr-stale', 'داده‌های قدیمی', 'lr_manage_university_data', array( Screens::class, 'stale' ) ),
 			array( 'lr-approvals', 'تأییدیه‌ها', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-rankings', 'رتبه‌بندی', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-prep', 'پادفک و کورس', 'lr_manage_academic_data', array( Screens::class, 'placeholder' ) ),
@@ -92,6 +95,8 @@ class Menu {
 		add_submenu_page( 'lr-settings', 'لایف‌روس', 'لایف‌روس', 'lr_access_settings', 'lr-settings', array( \LifeRuss\Core\Settings\SettingsPage::class, 'render' ) );
 		add_submenu_page( 'lr-settings', 'ریدایرکت‌ها', 'ریدایرکت‌ها', 'lr_view_redirects', 'lr-redirects', array( RedirectScreen::class, 'render' ) );
 		add_submenu_page( 'lr-settings', 'پایش ۴۰۴', 'پایش ۴۰۴', 'lr_manage_redirects', 'lr-404', array( NotFoundScreen::class, 'render' ) );
+		add_submenu_page( 'lr-settings', 'سلامت سئو', 'سلامت سئو', 'lr_edit_seo', 'lr-seo-health', array( Health::class, 'screen' ) );
+		add_submenu_page( 'lr-settings', 'نقشه کلیدواژه', 'نقشه کلیدواژه', 'lr_edit_seo', 'lr-seo-keywords', array( Keywords::class, 'screen' ) );
 		add_submenu_page( 'lr-settings', 'مقایسه دانشگاه', 'مقایسه دانشگاه', 'lr_edit_seo', 'lr-compare', array( CompareScreen::class, 'render' ) );
 		add_submenu_page( 'lr-settings', 'آمار جستجو', 'آمار جستجو', 'lr_edit_seo', 'lr-search-stats', array( SearchScreen::class, 'render' ) );
 		add_submenu_page( 'lr-settings', 'نسخه‌های تکراری', 'نسخه‌های تکراری', 'edit_posts', 'lr-duplicates', array( Duplicates::class, 'render' ) );

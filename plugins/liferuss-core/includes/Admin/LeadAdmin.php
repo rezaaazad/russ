@@ -116,6 +116,33 @@ class LeadAdmin {
 	}
 
 	/**
+	 * Leads grouped by UTM source, medium, campaign, and landing URL.
+	 */
+	public static function sources(): void {
+		self::guard( 'lr_manage_leads' );
+		global $wpdb;
+		$table = $wpdb->prefix . 'lr_leads';
+		$rows  = $wpdb->get_results( "SELECT COALESCE(utm_source, '') AS utm_source, COALESCE(utm_medium, '') AS utm_medium, COALESCE(utm_campaign, '') AS utm_campaign, landing_page, COUNT(*) AS total FROM `{$table}` WHERE deleted_at IS NULL GROUP BY utm_source, utm_medium, utm_campaign, landing_page ORDER BY total DESC LIMIT 50", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		Chrome::open( 'منبع لیدها', 'CRM' );
+		echo '<p>هر لید utm_source و utm_medium و utm_campaign و نشانی فرود را نگه می‌دارد.</p>';
+		if ( ! is_array( $rows ) || ! $rows ) {
+			Chrome::empty( 'لیدی با این تفکیک نیست.' );
+			Chrome::close();
+			return;
+		}
+		echo '<div class="lr-scroll"><table class="widefat lr-table"><thead><tr><th>منبع</th><th>رسانه</th><th>کمپین</th><th>فرود</th><th>تعداد</th></tr></thead><tbody>';
+		foreach ( $rows as $row ) {
+			echo '<tr><td>' . esc_html( '' !== (string) $row['utm_source'] ? (string) $row['utm_source'] : '—' ) . '</td>';
+			echo '<td>' . esc_html( '' !== (string) $row['utm_medium'] ? (string) $row['utm_medium'] : '—' ) . '</td>';
+			echo '<td>' . esc_html( '' !== (string) $row['utm_campaign'] ? (string) $row['utm_campaign'] : '—' ) . '</td>';
+			echo '<td>' . esc_html( (string) $row['landing_page'] ) . '</td>';
+			echo '<td>' . esc_html( Chrome::num( (int) $row['total'] ) ) . '</td></tr>';
+		}
+		echo '</tbody></table></div>';
+		Chrome::close();
+	}
+
+	/**
 	 * Export screen. The file itself is a POST so it is not cached.
 	 */
 	public static function export_screen(): void {

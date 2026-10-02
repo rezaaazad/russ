@@ -26,7 +26,7 @@ use LifeRuss\Core\Catalog\Editor;
 use LifeRuss\Core\Catalog\ProgramsScreen;
 use LifeRuss\Core\Catalog\Rest;
 use LifeRuss\Core\Front\Api;
-use LifeRuss\Core\Front\Routes;
+use LifeRuss\Core\Front\Routes as FrontRoutes;
 use LifeRuss\Core\Search\Cli as SearchCli;
 use LifeRuss\Core\Search\Indexer;
 use LifeRuss\Core\Content\Editor as ContentEditor;
@@ -57,7 +57,11 @@ use LifeRuss\Core\Roles\LimitedAdmin;
 use LifeRuss\Core\Roles\RoleRegistrar;
 use LifeRuss\Core\Security\Hardening;
 use LifeRuss\Core\Security\TwoFactor;
+use LifeRuss\Core\Seo\CatalogSitemap;
+use LifeRuss\Core\Seo\Keywords;
+use LifeRuss\Core\Seo\Quality;
 use LifeRuss\Core\Seo\RankMath;
+use LifeRuss\Core\Seo\Routes as SeoRoutes;
 use LifeRuss\Core\Settings\SettingsPage;
 use LifeRuss\Core\Users\Profile;
 
@@ -111,7 +115,11 @@ class Plugin {
 		Hardening::hooks();
 		RankMath::hooks();
 		Polylang::hooks();
-		Routes::hooks();
+		FrontRoutes::hooks();
+		SeoRoutes::hooks();
+		Quality::hooks();
+		Keywords::hooks();
+		CatalogSitemap::hooks();
 		Api::hooks();
 		Indexer::hooks();
 

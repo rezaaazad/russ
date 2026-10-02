@@ -24,7 +24,7 @@ function liferuss_is_catalog() {
 }
 
 /**
- * Filtered archive or page 2+, which should not be indexed.
+ * Filtered or sorted archive, which should not be indexed. Pagination is not a filter.
  */
 function liferuss_catalog_is_filtered() {
 	if ( ! liferuss_catalog_ready() || ! is_post_type_archive( array( 'lr_university', 'lr_field', 'lr_city' ) ) ) {
@@ -131,9 +131,51 @@ function liferuss_catalog_paged() {
 }
 
 /**
+ * Native amount in Persian digits, named currency, and a dollar equivalent.
+ *
+ * @param mixed  $amount   Native amount.
+ * @param string $currency Currency code. RUB is written as روبل.
+ * @param mixed  $usd      Dollar amount when the fee row already has one.
+ * @return string
+ */
+function liferuss_catalog_amount( $amount, $currency = 'RUB', $usd = null ) {
+	if ( null === $amount || '' === (string) $amount || (float) $amount <= 0 ) {
+		$usd_only = liferuss_catalog_usd( $usd, false );
+		return '' !== $usd_only ? liferuss_local_digits( $usd_only ) : '';
+	}
+	$labels = array(
+		'RUB' => 'روبل',
+		'USD' => 'دلار',
+		'EUR' => 'یورو',
+		'IRR' => 'ریال',
+		'IRT' => 'تومان',
+	);
+	$code   = strtoupper( (string) $currency );
+	$unit   = $labels[ $code ] ?? '';
+	$digits = liferuss_local_digits( number_format( (float) $amount, 0 ) );
+	$text   = '' !== $unit ? $digits . ' ' . $unit : $digits;
+	if ( 'USD' === $code ) {
+		return $text;
+	}
+	$usd_amount = $usd;
+	if ( ( null === $usd_amount || '' === (string) $usd_amount || (float) $usd_amount <= 0 ) && class_exists( '\LifeRuss\Core\Settings\Settings' ) ) {
+		$rate = \LifeRuss\Core\Settings\Settings::usd_per_unit( $code );
+		if ( null !== $rate && $rate > 0 ) {
+			$usd_amount = (float) $amount * $rate;
+		}
+	}
+	$usd_text = liferuss_catalog_usd( $usd_amount, false );
+	if ( '' !== $usd_text ) {
+		$text .= ' (' . liferuss_local_digits( $usd_text ) . ')';
+	}
+	return $text;
+}
+
+/**
  * Format a USD amount.
  *
  * @param mixed $amount Amount.
+ * @param bool  $with_stamp Whether to append the rate stamp.
  * @return string
  */
 function liferuss_catalog_usd( $amount, $with_stamp = false ) {
@@ -361,12 +403,42 @@ function liferuss_catalog_json_ld() {
 			if ( ! empty( $row['address'] ) ) {
 				$place['streetAddress'] = $row['address'];
 			}
-			$graph[] = array(
-				'@type'   => 'CollegeOrUniversity',
+			$node = array(
+				'@type'   => array( 'CollegeOrUniversity', 'EducationalOrganization' ),
 				'name'    => $row['name_fa'],
 				'url'     => get_permalink( (int) $row['post_id'] ),
 				'address' => $place,
 			);
+			if ( class_exists( '\LifeRuss\Core\Seo\Facts' ) ) {
+				$modified = \LifeRuss\Core\Seo\CatalogSitemap::iso( \LifeRuss\Core\Seo\Facts::verified_at( 'university', (int) $row['id'] ) );
+				if ( '' !== $modified ) {
+					$node['dateModified'] = $modified;
+				}
+			}
+			$graph[] = $node;
+			$program_slug = sanitize_title( (string) get_query_var( 'lr_program' ) );
+			if ( '' !== $program_slug && class_exists( '\LifeRuss\Core\Seo\Routes' ) ) {
+				$program = \LifeRuss\Core\Seo\Routes::program_row( (int) $row['post_id'], $program_slug );
+				if ( $program ) {
+					$offer = array(
+						'@type'         => 'Offer',
+						'price'         => is_numeric( $program['tuition'] ?? null ) ? (string) $program['tuition'] : '0',
+						'priceCurrency' => (string) ( $program['currency'] ? $program['currency'] : 'RUB' ),
+						'url'           => home_url( '/universities/' . rawurlencode( (string) $row['slug'] ) . '/' . rawurlencode( $program_slug ) . '/' ),
+					);
+					$graph[] = array(
+						'@type'       => 'Course',
+						'name'        => (string) ( $program['field']['name_fa'] ?? $program_slug ),
+						'provider'    => array(
+							'@type' => 'CollegeOrUniversity',
+							'name'  => $row['name_fa'],
+							'url'   => get_permalink( (int) $row['post_id'] ),
+						),
+						'offers'      => $offer,
+						'url'         => $offer['url'],
+					);
+				}
+			}
 			$faqs = liferuss_catalog_faqs( (int) $row['post_id'] );
 			if ( $faqs ) {
 				$entities = array();

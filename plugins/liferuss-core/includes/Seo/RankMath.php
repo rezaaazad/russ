@@ -96,7 +96,8 @@ class RankMath {
 	public static function robots( $robots ): array {
 		$robots = is_array( $robots ) ? $robots : array();
 		if ( function_exists( 'liferuss_should_noindex' ) && liferuss_should_noindex() ) {
-			$robots['index'] = 'noindex';
+			$robots['index']  = 'noindex';
+			$robots['follow'] = 'follow';
 		}
 		return $robots;
 	}
@@ -120,7 +121,7 @@ class RankMath {
 			}
 			$type = $node['@type'] ?? '';
 			$type = is_array( $type ) ? implode( ',', $type ) : (string) $type;
-			if ( preg_match( '/Article|BlogPosting|Course|FAQPage|Service|CollegeOrUniversity|MonetaryGrant|ItemList|BreadcrumbList/', $type ) ) {
+			if ( preg_match( '/Article|BlogPosting|Course|FAQPage|Service|CollegeOrUniversity|EducationalOrganization|Offer|MonetaryGrant|ItemList|BreadcrumbList/', $type ) ) {
 				unset( $data[ $key ] );
 			}
 		}
@@ -151,6 +152,12 @@ class RankMath {
 		}
 		if ( $post_id && function_exists( 'liferuss_post_excluded_from_sitemap' ) && liferuss_post_excluded_from_sitemap( $post_id ) ) {
 			return false;
+		}
+		if ( $post_id ) {
+			$modified = CatalogSitemap::modified( $post_id );
+			if ( '' !== $modified ) {
+				$url['lastmod'] = $modified;
+			}
 		}
 		return $url;
 	}

@@ -37,6 +37,10 @@ const screens = [
 	[ 'finance', '/wp-admin/admin.php?page=lr-finance' ],
 	[ 'finance-report', '/wp-admin/admin.php?page=lr-finance-report' ],
 	[ 'payments', '/wp-admin/admin.php?page=lr-payments' ],
+	[ 'seo-health', '/wp-admin/admin.php?page=lr-seo-health' ],
+	[ 'seo-keywords', '/wp-admin/admin.php?page=lr-seo-keywords' ],
+	[ 'stale', '/wp-admin/admin.php?page=lr-stale' ],
+	[ 'lead-sources', '/wp-admin/admin.php?page=lr-sources' ],
 ];
 
 function authCookies() {

@@ -278,7 +278,7 @@ function liferuss_magazine_json_ld() {
 		'@type'            => 'BlogPosting',
 		'headline'         => get_the_title( $post_id ),
 		'datePublished'    => get_the_date( 'c', $post_id ),
-		'dateModified'     => get_the_modified_date( 'c', $post_id ),
+		'dateModified'     => '' !== (string) get_post_meta( $post_id, '_lr_reviewed_at', true ) ? gmdate( 'c', strtotime( (string) get_post_meta( $post_id, '_lr_reviewed_at', true ) . ' UTC' ) ) : get_the_modified_date( 'c', $post_id ),
 		'description'      => wp_strip_all_tags( get_the_excerpt( $post_id ) ),
 		'url'              => get_permalink( $post_id ),
 		'inLanguage'       => liferuss_lang_meta( 'html_lang' ),
@@ -312,16 +312,19 @@ function liferuss_guide_json_ld() {
 	if ( ! is_singular( 'lr_guide' ) ) {
 		return;
 	}
-	$post_id = get_queried_object_id();
+	$post_id  = get_queried_object_id();
+	$reviewed = (string) get_post_meta( $post_id, '_lr_reviewed_at', true );
+	$modified = '' !== $reviewed ? gmdate( 'c', strtotime( $reviewed . ' UTC' ) ) : get_the_modified_date( 'c', $post_id );
 	echo '<script type="application/ld+json">' . wp_json_encode(
 		array(
-			'@context' => 'https://schema.org',
-			'@type'    => 'Article',
-			'headline' => get_the_title( $post_id ),
-			'url'      => get_permalink( $post_id ),
-			'author'   => array(
-				'@type' => 'Organization',
-				'name'  => liferuss_brand(),
+			'@context'     => 'https://schema.org',
+			'@type'        => 'Article',
+			'headline'     => get_the_title( $post_id ),
+			'url'          => get_permalink( $post_id ),
+			'dateModified' => $modified,
+			'author'       => array(
+				'@type' => 'Person',
+				'name'  => get_the_author_meta( 'display_name', (int) get_post_field( 'post_author', $post_id ) ),
 			),
 		),
 		JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
