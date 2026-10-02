@@ -150,9 +150,13 @@ function liferuss_complete_langs() {
 }
 
 /**
- * noindex for filtered archives, paginated archives, explicit flags, and incomplete translations.
+ * noindex for filtered or sorted listings, search, explicit flags, demo rows, and pages that fail the quality gate.
+ * Pagination keeps a self canonical and stays indexable.
  */
 function liferuss_should_noindex() {
+	if ( is_search() ) {
+		return true;
+	}
 	if ( get_query_var( 'lr_find' ) || get_query_var( 'lr_account' ) || get_query_var( 'lr_pay' ) ) {
 		return true;
 	}
@@ -169,10 +173,29 @@ function liferuss_should_noindex() {
 	if ( function_exists( 'liferuss_catalog_is_filtered' ) && liferuss_catalog_is_filtered() ) {
 		return true;
 	}
-	if ( is_paged() && ( is_archive() || is_home() || is_search() ) ) {
+	if ( is_singular() && '1' === (string) get_post_meta( get_queried_object_id(), '_lr_demo', true ) ) {
 		return true;
 	}
 	if ( is_singular() && '1' === (string) get_post_meta( get_queried_object_id(), '_lr_noindex', true ) ) {
+		return true;
+	}
+	if ( is_singular() && class_exists( '\LifeRuss\Core\Seo\Quality' ) ) {
+		$post_id = (int) get_queried_object_id();
+		$type    = (string) get_post_type( $post_id );
+		if ( in_array( $type, \LifeRuss\Core\Seo\Quality::types(), true ) && ! \LifeRuss\Core\Seo\Quality::indexable_post( $post_id ) ) {
+			return true;
+		}
+	}
+	$program = sanitize_title( (string) get_query_var( 'lr_program' ) );
+	if ( '' !== $program && is_singular( 'lr_university' ) && class_exists( '\LifeRuss\Core\Seo\Routes' ) ) {
+		$post_id = (int) get_queried_object_id();
+		$row     = \LifeRuss\Core\Seo\Routes::program_row( $post_id, $program );
+		if ( ! $row || ! \LifeRuss\Core\Seo\Quality::program_indexable( $post_id, (int) $row['id'] ) ) {
+			return true;
+		}
+	}
+	$field_city = sanitize_title( (string) get_query_var( 'lr_field_city' ) );
+	if ( '' !== $field_city && is_singular( 'lr_field' ) && class_exists( '\LifeRuss\Core\Seo\Quality' ) && ! \LifeRuss\Core\Seo\Quality::indexable_post( (int) get_queried_object_id() ) ) {
 		return true;
 	}
 	$lang = liferuss_current_lang();
@@ -193,6 +216,12 @@ function liferuss_post_excluded_from_sitemap( $post_id ) {
 		return true;
 	}
 	if ( '1' === (string) get_post_meta( $post_id, '_lr_noindex', true ) ) {
+		return true;
+	}
+	if ( '1' === (string) get_post_meta( $post_id, '_lr_demo', true ) ) {
+		return true;
+	}
+	if ( class_exists( '\LifeRuss\Core\Seo\Quality' ) && in_array( $post->post_type, \LifeRuss\Core\Seo\Quality::types(), true ) && ! \LifeRuss\Core\Seo\Quality::indexable_post( (int) $post_id ) ) {
 		return true;
 	}
 	if ( function_exists( 'pll_get_post_language' ) ) {
@@ -384,8 +413,9 @@ function liferuss_head_meta() {
 		echo '<link rel="canonical" href="' . esc_url( $url ) . '">' . "\n";
 	}
 
-	if ( ! function_exists( 'pll_current_language' ) ) {
-		foreach ( liferuss_complete_langs() as $code ) {
+	$hreflang = liferuss_complete_langs();
+	if ( ! function_exists( 'pll_current_language' ) && count( $hreflang ) >= 2 ) {
+		foreach ( $hreflang as $code ) {
 			$info = liferuss_languages()[ $code ];
 			echo '<link rel="alternate" hreflang="' . esc_attr( $info['hreflang'] ) . '" href="' . esc_url( liferuss_current_canonical( $code ) ) . '">' . "\n";
 		}
@@ -617,6 +647,30 @@ function liferuss_breadcrumbs() {
 		$items[] = array( 'label' => liferuss_t( 'crumb_search' ), 'url' => '' );
 	} elseif ( is_404() ) {
 		$items[] = array( 'label' => liferuss_t( 'crumb_404' ), 'url' => '' );
+	} elseif ( get_query_var( 'lr_program' ) && is_singular( 'lr_university' ) ) {
+		$items[] = array( 'label' => 'دانشگاه‌ها', 'url' => liferuss_url( '/universities/' ) );
+		$items[] = array( 'label' => get_the_title(), 'url' => get_permalink() );
+		$field   = sanitize_title( (string) get_query_var( 'lr_program' ) );
+		$label   = $field;
+		if ( class_exists( '\LifeRuss\Core\Repositories\Repository' ) ) {
+			$row = \LifeRuss\Core\Repositories\Repository::for( 'fields' )->find_by( 'slug', $field );
+			if ( $row ) {
+				$label = (string) $row['name_fa'];
+			}
+		}
+		$items[] = array( 'label' => $label, 'url' => '' );
+	} elseif ( get_query_var( 'lr_field_city' ) && is_singular( 'lr_field' ) ) {
+		$items[] = array( 'label' => 'رشته‌ها', 'url' => liferuss_url( '/fields/' ) );
+		$items[] = array( 'label' => get_the_title(), 'url' => get_permalink() );
+		$slug    = sanitize_title( (string) get_query_var( 'lr_field_city' ) );
+		$label   = $slug;
+		if ( class_exists( '\LifeRuss\Core\Repositories\Repository' ) ) {
+			$row = \LifeRuss\Core\Repositories\Repository::for( 'cities' )->find_by( 'slug', $slug );
+			if ( $row ) {
+				$label = (string) $row['name_fa'];
+			}
+		}
+		$items[] = array( 'label' => $label, 'url' => '' );
 	} else {
 		$catalog = array(
 			'lr_university' => array( 'دانشگاه‌ها', '/universities/' ),
@@ -707,13 +761,17 @@ function liferuss_llms_txt() {
 		'/'              => 'Home',
 		'/about/'        => 'About',
 		'/universities/' => 'Universities',
+		'/fields/'       => 'Fields of study',
+		'/cities/'       => 'Cities',
+		'/medicine/'     => 'Medicine',
+		'/dentistry/'    => 'Dentistry',
 		'/services/'     => 'Services',
 		'/costs/'             => 'Costs',
 		'/study-russia/'      => 'Study in Russia',
 		'/scholarships/'      => 'Scholarships',
 		'/padfak/'            => 'Preparatory faculty',
 		'/direct-course/'     => 'Direct admission',
-		'/migration-russia/'  => 'Immigration',
+		'/immigration/'       => 'Immigration and the law',
 		'/admission/'         => 'Admission request',
 		'/exchange/'          => 'Exchange rate inquiry',
 		'/cargo/'             => 'Freight and shipping',
@@ -792,7 +850,27 @@ function liferuss_sitemap_query_args( $args, $post_type ) {
  */
 function liferuss_sitemap_excluded_ids() {
 	global $wpdb;
-	$ids = $wpdb->get_col( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_lr_noindex' AND meta_value = '1'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	$ids  = $wpdb->get_col( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_lr_noindex' AND meta_value = '1'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	$demo = $wpdb->get_col( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_lr_demo' AND meta_value = '1'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	if ( is_array( $demo ) ) {
+		$ids = array_merge( (array) $ids, $demo );
+	}
+	if ( class_exists( '\LifeRuss\Core\Seo\Quality' ) ) {
+		$gated = get_posts(
+			array(
+				'post_type'      => \LifeRuss\Core\Seo\Quality::types(),
+				'post_status'    => 'publish',
+				'posts_per_page' => 300,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+			)
+		);
+		foreach ( $gated as $gated_id ) {
+			if ( ! \LifeRuss\Core\Seo\Quality::indexable_post( (int) $gated_id ) ) {
+				$ids[] = (int) $gated_id;
+			}
+		}
+	}
 	$ids = is_array( $ids ) ? $ids : array();
 	$sample_ids = $wpdb->get_col( "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'page' AND post_status IN ('publish','draft','pending','private','trash','future') AND post_name IN ('sample-page','برگه-نمونه')" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	if ( is_array( $sample_ids ) ) {
@@ -822,9 +900,19 @@ add_filter( 'wp_sitemaps_posts_query_args', 'liferuss_sitemap_query_args', 10, 2
  * @param bool   $public Whether the site is public.
  */
 function liferuss_robots_txt( $output, $public ) {
-	if ( ! $public || liferuss_rank_math_active() || str_contains( $output, 'Sitemap:' ) ) {
+	if ( ! $public ) {
 		return $output;
 	}
-	return trim( $output ) . "\nSitemap: " . esc_url_raw( home_url( '/wp-sitemap.xml' ) ) . "\n";
+	$lines = trim( (string) $output );
+	foreach ( array( '/account/', '/search/', '/pay/' ) as $path ) {
+		$rule = 'Disallow: ' . $path;
+		if ( ! str_contains( $lines, $rule ) ) {
+			$lines .= "\n" . $rule;
+		}
+	}
+	if ( ! liferuss_rank_math_active() && ! str_contains( $lines, 'Sitemap:' ) ) {
+		$lines .= "\nSitemap: " . esc_url_raw( home_url( '/wp-sitemap.xml' ) );
+	}
+	return trim( $lines ) . "\n";
 }
 add_filter( 'robots_txt', 'liferuss_robots_txt', 20, 2 );

@@ -1373,3 +1373,26 @@ body.lr-ui .lr-compact-notice a {
 	font-weight: 700;
 	text-decoration: none;
 }
+
+.lr-seo-check {
+	margin: 0 0 12px;
+	padding: 0;
+	list-style: none;
+}
+
+.lr-seo-check li {
+	margin: 0 0 6px;
+	padding: 8px 12px;
+	border-radius: 8px;
+	background: #f6f8fb;
+}
+
+.lr-seo-check .is-ok {
+	background: #e8f6ee;
+	color: #0b2341;
+}
+
+.lr-seo-check .is-miss {
+	background: #fde8e8;
+	color: #8a1f1f;
+}

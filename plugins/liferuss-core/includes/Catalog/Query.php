@@ -210,17 +210,18 @@ class Query {
 	}
 
 	/**
-	 * Whether the current university archive URL carries a filter or a page.
+	 * Whether the current archive URL carries a filter or a sort parameter.
 	 */
 	public static function request_is_filtered(): bool {
 		if ( self::filters_from_request() ) {
 			return true;
 		}
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$paged_raw = isset( $_GET['paged'] ) ? sanitize_text_field( wp_unslash( $_GET['paged'] ) ) : '';
+		$orderby = isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : '';
+		$order   = isset( $_GET['order'] ) ? sanitize_key( wp_unslash( $_GET['order'] ) ) : '';
+		$sort    = isset( $_GET['sort'] ) ? sanitize_key( wp_unslash( $_GET['sort'] ) ) : '';
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
-		$paged = (int) $paged_raw;
-		return max( $paged, (int) get_query_var( 'paged' ) ) > 1;
+		return '' !== $orderby || '' !== $order || '' !== $sort;
 	}
 
 	/**
@@ -473,20 +474,22 @@ class Query {
 	 */
 	private static function universities_for_field( int $field_id ): array {
 		global $wpdb;
-		$unis   = $wpdb->prefix . 'lr_universities';
-		$fees   = $wpdb->prefix . 'lr_tuition_fees';
-		$cities = $wpdb->prefix . 'lr_cities';
-		$sql    = "SELECT u.id, u.post_id, u.slug, u.name_fa, u.name_en, c.name_fa AS city_name,
+		$unis     = $wpdb->prefix . 'lr_universities';
+		$fees     = $wpdb->prefix . 'lr_tuition_fees';
+		$cities   = $wpdb->prefix . 'lr_cities';
+		$programs = $wpdb->prefix . 'lr_university_fields';
+		$sql      = "SELECT u.id, u.post_id, u.slug, u.name_fa, u.name_en, c.name_fa AS city_name,
 				MIN(t.amount_usd) AS min_usd, MAX(t.amount_usd) AS max_usd
 			FROM `{$unis}` u
-			INNER JOIN `{$fees}` t ON t.university_id = u.id AND t.field_id = %d AND t.is_current = 1 AND t.deleted_at IS NULL
+			INNER JOIN `{$programs}` p ON p.university_id = u.id AND p.field_id = %d AND p.status = 'active' AND p.deleted_at IS NULL
+			LEFT JOIN `{$fees}` t ON t.university_id = u.id AND t.field_id = %d AND t.is_current = 1 AND t.deleted_at IS NULL
 			LEFT JOIN `{$cities}` c ON c.id = u.city_id
 			WHERE u.deleted_at IS NULL AND u.status = 'published'
 			GROUP BY u.id, u.post_id, u.slug, u.name_fa, u.name_en, c.name_fa
 			ORDER BY min_usd ASC, u.name_fa ASC
 			LIMIT 100";
-		$rows   = $wpdb->get_results( $wpdb->prepare( $sql, $field_id ), ARRAY_A );
-		$out    = array();
+		$rows     = $wpdb->get_results( $wpdb->prepare( $sql, $field_id, $field_id ), ARRAY_A );
+		$out      = array();
 		foreach ( (array) $rows as $row ) {
 			$row['url'] = get_permalink( (int) $row['post_id'] );
 			$out[]      = $row;

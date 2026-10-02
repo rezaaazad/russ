@@ -5364,3 +5364,26 @@ body.has-compare-bar .lr-float {
     display: none;
   }
 }
+
+.lr-fresh {
+  margin: 0 0 16px;
+  color: #3d4d63;
+  font-size: 0.95rem;
+}
+
+.lr-auto-links,
+.lr-similar,
+.lr-related-entities {
+  margin: 0 0 24px;
+}
+
+.lr-auto-links ul,
+.lr-similar ul,
+.lr-related-entities ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

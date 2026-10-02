@@ -24,7 +24,7 @@ function liferuss_is_catalog() {
 }
 
 /**
- * Filtered archive or page 2+, which should not be indexed.
+ * Filtered or sorted archive, which should not be indexed. Pagination is not a filter.
  */
 function liferuss_catalog_is_filtered() {
 	if ( ! liferuss_catalog_ready() || ! is_post_type_archive( array( 'lr_university', 'lr_field', 'lr_city' ) ) ) {
@@ -361,12 +361,42 @@ function liferuss_catalog_json_ld() {
 			if ( ! empty( $row['address'] ) ) {
 				$place['streetAddress'] = $row['address'];
 			}
-			$graph[] = array(
-				'@type'   => 'CollegeOrUniversity',
+			$node = array(
+				'@type'   => array( 'CollegeOrUniversity', 'EducationalOrganization' ),
 				'name'    => $row['name_fa'],
 				'url'     => get_permalink( (int) $row['post_id'] ),
 				'address' => $place,
 			);
+			if ( class_exists( '\LifeRuss\Core\Seo\Facts' ) ) {
+				$modified = \LifeRuss\Core\Seo\CatalogSitemap::iso( \LifeRuss\Core\Seo\Facts::verified_at( 'university', (int) $row['id'] ) );
+				if ( '' !== $modified ) {
+					$node['dateModified'] = $modified;
+				}
+			}
+			$graph[] = $node;
+			$program_slug = sanitize_title( (string) get_query_var( 'lr_program' ) );
+			if ( '' !== $program_slug && class_exists( '\LifeRuss\Core\Seo\Routes' ) ) {
+				$program = \LifeRuss\Core\Seo\Routes::program_row( (int) $row['post_id'], $program_slug );
+				if ( $program ) {
+					$offer = array(
+						'@type'         => 'Offer',
+						'price'         => is_numeric( $program['tuition'] ?? null ) ? (string) $program['tuition'] : '0',
+						'priceCurrency' => (string) ( $program['currency'] ? $program['currency'] : 'RUB' ),
+						'url'           => home_url( '/universities/' . rawurlencode( (string) $row['slug'] ) . '/' . rawurlencode( $program_slug ) . '/' ),
+					);
+					$graph[] = array(
+						'@type'       => 'Course',
+						'name'        => (string) ( $program['field']['name_fa'] ?? $program_slug ),
+						'provider'    => array(
+							'@type' => 'CollegeOrUniversity',
+							'name'  => $row['name_fa'],
+							'url'   => get_permalink( (int) $row['post_id'] ),
+						),
+						'offers'      => $offer,
+						'url'         => $offer['url'],
+					);
+				}
+			}
 			$faqs = liferuss_catalog_faqs( (int) $row['post_id'] );
 			if ( $faqs ) {
 				$entities = array();

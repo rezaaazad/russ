@@ -38,6 +38,7 @@ get_header();
 						</nav>
 					<?php endif; ?>
 					<?php the_content(); ?>
+					<?php if ( class_exists( '\LifeRuss\Core\Seo\Links' ) ) { \LifeRuss\Core\Seo\Links::related_box( get_the_ID() ); } ?>
 					<aside class="lr-author">
 						<?php
 						$author_id   = (int) get_the_author_meta( 'ID' );

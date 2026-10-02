@@ -44,13 +44,15 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 		<?php if ( ! $row ) : ?>
 			<p>این دانشگاه هنوز منتشر نشده است.</p>
 		<?php else : ?>
+			<?php \LifeRuss\Core\Seo\Links::freshness( 'university', (int) $row['id'] ); ?>
+			<?php \LifeRuss\Core\Seo\Links::university( $row ); ?>
 			<ul class="lr-facts">
 				<?php if ( ! empty( $row['founded_year'] ) ) : ?><li>تأسیس <?php echo esc_html( liferuss_local_digits( (string) $row['founded_year'] ) ); ?></li><?php endif; ?>
 				<?php if ( 'state' === $row['ownership'] ) : ?><li>دولتی</li><?php elseif ( 'private' === $row['ownership'] ) : ?><li>خصوصی</li><?php endif; ?>
 				<?php if ( (int) get_post_meta( $post_id, '_lr_students_total', true ) ) : ?><li><?php echo esc_html( number_format_i18n( (int) get_post_meta( $post_id, '_lr_students_total', true ) ) ); ?> دانشجو</li><?php endif; ?>
 				<?php $usd = liferuss_catalog_usd( $row['min_tuition_usd'], true ); if ( $usd ) : ?><li>شهریه از <?php echo esc_html( $usd ); ?></li><?php endif; ?>
 				<?php if ( ! empty( $row['best_world_rank'] ) ) : ?><li>بهترین رتبه جهانی <?php echo esc_html( liferuss_local_digits( (string) $row['best_world_rank'] ) ); ?></li><?php endif; ?>
-				<?php if ( 'approved' === $row['health_ministry_status'] ) : ?><li>تأیید وزارت بهداشت</li><?php endif; ?>
+				<?php if ( 'approved' === $row['health_ministry_status'] ) : ?><li id="moh-fact">تأیید وزارت بهداشت</li><?php endif; ?>
 				<?php if ( 'approved' === $row['science_ministry_status'] ) : ?><li>تأیید وزارت علوم</li><?php endif; ?>
 				<?php if ( ! empty( $row['has_dormitory'] ) ) : ?><li>خوابگاه</li><?php endif; ?>
 			</ul>
@@ -76,7 +78,7 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 				<?php liferuss_table_scroll_close(); ?>
 			<?php endif; ?>
 			<?php if ( ! empty( $row['programs'] ) ) : ?>
-				<h2>رشته‌ها و شهریه</h2>
+				<h2 id="tuition">شهریه سال جاری</h2>
 				<?php liferuss_table_scroll_open(); ?>
 				<table class="lr-table">
 					<thead><tr><th>رشته</th><th>مقطع</th><th>زبان</th><th>مدت</th><th>شهریه</th><th>دلار</th></tr></thead>
@@ -110,6 +112,22 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 					</ul>
 				<?php endif; ?>
 			<?php endif; ?>
+			<h2 id="dorm">خوابگاه</h2>
+			<?php if ( ! empty( $row['dorm'] ) ) : ?>
+				<p><?php echo esc_html( number_format_i18n( (float) $row['dorm']['amount_min'] ) . ' ' . (string) $row['dorm']['currency'] ); ?>
+					<?php if ( ! empty( $row['dorm']['academic_year'] ) ) : ?>
+						— <?php echo esc_html( \LifeRuss\Core\Seo\Facts::display_year( (string) $row['dorm']['academic_year'] ) ); ?>
+					<?php endif; ?>
+				</p>
+			<?php elseif ( ! empty( $row['has_dormitory'] ) ) : ?>
+				<p>خوابگاه دارد. هزینهٔ سال جاری هنوز ثبت نشده است.</p>
+			<?php else : ?>
+				<p>خوابگاه برای این دانشگاه ثبت نشده است.</p>
+			<?php endif; ?>
+			<h2 id="admission">شرایط پذیرش</h2>
+			<p>زبان آموزش و مقطع هر رشته در جدول شهریه آمده است. مدارک نهایی را با منبع همان سال تحصیلی بسنجید.</p>
+			<h2 id="moh">وضعیت وزارت بهداشت</h2>
+			<p><?php echo 'approved' === $row['health_ministry_status'] ? 'تأیید شده' : ( 'rejected' === $row['health_ministry_status'] ? 'تأیید نشده' : 'وضعیت تأیید وزارت بهداشت ثبت نشده است' ); ?>.</p>
 			<?php if ( ! empty( $row['city'] ) ) : ?>
 				<h2>شهر</h2>
 				<p><a href="<?php echo esc_url( get_permalink( (int) $row['city']['post_id'] ) ); ?>"><?php echo esc_html( (string) $row['city']['name_fa'] ); ?></a>

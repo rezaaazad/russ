@@ -1,8 +1,8 @@
 # استقرار فاز ۴ / Phase 4 deployment
 
-قالب ۱.۱۳.۲ و افزونهٔ هسته ۱.۱۳.۲ (پایگاه ۱.۱۱.۰). Rank Math و Polylang اختیاری‌اند و داخل بسته نیستند. لایف‌روس فروشگاه نیست و کالا نمی‌فروشد؛ ووکامرس و کاتالوگ محصول ندارد. آکادمی داخل هسته است و افزونهٔ LMS ندارد.
+قالب ۱.۱۴.۰ و افزونهٔ هسته ۱.۱۴.۰ (پایگاه ۱.۱۴.۰). Rank Math و Polylang اختیاری‌اند و داخل بسته نیستند. لایف‌روس فروشگاه نیست و کالا نمی‌فروشد؛ ووکامرس و کاتالوگ محصول ندارد. آکادمی داخل هسته است و افزونهٔ LMS ندارد.
 
-Theme 1.13.2 and core plugin 1.13.2 (database 1.11.0). Rank Math and Polylang are optional and are not bundled. LifeRuss is not a store and sells no goods. Academy lives in the core plugin and does not use an LMS.
+Theme 1.14.0 and core plugin 1.14.0 (database 1.14.0). Rank Math and Polylang are optional and are not bundled. LifeRuss is not a store and sells no goods. Academy lives in the core plugin and does not use an LMS.
 
 ## کش بعد از به‌روزرسانی / Purge the cache
 

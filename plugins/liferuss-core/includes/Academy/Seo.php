@@ -67,6 +67,13 @@ class Seo {
 			),
 			'inLanguage'  => 'fa',
 			'url'         => home_url( '/academy/courses/' . $course['slug'] . '/' ),
+			'offers'      => array(
+				'@type'         => 'Offer',
+				'price'         => ( ! empty( $course['is_free'] ) || (int) $course['price'] < 1 ) ? '0' : (string) (int) $course['price'],
+				'priceCurrency' => 'IRT',
+				'availability'  => 'https://schema.org/InStock',
+				'url'           => home_url( '/academy/courses/' . $course['slug'] . '/' ),
+			),
 		);
 		self::print_schema( $data );
 	}

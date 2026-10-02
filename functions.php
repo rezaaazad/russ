@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.13.2' );
+define( 'LIFERUSS_VERSION', '1.14.0' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
