@@ -18,7 +18,7 @@ function liferuss_path_links() {
 	return array(
 		array(
 			'title' => liferuss_t( 'nav_study' ),
-			'url'   => '/study/',
+			'url'   => '/study-russia/',
 		),
 		array(
 			'title' => liferuss_t( 'nav_scholarships' ),
@@ -26,15 +26,15 @@ function liferuss_path_links() {
 		),
 		array(
 			'title' => liferuss_t( 'nav_podfak' ),
-			'url'   => '/podfak/',
+			'url'   => '/padfak/',
 		),
 		array(
 			'title' => liferuss_t( 'nav_direct' ),
-			'url'   => '/direct-admission/',
+			'url'   => '/direct-course/',
 		),
 		array(
 			'title' => liferuss_t( 'nav_immigration' ),
-			'url'   => '/immigration/',
+			'url'   => '/migration-russia/',
 		),
 		array(
 			'title' => liferuss_t( 'nav_admission' ),
@@ -196,7 +196,6 @@ function liferuss_path_live( $post_id ) {
 	if ( '' === $mode ) {
 		return;
 	}
-	echo '<section class="section path-live"><div class="container">';
 	if ( 'children' === $mode ) {
 		$children = get_pages(
 			array(
@@ -205,15 +204,24 @@ function liferuss_path_live( $post_id ) {
 				'sort_column' => 'menu_order,post_title',
 			)
 		);
-		echo '<div class="path-children">';
+		$children = is_array( $children ) ? $children : array();
+		$children = array_values(
+			array_filter(
+				$children,
+				static function ( $child ) {
+					return $child instanceof WP_Post && ! liferuss_is_placeholder_copy( $child->post_title );
+				}
+			)
+		);
 		if ( ! $children ) {
-			echo '<p class="lr-empty">' . esc_html( liferuss_t( 'path_empty' ) ) . '</p>';
+			return;
 		}
+		echo '<section class="section path-live"><div class="container"><div class="path-children">';
 		foreach ( $children as $child ) {
 			echo '<a class="path-child" href="' . esc_url( get_permalink( $child ) ) . '">';
-			echo '<strong>' . esc_html( get_the_title( $child ) ) . '</strong>';
+			echo '<strong>' . esc_html( get_the_title( $child ) ) . '</strong><span class="path-child-arrow" aria-hidden="true">‹</span>';
 			$lead = (string) get_post_meta( $child->ID, '_lr_lead', true );
-			if ( $lead ) {
+			if ( $lead && ! liferuss_is_placeholder_copy( $lead ) ) {
 				echo '<span>' . esc_html( $lead ) . '</span>';
 			}
 			echo '</a>';
@@ -224,11 +232,11 @@ function liferuss_path_live( $post_id ) {
 	if ( 'padfak' === $mode || 'direct' === $mode ) {
 		$type  = 'padfak' === $mode ? 'padfak' : 'direct_course';
 		$items = \LifeRuss\Core\Catalog\Query::prep( $type );
-		echo '<h2>' . esc_html( liferuss_t( 'path_prep_title' ) ) . '</h2>';
 		if ( ! $items ) {
-			echo '<p class="lr-empty">' . esc_html( liferuss_t( 'path_empty' ) ) . '</p></div></section>';
 			return;
 		}
+		echo '<section class="section path-live"><div class="container">';
+		echo '<h2>' . esc_html( liferuss_t( 'path_prep_title' ) ) . '</h2>';
 		echo '<div class="lr-cards">';
 		foreach ( $items as $item ) {
 			echo '<article class="lr-card"><div class="lr-card-body">';
@@ -262,15 +270,18 @@ function liferuss_path_live( $post_id ) {
 		$filters['field'] = $field;
 	}
 	$snap = \LifeRuss\Core\Catalog\Query::snapshot( $filters );
+	if ( (int) $snap['total'] < 1 ) {
+		return;
+	}
+	echo '<section class="section path-live"><div class="container">';
 	echo '<h2>' . esc_html( liferuss_t( 'path_live_title' ) ) . '</h2>';
 	echo '<ul class="lr-facts">';
-	echo '<li>' . esc_html( liferuss_t( 'path_count' ) ) . ' ' . (int) $snap['total'] . '</li>';
-	if ( $snap['min_usd'] > 0 ) {
-		$range = liferuss_catalog_usd( $snap['min_usd'] );
-		if ( $snap['max_usd'] > $snap['min_usd'] ) {
-			$range .= ' – ' . liferuss_catalog_usd( $snap['max_usd'] );
-		}
+	echo '<li>' . esc_html( liferuss_t( 'path_count' ) ) . ' ' . esc_html( liferuss_local_digits( (string) (int) $snap['total'] ) ) . '</li>';
+	if ( $snap['min_usd'] > 0 && (int) $snap['total'] >= 3 && (float) $snap['max_usd'] > (float) $snap['min_usd'] ) {
+		$range = liferuss_catalog_usd( $snap['min_usd'] ) . ' – ' . liferuss_catalog_usd( $snap['max_usd'] );
 		echo '<li>' . esc_html( liferuss_t( 'path_tuition' ) ) . ' ' . esc_html( $range ) . '</li>';
+	} elseif ( $snap['min_usd'] > 0 && (int) $snap['total'] >= 3 ) {
+		echo '<li>' . esc_html( liferuss_t( 'path_tuition' ) ) . ' ' . esc_html( liferuss_catalog_usd( $snap['min_usd'] ) ) . '</li>';
 	}
 	echo '</ul>';
 	if ( 'tuition' !== $mode ) {
@@ -296,12 +307,17 @@ function liferuss_path_tuition_block() {
 		return;
 	}
 	$snap = \LifeRuss\Core\Catalog\Query::snapshot( array() );
+	if ( (int) $snap['total'] < 3 ) {
+		return;
+	}
 	echo '<section class="section path-live"><div class="container">';
 	echo '<h2>' . esc_html( liferuss_t( 'path_tuition' ) ) . '</h2>';
 	echo '<ul class="lr-facts">';
-	echo '<li>' . esc_html( liferuss_t( 'path_count' ) ) . ' ' . (int) $snap['total'] . '</li>';
-	if ( $snap['min_usd'] > 0 ) {
+	echo '<li>' . esc_html( liferuss_t( 'path_count' ) ) . ' ' . esc_html( liferuss_local_digits( (string) (int) $snap['total'] ) ) . '</li>';
+	if ( $snap['min_usd'] > 0 && (float) $snap['max_usd'] > (float) $snap['min_usd'] ) {
 		echo '<li>' . esc_html( liferuss_catalog_usd( $snap['min_usd'] ) ) . ' – ' . esc_html( liferuss_catalog_usd( $snap['max_usd'] ) ) . '</li>';
+	} elseif ( $snap['min_usd'] > 0 ) {
+		echo '<li>' . esc_html( liferuss_catalog_usd( $snap['min_usd'] ) ) . '</li>';
 	}
 	echo '</ul></div></section>';
 }
@@ -316,6 +332,9 @@ function liferuss_path_quotes( $post_id ) {
 	foreach ( liferuss_path_ids( $post_id, '_lr_testimonial_ids' ) as $id ) {
 		$post = get_post( $id );
 		if ( ! $post || 'lr_testimonial' !== $post->post_type || 'publish' !== $post->post_status ) {
+			continue;
+		}
+		if ( liferuss_is_placeholder_copy( $post->post_title . ' ' . $post->post_content ) ) {
 			continue;
 		}
 		$quotes[] = $post;
@@ -548,7 +567,7 @@ function liferuss_hub_children() {
 	}
 	echo '<section class="section"><div class="container path-children">';
 	foreach ( $children as $child ) {
-		echo '<a class="path-child" href="' . esc_url( get_permalink( $child ) ) . '"><strong>' . esc_html( get_the_title( $child ) ) . '</strong></a>';
+		echo '<a class="path-child" href="' . esc_url( get_permalink( $child ) ) . '"><strong>' . esc_html( get_the_title( $child ) ) . '</strong><span class="path-child-arrow" aria-hidden="true">‹</span></a>';
 	}
 	echo '</div></section>';
 }

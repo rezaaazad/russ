@@ -1,0 +1,121 @@
+---
+title: LifeRuss ERD - Core and Education
+---
+erDiagram
+  LR_ACTIVITY_LOGS {
+    BIGINT id PK
+    BIGINT user_id FK
+    VARCHAR action
+    VARCHAR object_type
+    BIGINT object_id
+    VARCHAR summary
+    JSON changes
+    VARBINARY ip
+    VARCHAR user_agent
+    DATETIME created_at
+  }
+  LR_REDIRECTS {
+    BIGINT id PK
+    VARCHAR source_path
+    CHAR source_hash UK
+    VARCHAR target_url
+    SMALLINT status_code
+    ENUM match_type
+    VARCHAR lang
+    ENUM origin
+    VARCHAR object_type
+    BIGINT object_id
+    INT hits
+    DATETIME last_hit_at
+    TINYINT is_active
+    BIGINT created_by FK
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_TRANSLATIONS {
+    BIGINT id PK
+    VARCHAR object_type UK
+    BIGINT object_id UK
+    VARCHAR lang UK
+    VARCHAR field_key UK
+    MEDIUMTEXT value
+    ENUM status
+    BIGINT translated_by FK
+    DATETIME created_at
+    DATETIME updated_at
+  }
+  LR_RELATIONS {
+    BIGINT id PK
+    VARCHAR from_type UK
+    BIGINT from_id UK
+    VARCHAR to_type UK
+    BIGINT to_id UK
+    VARCHAR relation UK
+    SMALLINT sort_order
+    DATETIME created_at
+  }
+  LR_VIEW_STATS_DAILY {
+    DATE stat_date PK
+    VARCHAR object_type PK
+    BIGINT object_id PK
+    VARCHAR lang PK
+    INT views
+    INT leads
+  }
+  LR_LESSON_VOCAB {
+    BIGINT id PK
+    BIGINT lesson_id FK
+    VARCHAR word_ru
+    VARCHAR transliteration
+    VARCHAR meaning_fa
+    VARCHAR example_ru
+    VARCHAR example_fa
+    BIGINT audio_id FK
+    SMALLINT sort_order
+    DATETIME created_at
+    DATETIME updated_at
+  }
+  LR_QUIZZES {
+    BIGINT id PK
+    BIGINT lesson_id FK
+    BIGINT course_id FK
+    VARCHAR title
+    TINYINT pass_score
+    SMALLINT time_limit_sec
+    ENUM status
+    DATETIME created_at
+    DATETIME updated_at
+    DATETIME deleted_at
+  }
+  LR_QUIZ_QUESTIONS {
+    BIGINT id PK
+    BIGINT quiz_id FK
+    ENUM question_type
+    TEXT question
+    JSON options
+    JSON correct_answer
+    TEXT explanation
+    BIGINT media_id FK
+    SMALLINT sort_order
+    DATETIME created_at
+    DATETIME updated_at
+  }
+  WP_POSTS {
+    BIGINT ID PK
+    VARCHAR post_type
+    VARCHAR post_name
+    VARCHAR post_status
+    BIGINT post_author FK
+  }
+  WP_USERS {
+    BIGINT ID PK
+    VARCHAR user_login
+    VARCHAR user_email
+  }
+  WP_USERS |o--o{ LR_ACTIVITY_LOGS : "user_id"
+  WP_POSTS ||--o{ LR_LESSON_VOCAB : "lesson_id"
+  WP_POSTS |o--o{ LR_QUIZZES : "lesson_id"
+  LR_QUIZZES ||--o{ LR_QUIZ_QUESTIONS : "quiz_id"
+  WP_POSTS ||--o{ LR_RELATIONS : "from/to"
+  WP_POSTS ||--o{ LR_VIEW_STATS_DAILY : "object_id"

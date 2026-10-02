@@ -21,6 +21,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<article class="story-card">
 					<figure class="story-avatar">
 						<?php
+						$story_name = (string) ( $story['name'] ?? '' );
+						$bits       = preg_split( '/\s+/u', trim( $story_name ) );
+						$initials   = '';
+						if ( is_array( $bits ) ) {
+							foreach ( array_slice( $bits, 0, 2 ) as $bit ) {
+								$initials .= mb_substr( $bit, 0, 1 );
+							}
+						}
+						?>
+						<span class="story-fallback" aria-hidden="true"><?php echo esc_html( $initials ); ?></span>
+						<?php
 						liferuss_the_image(
 							array(
 								'id'       => $story['image_id'] ?? 0,

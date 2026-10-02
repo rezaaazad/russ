@@ -20,7 +20,7 @@ if ( '1' === (string) liferuss_opt( 'services_enabled', '1' ) ) :
 		</header>
 		<div class="services-grid">
 			<?php foreach ( liferuss_services() as $service ) : ?>
-				<article class="service-card">
+				<a class="service-card" href="<?php echo esc_url( liferuss_service_href( (string) ( $service['icon'] ?? '' ) ) ); ?>">
 					<?php if ( ! empty( $service['image_id'] ) ) : ?>
 						<?php echo wp_get_attachment_image( (int) $service['image_id'], 'thumbnail', false, array( 'class' => 'service-photo', 'alt' => $service['title'] ) ); ?>
 					<?php else : ?>
@@ -28,7 +28,7 @@ if ( '1' === (string) liferuss_opt( 'services_enabled', '1' ) ) :
 					<?php endif; ?>
 					<h3><?php echo esc_html( $service['title'] ); ?></h3>
 					<p><?php echo esc_html( $service['text'] ); ?></p>
-				</article>
+				</a>
 			<?php endforeach; ?>
 		</div>
 	</div>

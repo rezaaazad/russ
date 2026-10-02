@@ -29,7 +29,11 @@ class Assets {
 	 * @param string $hook Current admin hook suffix.
 	 */
 	public static function enqueue( string $hook ): void {
-		$ours = ( 'toplevel_page_liferuss' === $hook ) || str_starts_with( $hook, 'liferuss_page_' );
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$ours = ( 'toplevel_page_liferuss' === $hook )
+			|| str_starts_with( $hook, 'liferuss_page_' )
+			|| str_contains( $hook, 'page_lr-' )
+			|| str_contains( $hook, 'page_liferuss' );
 		if ( ! $ours ) {
 			return;
 		}
@@ -51,6 +55,25 @@ class Assets {
 			LIFERUSS_CORE_URL . 'assets/admin.css',
 			$deps,
 			LIFERUSS_CORE_VERSION
+		);
+
+		if ( 'lr-kanban' !== $page ) {
+			return;
+		}
+		wp_enqueue_script(
+			'liferuss-kanban',
+			LIFERUSS_CORE_URL . 'assets/kanban.js',
+			array(),
+			LIFERUSS_CORE_VERSION,
+			true
+		);
+		wp_localize_script(
+			'liferuss-kanban',
+			'liferussKanban',
+			array(
+				'ajax'  => admin_url( 'admin-ajax.php' ),
+				'nonce' => wp_create_nonce( 'lr_kanban' ),
+			)
 		);
 	}
 }

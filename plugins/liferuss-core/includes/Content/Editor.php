@@ -123,19 +123,49 @@ class Editor {
 	}
 
 	/**
-	 * Scholarship fields from the content brief. There is no ERD scholarship table.
+	 * Scholarship fields. Structured values live in lr_scholarships.
 	 *
 	 * @param \WP_Post $post Post.
 	 */
 	public static function scholarship_box( \WP_Post $post ): void {
 		wp_nonce_field( 'lr_path_save', 'lr_path_nonce' );
 		echo '<input type="hidden" name="lr_scholarship_present" value="1">';
-		self::text_row( 'مهلت', 'lr_deadline', (string) get_post_meta( $post->ID, '_lr_deadline', true ) );
-		self::text_row( 'پوشش', 'lr_coverage', (string) get_post_meta( $post->ID, '_lr_coverage', true ) );
-		echo '<p><label>شرایط<br><textarea class="large-text" rows="4" name="lr_eligibility">' . esc_textarea( (string) get_post_meta( $post->ID, '_lr_eligibility', true ) ) . '</textarea></label></p>';
-		self::text_row( 'منبع', 'lr_source', (string) get_post_meta( $post->ID, '_lr_source', true ) );
+		$row = \LifeRuss\Core\Scholarships\Store::for_post( $post->ID );
+		if ( ! $row ) {
+			$row = \LifeRuss\Core\Scholarships\Store::from_meta( $post->ID );
+		}
+		echo '<p><label>دانشگاه<br><select name="lr_university_id"><option value="0">—</option>';
+		foreach ( \LifeRuss\Core\Scholarships\Store::universities() as $id => $name ) {
+			echo '<option value="' . esc_attr( (string) $id ) . '" ' . selected( (int) ( $row['university_id'] ?? 0 ), (int) $id, false ) . '>' . esc_html( $name ) . '</option>';
+		}
+		echo '</select></label></p>';
+		self::text_row( 'رشته', 'lr_field_name', (string) ( $row['field_name'] ?? '' ) );
+		echo '<p><label>مقطع<br><select name="lr_degree">';
+		foreach ( \LifeRuss\Core\Scholarships\Store::degrees() as $key => $label ) {
+			echo '<option value="' . esc_attr( $key ) . '" ' . selected( (string) ( $row['degree'] ?? '' ), $key, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></label></p>';
+		echo '<p><label>نوع پوشش<br><select name="lr_coverage_type">';
+		foreach ( \LifeRuss\Core\Scholarships\Store::coverage_types() as $key => $label ) {
+			echo '<option value="' . esc_attr( $key ) . '" ' . selected( (string) ( $row['coverage_type'] ?? '' ), $key, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></label></p>';
+		self::text_row( 'درصد پوشش', 'lr_coverage_percent', (string) ( $row['coverage_percent'] ?? '' ) );
+		self::text_row( 'سهمیه', 'lr_quota', (string) ( $row['quota'] ?? '' ) );
+		self::text_row( 'مهلت', 'lr_deadline', (string) ( $row['deadline'] ?? get_post_meta( $post->ID, '_lr_deadline', true ) ) );
+		echo '<p><label>زبان<br><select name="lr_language">';
+		foreach ( array(
+			''      => 'نامشخص',
+			'ru'    => 'روسی',
+			'en'    => 'انگلیسی',
+			'ru_en' => 'روسی و انگلیسی',
+		) as $key => $label ) {
+			echo '<option value="' . esc_attr( $key ) . '" ' . selected( (string) ( $row['language'] ?? '' ), $key, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></label></p>';
+		echo '<p><label>شرایط<br><textarea class="large-text" rows="4" name="lr_eligibility">' . esc_textarea( (string) ( $row['requirements'] ?? get_post_meta( $post->ID, '_lr_eligibility', true ) ) ) . '</textarea></label></p>';
+		self::text_row( 'منبع', 'lr_source', (string) ( $row['source'] ?? '' ) );
 		self::text_row( 'نشانی منبع', 'lr_source_url', (string) get_post_meta( $post->ID, '_lr_source_url', true ) );
-		self::text_row( 'آخرین بررسی (UTC)', 'lr_verified', (string) get_post_meta( $post->ID, '_lr_last_verified_at', true ) );
 		self::links( $post->ID );
 		self::seo( $post->ID );
 	}
@@ -196,12 +226,32 @@ class Editor {
 		if ( ! self::authorized( $post_id ) || empty( $_POST['lr_scholarship_present'] ) ) {
 			return;
 		}
-		update_post_meta( $post_id, '_lr_deadline', sanitize_text_field( wp_unslash( $_POST['lr_deadline'] ?? '' ) ) );
-		update_post_meta( $post_id, '_lr_coverage', sanitize_text_field( wp_unslash( $_POST['lr_coverage'] ?? '' ) ) );
-		update_post_meta( $post_id, '_lr_eligibility', sanitize_textarea_field( wp_unslash( $_POST['lr_eligibility'] ?? '' ) ) );
-		update_post_meta( $post_id, '_lr_source', sanitize_text_field( wp_unslash( $_POST['lr_source'] ?? '' ) ) );
+		$deadline = sanitize_text_field( wp_unslash( $_POST['lr_deadline'] ?? '' ) );
+		$cover    = sanitize_key( wp_unslash( $_POST['lr_coverage_type'] ?? '' ) );
+		$percent  = absint( $_POST['lr_coverage_percent'] ?? 0 );
+		$needs    = sanitize_textarea_field( wp_unslash( $_POST['lr_eligibility'] ?? '' ) );
+		$source   = sanitize_text_field( wp_unslash( $_POST['lr_source'] ?? '' ) );
+		update_post_meta( $post_id, '_lr_deadline', $deadline );
+		update_post_meta( $post_id, '_lr_coverage', $cover . ( $percent ? ' ' . $percent . '%' : '' ) );
+		update_post_meta( $post_id, '_lr_eligibility', $needs );
+		update_post_meta( $post_id, '_lr_source', $source );
 		update_post_meta( $post_id, '_lr_source_url', esc_url_raw( wp_unslash( $_POST['lr_source_url'] ?? '' ) ) );
-		update_post_meta( $post_id, '_lr_last_verified_at', sanitize_text_field( wp_unslash( $_POST['lr_verified'] ?? '' ) ) );
+		update_post_meta( $post_id, '_lr_last_verified_at', gmdate( 'Y-m-d H:i:s' ) );
+		\LifeRuss\Core\Scholarships\Store::upsert(
+			$post_id,
+			array(
+				'university_id'    => absint( $_POST['lr_university_id'] ?? 0 ),
+				'field_name'       => sanitize_text_field( wp_unslash( $_POST['lr_field_name'] ?? '' ) ),
+				'degree'           => sanitize_key( wp_unslash( $_POST['lr_degree'] ?? '' ) ),
+				'coverage_type'    => $cover,
+				'coverage_percent' => $percent,
+				'quota'            => absint( $_POST['lr_quota'] ?? 0 ),
+				'deadline'         => $deadline,
+				'language'         => sanitize_key( wp_unslash( $_POST['lr_language'] ?? '' ) ),
+				'requirements'     => $needs,
+				'source'           => $source,
+			)
+		);
 		self::save_links( $post_id );
 		self::save_seo( $post_id );
 	}

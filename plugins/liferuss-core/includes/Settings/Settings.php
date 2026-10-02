@@ -81,11 +81,13 @@ class Settings {
 	 * Save manual rates. A changed rate rewrites tuition amount_usd.
 	 *
 	 * @param array<string, string> $incoming Currency code => raw rate.
+	 * @param array<string, bool>   $locks    Currency code => manual lock.
 	 * @return string[] Currencies that changed.
 	 */
-	public static function save_currency( array $incoming ): array {
+	public static function save_currency( array $incoming, array $locks = array() ): array {
 		$current = self::get( 'currency' );
 		$changed = array();
+		$touched = false;
 
 		foreach ( self::CURRENCIES as $code ) {
 			if ( ! array_key_exists( $code, $incoming ) ) {
@@ -95,7 +97,14 @@ class Settings {
 			if ( null === $normalized ) {
 				continue;
 			}
+			$lock     = ! empty( $locks[ $code ] ) ? '1' : '0';
 			$previous = (string) ( $current['rates'][ $code ]['usd_per_unit'] ?? '' );
+			$was_lock = (string) ( $current['rates'][ $code ]['manual_lock'] ?? '0' );
+			if ( $normalized === $previous && $lock === $was_lock ) {
+				continue;
+			}
+			$current['rates'][ $code ]['manual_lock'] = $lock;
+			$touched                                  = true;
 			if ( $normalized === $previous ) {
 				continue;
 			}
@@ -105,13 +114,14 @@ class Settings {
 			$changed[ $code ]                          = $normalized;
 		}
 
-		if ( ! $changed ) {
+		if ( ! $touched ) {
 			return array();
 		}
 
 		self::update( 'currency', $current );
 
 		foreach ( $changed as $code => $rate ) {
+			\LifeRuss\Core\Currency\Rates::history( $code, $rate, 'manual' );
 			$rows = '';
 			if ( '' !== $rate ) {
 				$rows = (string) self::recalculate_tuition( $code, (float) $rate );
@@ -130,6 +140,62 @@ class Settings {
 		}
 
 		return array_keys( $changed );
+	}
+
+	/**
+	 * Persist the optional auto-fetch settings without touching pair values.
+	 *
+	 * @param array<string, string> $config Provider fields.
+	 */
+	public static function save_fx( array $config ): void {
+		$current                 = self::get( 'currency' );
+		$provider                = (string) ( $config['provider'] ?? 'manual' );
+		$interval                = (string) ( $config['interval'] ?? 'daily' );
+		$current['provider']     = in_array( $provider, array( 'manual', 'json' ), true ) ? $provider : 'manual';
+		$current['json_url']     = esc_url_raw( (string) ( $config['json_url'] ?? '' ) );
+		$current['path_usd_rub'] = sanitize_text_field( (string) ( $config['path_usd_rub'] ?? '' ) );
+		$current['path_usd_irt'] = sanitize_text_field( (string) ( $config['path_usd_irt'] ?? '' ) );
+		$current['path_rub_irt'] = sanitize_text_field( (string) ( $config['path_rub_irt'] ?? '' ) );
+		$current['interval']     = in_array( $interval, array( 'hourly', '6h', 'daily' ), true ) ? $interval : 'daily';
+		self::update( 'currency', $current );
+	}
+
+	/**
+	 * Write one automatic rate when the pair is not manually locked.
+	 *
+	 * @param string $code       ISO code.
+	 * @param string $normalized Normalized usd_per_unit.
+	 */
+	public static function apply_auto_rate( string $code, string $normalized ): bool {
+		if ( ! in_array( $code, self::CURRENCIES, true ) || '' === $normalized ) {
+			return false;
+		}
+		$current = self::get( 'currency' );
+		if ( '1' === (string) ( $current['rates'][ $code ]['manual_lock'] ?? '0' ) ) {
+			return false;
+		}
+		$previous = (string) ( $current['rates'][ $code ]['usd_per_unit'] ?? '' );
+		if ( $normalized === $previous ) {
+			return true;
+		}
+		$current['rates'][ $code ]['usd_per_unit'] = $normalized;
+		$current['rates'][ $code ]['updated_at']   = gmdate( 'Y-m-d H:i:s' );
+		$current['rates'][ $code ]['updated_by']   = 0;
+		$current['rates'][ $code ]['manual_lock']  = '0';
+		self::update( 'currency', $current );
+		\LifeRuss\Core\Currency\Rates::history( $code, $normalized, 'auto' );
+		self::recalculate_tuition( $code, (float) $normalized );
+		ActivityLog::record(
+			'currency.auto',
+			'settings',
+			0,
+			sprintf( 'نرخ خودکار %s ذخیره شد.', $code ),
+			array(
+				'currency'     => $code,
+				'usd_per_unit' => $normalized,
+			)
+		);
+		return true;
 	}
 
 	/**
@@ -193,6 +259,7 @@ class Settings {
 			'usd_per_unit' => '',
 			'updated_at'   => '',
 			'updated_by'   => 0,
+			'manual_lock'  => '0',
 		);
 		$rates = array();
 		foreach ( self::CURRENCIES as $code ) {
@@ -227,7 +294,16 @@ class Settings {
 				'copyright' => '',
 			),
 			'currency'      => array(
-				'rates' => $rates,
+				'provider'      => 'manual',
+				'json_url'      => '',
+				'path_usd_rub'  => '',
+				'path_usd_irt'  => '',
+				'path_rub_irt'  => '',
+				'interval'      => 'daily',
+				'fail_count'    => 0,
+				'last_error'    => '',
+				'last_fetch_at' => '',
+				'rates'         => $rates,
 			),
 			'notifications' => array(
 				'telegram_enabled' => '0',
@@ -262,6 +338,27 @@ class Settings {
 			),
 			'backup'        => array(
 				'retention_days' => '30',
+			),
+			'search'        => array(
+				'host'         => '',
+				'api_key'      => '',
+				'index_prefix' => 'liferuss',
+			),
+			'account'       => array(
+				'sms_provider' => 'stub',
+			),
+			'payments'      => array(
+				'merchant_id' => '',
+				'sandbox'     => '1',
+			),
+			'crm'           => array(
+				'auto_assign'        => '1',
+				'sla_hours'          => '4',
+				'dedupe_days'        => '30',
+				'followup_contacted' => '2',
+				'followup_documents' => '1',
+				'followup_qualified' => '1',
+				'daily_digest'       => '1',
 			),
 		);
 

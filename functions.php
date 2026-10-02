@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.6.0' );
+define( 'LIFERUSS_VERSION', '1.12.0' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -19,6 +19,7 @@ require_once LIFERUSS_DIR . '/inc/landing-i18n.php';
 require_once LIFERUSS_DIR . '/inc/i18n-defaults.php';
 require_once LIFERUSS_DIR . '/inc/i18n.php';
 require_once LIFERUSS_DIR . '/inc/helpers.php';
+require_once LIFERUSS_DIR . '/inc/photos.php';
 require_once LIFERUSS_DIR . '/inc/options.php';
 require_once LIFERUSS_DIR . '/inc/landings.php';
 require_once LIFERUSS_DIR . '/inc/customizer.php';
@@ -29,8 +30,10 @@ require_once LIFERUSS_DIR . '/inc/catalog.php';
 require_once LIFERUSS_DIR . '/inc/paths.php';
 require_once LIFERUSS_DIR . '/inc/magazine.php';
 require_once LIFERUSS_DIR . '/inc/home-sections.php';
+require_once LIFERUSS_DIR . '/inc/compare.php';
 require_once LIFERUSS_DIR . '/inc/admin-landings.php';
 require_once LIFERUSS_DIR . '/inc/admin-options.php';
+require_once LIFERUSS_DIR . '/inc/ux.php';
 
 /**
  * Theme supports, menus, and image sizes.
@@ -93,6 +96,31 @@ function liferuss_assets() {
 		array(),
 		LIFERUSS_VERSION,
 		true
+	);
+	wp_enqueue_script(
+		'liferuss-finder',
+		LIFERUSS_URI . '/assets/js/finder.js',
+		array(),
+		LIFERUSS_VERSION,
+		true
+	);
+	wp_localize_script(
+		'liferuss-finder',
+		'liferussFinder',
+		array(
+			'suggestUrl'  => rest_url( 'liferuss/v1/search/suggest' ),
+			'compareBase' => liferuss_url( '/compare/' ),
+			'uniBase'     => liferuss_url( '/universities/' ),
+			'searchBase'  => liferuss_url( '/search/' ),
+			'contactUrl'  => liferuss_url( '/contact/' ),
+			'strings'     => array(
+				'add'    => 'مقایسه',
+				'remove' => 'حذف از مقایسه',
+				'need'   => 'حداقل یک دانشگاه دیگر اضافه کنید',
+				'full'   => 'حداکثر ۴ دانشگاه',
+				'open'   => 'مشاهده مقایسه',
+			),
+		)
 	);
 	$lead_url  = '';
 	$turnstile = '';
@@ -160,24 +188,28 @@ function liferuss_form_tracking_fields() {
 function liferuss_preload() {
 	$font = LIFERUSS_URI . '/assets/fonts/vazirmatn-700.woff2';
 	echo '<link rel="preload" as="font" type="font/woff2" href="' . esc_url( $font ) . '" crossorigin>' . "\n";
+	$id       = 0;
+	$fallback = '';
+	$sizes    = '100vw';
 	if ( is_front_page() ) {
-		$hero_id = absint( liferuss_opt( 'hero_bg_id' ) );
-		if ( ! $hero_id ) {
-			$hero_id = absint( liferuss_opt( 'hero_image_id' ) );
+		$id = absint( liferuss_opt( 'hero_bg_id' ) );
+		if ( ! $id ) {
+			$id = absint( liferuss_opt( 'hero_image_id' ) );
 		}
-		liferuss_print_image_preload( $hero_id, 'st-basil.jpg', '100vw' );
+		$fallback = 'saint-basil.jpg';
 	} elseif ( is_page_template( 'templates/freight.php' ) ) {
-		liferuss_print_image_preload(
-			liferuss_opt( 'freight_hero_image_id' ),
-			liferuss_opt( 'freight_hero_image', 'st-basil.jpg' ),
-			'(max-width: 860px) 92vw, 560px'
-		);
+		$id       = absint( liferuss_opt( 'freight_hero_image_id' ) );
+		$fallback = (string) liferuss_opt( 'freight_hero_image', 'moscow-night.jpg' );
+		$sizes    = '(max-width: 860px) 92vw, 560px';
 	} elseif ( is_page_template( 'templates/trade.php' ) ) {
-		liferuss_print_image_preload(
-			liferuss_opt( 'trade_hero_image_id' ),
-			liferuss_opt( 'trade_hero_image', 'st-basil.jpg' ),
-			'(max-width: 860px) 92vw, 560px'
-		);
+		$id       = absint( liferuss_opt( 'trade_hero_image_id' ) );
+		$fallback = (string) liferuss_opt( 'trade_hero_image', 'moscow-night.jpg' );
+		$sizes    = '(max-width: 860px) 92vw, 560px';
+	} elseif ( ! is_admin() ) {
+		$fallback = liferuss_photo_file( liferuss_photo_scene() );
+	}
+	if ( $id || $fallback ) {
+		liferuss_print_image_preload( $id, $fallback, $sizes );
 	}
 }
 add_action( 'wp_head', 'liferuss_preload', 1 );

@@ -1,18 +1,91 @@
+function latinDigits(value) {
+  var fa = "۰۱۲۳۴۵۶۷۸۹";
+  var ar = "٠١٢٣٤٥٦٧٨٩";
+  return String(value).replace(/[۰-۹]/g, function (digit) {
+    return String(fa.indexOf(digit));
+  }).replace(/[٠-٩]/g, function (digit) {
+    return String(ar.indexOf(digit));
+  });
+}
+
 (function () {
   "use strict";
 
   var body = document.body;
   var toggle = document.querySelector(".nav-toggle");
   var nav = document.getElementById("site-nav");
+  var searchToggle = document.querySelector(".header-search-toggle");
+  var searchClose = document.querySelector(".header-search-close");
+  var searchBox = document.getElementById("header-search");
+
+  function setSearch(open) {
+    if (!searchBox) {
+      return;
+    }
+    searchBox.classList.toggle("is-open", open);
+    body.classList.toggle("search-open", open);
+    if (searchToggle) {
+      searchToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    if (open) {
+      var input = searchBox.querySelector("input");
+      if (input) {
+        input.focus();
+      }
+    }
+  }
 
   function setNav(open) {
     body.classList.toggle("nav-open", open);
+    if (open) {
+      setSearch(false);
+    }
     if (toggle) {
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
       var labels = window.liferussTheme && window.liferussTheme.strings ? window.liferussTheme.strings : {};
       toggle.setAttribute("aria-label", open ? (labels.closeMenu || "Close menu") : (labels.openMenu || "Open menu"));
     }
   }
+
+  if (searchToggle && searchBox) {
+    searchToggle.addEventListener("click", function () {
+      setSearch(!searchBox.classList.contains("is-open"));
+    });
+  }
+  if (searchClose) {
+    searchClose.addEventListener("click", function () {
+      setSearch(false);
+      if (searchToggle) {
+        searchToggle.focus();
+      }
+    });
+  }
+
+  document.querySelectorAll(".submenu-toggle").forEach(function (button) {
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var item = button.closest(".menu-item");
+      if (!item) {
+        return;
+      }
+      var open = !item.classList.contains("is-open");
+      var parent = item.parentElement;
+      if (parent && open) {
+        parent.querySelectorAll(".menu-item.is-open").forEach(function (sibling) {
+          if (sibling !== item) {
+            sibling.classList.remove("is-open");
+            var toggle = sibling.querySelector(".submenu-toggle");
+            if (toggle) {
+              toggle.setAttribute("aria-expanded", "false");
+            }
+          }
+        });
+      }
+      item.classList.toggle("is-open", open);
+      button.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  });
 
   if (toggle && nav) {
     toggle.addEventListener("click", function () {
@@ -27,10 +100,27 @@
 
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape") {
+        if (searchBox && searchBox.classList.contains("is-open")) {
+          setSearch(false);
+          return;
+        }
         setNav(false);
       }
     });
   }
+
+  document.querySelectorAll(".story-avatar img").forEach(function (img) {
+    function drop() {
+      if (img.parentNode) {
+        img.parentNode.removeChild(img);
+      }
+    }
+    if (img.complete && img.naturalWidth === 0) {
+      drop();
+    } else {
+      img.addEventListener("error", drop);
+    }
+  });
 
   document.querySelectorAll(".js-scroll-consult").forEach(function (link) {
     link.addEventListener("click", function (event) {
@@ -343,6 +433,23 @@
 
       form.addEventListener("submit", function (event) {
         event.preventDefault();
+        var phone = form.querySelector("[name='consult_phone']");
+        if (phone) {
+          phone.value = latinDigits(phone.value).replace(/\s+/g, "");
+          var valid = /^(\+?98|0)?9\d{9}$/.test(phone.value) || /^\+?\d{8,15}$/.test(phone.value);
+          phone.setCustomValidity(valid ? "" : "شماره را با ارقام درست وارد کنید.");
+          if (!valid) {
+            phone.reportValidity();
+            return;
+          }
+        }
+        var visaYear = form.querySelector("[name='consult_visa_expiry_y']");
+        var visaHidden = form.querySelector("[name='consult_visa_expiry']");
+        if (visaYear && visaHidden && visaYear.value) {
+          var visaMonth = form.querySelector("[name='consult_visa_expiry_m']");
+          var visaDay = form.querySelector("[name='consult_visa_expiry_d']");
+          visaHidden.value = visaYear.value + "/" + (visaMonth ? visaMonth.value : "") + "/" + (visaDay ? visaDay.value : "");
+        }
         applyTracking(form);
         var data = new FormData(form);
         data.set("action", "liferuss_consult");
@@ -409,4 +516,79 @@
       });
     });
   }
+})();
+
+(function () {
+  var mq = window.matchMedia("(max-width: 860px)");
+  function syncFooter() {
+    var items = document.querySelectorAll(".footer-acc");
+    for (var i = 0; i < items.length; i++) {
+      if (mq.matches) {
+        items[i].removeAttribute("open");
+      } else {
+        items[i].setAttribute("open", "");
+      }
+    }
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", syncFooter);
+  } else {
+    syncFooter();
+  }
+  if (mq.addEventListener) {
+    mq.addEventListener("change", syncFooter);
+  } else if (mq.addListener) {
+    mq.addListener(syncFooter);
+  }
+})();
+
+(function () {
+  document.querySelectorAll(".lr-file-input").forEach(function (input) {
+    input.addEventListener("change", function () {
+      var name = input.parentElement ? input.parentElement.querySelector(".lr-file-name") : null;
+      if (!name) {
+        return;
+      }
+      name.textContent = input.files && input.files[0] ? input.files[0].name : name.getAttribute("data-empty") || name.textContent;
+    });
+  });
+
+  document.querySelectorAll(".lr-filter-toggle").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var form = button.closest("form");
+      if (!form) {
+        return;
+      }
+      var open = form.classList.toggle("is-open");
+      button.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  });
+
+  document.querySelectorAll(".lr-account-form select[name='channel']").forEach(function (select) {
+    var form = select.closest("form");
+    var field = form ? form.querySelector("[name='target']") : null;
+    var label = form ? form.querySelector(".lr-otp-label") : null;
+    if (!field) {
+      return;
+    }
+    function sync() {
+      if (select.value === "email") {
+        field.type = "email";
+        field.inputMode = "email";
+        field.autocomplete = "email";
+        if (label) {
+          label.textContent = "ایمیل";
+        }
+        return;
+      }
+      field.type = "tel";
+      field.inputMode = "tel";
+      field.autocomplete = "tel";
+      if (label) {
+        label.textContent = "شماره موبایل";
+      }
+    }
+    select.addEventListener("change", sync);
+    sync();
+  });
 })();

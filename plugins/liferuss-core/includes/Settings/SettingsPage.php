@@ -70,6 +70,22 @@ class SettingsPage {
 				'label' => 'پشتیبان',
 				'cap'   => 'lr_manage_backup',
 			),
+			'search'        => array(
+				'label' => 'جستجو',
+				'cap'   => 'lr_manage_settings',
+			),
+			'crm'           => array(
+				'label' => 'اتوماسیون CRM',
+				'cap'   => 'lr_manage_settings',
+			),
+			'account'       => array(
+				'label' => 'حساب مراجع',
+				'cap'   => 'lr_manage_settings',
+			),
+			'payments'      => array(
+				'label' => 'پرداخت خدمات',
+				'cap'   => 'lr_manage_settings',
+			),
 		);
 	}
 
@@ -267,20 +283,40 @@ class SettingsPage {
 	 */
 	private static function fields_currency(): void {
 		$v = Settings::get( 'currency' );
-		echo '<tr><td colspan="2"><p>' . esc_html__( 'نرخ دستی: چند دلار آمریکا برابر یک واحد از ارز است. با ذخیره، amount_usd شهریه‌های همان ارز دوباره حساب می‌شود.', 'liferuss-core' ) . '</p></td></tr>';
+		echo '<tr><td colspan="2"><p>' . esc_html__( 'نرخ دستی منبع حقیقت است: چند دلار آمریکا برابر یک واحد از ارز است. قفل دستی همیشه بر به‌روزرسانی خودکار مقدم است. IRT روی جفت IRR ذخیره می‌شود.', 'liferuss-core' ) . '</p></td></tr>';
+		echo '<tr><th scope="row"><label for="fx_provider">' . esc_html__( 'منبع', 'liferuss-core' ) . '</label></th><td><select id="fx_provider" name="fx_provider">';
+		foreach ( array(
+			'manual' => 'دستی',
+			'json'   => 'نشانی JSON',
+		) as $key => $label ) {
+			echo '<option value="' . esc_attr( $key ) . '" ' . selected( (string) $v['provider'], $key, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></td></tr>';
+		self::text_row( 'fx_json_url', __( 'نشانی JSON', 'liferuss-core' ), (string) $v['json_url'], 'url' );
+		self::text_row( 'fx_path_usd_rub', __( 'مسیر JSON برای USD به RUB', 'liferuss-core' ), (string) $v['path_usd_rub'] );
+		self::text_row( 'fx_path_usd_irt', __( 'مسیر JSON برای USD به IRT', 'liferuss-core' ), (string) $v['path_usd_irt'] );
+		self::text_row( 'fx_path_rub_irt', __( 'مسیر JSON برای RUB به IRT', 'liferuss-core' ), (string) $v['path_rub_irt'] );
+		echo '<tr><th scope="row"><label for="fx_interval">' . esc_html__( 'بازه', 'liferuss-core' ) . '</label></th><td><select id="fx_interval" name="fx_interval">';
+		foreach ( array(
+			'hourly' => 'ساعتی',
+			'6h'     => 'هر ۶ ساعت',
+			'daily'  => 'روزانه',
+		) as $key => $label ) {
+			echo '<option value="' . esc_attr( $key ) . '" ' . selected( (string) $v['interval'], $key, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></td></tr>';
+		if ( (int) $v['fail_count'] > 0 ) {
+			echo '<tr><th scope="row">' . esc_html__( 'خطای واکشی', 'liferuss-core' ) . '</th><td>' . esc_html( (string) $v['fail_count'] . ' — ' . (string) $v['last_error'] ) . '</td></tr>';
+		}
 		foreach ( Settings::CURRENCIES as $code ) {
 			$rate = $v['rates'][ $code ];
 			$meta = '';
 			if ( ! empty( $rate['updated_at'] ) ) {
-				$meta = sprintf(
-					/* translators: 1: datetime UTC, 2: user id */
-					__( 'آخرین به‌روزرسانی: %1$s (کاربر %2$d)', 'liferuss-core' ),
-					(string) $rate['updated_at'],
-					(int) $rate['updated_by']
-				);
+				$meta = 'آخرین به‌روزرسانی: ' . \LifeRuss\Core\CRM\Jalali::plain( (string) $rate['updated_at'] );
 			}
 			echo '<tr><th scope="row"><label for="rate_' . esc_attr( $code ) . '">' . esc_html( $code ) . '</label></th><td>';
-			echo '<input class="regular-text" type="text" inputmode="decimal" id="rate_' . esc_attr( $code ) . '" name="rates[' . esc_attr( $code ) . ']" value="' . esc_attr( (string) $rate['usd_per_unit'] ) . '">';
+			echo '<input class="regular-text" type="text" inputmode="decimal" id="rate_' . esc_attr( $code ) . '" name="rates[' . esc_attr( $code ) . ']" value="' . esc_attr( (string) $rate['usd_per_unit'] ) . '"> ';
+			echo '<label><input type="checkbox" name="locks[' . esc_attr( $code ) . ']" value="1" ' . checked( '1', (string) ( $rate['manual_lock'] ?? '0' ), false ) . '> ' . esc_html__( 'قفل دستی', 'liferuss-core' ) . '</label>';
 			if ( $meta ) {
 				echo '<p class="description">' . esc_html( $meta ) . '</p>';
 			}
@@ -374,6 +410,138 @@ class SettingsPage {
 	}
 
 	/**
+	 * Meilisearch connection. An empty host keeps the MySQL fallback.
+	 */
+	private static function fields_search(): void {
+		$v = Settings::get( 'search' );
+		self::text_row( 'search_host', __( 'آدرس Meilisearch', 'liferuss-core' ), (string) $v['host'] );
+		self::text_row( 'search_api_key', __( 'کلید API', 'liferuss-core' ), '', 'password' );
+		self::text_row( 'search_index_prefix', __( 'پیشوند نمایه', 'liferuss-core' ), (string) $v['index_prefix'] );
+		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'اگر آدرس یا کلید خالی باشد، یا سرویس جواب ندهد، جستجو با جدول محلی MySQL ادامه پیدا می‌کند. کلید ذخیره‌شده اینجا نمایش داده نمی‌شود؛ برای عوض کردنش مقدار جدید بنویسید.', 'liferuss-core' ) . '</p>';
+		$url = wp_nonce_url( admin_url( 'admin-post.php?action=lr_search_reindex' ), 'lr_search_reindex' );
+		echo '<p><a class="button" href="' . esc_url( $url ) . '">' . esc_html__( 'بازسازی نمایه', 'liferuss-core' ) . '</a></p>';
+		if ( isset( $_GET['reindex'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$count = absint( wp_unslash( $_GET['reindex'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			echo '<p>' . esc_html( sprintf( /* translators: %d: document count */ __( '%d سند در نمایهٔ محلی نوشته شد.', 'liferuss-core' ), $count ) ) . '</p>';
+		}
+		echo '</td></tr>';
+	}
+
+	/**
+	 * Save search settings. A blank key keeps the stored key.
+	 */
+	private static function save_search(): void {
+		$current = Settings::get( 'search' );
+		$key     = self::posted_text( 'search_api_key' );
+		if ( '' === $key ) {
+			$key = (string) $current['api_key'];
+		}
+		$prefix = sanitize_key( self::posted_text( 'search_index_prefix' ) );
+		if ( '' === $prefix ) {
+			$prefix = 'liferuss';
+		}
+		Settings::update(
+			'search',
+			array(
+				'host'         => untrailingslashit( esc_url_raw( self::posted_text( 'search_host' ) ) ),
+				'api_key'      => $key,
+				'index_prefix' => $prefix,
+			)
+		);
+	}
+
+	/**
+	 * CRM automation rules.
+	 */
+	private static function fields_crm(): void {
+		$v = Settings::get( 'crm' );
+		echo '<tr><th scope="row">' . esc_html__( 'ارجاع خودکار', 'liferuss-core' ) . '</th><td>';
+		echo '<label><input type="checkbox" name="auto_assign" value="1" ' . checked( '1', (string) $v['auto_assign'], false ) . '> ';
+		echo esc_html__( 'لید جدید بین مشاوران و اپراتورهای فعال همان سرویس، به‌نوبت، تقسیم شود. فقط کسانی که lr_allowed_services همان گروه را دارند.', 'liferuss-core' );
+		echo '</label></td></tr>';
+		self::text_row( 'sla_hours', __( 'مهلت اولین تماس (ساعت)', 'liferuss-core' ), (string) $v['sla_hours'], 'number' );
+		self::text_row( 'dedupe_days', __( 'پنجرهٔ تکرار (روز)', 'liferuss-core' ), (string) $v['dedupe_days'], 'number' );
+		self::text_row( 'followup_contacted', __( 'پیگیری پس از «تماس» (روز)', 'liferuss-core' ), (string) $v['followup_contacted'], 'number' );
+		self::text_row( 'followup_documents', __( 'یادآوری پس از «مدارک» (روز)', 'liferuss-core' ), (string) $v['followup_documents'], 'number' );
+		self::text_row( 'followup_qualified', __( 'پیگیری پس از «واجد شرایط» (روز)', 'liferuss-core' ), (string) $v['followup_qualified'], 'number' );
+		echo '<tr><th scope="row">' . esc_html__( 'خلاصهٔ روزانه', 'liferuss-core' ) . '</th><td>';
+		echo '<label><input type="checkbox" name="daily_digest" value="1" ' . checked( '1', (string) $v['daily_digest'], false ) . '> ';
+		echo esc_html__( 'هر روز وظایف سررسیدشده برای هر مشاور ایمیل شود. تأخیر SLA به مدیر و، اگر روشن باشد، تلگرام می‌رود.', 'liferuss-core' );
+		echo '</label></td></tr>';
+	}
+
+	/**
+	 * Save CRM rules.
+	 */
+	private static function save_crm(): void {
+		$hours = absint( self::posted_text( 'sla_hours' ) );
+		$days  = absint( self::posted_text( 'dedupe_days' ) );
+		Settings::update(
+			'crm',
+			array(
+				'auto_assign'        => isset( $_POST['auto_assign'] ) ? '1' : '0', // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				'sla_hours'          => (string) ( $hours > 0 ? $hours : 4 ),
+				'dedupe_days'        => (string) ( $days > 0 ? $days : 30 ),
+				'followup_contacted' => (string) absint( self::posted_text( 'followup_contacted' ) ),
+				'followup_documents' => (string) absint( self::posted_text( 'followup_documents' ) ),
+				'followup_qualified' => (string) absint( self::posted_text( 'followup_qualified' ) ),
+				'daily_digest'       => isset( $_POST['daily_digest'] ) ? '1' : '0', // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			)
+		);
+	}
+
+	/**
+	 * Client account delivery.
+	 */
+	private static function fields_account(): void {
+		$v = Settings::get( 'account' );
+		echo '<tr><th scope="row"><label for="sms_provider">' . esc_html__( 'ارسال پیامک', 'liferuss-core' ) . '</label></th><td>';
+		echo '<select id="sms_provider" name="sms_provider">';
+		echo '<option value="stub"' . selected( 'stub', (string) $v['sms_provider'], false ) . '>' . esc_html__( 'آزمایشی — ثبت در گزارش، بدون اپراتور', 'liferuss-core' ) . '</option>';
+		echo '</select>';
+		echo '<p class="description">' . esc_html__( 'ورود با ایمیل از نامهٔ سایت استفاده می‌کند. پیامک از فیلتر liferuss_sms_send می‌گذرد و در غیر این صورت به این ارائه‌دهنده می‌رسد.', 'liferuss-core' ) . '</p>';
+		echo '</td></tr>';
+	}
+
+	/**
+	 * Save the SMS provider. Only the stub is built in.
+	 */
+	private static function fields_payments(): void {
+		$v = Settings::get( 'payments' );
+		self::text_row( 'merchant_id', __( 'مرچنت زرین‌پال', 'liferuss-core' ), (string) $v['merchant_id'] );
+		echo '<tr><th scope="row">' . esc_html__( 'سندباکس', 'liferuss-core' ) . '</th><td>';
+		echo '<label><input type="checkbox" name="pay_sandbox" value="1" ' . checked( '1', (string) $v['sandbox'], false ) . '> ' . esc_html__( 'استفاده از sandbox.zarinpal.com', 'liferuss-core' ) . '</label>';
+		echo '<p class="description">' . esc_html__( 'مبلغ صورتحساب به تومان (IRT) به درگاه می‌رود. درگاه‌های دیگر با فیلتر liferuss_payment_gateway جایگزین می‌شوند.', 'liferuss-core' ) . '</p>';
+		echo '</td></tr>';
+	}
+
+	/**
+	 * Save Zarinpal credentials.
+	 */
+	private static function save_payments(): void {
+		Settings::update(
+			'payments',
+			array(
+				'merchant_id' => self::posted_text( 'merchant_id' ),
+				'sandbox'     => isset( $_POST['pay_sandbox'] ) ? '1' : '0', // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			)
+		);
+	}
+
+	/**
+	 * Save the SMS provider. Only the stub is built in.
+	 */
+	private static function save_account(): void {
+		$provider = sanitize_key( self::posted_text( 'sms_provider' ) );
+		Settings::update(
+			'account',
+			array(
+				'sms_provider' => 'stub' === $provider ? 'stub' : 'stub',
+			)
+		);
+	}
+
+	/**
 	 * Backup placeholder.
 	 */
 	private static function fields_backup(): void {
@@ -431,11 +599,25 @@ class SettingsPage {
 	 */
 	private static function save_currency(): void {
 		$incoming = array();
+		$locks    = array();
 		$posted   = isset( $_POST['rates'] ) && is_array( $_POST['rates'] ) ? wp_unslash( $_POST['rates'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$locked   = isset( $_POST['locks'] ) && is_array( $_POST['locks'] ) ? wp_unslash( $_POST['locks'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		foreach ( Settings::CURRENCIES as $code ) {
 			$incoming[ $code ] = isset( $posted[ $code ] ) ? sanitize_text_field( (string) $posted[ $code ] ) : '';
+			$locks[ $code ]    = ! empty( $locked[ $code ] );
 		}
-		Settings::save_currency( $incoming );
+		Settings::save_fx(
+			array(
+				'provider'     => self::posted_text( 'fx_provider' ),
+				'json_url'     => self::posted_text( 'fx_json_url' ),
+				'path_usd_rub' => self::posted_text( 'fx_path_usd_rub' ),
+				'path_usd_irt' => self::posted_text( 'fx_path_usd_irt' ),
+				'path_rub_irt' => self::posted_text( 'fx_path_rub_irt' ),
+				'interval'     => self::posted_text( 'fx_interval' ),
+			)
+		);
+		Settings::save_currency( $incoming, $locks );
+		\LifeRuss\Core\Currency\Rates::reschedule();
 	}
 
 	/**

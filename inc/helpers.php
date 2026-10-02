@@ -31,53 +31,13 @@ function liferuss_bundled_webp_sources( $file ) {
 		return array();
 	}
 
-	static $known = array(
-		'st-basil.jpg'             => array(
-			array( 'file' => 'st-basil-800.webp', 'w' => 800 ),
-			array( 'file' => 'st-basil.webp', 'w' => 933 ),
-		),
-		'hero-student.jpg'         => array(
-			array( 'file' => 'hero-student-400.webp', 'w' => 400 ),
-			array( 'file' => 'hero-student.webp', 'w' => 640 ),
-		),
-		'consult-student.jpg'      => array(
-			array( 'file' => 'consult-student.webp', 'w' => 720 ),
-		),
-		'universities/bauman.jpg'  => array(
-			array( 'file' => 'universities/bauman.webp', 'w' => 720 ),
-		),
-		'universities/hse.jpg'     => array(
-			array( 'file' => 'universities/hse.webp', 'w' => 524 ),
-		),
-		'universities/msu.jpg'     => array(
-			array( 'file' => 'universities/msu.webp', 'w' => 720 ),
-		),
-		'universities/rudn.jpg'    => array(
-			array( 'file' => 'universities/rudn.webp', 'w' => 720 ),
-		),
-		'universities/sechenov.jpg' => array(
-			array( 'file' => 'universities/sechenov.webp', 'w' => 446 ),
-		),
-		'universities/spbu.jpg'    => array(
-			array( 'file' => 'universities/spbu.webp', 'w' => 524 ),
-		),
-		'students/student-1.jpg'   => array(
-			array( 'file' => 'students/student-1.webp', 'w' => 160 ),
-		),
-		'students/student-2.jpg'   => array(
-			array( 'file' => 'students/student-2.webp', 'w' => 160 ),
-		),
-		'students/student-3.jpg'   => array(
-			array( 'file' => 'students/student-3.webp', 'w' => 160 ),
-		),
-	);
-
-	if ( isset( $known[ $file ] ) ) {
-		$candidates = $known[ $file ];
-	} else {
-		$sibling = preg_replace( '/\.(jpe?g|png)$/i', '.webp', $file );
-		$candidates = ( $sibling && $sibling !== $file ) ? array( array( 'file' => $sibling, 'w' => 0 ) ) : array();
+	$slug = liferuss_photo_slug_from_file( $file );
+	if ( $slug ) {
+		return liferuss_photo_variants( $slug, 'webp' );
 	}
+
+	$sibling    = preg_replace( '/\.(jpe?g|png)$/i', '.webp', $file );
+	$candidates = ( $sibling && $sibling !== $file ) ? array( array( 'file' => $sibling, 'w' => 0 ) ) : array();
 
 	$dir    = LIFERUSS_DIR . '/assets/images/';
 	$sources = array();
@@ -125,6 +85,12 @@ function liferuss_print_image_preload( $id, $fallback = '', $sizes = '100vw' ) {
 		return;
 	}
 
+	$slug = liferuss_photo_slug_from_file( $fallback );
+	if ( $slug ) {
+		liferuss_print_photo_preload( $slug, $sizes );
+		return;
+	}
+
 	$sources = liferuss_bundled_webp_sources( $fallback );
 	if ( $sources ) {
 		$href   = liferuss_img( $sources[0]['file'] );
@@ -149,7 +115,7 @@ function liferuss_print_image_preload( $id, $fallback = '', $sizes = '100vw' ) {
  * @param int    $id       Attachment ID.
  * @param string $fallback Bundled fallback path.
  */
-function liferuss_the_hero_lcp( $id, $fallback = 'st-basil.jpg' ) {
+function liferuss_the_hero_lcp( $id, $fallback = 'saint-basil.jpg' ) {
 	echo '<div class="hero-media" aria-hidden="true">';
 	$id = absint( $id );
 	if ( $id && function_exists( 'wp_attachment_is_image' ) && wp_attachment_is_image( $id ) ) {
@@ -224,23 +190,99 @@ function liferuss_social_url( $value, $network ) {
  * @return array<int, array<string, string>>
  */
 function liferuss_default_nav_items() {
-	$blog = get_option( 'page_for_posts' ) ? get_permalink( get_option( 'page_for_posts' ) ) : liferuss_url( '/blog/' );
-	return array(
-		array( 'title' => liferuss_t( 'nav_home' ), 'url' => liferuss_home() ),
-		array( 'title' => liferuss_t( 'nav_about' ), 'url' => liferuss_url( '/about/' ) ),
-		array( 'title' => liferuss_t( 'nav_universities' ), 'url' => liferuss_url( '/universities/' ) ),
-		array( 'title' => liferuss_t( 'nav_study' ), 'url' => liferuss_url( '/study/' ) ),
-		array( 'title' => liferuss_t( 'nav_scholarships' ), 'url' => liferuss_url( '/scholarships/' ) ),
-		array( 'title' => liferuss_t( 'nav_podfak' ), 'url' => liferuss_url( '/podfak/' ) ),
-		array( 'title' => liferuss_t( 'nav_immigration' ), 'url' => liferuss_url( '/immigration/' ) ),
-		array( 'title' => liferuss_t( 'nav_services' ), 'url' => liferuss_url( '/services/' ) ),
-		array( 'title' => liferuss_t( 'nav_costs' ), 'url' => liferuss_url( '/costs/' ) ),
-		array( 'title' => liferuss_t( 'nav_blog' ), 'url' => $blog ),
-		array( 'title' => liferuss_t( 'nav_cargo' ), 'url' => liferuss_url( '/cargo/' ) ),
-		array( 'title' => liferuss_t( 'nav_guide' ), 'url' => liferuss_url( '/russia-guide/' ) ),
-		array( 'title' => liferuss_t( 'nav_trade' ), 'url' => liferuss_url( '/trade/' ) ),
-		array( 'title' => liferuss_t( 'nav_contact' ), 'url' => liferuss_url( '/contact/' ) ),
+	$flat = array();
+	foreach ( liferuss_nav_tree() as $item ) {
+		$flat[] = array(
+			'title' => $item['title'],
+			'url'   => $item['url'],
+		);
+		foreach ( $item['children'] as $child ) {
+			$flat[] = $child;
+		}
+	}
+	return $flat;
+}
+
+/**
+ * Grouped primary navigation. Top-level labels stay short so 1024px still fits.
+ *
+ * @return array<int, array{title: string, url: string, class: string, children: array<int, array{title: string, url: string}>}>
+ */
+function liferuss_nav_tree() {
+	$blog = get_option( 'page_for_posts' ) ? get_permalink( (int) get_option( 'page_for_posts' ) ) : liferuss_url( '/blog/' );
+	$tree = array(
+		array(
+			'title'    => liferuss_t( 'nav_home' ),
+			'url'      => liferuss_home(),
+			'class'    => 'menu-item--home',
+			'children' => array(),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_study_menu' ),
+			'url'      => liferuss_url( '/study-russia/' ),
+			'class'    => '',
+			'children' => array(
+				array( 'title' => liferuss_t( 'nav_universities' ), 'url' => liferuss_url( '/universities/' ) ),
+				array( 'title' => liferuss_t( 'nav_fields' ), 'url' => liferuss_url( '/fields/' ) ),
+				array( 'title' => liferuss_t( 'nav_cities' ), 'url' => liferuss_url( '/cities/' ) ),
+				array( 'title' => liferuss_t( 'nav_compare' ), 'url' => liferuss_url( '/compare/' ) ),
+				array( 'title' => liferuss_t( 'nav_scholarships' ), 'url' => liferuss_url( '/scholarships/' ) ),
+				array( 'title' => liferuss_t( 'nav_podfak' ), 'url' => liferuss_url( '/padfak/' ) ),
+				array( 'title' => liferuss_t( 'nav_direct' ), 'url' => liferuss_url( '/direct-course/' ) ),
+				array( 'title' => liferuss_t( 'nav_costs' ), 'url' => liferuss_url( '/costs/' ) ),
+				array( 'title' => liferuss_t( 'nav_admission' ), 'url' => liferuss_url( '/admission/' ) ),
+			),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_services' ),
+			'url'      => liferuss_url( '/services/' ),
+			'class'    => '',
+			'children' => array(
+				array( 'title' => liferuss_t( 'nav_exchange' ), 'url' => liferuss_url( '/exchange/' ) ),
+				array( 'title' => liferuss_t( 'nav_cargo' ), 'url' => liferuss_url( '/cargo/' ) ),
+				array( 'title' => liferuss_t( 'nav_trade' ), 'url' => liferuss_url( '/trade/' ) ),
+			),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_academy' ),
+			'url'      => liferuss_url( '/academy/' ),
+			'class'    => '',
+			'children' => array(
+				array( 'title' => liferuss_t( 'nav_language' ), 'url' => liferuss_url( '/academy/courses/russian-language/' ) ),
+				array( 'title' => liferuss_t( 'nav_plans' ) !== 'nav_plans' ? liferuss_t( 'nav_plans' ) : 'طرح‌ها', 'url' => liferuss_url( '/academy/plans/' ) ),
+			),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_migration' ),
+			'url'      => liferuss_url( '/migration-russia/' ),
+			'class'    => '',
+			'children' => array(
+				array( 'title' => liferuss_t( 'nav_guide' ), 'url' => liferuss_url( '/russia-guide/' ) ),
+			),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_magazine' ),
+			'url'      => $blog,
+			'class'    => '',
+			'children' => array(),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_about' ),
+			'url'      => liferuss_url( '/about/' ),
+			'class'    => '',
+			'children' => array(),
+		),
+		array(
+			'title'    => liferuss_t( 'nav_contact' ),
+			'url'      => liferuss_url( '/contact/' ),
+			'class'    => '',
+			'children' => array(),
+		),
 	);
+	if ( function_exists( 'liferuss_filter_nav_tree' ) ) {
+		return liferuss_filter_nav_tree( $tree );
+	}
+	return $tree;
 }
 
 /**
@@ -292,6 +334,7 @@ function liferuss_icon( $name ) {
 		'home'      => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-8.5z"/></svg>',
 		'docs'      => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h7l5 5v11a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M14 4v5h5"/><path d="M9 13h6M9 16h6"/></svg>',
 		'plane'     => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13.2 10.4 12 21 4.8c.5-.3 1 .4.6.9L14.2 14l-1.1 6.2-3.2-4.4L5.2 17 3 13.2z"/></svg>',
+		'user'      => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M6.2 19.2v-.6a4.2 4.2 0 0 1 4.2-4.2h3.2a4.2 4.2 0 0 1 4.2 4.2v.6"/></svg>',
 		'users'     => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.8 18.5c.7-2.6 2.7-4 5.2-4s4.5 1.4 5.2 4"/><circle cx="17" cy="9" r="2.3"/><path d="M16.2 14.6c2 .3 3.4 1.5 4 3.4"/></svg>',
 		'shield'    => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 19 6.2v6.1c0 4.2-2.8 7-7 8.7-4.2-1.7-7-4.5-7-8.7V6.2L12 3.5z"/><path d="m8.8 12 2.2 2.2 4.4-4.4"/></svg>',
 		'chat'      => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H9l-4 3v-3H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z"/></svg>',
@@ -334,16 +377,75 @@ function liferuss_icon( $name ) {
 }
 
 /**
+ * True when a string is still seed or placeholder copy.
+ *
+ * @param string $text Raw text or HTML.
+ * @return bool
+ */
+function liferuss_is_placeholder_copy( $text ) {
+	$text = wp_strip_all_tags( (string) $text );
+	$needles = array(
+		'(نمونه)',
+		'متن نمونه',
+		'این بخش نمونه',
+		'بخش نمونه است',
+		'نظر نمونه',
+		'محتوای نمونه',
+		'این متن نمونه',
+		'دادهٔ نمونه',
+		'داده‌ها نمونه',
+		'راهنمای نمونه',
+		'دانستنی نمونه',
+		'این صفحه نمونه',
+		'پیش‌نویس منتشر نشود',
+		'سهمیه‌های نمونه',
+	);
+	foreach ( $needles as $needle ) {
+		if ( str_contains( $text, $needle ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * Fallback menu markup when no WP menu is assigned.
  */
 function liferuss_fallback_menu() {
 	echo '<ul class="nav-list">';
-	foreach ( liferuss_default_nav_items() as $item ) {
+	foreach ( liferuss_nav_tree() as $item ) {
+		$children = $item['children'];
+		$classes  = 'menu-item';
+		if ( $item['class'] ) {
+			$classes .= ' ' . $item['class'];
+		}
+		if ( $children ) {
+			$classes .= ' menu-item-has-children';
+		}
+		echo '<li class="' . esc_attr( $classes ) . '">';
+		if ( $children ) {
+			echo '<div class="menu-row">';
+		}
 		printf(
-			'<li class="menu-item"><a href="%s">%s</a></li>',
+			'<a href="%s">%s</a>',
 			esc_url( $item['url'] ),
 			esc_html( $item['title'] )
 		);
+		if ( $children ) {
+			echo '<button type="button" class="submenu-toggle" aria-expanded="false" aria-label="' . esc_attr( liferuss_t( 'submenu_toggle' ) ) . '"></button></div>';
+		}
+		if ( $children ) {
+			echo '<ul class="sub-menu">';
+			foreach ( $children as $child ) {
+				printf(
+					'<li class="menu-item"><a href="%s">%s</a></li>',
+					esc_url( $child['url'] ),
+					esc_html( $child['title'] )
+				);
+			}
+			echo '</ul>';
+		}
+		echo '</li>';
 	}
 	echo '</ul>';
 }
@@ -357,7 +459,10 @@ function liferuss_fallback_menu() {
 function liferuss_cta_url( $link ) {
 	$link = trim( (string) $link );
 	if ( '' === $link ) {
-		return liferuss_home() . '#consultation';
+		return liferuss_url( '/contact/' ) . '#consultation';
+	}
+	if ( '#consultation' === $link || str_starts_with( $link, '#consultation' ) ) {
+		return liferuss_url( '/contact/' ) . $link;
 	}
 	if ( isset( $link[0] ) && '#' === $link[0] ) {
 		return $link;

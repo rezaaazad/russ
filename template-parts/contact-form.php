@@ -70,14 +70,14 @@ $message   = isset( $_GET['consult_msg'] ) ? sanitize_text_field( rawurldecode( 
 				</label>
 				<label>
 					<span><?php echo esc_html( liferuss_opt( 'form_phone_label' ) ); ?></span>
-					<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" placeholder="<?php echo esc_attr( liferuss_opt( 'form_phone_ph' ) ); ?>">
+					<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" maxlength="16" pattern="^(\+?98|0)?9\d{9}$|^\+?\d{8,15}$" placeholder="<?php echo esc_attr( liferuss_opt( 'form_phone_ph' ) ); ?>">
 				</label>
 				<label>
 					<span><?php echo esc_html( liferuss_t( 'contact_message_label' ) ); ?></span>
 					<textarea name="consult_message" rows="5" placeholder="<?php echo esc_attr( liferuss_t( 'contact_message_ph' ) ); ?>"></textarea>
 				</label>
 				<button class="btn btn-gold btn-block" type="submit">
-					<?php echo esc_html( liferuss_opt( 'form_submit' ) ); ?>
+					<?php echo esc_html( liferuss_t( 'contact_send' ) ); ?>
 					<?php echo liferuss_icon( 'arrow' ); ?>
 				</button>
 				<p class="form-note"><?php echo esc_html( liferuss_opt( 'form_note' ) ); ?></p>

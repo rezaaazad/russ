@@ -58,32 +58,46 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 
 		<nav class="site-nav" id="site-nav" aria-label="<?php echo esc_attr( liferuss_t( 'nav_aria' ) ); ?>">
 			<?php
-			// Assigned WP menu OR fallback — never both (avoids duplicate nav lists).
-			if ( has_nav_menu( 'primary' ) ) {
-				wp_nav_menu(
-					array(
-						'theme_location' => 'primary',
-						'container'      => false,
-						'menu_class'     => 'nav-list',
-						'fallback_cb'    => false,
-						'depth'          => 1,
-					)
-				);
-			} else {
-				liferuss_fallback_menu();
-			}
+			// Designed mega menu. A saved flat menu of 13 items overlaps the header at 1024–1440.
+			liferuss_fallback_menu();
+			?>
+			<p class="drawer-consult"><a class="btn btn-gold" href="<?php echo esc_url( liferuss_url( '/contact/' ) ); ?>#consultation"><?php echo esc_html( liferuss_t( 'drawer_consult' ) ); ?></a></p>
+			<?php if ( $show_phone && $phone ) : ?>
+				<p class="drawer-phone"><a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>"><bdi dir="ltr"><?php echo esc_html( $phone ); ?></bdi></a></p>
+			<?php endif; ?>
+			<?php
+			liferuss_language_switcher( 'drawer' );
 			?>
 		</nav>
 
 		<div class="header-actions">
+			<button class="header-search-toggle" type="button" aria-expanded="false" aria-controls="header-search" aria-label="<?php echo esc_attr( liferuss_t( 'search_open' ) ); ?>">
+				<?php echo liferuss_icon( 'search' ); ?>
+			</button>
+			<div class="header-search" id="header-search">
+				<?php liferuss_header_search(); ?>
+				<button class="header-search-close" type="button" aria-label="<?php echo esc_attr( liferuss_t( 'search_close' ) ); ?>">
+					<?php echo liferuss_icon( 'close' ); ?>
+				</button>
+			</div>
+			<?php
+			$account_in    = is_user_logged_in();
+			$account_label = $account_in ? liferuss_t( 'account_aria_user' ) : liferuss_t( 'account_aria_guest' );
+			?>
+			<a class="header-account<?php echo $account_in ? ' is-in' : ''; ?>" href="<?php echo esc_url( liferuss_url( '/account/' ) ); ?>" aria-label="<?php echo esc_attr( $account_label ); ?>" data-tip="<?php echo esc_attr( $account_label ); ?>">
+				<?php echo liferuss_icon( 'user' ); ?>
+				<?php if ( $account_in ) : ?>
+					<span class="header-account-dot" aria-hidden="true"></span>
+				<?php endif; ?>
+			</a>
 			<?php liferuss_language_switcher( 'header' ); ?>
 			<?php if ( $show_phone && $phone ) : ?>
 				<a class="header-phone" href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>">
 					<?php echo liferuss_icon( 'phone' ); ?>
-					<span><?php echo esc_html( $phone ); ?></span>
+					<span dir="ltr"><?php echo esc_html( $phone ); ?></span>
 				</a>
 			<?php endif; ?>
-			<a class="btn btn-gold js-scroll-consult" href="<?php echo esc_url( $cta_link ); ?>">
+			<a class="btn btn-gold header-cta js-scroll-consult" href="<?php echo esc_url( $cta_link ); ?>">
 				<?php echo esc_html( $cta_text ); ?>
 				<?php echo liferuss_icon( 'arrow' ); ?>
 			</a>

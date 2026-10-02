@@ -1,9 +1,10 @@
 <?php
 /**
- * Nine-role capability matrix from the admin-panel spec.
+ * Capability matrix from the admin-panel spec, plus Academy roles.
  *
  * Super Admin is the WordPress `administrator` role, as specified.
- * The other eight roles use the lr_* prefix.
+ * The other roles use the lr_* prefix. Finance and instructor were added
+ * for Academy: finance sees every payment line, a مدرس sees only their own.
  *
  * @package LifeRussCore
  */
@@ -61,6 +62,18 @@ class RoleCatalog {
 			'lr_trade_operator'    => array(
 				'label' => 'اپراتور تجارت',
 				'caps'  => self::grant( self::operator( 'lr_manage_trade_requests' ) ),
+			),
+			'lr_finance'           => array(
+				'label' => 'مالی',
+				'caps'  => self::grant( self::finance() ),
+			),
+			'lr_instructor'        => array(
+				'label' => 'مدرس',
+				'caps'  => self::grant( self::instructor() ),
+			),
+			'lr_client'            => array(
+				'label' => 'مراجع',
+				'caps'  => self::grant( array() ),
 			),
 		);
 	}
@@ -133,6 +146,11 @@ class RoleCatalog {
 				'lr_manage_redirects',
 				'lr_manage_settings',
 				'lr_access_settings',
+				'lr_export_payments',
+				'lr_academy_access',
+				'lr_academy_manage',
+				'lr_view_finance',
+				'lr_export_academy',
 				'lr_view_activity_log',
 				'lr_view_all_dashboard',
 				'list_users',
@@ -268,6 +286,35 @@ class RoleCatalog {
 	}
 
 	/**
+	 * Every Academy figure and the global revenue report. No CRM delete.
+	 *
+	 * @return string[]
+	 */
+	private static function finance(): array {
+		return array(
+			'lr_view_dashboard',
+			'lr_academy_access',
+			'lr_academy_manage',
+			'lr_view_finance',
+			'lr_export_academy',
+			'lr_export_payments',
+		);
+	}
+
+	/**
+	 * Own courses, own students, and own sales. Export stays with finance and admin.
+	 *
+	 * @return string[]
+	 */
+	private static function instructor(): array {
+		return array(
+			'lr_academy_access',
+			'lr_academy_own',
+			'upload_files',
+		);
+	}
+
+	/**
 	 * Own leads, own admission requests, and read-only university data.
 	 *
 	 * @return string[]
@@ -277,6 +324,7 @@ class RoleCatalog {
 			self::scoped_crm(),
 			array(
 				'lr_view_own_admission_requests',
+				'lr_manage_immigration_requests',
 				'lr_access_admission',
 				'lr_access_requests',
 				'read_lr_university',
@@ -337,6 +385,7 @@ class RoleCatalog {
 			'lr_manage_exchange_requests',
 			'lr_manage_cargo_requests',
 			'lr_manage_trade_requests',
+			'lr_manage_immigration_requests',
 			'lr_access_requests',
 			'lr_access_admission',
 		);

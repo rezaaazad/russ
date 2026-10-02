@@ -136,11 +136,54 @@ function liferuss_catalog_paged() {
  * @param mixed $amount Amount.
  * @return string
  */
-function liferuss_catalog_usd( $amount ) {
+function liferuss_catalog_usd( $amount, $with_stamp = false ) {
 	if ( null === $amount || '' === (string) $amount || (float) $amount <= 0 ) {
 		return '';
 	}
-	return '$' . number_format_i18n( (float) $amount, 0 );
+	$digits = number_format_i18n( (float) $amount, 0 );
+	$lang   = function_exists( 'liferuss_current_lang' ) ? liferuss_current_lang() : 'fa';
+	$text   = ( 'fa' === $lang || 'ar' === $lang ) ? $digits . ' دلار' : '$' . $digits;
+	if ( $with_stamp && function_exists( 'liferuss_fx_stamp_text' ) ) {
+		$stamp = liferuss_fx_stamp_text();
+		if ( '' !== $stamp ) {
+			$text .= ' (' . $stamp . ')';
+		}
+	}
+	return $text;
+}
+
+/**
+ * Plain Jalali stamp for a tuition USD figure.
+ *
+ * @return string
+ */
+function liferuss_fx_stamp_text() {
+	if ( ! class_exists( '\LifeRuss\Core\Currency\Rates' ) ) {
+		return '';
+	}
+	return \LifeRuss\Core\Currency\Rates::stamp_text();
+}
+
+/**
+ * Rate lines and the Jalali stamp on the exchange inquiry page.
+ */
+function liferuss_fx_panel() {
+	if ( ! class_exists( '\LifeRuss\Core\Currency\Rates' ) ) {
+		return;
+	}
+	$lines = \LifeRuss\Core\Currency\Rates::pair_lines();
+	$stamp = \LifeRuss\Core\Currency\Rates::stamp_html();
+	if ( ! $lines && '' === $stamp ) {
+		return;
+	}
+	echo '<div class="lr-fx">';
+	foreach ( $lines as $line ) {
+		echo '<p>' . esc_html( $line ) . '</p>';
+	}
+	if ( '' !== $stamp ) {
+		echo '<p class="lr-meta">' . $stamp . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Rates::stamp_html() returns escaped markup.
+	}
+	echo '</div>';
 }
 
 /**
@@ -176,6 +219,34 @@ function liferuss_catalog_lang( $lang ) {
 }
 
 /**
+ * Tidy empty catalog panel with a consultation link.
+ *
+ * @param string $title Heading.
+ */
+function liferuss_empty_catalog( $title ) {
+	echo '<div class="lr-empty-state">';
+	echo '<h2>' . esc_html( $title ) . '</h2>';
+	echo '<p>' . esc_html( liferuss_t( 'catalog_empty_lead' ) ) . '</p>';
+	echo '<a class="btn btn-gold" href="' . esc_url( liferuss_url( '/contact/' ) . '#consultation' ) . '">' . esc_html( liferuss_t( 'catalog_empty_cta' ) ) . '</a>';
+	echo '</div>';
+}
+
+/**
+ * Published universities for the homepage slider.
+ *
+ * @param int $limit Max cards.
+ * @return array<int, array<string, mixed>>
+ */
+function liferuss_home_universities( $limit = 8 ) {
+	if ( ! function_exists( 'liferuss_catalog_ready' ) || ! liferuss_catalog_ready() ) {
+		return array();
+	}
+	$result = \LifeRuss\Core\Catalog\Query::universities( array(), 1 );
+	$items  = isset( $result['items'] ) && is_array( $result['items'] ) ? $result['items'] : array();
+	return array_slice( $items, 0, max( 1, (int) $limit ) );
+}
+
+/**
  * Card grid.
  *
  * @param array $items Cards.
@@ -183,7 +254,7 @@ function liferuss_catalog_lang( $lang ) {
 function liferuss_catalog_cards( $items ) {
 	echo '<div class="lr-cards" id="lr-catalog-results">';
 	if ( ! $items ) {
-		echo '<p class="lr-empty">موردی با این فیلتر پیدا نشد.</p>';
+		liferuss_empty_catalog( liferuss_t( 'nav_universities' ) );
 	}
 	foreach ( $items as $item ) {
 		$url  = $item['url'] ?? '';
@@ -203,13 +274,16 @@ function liferuss_catalog_cards( $items ) {
 			$bits[] = 'از ' . $usd;
 		}
 		if ( ! empty( $item['best_world_rank'] ) ) {
-			$bits[] = 'رتبه ' . (int) $item['best_world_rank'];
+			$bits[] = 'رتبه ' . liferuss_local_digits( (string) (int) $item['best_world_rank'] );
 		}
 		if ( 'approved' === ( $item['health'] ?? '' ) || 'approved' === ( $item['science'] ?? '' ) ) {
 			$bits[] = 'تأیید وزارتخانه';
 		}
 		if ( $bits ) {
 			echo '<p class="lr-meta">' . esc_html( implode( ' · ', $bits ) ) . '</p>';
+		}
+		if ( ! empty( $item['slug'] ) ) {
+			echo '<button type="button" class="btn btn-ghost lr-compare-add" data-slug="' . esc_attr( (string) $item['slug'] ) . '" data-name="' . esc_attr( (string) $name ) . '" aria-pressed="false">مقایسه</button>';
 		}
 		echo '</div></article>';
 	}
@@ -253,6 +327,9 @@ function liferuss_catalog_faqs( $post_id ) {
 	foreach ( explode( ',', $raw ) as $id ) {
 		$faq = get_post( absint( $id ) );
 		if ( ! $faq || 'lr_faq' !== $faq->post_type ) {
+			continue;
+		}
+		if ( function_exists( 'liferuss_is_placeholder_copy' ) && liferuss_is_placeholder_copy( $faq->post_title . ' ' . $faq->post_content ) ) {
 			continue;
 		}
 		$faqs[] = array(

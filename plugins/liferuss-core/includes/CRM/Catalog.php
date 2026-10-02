@@ -94,7 +94,7 @@ class Catalog {
 			),
 			'immigration' => array(
 				'service' => 'migration',
-				'request' => '',
+				'request' => 'immigration_requests',
 			),
 			'contact'     => array(
 				'service' => 'contact',
@@ -111,7 +111,7 @@ class Catalog {
 	 */
 	public static function stages( string $suffix ): array {
 		$map = array(
-			'admission_requests' => array(
+			'admission_requests'   => array(
 				'new'             => 'جدید',
 				'collecting_docs' => 'جمع مدارک',
 				'submitted'       => 'ارسال شد',
@@ -122,7 +122,7 @@ class Catalog {
 				'rejected'        => 'رد',
 				'cancelled'       => 'لغو',
 			),
-			'exchange_requests'  => array(
+			'exchange_requests'    => array(
 				'new'         => 'جدید',
 				'quoted'      => 'اعلام نرخ',
 				'accepted'    => 'پذیرفته',
@@ -130,7 +130,7 @@ class Catalog {
 				'done'        => 'انجام شد',
 				'cancelled'   => 'لغو',
 			),
-			'cargo_requests'     => array(
+			'cargo_requests'       => array(
 				'new'        => 'جدید',
 				'quoted'     => 'اعلام قیمت',
 				'confirmed'  => 'تأیید',
@@ -140,7 +140,15 @@ class Catalog {
 				'delivered'  => 'تحویل شد',
 				'cancelled'  => 'لغو',
 			),
-			'trade_requests'     => array(
+			'immigration_requests' => array(
+				'new'         => 'جدید',
+				'reviewing'   => 'بررسی',
+				'documents'   => 'مدارک',
+				'in_progress' => 'در حال انجام',
+				'done'        => 'انجام شد',
+				'cancelled'   => 'لغو',
+			),
+			'trade_requests'       => array(
 				'new'           => 'جدید',
 				'reviewing'     => 'بررسی',
 				'sourcing'      => 'سورسینگ',

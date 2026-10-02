@@ -20,6 +20,7 @@ $term = get_queried_object();
 		<p><a class="btn btn-gold" href="<?php echo esc_url( liferuss_url( '/cities/' ) ); ?>"><?php echo esc_html( liferuss_t( 'nav_cities' ) ); ?></a></p>
 	</div>
 </header>
+<?php liferuss_the_guide_culture(); ?>
 <section class="section">
 	<div class="container lr-cards">
 		<?php if ( have_posts() ) : ?>

@@ -19,7 +19,7 @@ $fields  = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::options( 'lr
 ?>
 <header class="page-hero">
 	<div class="container">
-		<p class="eyebrow"><?php echo esc_html( liferuss_brand() ); ?></p>
+		<p class="eyebrow"><?php echo esc_html( liferuss_t( 'nav_universities' ) ); ?></p>
 		<h1>دانشگاه‌های روسیه</h1>
 		<?php liferuss_breadcrumbs(); ?>
 	</div>
@@ -27,7 +27,8 @@ $fields  = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::options( 'lr
 <div class="section">
 	<div class="container">
 		<form class="lr-filters" id="lr-uni-filters" method="get" action="<?php echo esc_url( get_post_type_archive_link( 'lr_university' ) ); ?>">
-			<label>شهر
+			<button class="btn btn-ghost lr-filter-toggle" type="button"><?php echo esc_html( liferuss_t( 'filter_more' ) ); ?></button>
+			<label class="lr-filter-keep">شهر
 				<select name="city">
 					<option value="">همه</option>
 					<?php foreach ( $cities as $city ) : ?>
@@ -43,7 +44,7 @@ $fields  = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::options( 'lr
 					<?php endforeach; ?>
 				</select>
 			</label>
-			<label>مقطع
+			<label class="lr-filter-keep">مقطع
 				<select name="degree">
 					<option value="">همه</option>
 					<?php foreach ( array( 'bachelor', 'specialist', 'master', 'phd', 'residency' ) as $degree ) : ?>
@@ -51,6 +52,7 @@ $fields  = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::options( 'lr
 					<?php endforeach; ?>
 				</select>
 			</label>
+			<div class="lr-filter-extra">
 			<label>زبان
 				<select name="lang">
 					<option value="">همه</option>
@@ -69,9 +71,12 @@ $fields  = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::options( 'lr
 				<input type="number" name="rank" min="1" inputmode="numeric" value="<?php echo isset( $filters['rank'] ) ? esc_attr( (string) $filters['rank'] ) : ''; ?>">
 			</label>
 			<label class="lr-check"><input type="checkbox" name="ministry" value="approved" <?php checked( ( $filters['ministry'] ?? '' ), 'approved' ); ?>> تأیید وزارتخانه</label>
+			</div>
 			<button class="btn btn-gold" type="submit">اعمال فیلتر</button>
 		</form>
-		<p class="lr-count"><?php echo esc_html( (string) (int) $result['total'] ); ?> دانشگاه</p>
+		<?php if ( (int) $result['total'] > 0 ) : ?>
+			<p class="lr-count"><?php echo esc_html( (string) (int) $result['total'] ); ?> دانشگاه</p>
+		<?php endif; ?>
 		<?php liferuss_catalog_cards( $result['items'] ); ?>
 		<?php liferuss_catalog_pager( $page, (int) $result['pages'] ); ?>
 	</div>

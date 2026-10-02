@@ -14,7 +14,7 @@ get_header();
 
 <header class="page-hero">
 	<div class="container">
-		<p class="eyebrow"><?php echo esc_html( liferuss_brand() ); ?></p>
+		<p class="eyebrow"><?php echo esc_html( liferuss_t( 'nav_about' ) ); ?></p>
 		<h1><?php echo esc_html( liferuss_t( 'about_h1' ) ); ?></h1>
 		<p><?php echo esc_html( liferuss_t( 'about_lead' ) ); ?></p>
 		<?php liferuss_breadcrumbs(); ?>

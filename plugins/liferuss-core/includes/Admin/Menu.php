@@ -44,15 +44,19 @@ class Menu {
 			array( 'lr-leads-queue', 'CRM — صف مشترک', 'lr_assign_leads', array( LeadAdmin::class, 'queue' ) ),
 			array( 'lr-leads', 'CRM — همه لیدها', 'lr_manage_leads', array( LeadAdmin::class, 'all' ) ),
 			array( 'lr-my-leads', 'CRM — لیدهای من', 'lr_view_own_leads', array( LeadAdmin::class, 'mine' ) ),
+			array( 'lr-kanban', 'CRM — کانبان', 'lr_access_crm', array( Kanban::class, 'render' ) ),
 			array( 'lr-tasks', 'CRM — وظایف و پیگیری', 'lr_access_crm', array( LeadAdmin::class, 'tasks' ) ),
 			array( 'lr-funnel', 'CRM — گزارش قیف', 'lr_manage_leads', array( LeadAdmin::class, 'funnel' ) ),
 			array( 'lr-export', 'CRM — خروجی', 'lr_export_leads', array( LeadAdmin::class, 'export_screen' ) ),
+			array( 'lr-payments', 'پرداخت‌های خدمات', 'lr_manage_leads', array( \LifeRuss\Core\Payments\Admin::class, 'screen' ) ),
 			array( 'lr-req-admission', 'درخواست‌ها — پذیرش', 'lr_access_admission', array( LeadAdmin::class, 'admission' ) ),
 			array( 'lr-req-exchange', 'درخواست‌ها — صرافی', 'lr_manage_exchange_requests', array( LeadAdmin::class, 'exchange' ) ),
 			array( 'lr-req-cargo', 'درخواست‌ها — کارگو', 'lr_manage_cargo_requests', array( LeadAdmin::class, 'cargo' ) ),
 			array( 'lr-req-trade', 'درخواست‌ها — تجارت', 'lr_manage_trade_requests', array( LeadAdmin::class, 'trade' ) ),
+			array( 'lr-req-immigration', 'درخواست‌ها — مهاجرت', 'lr_manage_immigration_requests', array( LeadAdmin::class, 'immigration' ) ),
 			array( 'lr-universities', 'دانشگاه‌ها — داده‌ها', 'lr_view_university_data', array( Screens::class, 'universities' ) ),
 			array( 'lr-tuition', 'دانشگاه‌ها — شهریه‌ها', 'lr_view_university_data', array( Screens::class, 'tuition' ) ),
+			array( 'lr-programs', 'دانشگاه‌ها — رشته‌ها', 'lr_manage_university_data', array( \LifeRuss\Core\Catalog\ProgramsScreen::class, 'render' ) ),
 			array( 'lr-approvals', 'دانشگاه‌ها — تأییدیه‌ها', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-rankings', 'دانشگاه‌ها — رتبه‌بندی', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-prep', 'دانشگاه‌ها — پادفک و کورس', 'lr_manage_academic_data', array( Screens::class, 'placeholder' ) ),
@@ -62,6 +66,8 @@ class Menu {
 			array( 'lr-services', 'خدمات و فرم‌ها', 'lr_manage_services', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-redirects', 'سئو — ریدایرکت‌ها', 'lr_view_redirects', array( RedirectScreen::class, 'render' ) ),
 			array( 'lr-404', 'سئو — پایش ۴۰۴', 'lr_manage_redirects', array( NotFoundScreen::class, 'render' ) ),
+			array( 'lr-compare', 'سئو — مقایسه دانشگاه', 'lr_edit_seo', array( CompareScreen::class, 'render' ) ),
+			array( 'lr-search-stats', 'سئو — آمار جستجو', 'lr_edit_seo', array( SearchScreen::class, 'render' ) ),
 			array( 'lr-activity', 'گزارش فعالیت', 'lr_view_activity_log', array( Screens::class, 'placeholder' ) ),
 			array( 'lr-roles', 'نقش‌ها و مجوزها', 'lr_manage_roles', array( Screens::class, 'placeholder' ) ),
 		);
@@ -76,6 +82,7 @@ class Menu {
 		self::link( 'گروه‌های رشته', 'manage_lr_field_groups', 'edit-tags.php?taxonomy=lr_field_group&post_type=lr_field' );
 		self::link( 'شهرها', 'edit_lr_cities', 'edit.php?post_type=lr_city' );
 		self::link( 'بورسیه‌ها', 'edit_lr_scholarships', 'edit.php?post_type=lr_scholarship' );
+		add_submenu_page( 'liferuss', 'انتقال بورسیه‌ها', 'بورسیه‌ها — انتقال جدول', 'edit_lr_scholarships', 'lr-scholarship-migrate', array( \LifeRuss\Core\Scholarships\Admin::class, 'screen' ) );
 		self::link( 'برگه‌ها', 'edit_pages', 'edit.php?post_type=page' );
 		self::link( 'مجله — نوشته‌ها', 'edit_posts', 'edit.php' );
 		self::link( 'مجله — دسته‌ها', 'manage_categories', 'edit-tags.php?taxonomy=category' );
@@ -113,6 +120,14 @@ class Menu {
 			'lr_edit_vocab',
 			'lr-vocab',
 			array( Screens::class, 'placeholder' )
+		);
+		add_submenu_page(
+			'liferuss',
+			'نسخه‌های تکراری',
+			'ابزار — نسخه‌های تکراری',
+			'edit_posts',
+			'lr-duplicates',
+			array( Duplicates::class, 'render' )
 		);
 	}
 

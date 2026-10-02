@@ -13,7 +13,7 @@ get_header();
 $terms = get_terms(
 	array(
 		'taxonomy'   => 'lr_guide_cat',
-		'hide_empty' => false,
+		'hide_empty' => true,
 	)
 );
 ?>
@@ -32,6 +32,7 @@ $terms = get_terms(
 		</nav>
 	</div>
 </header>
+<?php liferuss_the_guide_culture(); ?>
 <section class="section">
 	<div class="container">
 		<div class="lr-cards">
@@ -46,7 +47,7 @@ $terms = get_terms(
 					</div></article>
 				<?php endwhile; ?>
 			<?php else : ?>
-				<p class="lr-empty"><?php echo esc_html( liferuss_t( 'path_empty' ) ); ?></p>
+				<?php liferuss_empty_catalog( liferuss_t( 'nav_guide' ) ); ?>
 			<?php endif; ?>
 		</div>
 	</div>

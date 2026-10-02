@@ -102,6 +102,10 @@ function liferuss_opt( $key, $default = '' ) {
 		return $fa;
 	}
 
+	if ( function_exists( 'liferuss_blank_default_contact' ) ) {
+		$fa = liferuss_blank_default_contact( $fa, $key );
+	}
+
 	$lang = function_exists( 'liferuss_current_lang' ) ? liferuss_current_lang() : 'fa';
 	if ( 'fa' === $lang || ! function_exists( 'liferuss_lang_overlay' ) ) {
 		return $fa;
@@ -218,6 +222,12 @@ function liferuss_the_image( $args ) {
 
 	if ( $id && wp_attachment_is_image( $id ) ) {
 		echo wp_get_attachment_image( $id, $args['size'], false, $attr );
+		return;
+	}
+
+	$slug = liferuss_photo_slug_from_file( (string) $args['fallback'] );
+	if ( $slug ) {
+		liferuss_photo_markup( $slug, $args );
 		return;
 	}
 

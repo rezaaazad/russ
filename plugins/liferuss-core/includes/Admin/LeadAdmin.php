@@ -7,6 +7,7 @@
 
 namespace LifeRuss\Core\Admin;
 
+use LifeRuss\Core\Account\Portal;
 use LifeRuss\Core\CRM\Catalog;
 use LifeRuss\Core\CRM\Files;
 use LifeRuss\Core\CRM\Jalali;
@@ -156,6 +157,13 @@ class LeadAdmin {
 	}
 
 	/**
+	 * Immigration queue.
+	 */
+	public static function immigration(): void {
+		self::request_screen( 'immigration_requests', 'lr_manage_immigration_requests', 'درخواست‌های مهاجرت' );
+	}
+
+	/**
 	 * Lead detail.
 	 */
 	public static function detail(): void {
@@ -255,6 +263,17 @@ class LeadAdmin {
 		submit_button( __( 'افزودن یادداشت', 'liferuss-core' ) );
 		echo '</form>';
 
+		echo '<h2>' . esc_html__( 'گفتگو با مراجع', 'liferuss-core' ) . '</h2><ul>';
+		foreach ( Portal::messages( $id ) as $message ) {
+			$author = get_userdata( (int) $message['author_id'] );
+			echo '<li><strong>' . esc_html( $author ? $author->display_name : __( 'مراجع', 'liferuss-core' ) ) . '</strong> ' . Jalali::html( (string) $message['created_at'] ) . '<br>' . esc_html( (string) $message['body'] ) . '</li>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Jalali::html() returns escaped markup.
+		}
+		echo '</ul><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		self::save_fields( $id, 'message' );
+		echo '<textarea name="message" rows="3" class="large-text"></textarea>';
+		submit_button( __( 'ارسال به مراجع', 'liferuss-core' ) );
+		echo '</form>';
+
 		echo '<h2>' . esc_html__( 'وظایف', 'liferuss-core' ) . '</h2><ul>';
 		foreach ( $tasks['items'] as $task ) {
 			echo '<li>' . esc_html( (string) $task['title'] ) . ' — ' . esc_html( (string) $task['status'] ) . ' — ' . Jalali::html( (string) $task['due_at'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Jalali::html() returns escaped markup.
@@ -307,6 +326,8 @@ class LeadAdmin {
 		}
 		echo '</ul>';
 
+		\LifeRuss\Core\Payments\Checkout::box( $id );
+
 		echo '<h2>UTM</h2><ul>';
 		foreach ( array( 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'landing_page', 'referrer', 'source' ) as $key ) {
 			echo '<li><strong>' . esc_html( $key ) . ':</strong> ' . esc_html( (string) $lead[ $key ] ) . '</li>';
@@ -341,6 +362,8 @@ class LeadAdmin {
 			LeadWriter::assign( $id, absint( self::posted( 'consultant_id' ) ) );
 		} elseif ( 'note' === $do ) {
 			LeadWriter::add_note( $id, self::posted_area( 'note' ) );
+		} elseif ( 'message' === $do ) {
+			Portal::add_message( $id, get_current_user_id(), self::posted_area( 'message' ) );
 		} elseif ( 'task' === $do ) {
 			$due = self::posted( 'task_due' );
 			$due = $due ? gmdate( 'Y-m-d H:i:s', strtotime( $due . ' UTC' ) ) : '';
@@ -550,12 +573,14 @@ class LeadAdmin {
 			}
 		}
 		$after = isset( $_GET['lr_after'] ) ? sanitize_text_field( wp_unslash( $_GET['lr_after'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $after ) ) {
-			$args['created_after'] = $after . ' 00:00:00';
+		$from  = Jalali::filter_utc( $after, false );
+		if ( $from ) {
+			$args['created_after'] = $from;
 		}
 		$before = isset( $_GET['lr_before'] ) ? sanitize_text_field( wp_unslash( $_GET['lr_before'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $before ) ) {
-			$args['created_before'] = $before . ' 23:59:59';
+		$until  = Jalali::filter_utc( $before, true );
+		if ( $until ) {
+			$args['created_before'] = $until;
 		}
 		return $args;
 	}
@@ -603,8 +628,9 @@ class LeadAdmin {
 		}
 		$after  = isset( $_GET['lr_after'] ) ? sanitize_text_field( wp_unslash( $_GET['lr_after'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$before = isset( $_GET['lr_before'] ) ? sanitize_text_field( wp_unslash( $_GET['lr_before'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		echo '<input type="date" name="lr_after" value="' . esc_attr( $after ) . '" title="' . esc_attr__( 'از تاریخ میلادی', 'liferuss-core' ) . '"> ';
-		echo '<input type="date" name="lr_before" value="' . esc_attr( $before ) . '" title="' . esc_attr__( 'تا تاریخ میلادی', 'liferuss-core' ) . '"> ';
+		$hint   = Jalali::year_hint();
+		echo '<input type="text" name="lr_after" value="' . esc_attr( $after ) . '" placeholder="' . esc_attr( 'از ' . $hint[0] ) . '" inputmode="numeric"> ';
+		echo '<input type="text" name="lr_before" value="' . esc_attr( $before ) . '" placeholder="' . esc_attr( 'تا ' . $hint[1] ) . '" inputmode="numeric"> ';
 		submit_button( __( 'فیلتر', 'liferuss-core' ), 'secondary', '', false );
 		echo '</form>';
 	}

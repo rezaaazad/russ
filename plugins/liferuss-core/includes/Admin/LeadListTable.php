@@ -113,7 +113,11 @@ class LeadListTable extends \WP_List_Table {
 	public function column_status( $item ): string {
 		$statuses = Catalog::lead_statuses();
 		$key      = (string) $item['status'];
-		return esc_html( $statuses[ $key ] ?? $key );
+		$label    = $statuses[ $key ] ?? $key;
+		if ( ! empty( $item['sla_overdue'] ) ) {
+			$label .= ' — دیرشده';
+		}
+		return esc_html( $label );
 	}
 
 	/**

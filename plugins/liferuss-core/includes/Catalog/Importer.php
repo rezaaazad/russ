@@ -89,6 +89,7 @@ class Importer {
 		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		if ( ! $dry_run ) {
 			Store::bump();
+			do_action( 'liferuss_catalog_imported', $type );
 		}
 		update_option( 'lr_import_report', $report, false );
 		return $report;

@@ -7,6 +7,8 @@
 
 namespace LifeRuss\Core\Database;
 
+use LifeRuss\Core\Academy\Schema as AcademySchema;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -39,7 +41,7 @@ class Migrator {
 		$charset = self::charset_collate();
 		$errors  = array();
 
-		foreach ( Tables::all() as $suffix => $def ) {
+		foreach ( self::catalogue() as $suffix => $def ) {
 			$sql    = self::create_sql( $suffix, $def, $charset );
 			$result = dbDelta( $sql );
 			if ( ! empty( $wpdb->last_error ) ) {
@@ -117,7 +119,7 @@ class Migrator {
 	private static function add_foreign_keys( array &$errors ): void {
 		global $wpdb;
 
-		foreach ( Tables::all() as $suffix => $def ) {
+		foreach ( self::catalogue() as $suffix => $def ) {
 			if ( empty( $def['fks'] ) ) {
 				continue;
 			}
@@ -143,6 +145,15 @@ class Migrator {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Core tables plus the Academy catalogue.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	public static function catalogue(): array {
+		return array_merge( Tables::all(), AcademySchema::tables() );
 	}
 
 	/**

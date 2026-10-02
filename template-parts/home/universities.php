@@ -1,12 +1,17 @@
 <?php
 /**
- * Homepage section.
+ * Homepage universities from the published catalog.
  *
  * @package LifeRuss
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
+}
+
+$unis = liferuss_home_universities( 8 );
+if ( count( $unis ) < 3 ) {
+	return;
 }
 ?>
 <section class="section universities-section" id="universities">
@@ -27,37 +32,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</header>
 		<div class="uni-slider" data-slider>
 			<div class="uni-track" data-slider-track>
-				<?php foreach ( liferuss_universities() as $uni ) : ?>
-					<?php
-					$card_tag = ! empty( $uni['link'] ) ? 'a' : 'article';
-					$href     = ! empty( $uni['link'] ) ? ' href="' . esc_url( $uni['link'] ) . '"' : '';
-					?>
-					<<?php echo $card_tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> class="uni-card"<?php echo $href; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+				<?php foreach ( $unis as $uni ) : ?>
+					<a class="uni-card" href="<?php echo esc_url( (string) ( $uni['url'] ?? '' ) ); ?>">
 						<figure class="uni-photo">
-							<?php
-							liferuss_the_image(
-								array(
-									'id'       => $uni['image_id'] ?? 0,
-									'fallback' => $uni['image'] ?? '',
-									'alt'      => $uni['name'],
-									'width'    => 640,
-									'height'   => 400,
-									'size'     => 'liferuss-card',
-									'sizes'    => '(max-width: 640px) 92vw, (max-width: 1100px) 46vw, 280px',
-								)
-							);
-							?>
+							<?php if ( ! empty( $uni['thumbnail'] ) ) : ?>
+								<img src="<?php echo esc_url( (string) $uni['thumbnail'] ); ?>" alt="<?php echo esc_attr( (string) ( $uni['name'] ?? '' ) ); ?>" width="640" height="400" loading="lazy" decoding="async">
+							<?php endif; ?>
 						</figure>
 						<div class="uni-body">
-							<p class="uni-latin"><?php echo esc_html( $uni['latin'] ); ?></p>
-							<h3><?php echo esc_html( $uni['name'] ); ?></h3>
+							<?php if ( ! empty( $uni['name_en'] ) ) : ?>
+								<p class="uni-latin"><?php echo esc_html( (string) $uni['name_en'] ); ?></p>
+							<?php endif; ?>
+							<h3><?php echo esc_html( (string) ( $uni['name'] ?? '' ) ); ?></h3>
 							<p class="uni-meta">
-								<span class="rank"><?php echo liferuss_icon( 'star' ); ?> <?php echo esc_html( $uni['rank'] ); ?></span>
-								<span><?php echo esc_html( $uni['city'] ); ?></span>
+								<?php if ( ! empty( $uni['best_world_rank'] ) ) : ?>
+									<span class="rank"><?php echo liferuss_icon( 'star' ); ?> <?php echo esc_html( (string) $uni['best_world_rank'] ); ?></span>
+								<?php endif; ?>
+								<?php if ( ! empty( $uni['city'] ) ) : ?>
+									<span><?php echo esc_html( (string) $uni['city'] ); ?></span>
+								<?php endif; ?>
 							</p>
-							<p><?php echo esc_html( $uni['focus'] ); ?></p>
 						</div>
-					</<?php echo $card_tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+					</a>
 				<?php endforeach; ?>
 			</div>
 		</div>

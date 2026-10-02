@@ -1,16 +1,5 @@
-# Image credits
+# عکس‌های قالب
 
-Bundled photographs are used under their original licenses:
+شش عکس اصلی را صاحب سایت داده است: سنت باسیل، مسکو در غروب، سن‌پترزبورگ، زوج با لباس سنتی، برش، و ماتریوشکا با سماور.
 
-- Saint Basil’s Cathedral — Wikimedia Commons
-- Moscow State University — Wikimedia Commons
-- Saint Petersburg State University (Twelve Collegia) — Wikimedia Commons
-- HSE Moscow buildings — Wikimedia Commons
-- Sechenov University — Wikimedia Commons
-- RUDN University — Wikimedia Commons
-- Bauman MSTU — Wikimedia Commons
-- Student / graduate photographs — Pexels (free license)
-
-Do not treat these files as original brand photography. Replace them in production with licensed campaign photos if needed.
-
-WebP derivatives (`*.webp`, `st-basil-800.webp`, `hero-student-400.webp`) are generated from the same sources for responsive delivery. Keep the original JPEGs as fallbacks.
+از هر عکس نسخهٔ WebP و JPG در عرض‌های ۶۴۰، ۱۰۲۴، ۱۶۰۰ و ۱۹۲۰ ساخته شده است. برش اشتراک‌گذاری `saint-basil-og` دقیقاً ۱۲۰۰×۶۳۰ است. پس‌زمینهٔ کارت دوره، `saint-basil-card`، همان کلیسا با پوشش سرمه‌ای است.

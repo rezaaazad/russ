@@ -15,13 +15,16 @@ $result = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::fields( $page
 ?>
 <header class="page-hero">
 	<div class="container">
-		<p class="eyebrow"><?php echo esc_html( liferuss_brand() ); ?></p>
+		<p class="eyebrow"><?php echo esc_html( liferuss_t( 'nav_fields' ) ); ?></p>
 		<h1>رشته‌ها</h1>
 		<?php liferuss_breadcrumbs(); ?>
 	</div>
 </header>
 <div class="section">
 	<div class="container">
+		<?php if ( empty( $result['items'] ) ) : ?>
+			<?php liferuss_empty_catalog( liferuss_t( 'nav_fields' ) ); ?>
+		<?php else : ?>
 		<div class="lr-cards">
 			<?php foreach ( $result['items'] as $item ) : ?>
 				<article class="lr-card"><div class="lr-card-body">
@@ -33,6 +36,7 @@ $result = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::fields( $page
 			<?php endforeach; ?>
 		</div>
 		<?php liferuss_catalog_pager( $page, (int) $result['pages'] ); ?>
+		<?php endif; ?>
 	</div>
 </div>
 <?php

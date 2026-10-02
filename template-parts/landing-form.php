@@ -49,7 +49,7 @@ $choices     = (array) liferuss_opt( $choices_key, array() );
 					</label>
 					<label>
 						<span><?php echo esc_html( liferuss_opt( $prefix . '_form_phone_label' ) ); ?></span>
-						<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" placeholder="<?php echo esc_attr( liferuss_opt( $prefix . '_form_phone_ph' ) ); ?>">
+						<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" maxlength="16" pattern="^(\+?98|0)?9\d{9}$|^\+?\d{8,15}$" placeholder="<?php echo esc_attr( liferuss_opt( $prefix . '_form_phone_ph' ) ); ?>">
 					</label>
 
 					<?php if ( 'freight' === $prefix ) : ?>
@@ -71,7 +71,7 @@ $choices     = (array) liferuss_opt( $choices_key, array() );
 						</label>
 						<label>
 							<span><?php echo esc_html( liferuss_opt( 'freight_form_weight_label' ) ); ?></span>
-							<input type="text" name="consult_weight" placeholder="<?php echo esc_attr( liferuss_opt( 'freight_form_weight_ph' ) ); ?>">
+							<input type="text" name="consult_weight" inputmode="decimal" placeholder="<?php echo esc_attr( liferuss_opt( 'freight_form_weight_ph' ) ); ?>">
 						</label>
 						<label>
 							<span><?php echo esc_html( liferuss_opt( 'freight_form_dims_label' ) ); ?></span>
@@ -79,11 +79,11 @@ $choices     = (array) liferuss_opt( $choices_key, array() );
 						</label>
 						<label>
 							<span><?php echo esc_html( liferuss_opt( 'freight_form_packages_label' ) ); ?></span>
-							<input type="text" name="consult_packages" placeholder="<?php echo esc_attr( liferuss_opt( 'freight_form_packages_ph' ) ); ?>">
+							<input type="text" name="consult_packages" inputmode="decimal" placeholder="<?php echo esc_attr( liferuss_opt( 'freight_form_packages_ph' ) ); ?>">
 						</label>
 						<label class="landing-span-2">
 							<span><?php echo esc_html( liferuss_opt( 'freight_form_value_label' ) ); ?></span>
-							<input type="text" name="consult_value" placeholder="<?php echo esc_attr( liferuss_opt( 'freight_form_value_ph' ) ); ?>">
+							<input type="text" name="consult_value" inputmode="decimal" placeholder="<?php echo esc_attr( liferuss_opt( 'freight_form_value_ph' ) ); ?>">
 						</label>
 					<?php else : ?>
 						<label>
@@ -108,7 +108,7 @@ $choices     = (array) liferuss_opt( $choices_key, array() );
 						</label>
 						<label>
 							<span><?php echo esc_html( liferuss_opt( 'trade_form_qty_label' ) ); ?></span>
-							<input type="text" name="consult_qty" placeholder="<?php echo esc_attr( liferuss_opt( 'trade_form_qty_ph' ) ); ?>">
+							<input type="text" name="consult_qty" inputmode="decimal" placeholder="<?php echo esc_attr( liferuss_opt( 'trade_form_qty_ph' ) ); ?>">
 						</label>
 						<label>
 							<span><?php echo esc_html( liferuss_opt( 'trade_form_specs_label' ) ); ?></span>
@@ -122,7 +122,11 @@ $choices     = (array) liferuss_opt( $choices_key, array() );
 					</label>
 					<label class="landing-span-2">
 						<span><?php echo esc_html( liferuss_opt( $prefix . '_form_file_label' ) ); ?></span>
-						<input type="file" name="consult_file" accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf">
+						<span class="lr-file">
+							<input class="lr-file-input" type="file" name="consult_file" accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf">
+							<span class="btn btn-ghost lr-file-btn"><?php echo esc_html( liferuss_t( 'file_choose' ) ); ?></span>
+							<span class="lr-file-name"><?php echo esc_html( liferuss_t( 'file_none' ) ); ?></span>
+						</span>
 						<small class="form-note"><?php echo esc_html( liferuss_opt( $prefix . '_form_file_note' ) ); ?></small>
 					</label>
 				</div>
@@ -140,7 +144,7 @@ $choices     = (array) liferuss_opt( $choices_key, array() );
 			liferuss_the_image(
 				array(
 					'id'       => liferuss_opt( $prefix . '_form_banner_image_id' ),
-					'fallback' => liferuss_opt( $prefix . '_form_banner_image', 'consult-student.jpg' ),
+					'fallback' => liferuss_opt( $prefix . '_form_banner_image', 'saint-basil.jpg' ),
 					'alt'      => liferuss_opt( $prefix . '_form_banner_title' ),
 					'width'    => 720,
 					'height'   => 480,

@@ -18,16 +18,14 @@ get_header();
 		<article <?php post_class( 'single-article' ); ?>>
 			<header class="page-hero">
 				<div class="container">
-					<p class="eyebrow"><?php echo esc_html( get_the_date() ); ?> · <?php echo esc_html( liferuss_reading_minutes( get_the_ID() ) ); ?> <?php echo esc_html( liferuss_t( 'reading_min' ) ); ?></p>
+					<p class="eyebrow"><?php echo esc_html( get_the_date() ); ?> · <?php echo esc_html( number_format_i18n( liferuss_reading_minutes( get_the_ID() ) ) ); ?> <?php echo esc_html( liferuss_t( 'reading_min' ) ); ?></p>
 					<h1><?php the_title(); ?></h1>
 					<?php liferuss_breadcrumbs(); ?>
 				</div>
 			</header>
 			<div class="container single-layout">
 				<div class="prose">
-					<?php if ( has_post_thumbnail() ) : ?>
-						<figure class="single-thumb"><?php the_post_thumbnail( 'liferuss-wide' ); ?></figure>
-					<?php endif; ?>
+					<figure class="single-thumb"><?php liferuss_the_entry_image( 'single' ); ?></figure>
 					<?php $toc = liferuss_toc_items(); ?>
 					<?php if ( $toc ) : ?>
 						<nav class="lr-toc" aria-label="<?php echo esc_attr( liferuss_t( 'toc' ) ); ?>">
@@ -41,10 +39,34 @@ get_header();
 					<?php endif; ?>
 					<?php the_content(); ?>
 					<aside class="lr-author">
-						<?php echo get_avatar( get_the_author_meta( 'ID' ), 64 ); ?>
+						<?php
+						$author_id   = (int) get_the_author_meta( 'ID' );
+						$author_name = get_the_author();
+						$avatar_data = get_avatar_data( $author_id, array( 'size' => 64 ) );
+						$avatar_url  = isset( $avatar_data['url'] ) ? (string) $avatar_data['url'] : '';
+						$real_avatar = ! empty( $avatar_data['found_avatar'] ) && ! str_contains( $avatar_url, 'gravatar.com' );
+						if ( $author_name === get_the_author_meta( 'user_login' ) ) {
+							$author_name = liferuss_t( 'author_fallback' );
+						}
+						$author_bits = preg_split( '/\s+/u', trim( (string) $author_name ) );
+						$author_mark = '';
+						if ( is_array( $author_bits ) ) {
+							foreach ( array_slice( $author_bits, 0, 2 ) as $bit ) {
+								$author_mark .= mb_substr( $bit, 0, 1 );
+							}
+						}
+						?>
+						<?php if ( $real_avatar ) : ?>
+							<?php echo get_avatar( $author_id, 64 ); ?>
+						<?php else : ?>
+							<span class="lr-author-mark" aria-hidden="true"><?php echo esc_html( $author_mark ); ?></span>
+						<?php endif; ?>
 						<div>
-							<strong><?php the_author(); ?></strong>
-							<p><?php echo esc_html( get_the_author_meta( 'description' ) ? get_the_author_meta( 'description' ) : liferuss_t( 'author_fallback' ) ); ?></p>
+							<strong><?php echo esc_html( $author_name ); ?></strong>
+							<?php $bio = trim( (string) get_the_author_meta( 'description' ) ); ?>
+							<?php if ( $bio && $bio !== $author_name ) : ?>
+								<p><?php echo esc_html( $bio ); ?></p>
+							<?php endif; ?>
 						</div>
 					</aside>
 					<?php $related = liferuss_related_posts( get_the_ID() ); ?>
@@ -59,10 +81,16 @@ get_header();
 						</section>
 					<?php endif; ?>
 					<p class="lr-inline-cta"><a class="btn btn-gold" href="#consultation"><?php echo esc_html( liferuss_t( 'magazine_cta' ) ); ?></a></p>
+					<?php if ( get_previous_post() || get_next_post() ) : ?>
 					<nav class="post-nav">
-						<?php previous_post_link( '%link', liferuss_t( 'post_prev' ) ); ?>
-						<?php next_post_link( '%link', liferuss_t( 'post_next' ) ); ?>
+						<?php if ( get_previous_post() ) : ?>
+							<?php previous_post_link( '%link', liferuss_t( 'post_prev' ) ); ?>
+						<?php endif; ?>
+						<?php if ( get_next_post() ) : ?>
+							<?php next_post_link( '%link', liferuss_t( 'post_next' ) ); ?>
+						<?php endif; ?>
 					</nav>
+					<?php endif; ?>
 				</div>
 			</div>
 		</article>

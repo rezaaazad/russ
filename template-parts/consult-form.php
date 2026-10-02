@@ -45,6 +45,9 @@ if ( 'admission' === $type ) {
 			<p class="eyebrow"><?php echo esc_html( liferuss_opt( 'form_eyebrow' ) ); ?></p>
 			<<?php echo $heading; ?>><?php echo esc_html( $form_title ); ?></<?php echo $heading; ?>>
 			<p><?php echo esc_html( $form_intro ); ?></p>
+			<?php if ( 'exchange' === $type && function_exists( 'liferuss_fx_panel' ) ) : ?>
+				<?php liferuss_fx_panel(); ?>
+			<?php endif; ?>
 			<div class="consult-channels">
 				<p class="screen-reader-text"><?php echo esc_html( liferuss_t( 'channels_aria' ) ); ?></p>
 				<?php if ( $whatsapp ) : ?>
@@ -105,7 +108,7 @@ if ( 'admission' === $type ) {
 				</label>
 				<label>
 					<span><?php echo esc_html( liferuss_opt( 'form_phone_label' ) ); ?></span>
-					<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" placeholder="<?php echo esc_attr( liferuss_opt( 'form_phone_ph' ) ); ?>">
+					<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" maxlength="16" pattern="^(\+?98|0)?9\d{9}$|^\+?\d{8,15}$" placeholder="<?php echo esc_attr( liferuss_opt( 'form_phone_ph' ) ); ?>">
 				</label>
 				<?php if ( $needs_level ) : ?>
 				<label>
@@ -147,6 +150,55 @@ if ( 'admission' === $type ) {
 				<?php endif; ?>
 				<?php if ( 'immigration' === $type ) : ?>
 				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_imm_type' ) ); ?></span>
+					<select name="consult_imm_type">
+						<option value="visa">ویزا</option>
+						<option value="residency">اقامت</option>
+						<option value="registration">ثبت‌نام</option>
+						<option value="work">کار</option>
+						<option value="deportation">دیپورت</option>
+						<option value="entry-ban">ممنوعیت ورود</option>
+					</select>
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_nationality' ) ); ?></span>
+					<input type="text" name="consult_nationality">
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_current_city' ) ); ?></span>
+					<input type="text" name="consult_city">
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_visa_status' ) ); ?></span>
+					<input type="text" name="consult_visa_status">
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_visa_expiry' ) ); ?></span>
+					<input type="hidden" name="consult_visa_expiry" value="">
+					<span class="lr-date-parts">
+						<select name="consult_visa_expiry_y" aria-label="<?php echo esc_attr( liferuss_t( 'form_visa_expiry' ) ); ?>">
+							<option value="">سال</option>
+							<?php for ( $year = 1404; $year <= 1412; $year++ ) : ?>
+								<option value="<?php echo esc_attr( (string) $year ); ?>"><?php echo esc_html( liferuss_local_digits( (string) $year ) ); ?></option>
+							<?php endfor; ?>
+						</select>
+						<select name="consult_visa_expiry_m">
+							<?php for ( $month = 1; $month <= 12; $month++ ) : ?>
+								<option value="<?php echo esc_attr( (string) $month ); ?>"><?php echo esc_html( liferuss_local_digits( (string) $month ) ); ?></option>
+							<?php endfor; ?>
+						</select>
+						<select name="consult_visa_expiry_d">
+							<?php for ( $day = 1; $day <= 31; $day++ ) : ?>
+								<option value="<?php echo esc_attr( (string) $day ); ?>"><?php echo esc_html( liferuss_local_digits( (string) $day ) ); ?></option>
+							<?php endfor; ?>
+						</select>
+					</span>
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_t( 'form_documents' ) ); ?></span>
+					<textarea name="consult_documents" rows="3"></textarea>
+				</label>
+				<label>
 					<span><?php echo esc_html( liferuss_t( 'form_notes' ) ); ?></span>
 					<textarea name="consult_message" rows="3"></textarea>
 				</label>
@@ -164,7 +216,7 @@ if ( 'admission' === $type ) {
 			liferuss_the_image(
 				array(
 					'id'       => liferuss_opt( 'form_image_id' ),
-					'fallback' => 'consult-student.jpg',
+					'fallback' => liferuss_photo_file( liferuss_photo_aside() ),
 					'alt'      => liferuss_t( 'form_alt' ),
 					'width'    => 720,
 					'height'   => 480,

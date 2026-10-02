@@ -210,6 +210,204 @@ class Tables {
 				),
 				'fks'     => array(),
 			),
+			'compare_pages'    => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'           => $id,
+					'slug'         => 'varchar(191) NOT NULL',
+					'uni_slugs'    => 'varchar(400) NOT NULL',
+					'intro'        => 'longtext DEFAULT NULL',
+					'faq'          => 'longtext DEFAULT NULL',
+					'is_indexable' => 'tinyint(1) NOT NULL DEFAULT 0',
+					'created_at'   => $dt,
+					'updated_at'   => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'UNIQUE KEY slug (slug)',
+					'KEY is_indexable (is_indexable)',
+				),
+				'fks'     => array(),
+			),
+			'search_docs'      => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'          => $id,
+					'doc_key'     => 'varchar(80) NOT NULL',
+					'object_type' => 'varchar(20) NOT NULL',
+					'object_id'   => 'bigint(20) unsigned NOT NULL',
+					'title'       => 'varchar(255) NOT NULL DEFAULT \'\'',
+					'text_norm'   => 'mediumtext NOT NULL',
+					'aliases'     => 'text NOT NULL',
+					'excerpt'     => 'varchar(300) NOT NULL DEFAULT \'\'',
+					'url'         => 'varchar(500) NOT NULL DEFAULT \'\'',
+					'slug'        => 'varchar(200) NOT NULL DEFAULT \'\'',
+					'city'        => 'varchar(150) NOT NULL DEFAULT \'\'',
+					'city_slug'   => 'varchar(150) NOT NULL DEFAULT \'\'',
+					'updated_at'  => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'UNIQUE KEY doc_key (doc_key)',
+					'KEY type_city (object_type, city_slug)',
+					'KEY object_id (object_id)',
+					'FULLTEXT KEY doc_search (title, text_norm, aliases)',
+				),
+				'fks'     => array(),
+			),
+			'search_stats'     => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'         => $id,
+					'query_hash' => 'char(40) NOT NULL',
+					'query_text' => 'varchar(191) NOT NULL',
+					'total'      => 'int(10) unsigned NOT NULL DEFAULT 0',
+					'zeros'      => 'int(10) unsigned NOT NULL DEFAULT 0',
+					'last_at'    => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'UNIQUE KEY query_hash (query_hash)',
+					'KEY total (total)',
+					'KEY zeros (zeros)',
+				),
+				'fks'     => array(),
+			),
+			'search_queue'     => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'          => $id,
+					'object_type' => 'varchar(20) NOT NULL',
+					'object_id'   => 'bigint(20) unsigned NOT NULL',
+					'action'      => "varchar(10) NOT NULL DEFAULT 'upsert'",
+					'attempts'    => 'tinyint(3) unsigned NOT NULL DEFAULT 0',
+					'created_at'  => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'UNIQUE KEY object_ref (object_type, object_id)',
+					'KEY created_at (created_at)',
+				),
+				'fks'     => array(),
+			),
+			'lead_messages'    => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'         => $id,
+					'lead_id'    => 'bigint(20) unsigned NOT NULL',
+					'author_id'  => 'bigint(20) unsigned NOT NULL DEFAULT 0',
+					'body'       => 'text NOT NULL',
+					'created_at' => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'KEY lead_created (lead_id, created_at)',
+				),
+				'fks'     => array(),
+			),
+			'lesson_progress'  => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'         => $id,
+					'user_id'    => 'bigint(20) unsigned NOT NULL',
+					'lesson_id'  => 'bigint(20) unsigned NOT NULL',
+					'completed'  => 'tinyint(1) NOT NULL DEFAULT 0',
+					'updated_at' => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'UNIQUE KEY user_lesson (user_id, lesson_id)',
+					'KEY lesson_id (lesson_id)',
+				),
+				'fks'     => array(),
+			),
+			'quiz_attempts'    => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'         => $id,
+					'user_id'    => 'bigint(20) unsigned NOT NULL',
+					'lesson_id'  => 'bigint(20) unsigned NOT NULL DEFAULT 0',
+					'kind'       => "varchar(20) NOT NULL DEFAULT 'lesson'",
+					'score'      => 'smallint(5) unsigned NOT NULL DEFAULT 0',
+					'max_score'  => 'smallint(5) unsigned NOT NULL DEFAULT 0',
+					'detail'     => 'text',
+					'created_at' => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'KEY user_kind (user_id, kind)',
+					'KEY lesson_id (lesson_id)',
+				),
+				'fks'     => array(),
+			),
+			'scholarships'     => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'               => $id,
+					'post_id'          => 'bigint(20) unsigned NOT NULL',
+					'university_id'    => $fkn,
+					'field_name'       => 'varchar(120) NOT NULL DEFAULT \'\'',
+					'degree'           => 'varchar(40) NOT NULL DEFAULT \'\'',
+					'coverage_type'    => 'varchar(40) NOT NULL DEFAULT \'\'',
+					'coverage_percent' => 'smallint(5) unsigned DEFAULT NULL',
+					'quota'            => 'int(10) unsigned DEFAULT NULL',
+					'deadline'         => 'varchar(40) NOT NULL DEFAULT \'\'',
+					'language'         => 'varchar(20) NOT NULL DEFAULT \'\'',
+					'requirements'     => 'text',
+					'source'           => 'varchar(255) NOT NULL DEFAULT \'\'',
+					'last_updated'     => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'UNIQUE KEY post_id (post_id)',
+					'KEY university_id (university_id)',
+					'KEY degree_lang (degree, language)',
+				),
+				'fks'     => array(),
+			),
+			'payments'         => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'           => $id,
+					'lead_id'      => 'bigint(20) unsigned NOT NULL',
+					'token'        => 'char(32) NOT NULL',
+					'amount_toman' => 'bigint(20) unsigned NOT NULL',
+					'description'  => 'varchar(255) NOT NULL',
+					'status'       => "enum('pending','paid','failed','expired','cancelled') NOT NULL DEFAULT 'pending'",
+					'expires_at'   => $dtn,
+					'gateway'      => "varchar(20) NOT NULL DEFAULT 'zarinpal'",
+					'authority'    => 'varchar(64) NOT NULL DEFAULT \'\'',
+					'ref_id'       => 'varchar(64) NOT NULL DEFAULT \'\'',
+					'paid_at'      => $dtn,
+					'created_by'   => 'bigint(20) unsigned NOT NULL DEFAULT 0',
+					'revenue_line' => "varchar(20) NOT NULL DEFAULT 'study'",
+					'created_at'   => $dt,
+					'updated_at'   => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'UNIQUE KEY token (token)',
+					'KEY lead_status (lead_id, status)',
+					'KEY status_created (status, created_at)',
+					'KEY revenue_paid (revenue_line, status, paid_at)',
+				),
+				'fks'     => array(),
+			),
+			'rate_history'     => array(
+				'soft'    => false,
+				'columns' => array(
+					'id'           => $id,
+					'currency'     => 'varchar(8) NOT NULL',
+					'usd_per_unit' => 'varchar(32) NOT NULL',
+					'source'       => "varchar(12) NOT NULL DEFAULT 'manual'",
+					'created_at'   => $dt,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'KEY currency_created (currency, created_at)',
+				),
+				'fks'     => array(),
+			),
 		);
 	}
 
@@ -842,7 +1040,7 @@ class Tables {
 		$degree = "enum('bachelor','specialist','master','phd','residency') DEFAULT NULL";
 
 		return array(
-			'services'            => array(
+			'services'             => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'              => $id,
@@ -877,7 +1075,7 @@ class Tables {
 					),
 				),
 			),
-			'leads'               => array(
+			'leads'                => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'                  => $id,
@@ -913,6 +1111,9 @@ class Tables {
 					'priority'            => "enum('low','normal','high','urgent') NOT NULL DEFAULT 'normal'",
 					'next_follow_up_at'   => $dtn,
 					'first_response_at'   => $dtn,
+					'sla_due_at'          => $dtn,
+					'sla_escalated_at'    => $dtn,
+					'sla_overdue'         => 'tinyint(1) NOT NULL DEFAULT 0',
 					'closed_at'           => $dtn,
 					'lost_reason'         => 'varchar(120) DEFAULT NULL',
 					'duplicate_of'        => $fkn,
@@ -939,6 +1140,7 @@ class Tables {
 					'KEY duplicate_of (duplicate_of)',
 					'KEY legacy_post_id (legacy_post_id)',
 					'KEY next_follow_up_at (next_follow_up_at)',
+					'KEY sla_due_at (sla_due_at)',
 					'KEY closed_at (closed_at)',
 					'KEY created_at (created_at)',
 					'KEY deleted_at (deleted_at)',
@@ -964,7 +1166,7 @@ class Tables {
 					),
 				),
 			),
-			'lead_notes'          => array(
+			'lead_notes'           => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'         => $id,
@@ -991,7 +1193,7 @@ class Tables {
 					),
 				),
 			),
-			'lead_tasks'          => array(
+			'lead_tasks'           => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'           => $id,
@@ -1026,7 +1228,7 @@ class Tables {
 					),
 				),
 			),
-			'lead_files'          => array(
+			'lead_files'           => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'            => $id,
@@ -1058,7 +1260,7 @@ class Tables {
 					),
 				),
 			),
-			'lead_status_history' => array(
+			'lead_status_history'  => array(
 				'soft'    => false,
 				'columns' => array(
 					'id'          => $id,
@@ -1083,7 +1285,7 @@ class Tables {
 					),
 				),
 			),
-			'admission_requests'  => array(
+			'admission_requests'   => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'                => $id,
@@ -1153,7 +1355,7 @@ class Tables {
 					),
 				),
 			),
-			'exchange_requests'   => array(
+			'exchange_requests'    => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'                => $id,
@@ -1191,7 +1393,7 @@ class Tables {
 					),
 				),
 			),
-			'cargo_requests'      => array(
+			'cargo_requests'       => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'                  => $id,
@@ -1237,7 +1439,42 @@ class Tables {
 					),
 				),
 			),
-			'trade_requests'      => array(
+			'immigration_requests' => array(
+				'soft'    => true,
+				'columns' => array(
+					'id'           => $id,
+					'lead_id'      => $fk,
+					'request_type' => "enum('visa','residency','registration','work','deportation','entry-ban') NOT NULL DEFAULT 'visa'",
+					'nationality'  => 'varchar(80) NOT NULL DEFAULT \'\'',
+					'current_city' => 'varchar(100) NOT NULL DEFAULT \'\'',
+					'visa_status'  => 'varchar(80) NOT NULL DEFAULT \'\'',
+					'expiry_date'  => 'date DEFAULT NULL',
+					'documents'    => 'text',
+					'operator_id'  => $fkn,
+					'stage'        => "enum('new','reviewing','documents','in_progress','done','cancelled') NOT NULL DEFAULT 'new'",
+					'created_at'   => $dt,
+					'updated_at'   => $dt,
+					'deleted_at'   => $dtn,
+				),
+				'primary' => 'id',
+				'indexes' => array(
+					'KEY lead_id (lead_id)',
+					'KEY stage_created (stage, created_at)',
+					'KEY operator_stage (operator_id, stage)',
+					'KEY request_type (request_type)',
+					'KEY created_at (created_at)',
+					'KEY deleted_at (deleted_at)',
+				),
+				'fks'     => array(
+					array(
+						'column'     => 'lead_id',
+						'ref_table'  => 'leads',
+						'ref_column' => 'id',
+						'name'       => 'imm_lead',
+					),
+				),
+			),
+			'trade_requests'       => array(
 				'soft'    => true,
 				'columns' => array(
 					'id'                  => $id,

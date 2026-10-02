@@ -42,7 +42,7 @@ class Query {
 		global $wpdb;
 		$unis   = $wpdb->prefix . 'lr_universities';
 		$cities = $wpdb->prefix . 'lr_cities';
-		$where  = array( 'u.deleted_at IS NULL', "u.status = 'published'" );
+		$where  = array( 'u.deleted_at IS NULL', "u.status = 'published'", self::not_demo_sql( 'u.post_id' ) );
 		$params = array();
 		self::university_filters( $where, $params, $filters );
 		$sql_where = implode( ' AND ', $where );
@@ -517,7 +517,7 @@ class Query {
 		$name = $wpdb->prefix . $table;
 		$row  = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM `{$name}` WHERE slug = %s AND status = 'published' AND deleted_at IS NULL LIMIT 1",
+				"SELECT * FROM `{$name}` WHERE slug = %s AND status = 'published' AND deleted_at IS NULL AND " . self::not_demo_sql( 'post_id' ) . ' LIMIT 1',
 				$slug
 			),
 			ARRAY_A
@@ -562,11 +562,12 @@ class Query {
 		}
 		global $wpdb;
 		$name  = $wpdb->prefix . $table;
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$name}` WHERE status = 'published' AND deleted_at IS NULL" );
+		$demo  = self::not_demo_sql( 'post_id' );
+		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$name}` WHERE status = 'published' AND deleted_at IS NULL AND {$demo}" );
 		$pages = max( 1, (int) ceil( $total / self::PER_PAGE ) );
 		$rows  = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM `{$name}` WHERE status = 'published' AND deleted_at IS NULL ORDER BY name_fa ASC LIMIT %d OFFSET %d",
+				"SELECT * FROM `{$name}` WHERE status = 'published' AND deleted_at IS NULL AND {$demo} ORDER BY name_fa ASC LIMIT %d OFFSET %d",
 				self::PER_PAGE,
 				( $page - 1 ) * self::PER_PAGE
 			),
@@ -603,7 +604,7 @@ class Query {
 		global $wpdb;
 		$unis   = $wpdb->prefix . 'lr_universities';
 		$cities = $wpdb->prefix . 'lr_cities';
-		$where  = array( 'u.deleted_at IS NULL', "u.status = 'published'" );
+		$where  = array( 'u.deleted_at IS NULL', "u.status = 'published'", self::not_demo_sql( 'u.post_id' ) );
 		$params = array();
 		self::university_filters( $where, $params, $filters );
 		$sql_where = implode( ' AND ', $where );
@@ -645,9 +646,10 @@ class Query {
 		$prep   = $wpdb->prefix . 'lr_prep_programs';
 		$unis   = $wpdb->prefix . 'lr_universities';
 		$cities = $wpdb->prefix . 'lr_cities';
+		$demo   = self::not_demo_sql( 'u.post_id' );
 		$sql    = "SELECT p.duration_months, p.tuition, p.currency, p.track, p.format, u.id AS university_id, u.post_id, u.name_fa, u.slug, c.name_fa AS city_name
 			FROM `{$prep}` p
-			INNER JOIN `{$unis}` u ON u.id = p.university_id AND u.deleted_at IS NULL AND u.status = 'published'
+			INNER JOIN `{$unis}` u ON u.id = p.university_id AND u.deleted_at IS NULL AND u.status = 'published' AND {$demo}
 			LEFT JOIN `{$cities}` c ON c.id = u.city_id
 			WHERE p.program_type = %s AND p.status = 'active' AND p.deleted_at IS NULL
 			ORDER BY u.name_fa ASC
@@ -663,7 +665,7 @@ class Query {
 		}
 		$flag = 'padfak' === $type ? 'has_padfak' : 'has_direct_course';
 		$more = $wpdb->get_results(
-			"SELECT u.post_id, u.name_fa, u.slug, c.name_fa AS city_name, u.id AS university_id FROM `{$unis}` u LEFT JOIN `{$cities}` c ON c.id = u.city_id WHERE u.deleted_at IS NULL AND u.status = 'published' AND u.{$flag} = 1 ORDER BY u.name_fa ASC LIMIT 100",
+			"SELECT u.post_id, u.name_fa, u.slug, c.name_fa AS city_name, u.id AS university_id FROM `{$unis}` u LEFT JOIN `{$cities}` c ON c.id = u.city_id WHERE u.deleted_at IS NULL AND u.status = 'published' AND u.{$flag} = 1 AND {$demo} ORDER BY u.name_fa ASC LIMIT 100",
 			ARRAY_A
 		);
 		foreach ( (array) $more as $row ) {
@@ -689,7 +691,27 @@ class Query {
 	 * @param array<string, mixed> $filters Filters.
 	 * @param int                  $page    Page.
 	 */
+	/**
+	 * SQL fragment that hides posts flagged `_lr_demo=1`.
+	 *
+	 * @param string $post_column Column such as u.post_id.
+	 */
+	private static function not_demo_sql( string $post_column ): string {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			return '1=1';
+		}
+		global $wpdb;
+		return "NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} lr_dm WHERE lr_dm.post_id = {$post_column} AND lr_dm.meta_key = '_lr_demo' AND lr_dm.meta_value = '1')";
+	}
+
+	/**
+	 * Transient key tied to the catalog generation.
+	 *
+	 * @param string               $kind    Kind.
+	 * @param array<string, mixed> $filters Filters.
+	 * @param int                  $page    Page.
+	 */
 	private static function cache_key( string $kind, array $filters, int $page ): string {
-		return 'lr_cat_' . Store::generation() . '_' . md5( $kind . '|' . $page . '|' . wp_json_encode( $filters ) );
+		return 'lr_cat_' . Store::generation() . '_d2_' . md5( $kind . '|' . $page . '|' . wp_json_encode( $filters ) );
 	}
 }

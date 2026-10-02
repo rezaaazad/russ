@@ -289,10 +289,11 @@ class Screens {
 	 */
 	private static function request_kpis(): void {
 		$queues = array(
-			'lr_access_admission'         => array( 'admission_requests', __( 'درخواست پذیرش', 'liferuss-core' ), true ),
-			'lr_manage_exchange_requests' => array( 'exchange_requests', __( 'درخواست صرافی', 'liferuss-core' ), false ),
-			'lr_manage_cargo_requests'    => array( 'cargo_requests', __( 'درخواست کارگو', 'liferuss-core' ), false ),
-			'lr_manage_trade_requests'    => array( 'trade_requests', __( 'درخواست تجارت', 'liferuss-core' ), false ),
+			'lr_access_admission'            => array( 'admission_requests', __( 'درخواست پذیرش', 'liferuss-core' ), true ),
+			'lr_manage_exchange_requests'    => array( 'exchange_requests', __( 'درخواست صرافی', 'liferuss-core' ), false ),
+			'lr_manage_cargo_requests'       => array( 'cargo_requests', __( 'درخواست کارگو', 'liferuss-core' ), false ),
+			'lr_manage_trade_requests'       => array( 'trade_requests', __( 'درخواست تجارت', 'liferuss-core' ), false ),
+			'lr_manage_immigration_requests' => array( 'immigration_requests', __( 'درخواست مهاجرت', 'liferuss-core' ), false ),
 		);
 		foreach ( $queues as $cap => $meta ) {
 			if ( ! current_user_can( $cap ) && ! ( $meta[2] && current_user_can( 'lr_view_own_admission_requests' ) ) ) {

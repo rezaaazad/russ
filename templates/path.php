@@ -31,18 +31,18 @@ $program  = (string) get_post_meta( $post_id, '_lr_program', true );
 
 <header class="page-hero">
 	<div class="container">
-		<?php if ( $eyebrow ) : ?>
+		<?php if ( $eyebrow && ! liferuss_is_placeholder_copy( $eyebrow ) ) : ?>
 			<p class="eyebrow"><?php echo esc_html( $eyebrow ); ?></p>
 		<?php endif; ?>
 		<h1><?php the_title(); ?></h1>
-		<?php if ( $lead ) : ?>
+		<?php if ( $lead && ! liferuss_is_placeholder_copy( $lead ) ) : ?>
 			<p><?php echo esc_html( $lead ); ?></p>
 		<?php endif; ?>
 		<?php liferuss_breadcrumbs(); ?>
 	</div>
 </header>
 
-<?php if ( get_the_content() ) : ?>
+<?php if ( get_the_content() && ! liferuss_is_placeholder_copy( get_the_content() ) ) : ?>
 <section class="section">
 	<div class="container path-prose">
 		<?php the_content(); ?>
@@ -58,6 +58,9 @@ $program  = (string) get_post_meta( $post_id, '_lr_program', true );
 			$title = isset( $section['title'] ) ? (string) $section['title'] : '';
 			$body  = isset( $section['body'] ) ? (string) $section['body'] : '';
 			if ( '' === $title && '' === trim( wp_strip_all_tags( $body ) ) ) {
+				continue;
+			}
+			if ( liferuss_is_placeholder_copy( $title . ' ' . $body ) ) {
 				continue;
 			}
 			?>

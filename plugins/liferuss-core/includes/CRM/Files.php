@@ -132,7 +132,8 @@ class Files {
 		if ( ! $file || ! empty( $file['purged_at'] ) ) {
 			wp_die( esc_html__( 'فایل پیدا نشد.', 'liferuss-core' ), '', array( 'response' => 404 ) );
 		}
-		if ( ! LeadWriter::can_view( (int) $file['lead_id'] ) ) {
+		$owner = is_user_logged_in() && class_exists( '\LifeRuss\Core\Account\Portal' ) && \LifeRuss\Core\Account\Portal::owns( get_current_user_id(), (int) $file['lead_id'] );
+		if ( ! $owner && ! LeadWriter::can_view( (int) $file['lead_id'] ) ) {
 			wp_die( esc_html__( 'به این فایل دسترسی ندارید.', 'liferuss-core' ), '', array( 'response' => 403 ) );
 		}
 		$path = self::locate( (string) $file['stored_path'] );
