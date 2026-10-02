@@ -217,4 +217,100 @@ class Jalali {
 		}
 		return gmdate( 'Y-m-d H:i:s', $start );
 	}
+
+	/**
+	 * Tehran-local Jalali parts for today plus a day offset.
+	 *
+	 * @param int $day_offset Days from today. Negative is earlier.
+	 * @return array{0: int, 1: int, 2: int}
+	 */
+	public static function tehran_parts( int $day_offset = 0 ): array {
+		$local = time() + (int) ( 3.5 * HOUR_IN_SECONDS ) + ( $day_offset * DAY_IN_SECONDS );
+		return self::to_jalali( (int) gmdate( 'Y', $local ), (int) gmdate( 'n', $local ), (int) gmdate( 'j', $local ) );
+	}
+
+	/**
+	 * ASCII Jalali date.
+	 *
+	 * @param array{0: int, 1: int, 2: int} $parts Year, month, day.
+	 */
+	public static function ymd( array $parts ): string {
+		return sprintf( '%04d/%02d/%02d', $parts[0], $parts[1], $parts[2] );
+	}
+
+	/**
+	 * Western digits to Persian digits.
+	 *
+	 * @param string $ascii Digits.
+	 */
+	public static function fa_digits( string $ascii ): string {
+		return strtr(
+			$ascii,
+			array(
+				'0' => '۰',
+				'1' => '۱',
+				'2' => '۲',
+				'3' => '۳',
+				'4' => '۴',
+				'5' => '۵',
+				'6' => '۶',
+				'7' => '۷',
+				'8' => '۸',
+				'9' => '۹',
+			)
+		);
+	}
+
+	/**
+	 * Dashboard presets in the current Jalali year.
+	 *
+	 * @return array<string, array{label: string, from: string, to: string}>
+	 */
+	public static function presets(): array {
+		$today = self::tehran_parts( 0 );
+		$to    = self::ymd( $today );
+		return array(
+			'today' => array(
+				'label' => 'امروز',
+				'from'  => $to,
+				'to'    => $to,
+			),
+			'7'     => array(
+				'label' => '۷ روز',
+				'from'  => self::ymd( self::tehran_parts( -6 ) ),
+				'to'    => $to,
+			),
+			'30'    => array(
+				'label' => '۳۰ روز',
+				'from'  => self::ymd( self::tehran_parts( -29 ) ),
+				'to'    => $to,
+			),
+			'month' => array(
+				'label' => 'این ماه',
+				'from'  => sprintf( '%04d/%02d/01', $today[0], $today[1] ),
+				'to'    => $to,
+			),
+			'year'  => array(
+				'label' => 'امسال',
+				'from'  => sprintf( '%04d/01/01', $today[0] ),
+				'to'    => $to,
+			),
+		);
+	}
+
+	/**
+	 * Placeholder pair for the current Jalali year, in Persian digits.
+	 *
+	 * @return array{0: string, 1: string}
+	 */
+	public static function year_hint(): array {
+		$year  = self::tehran_parts( 0 )[0];
+		$probe = self::to_gregorian( $year, 12, 30 );
+		$back  = self::to_jalali( $probe[0], $probe[1], $probe[2] );
+		$last  = ( $back[0] === $year && 12 === $back[1] ) ? 30 : 29;
+		return array(
+			self::fa_digits( sprintf( '%04d/01/01', $year ) ),
+			self::fa_digits( sprintf( '%04d/12/%02d', $year, $last ) ),
+		);
+	}
 }

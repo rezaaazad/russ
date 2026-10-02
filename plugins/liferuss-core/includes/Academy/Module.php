@@ -40,7 +40,9 @@ class Module {
 	 */
 	public static function install(): void {
 		Catalog::seed_categories();
+		Catalog::fill_descriptions();
 		Legacy::maybe();
+		Legacy::relabel_shop();
 		Finance::backfill();
 	}
 

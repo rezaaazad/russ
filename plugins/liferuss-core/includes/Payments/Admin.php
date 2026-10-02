@@ -44,8 +44,9 @@ class Admin {
 		echo '<div class="wrap lr-wrap"><h1>' . esc_html__( 'پرداخت‌های خدمات', 'liferuss-core' ) . '</h1>';
 		echo '<form method="get">';
 		echo '<input type="hidden" name="page" value="lr-payments">';
-		echo '<input type="text" name="lr_after" placeholder="از ۱۴۰۴/۰۱/۰۱" value="' . esc_attr( $after ) . '"> ';
-		echo '<input type="text" name="lr_before" placeholder="تا ۱۴۰۴/۱۲/۲۹" value="' . esc_attr( $before ) . '"> ';
+		$hint = Jalali::year_hint();
+		echo '<input type="text" name="lr_after" placeholder="' . esc_attr( 'از ' . $hint[0] ) . '" value="' . esc_attr( $after ) . '"> ';
+		echo '<input type="text" name="lr_before" placeholder="' . esc_attr( 'تا ' . $hint[1] ) . '" value="' . esc_attr( $before ) . '"> ';
 		echo '<select name="lr_status"><option value="">همه</option>';
 		foreach ( Checkout::statuses() as $key => $label ) {
 			echo '<option value="' . esc_attr( $key ) . '" ' . selected( $status, $key, false ) . '>' . esc_html( $label ) . '</option>';

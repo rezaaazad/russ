@@ -25,6 +25,7 @@ class Admin {
 	 */
 	public static function hooks(): void {
 		add_action( 'admin_menu', array( self::class, 'menu' ) );
+		add_action( 'admin_enqueue_scripts', array( self::class, 'assets' ) );
 		add_action( 'admin_post_lr_academy_save', array( self::class, 'save' ) );
 		add_action( 'admin_post_lr_academy_export', array( self::class, 'export' ) );
 		add_action( 'admin_post_lr_finance_export', array( self::class, 'export_finance' ) );
@@ -51,8 +52,8 @@ class Admin {
 		$data  = Metrics::summary( $range[0], $range[1], self::instructor_scope() );
 		$now   = $data['current'];
 		$prev  = $data['previous'];
-		echo '<div class="wrap"><h1>داشبورد آکادمی</h1>';
-		self::range_form( 'lr-academy' );
+		echo '<div class="wrap lr-academy-dash"><h1>داشبورد آکادمی</h1>';
+		self::range_form( 'lr-academy', $range[2], $range[3] );
 		if ( current_user_can( 'lr_export_academy' ) ) {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 			wp_nonce_field( 'lr_academy_save' );
@@ -60,23 +61,30 @@ class Admin {
 			submit_button( 'خروجی CSV', 'secondary', 'submit', false );
 			echo '</form>';
 		}
-		echo '<table class="widefat striped" style="max-width:920px"><thead><tr><th>شاخص</th><th>این بازه</th><th>بازهٔ قبل</th></tr></thead><tbody>';
-		self::metric_row( 'درآمد آکادمی', $now['revenue'], $prev['revenue'] );
-		self::metric_row( 'فروش دوره', $now['courses'], $prev['courses'] );
-		self::metric_row( 'درآمد اشتراک', $now['subscriptions'], $prev['subscriptions'] );
-		self::metric_row( 'کلاس خصوصی', $now['private'], $prev['private'] );
-		self::metric_row( 'کلاس گروهی', $now['group'], $prev['group'] );
-		self::metric_row( 'بازپرداخت', $now['refunds'], $prev['refunds'] );
-		echo '<tr><td>دانشجوی فعال (۳۰ روز اخیر)</td><td>' . esc_html( (string) $now['active'] ) . '</td><td>' . esc_html( (string) $prev['active'] ) . '</td></tr>';
-		echo '<tr><td>دانشجوی جدید</td><td>' . esc_html( (string) $now['new_students'] ) . '</td><td>' . esc_html( (string) $prev['new_students'] ) . '</td></tr>';
-		echo '<tr><td>نرخ تبدیل</td><td>' . esc_html( (string) $now['conversion'] ) . '٪</td><td>' . esc_html( (string) $prev['conversion'] ) . '٪</td></tr>';
-		echo '</tbody></table>';
-		echo '<h2>پرفروش‌ها</h2><ul>';
-		foreach ( $now['bestsellers'] as $row ) {
-			echo '<li>' . esc_html( (string) $row['title'] ) . ' — ' . esc_html( (string) $row['sales'] ) . '</li>';
-		}
-		echo '</ul>';
-		self::chart( $now['days'] );
+		echo '<div class="lr-kpis">';
+		self::kpi( 'درآمد آکادمی', number_format_i18n( (int) $now['revenue'] ), (int) $now['revenue'], (int) $prev['revenue'], false );
+		self::kpi( 'فروش دوره', number_format_i18n( (int) $now['courses'] ), (int) $now['courses'], (int) $prev['courses'], false );
+		self::kpi( 'اشتراک', number_format_i18n( (int) $now['subscriptions'] ), (int) $now['subscriptions'], (int) $prev['subscriptions'], false );
+		self::kpi( 'کلاس خصوصی', number_format_i18n( (int) $now['private'] ), (int) $now['private'], (int) $prev['private'], false );
+		self::kpi( 'کلاس گروهی', number_format_i18n( (int) $now['group'] ), (int) $now['group'], (int) $prev['group'], false );
+		self::kpi( 'بازپرداخت', number_format_i18n( (int) $now['refunds'] ), (int) $now['refunds'], (int) $prev['refunds'], true );
+		self::kpi( 'دانشجوی جدید', number_format_i18n( (int) $now['new_students'] ), (int) $now['new_students'], (int) $prev['new_students'], false );
+		self::kpi( 'نرخ تبدیل', (string) $now['conversion'] . '٪', (float) $now['conversion'], (float) $prev['conversion'], false );
+		echo '</div>';
+		echo '<div class="lr-charts">';
+		echo '<section class="lr-panel"><h2>درآمد در طول زمان</h2>';
+		self::revenue_chart( (array) $now['days'] );
+		echo '</section>';
+		echo '<section class="lr-panel"><h2>درآمد به تفکیک مدل</h2>';
+		self::model_chart( $now );
+		echo '</section></div>';
+		echo '<div class="lr-split">';
+		echo '<section class="lr-panel"><h2>پرفروش‌ها</h2>';
+		self::bestsellers_table( (array) $now['bestsellers'] );
+		echo '</section>';
+		echo '<section class="lr-panel"><h2>سفارش‌های اخیر</h2>';
+		self::recent_orders();
+		echo '</section></div>';
 		echo '</div>';
 	}
 
@@ -209,22 +217,29 @@ class Admin {
 	 */
 	public static function finance(): void {
 		self::guard( 'lr_view_finance' );
-		$range  = self::range();
-		$report = Finance::report( $range[0], $range[1] );
-		echo '<div class="wrap"><h1>گزارش مالی لایف‌روس</h1>';
-		self::range_form( 'lr-academy-finance' );
+		$range     = self::range();
+		$report    = Finance::report( $range[0], $range[1] );
+		$seconds   = max( 1, strtotime( $range[1] . ' UTC' ) - strtotime( $range[0] . ' UTC' ) );
+		$prev_to   = gmdate( 'Y-m-d H:i:s', strtotime( $range[0] . ' UTC' ) - 1 );
+		$prev_from = gmdate( 'Y-m-d H:i:s', strtotime( $prev_to . ' UTC' ) - $seconds );
+		$previous  = Finance::report( $prev_from, $prev_to );
+		echo '<div class="wrap lr-academy-dash"><h1>گزارش مالی لایف‌روس</h1>';
+		self::range_form( 'lr-academy-finance', $range[2], $range[3] );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		wp_nonce_field( 'lr_academy_save' );
 		echo '<input type="hidden" name="action" value="lr_finance_export"><input type="hidden" name="from" value="' . esc_attr( $range[2] ) . '"><input type="hidden" name="to" value="' . esc_attr( $range[3] ) . '">';
 		submit_button( 'خروجی CSV', 'secondary', 'submit', false );
 		echo '</form>';
-		echo '<table class="widefat striped" style="max-width:640px"><thead><tr><th>خط</th><th>خالص (تومان)</th></tr></thead><tbody>';
+		echo '<div class="lr-kpis">';
 		foreach ( Finance::lines() as $key => $label ) {
-			echo '<tr><td>' . esc_html( $label ) . '</td><td>' . esc_html( (string) ( $report['totals'][ $key ] ?? 0 ) ) . '</td></tr>';
+			$amount = (int) ( $report['totals'][ $key ] ?? 0 );
+			$before = (int) ( $previous['totals'][ $key ] ?? 0 );
+			self::kpi( $label, number_format_i18n( $amount ), $amount, $before, false );
 		}
-		echo '</tbody></table>';
-		self::chart( self::finance_days( $report['days'] ) );
 		echo '</div>';
+		echo '<section class="lr-panel"><h2>درآمد خط‌ها در طول زمان</h2>';
+		self::finance_chart( $report['days'] );
+		echo '</section></div>';
 	}
 
 	/**
@@ -431,15 +446,67 @@ class Admin {
 	}
 
 	/**
-	 * Jalali range from the query, defaulting to the last 30 days.
+	 * Chart.js and the dashboard styles, only on the two report screens.
+	 *
+	 * @param string $hook Admin hook suffix.
+	 */
+	public static function assets( string $hook ): void {
+		if ( 'toplevel_page_lr-academy' !== $hook && 'lr-academy_page_lr-academy-finance' !== $hook ) {
+			return;
+		}
+		wp_enqueue_style( 'lr-academy-admin', LIFERUSS_CORE_URL . 'assets/academy-admin.css', array(), LIFERUSS_CORE_VERSION );
+		wp_enqueue_script( 'lr-chart', LIFERUSS_CORE_URL . 'assets/chart.umd.min.js', array(), '4.4.6', true );
+		wp_enqueue_script( 'lr-academy-admin', LIFERUSS_CORE_URL . 'assets/academy-admin.js', array( 'lr-chart' ), LIFERUSS_CORE_VERSION, true );
+	}
+
+	/**
+	 * Jalali range from the query. Empty fields mean the last 30 Tehran days.
 	 *
 	 * @return array{0: string, 1: string, 2: string, 3: string}
 	 */
 	private static function range(): array {
-		$from  = isset( $_GET['from'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['from'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$to    = isset( $_GET['to'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['to'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$start = $from ? Jalali::filter_utc( $from, false ) : gmdate( 'Y-m-d H:i:s', time() - ( 30 * DAY_IN_SECONDS ) );
-		$end   = $to ? Jalali::filter_utc( $to, true ) : Db::now();
+		$from = isset( $_GET['from'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['from'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$to   = isset( $_GET['to'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['to'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return self::bounds_from_text( $from, $to );
+	}
+
+	/**
+	 * Range posted with an export.
+	 *
+	 * @return array{0: string, 1: string}
+	 */
+	private static function posted_range(): array {
+		$from   = isset( $_POST['from'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['from'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is checked in the export handler.
+		$to     = isset( $_POST['to'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['to'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is checked in the export handler.
+		$bounds = self::bounds_from_text( $from, $to );
+		return array( $bounds[0], $bounds[1] );
+	}
+
+	/**
+	 * Resolve Jalali inputs to UTC bounds. Blank input uses the 30-day preset.
+	 *
+	 * @param string $from From text.
+	 * @param string $to   To text.
+	 * @return array{0: string, 1: string, 2: string, 3: string}
+	 */
+	private static function bounds_from_text( string $from, string $to ): array {
+		$preset = Jalali::presets()['30'];
+		if ( '' === $from ) {
+			$from = $preset['from'];
+		}
+		if ( '' === $to ) {
+			$to = $preset['to'];
+		}
+		$start = Jalali::filter_utc( $from, false );
+		$end   = Jalali::filter_utc( $to, true );
+		if ( '' === $start ) {
+			$from  = $preset['from'];
+			$start = Jalali::filter_utc( $from, false );
+		}
+		if ( '' === $end ) {
+			$to  = $preset['to'];
+			$end = Jalali::filter_utc( $to, true );
+		}
 		if ( '' === $start ) {
 			$start = gmdate( 'Y-m-d H:i:s', time() - ( 30 * DAY_IN_SECONDS ) );
 		}
@@ -450,78 +517,278 @@ class Admin {
 	}
 
 	/**
-	 * Range posted with an export.
-	 *
-	 * @return array{0: string, 1: string}
-	 */
-	private static function posted_range(): array {
-		$from  = isset( $_POST['from'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['from'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is checked in the export handler.
-		$to    = isset( $_POST['to'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['to'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is checked in the export handler.
-		$start = $from ? Jalali::filter_utc( $from, false ) : gmdate( 'Y-m-d H:i:s', time() - ( 30 * DAY_IN_SECONDS ) );
-		$end   = $to ? Jalali::filter_utc( $to, true ) : Db::now();
-		return array( $start ? $start : Db::now(), $end ? $end : Db::now() );
-	}
-
-	/**
-	 * Date filter.
+	 * Date filter with the current Jalali year and presets.
 	 *
 	 * @param string $page Admin page slug.
+	 * @param string $from Resolved from.
+	 * @param string $to   Resolved to.
 	 */
-	private static function range_form( string $page ): void {
-		echo '<form method="get"><input type="hidden" name="page" value="' . esc_attr( $page ) . '">';
-		echo '<input name="from" placeholder="از ۱۴۰۴/۰۱/۰۱"> <input name="to" placeholder="تا ۱۴۰۴/۱۲/۲۹"> ';
+	private static function range_form( string $page, string $from, string $to ): void {
+		$hint = Jalali::year_hint();
+		echo '<div class="lr-presets">';
+		foreach ( Jalali::presets() as $preset ) {
+			$url   = add_query_arg(
+				array(
+					'page' => $page,
+					'from' => $preset['from'],
+					'to'   => $preset['to'],
+				),
+				admin_url( 'admin.php' )
+			);
+			$class = ( $from === $preset['from'] && $to === $preset['to'] ) ? 'button button-primary' : 'button';
+			echo '<a class="' . esc_attr( $class ) . '" href="' . esc_url( $url ) . '">' . esc_html( $preset['label'] ) . '</a>';
+		}
+		echo '</div>';
+		echo '<form class="lr-range" method="get"><input type="hidden" name="page" value="' . esc_attr( $page ) . '">';
+		echo '<input type="text" name="from" inputmode="numeric" value="' . esc_attr( $from ) . '" placeholder="' . esc_attr( 'از ' . $hint[0] ) . '"> ';
+		echo '<input type="text" name="to" inputmode="numeric" value="' . esc_attr( $to ) . '" placeholder="' . esc_attr( 'تا ' . $hint[1] ) . '"> ';
 		submit_button( 'اعمال', 'secondary', 'submit', false );
 		echo '</form>';
 	}
 
 	/**
-	 * One comparison row.
+	 * One KPI card with a percent change against the previous window.
 	 *
-	 * @param string $label Label.
-	 * @param int    $now   Current.
-	 * @param int    $prev  Previous.
+	 * @param string    $label   Label.
+	 * @param string    $display Already formatted value.
+	 * @param int|float $now     Current.
+	 * @param int|float $prev    Previous.
+	 * @param bool      $invert  True when an increase is worse, such as refunds.
 	 */
-	private static function metric_row( string $label, int $now, int $prev ): void {
-		echo '<tr><td>' . esc_html( $label ) . '</td><td>' . esc_html( number_format_i18n( $now ) ) . '</td><td>' . esc_html( number_format_i18n( $prev ) ) . '</td></tr>';
+	private static function kpi( string $label, string $display, $now, $prev, bool $invert ): void {
+		$now  = (float) $now;
+		$prev = (float) $prev;
+		echo '<article class="lr-kpi"><span>' . esc_html( $label ) . '</span><strong>' . esc_html( $display ) . '</strong>';
+		if ( 0.0 === $now && 0.0 === $prev ) {
+			echo '<span class="lr-delta">—</span>';
+		} else {
+			$pct  = ( 0.0 === $prev ) ? 100.0 : ( ( $now - $prev ) * 100 ) / $prev;
+			$up   = $now >= $prev;
+			$good = $invert ? ! $up : $up;
+			$mark = $up ? '▲' : '▼';
+			echo '<span class="lr-delta ' . esc_attr( $good ? 'up' : 'down' ) . '">' . esc_html( $mark . ' ' . number_format_i18n( abs( $pct ), 1 ) . '٪' ) . '</span>';
+		}
+		echo '</article>';
 	}
 
 	/**
-	 * SVG bars.
+	 * Revenue bars for the selected window.
 	 *
 	 * @param array<int, array<string, mixed>> $days Days.
 	 */
-	private static function chart( array $days ): void {
-		echo '<h2>روند</h2><svg viewBox="0 0 640 160" width="100%" height="160" role="img">';
-		$max = 1;
-		foreach ( $days as $day ) {
-			$max = max( $max, (int) $day['amount'] );
+	private static function revenue_chart( array $days ): void {
+		if ( ! $days ) {
+			echo '<p class="lr-empty">در این بازه درآمدی ثبت نشده است.</p>';
+			return;
 		}
-		$i = 0;
-		$n = max( 1, count( $days ) );
+		$labels = array();
+		$values = array();
 		foreach ( $days as $day ) {
-			$h = (int) round( ( (int) $day['amount'] * 120 ) / $max );
-			$x = (int) round( ( $i * 620 ) / $n );
-			echo '<rect x="' . esc_attr( (string) $x ) . '" y="' . esc_attr( (string) ( 140 - $h ) ) . '" width="12" height="' . esc_attr( (string) $h ) . '" fill="#0b2341"/>';
-			++$i;
+			$labels[] = (string) $day['day'];
+			$values[] = (int) $day['amount'];
 		}
-		echo '</svg>';
+		self::chart_canvas(
+			'revenue',
+			array(
+				'type'    => 'bar',
+				'data'    => array(
+					'labels'   => $labels,
+					'datasets' => array(
+						array(
+							'type'            => 'bar',
+							'label'           => 'درآمد',
+							'data'            => $values,
+							'backgroundColor' => '#0b2341',
+							'borderRadius'    => 4,
+							'order'           => 2,
+						),
+						array(
+							'type'            => 'line',
+							'label'           => 'روند',
+							'data'            => $values,
+							'borderColor'     => '#e8b923',
+							'backgroundColor' => '#e8b923',
+							'tension'         => 0.3,
+							'order'           => 1,
+						),
+					),
+				),
+				'options' => self::chart_options( false ),
+			)
+		);
 	}
 
 	/**
-	 * Flatten finance days to amount bars.
+	 * Doughnut of course, plan, and class revenue.
+	 *
+	 * @param array<string, mixed> $now Current slice.
+	 */
+	private static function model_chart( array $now ): void {
+		$values = array(
+			(int) $now['courses'],
+			(int) $now['subscriptions'],
+			(int) $now['private'],
+			(int) $now['group'],
+		);
+		$sum    = 0;
+		foreach ( $values as $value ) {
+			$sum += $value;
+		}
+		if ( $sum < 1 ) {
+			echo '<p class="lr-empty">در این بازه فروشی ثبت نشده است.</p>';
+			return;
+		}
+		self::chart_canvas(
+			'models',
+			array(
+				'type'    => 'doughnut',
+				'data'    => array(
+					'labels'   => array( 'دوره', 'اشتراک', 'کلاس خصوصی', 'کلاس گروهی' ),
+					'datasets' => array(
+						array(
+							'data'            => $values,
+							'backgroundColor' => array( '#0b2341', '#e8b923', '#14325a', '#8aa0bd' ),
+							'borderWidth'     => 0,
+						),
+					),
+				),
+				'options' => array(
+					'responsive'          => true,
+					'maintainAspectRatio' => false,
+					'plugins'             => array(
+						'legend' => array(
+							'position' => 'bottom',
+						),
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Stacked bars, one series per LifeRuss revenue line.
 	 *
 	 * @param array<string, array<string, int>> $days Days.
-	 * @return array<int, array<string, mixed>>
 	 */
-	private static function finance_days( array $days ): array {
-		$out = array();
-		foreach ( $days as $day => $lines ) {
-			$out[] = array(
-				'day'    => $day,
-				'amount' => array_sum( $lines ),
+	private static function finance_chart( array $days ): void {
+		if ( ! $days ) {
+			echo '<p class="lr-empty">در این بازه درآمدی ثبت نشده است.</p>';
+			return;
+		}
+		$labels = array_keys( $days );
+		$colors = array(
+			'study'    => '#0b2341',
+			'academy'  => '#e8b923',
+			'exchange' => '#14325a',
+			'cargo'    => '#8aa0bd',
+			'trade'    => '#6b4b16',
+		);
+		$sets   = array();
+		foreach ( Finance::lines() as $key => $label ) {
+			$data = array();
+			foreach ( $days as $lines ) {
+				$data[] = (int) ( $lines[ $key ] ?? 0 );
+			}
+			$sets[] = array(
+				'label'           => $label,
+				'data'            => $data,
+				'backgroundColor' => $colors[ $key ],
+				'stack'           => 'revenue',
 			);
 		}
-		return $out;
+		$options                = self::chart_options( true );
+		$options['scales']['x'] = array( 'stacked' => true );
+		$scale_y                = $options['scales']['y'];
+		$scale_y['stacked']     = true;
+		$options['scales']['y'] = $scale_y;
+		self::chart_canvas(
+			'finance',
+			array(
+				'type'    => 'bar',
+				'data'    => array(
+					'labels'   => $labels,
+					'datasets' => $sets,
+				),
+				'options' => $options,
+			)
+		);
+	}
+
+	/**
+	 * Shared Chart.js options.
+	 *
+	 * @param bool $legend Show the legend.
+	 * @return array<string, mixed>
+	 */
+	private static function chart_options( bool $legend ): array {
+		return array(
+			'responsive'          => true,
+			'maintainAspectRatio' => false,
+			'plugins'             => array(
+				'legend' => array(
+					'display'  => $legend,
+					'position' => 'bottom',
+				),
+			),
+			'scales'              => array(
+				'y' => array(
+					'beginAtZero' => true,
+				),
+			),
+		);
+	}
+
+	/**
+	 * Emit a canvas whose config is read by academy-admin.js.
+	 *
+	 * @param string               $id     Canvas id.
+	 * @param array<string, mixed> $config Chart.js config.
+	 */
+	private static function chart_canvas( string $id, array $config ): void {
+		$json = wp_json_encode( $config );
+		echo '<div class="lr-chart-box"><canvas id="' . esc_attr( 'lr-chart-' . $id ) . '" data-lr-chart="' . esc_attr( (string) $json ) . '"></canvas></div>';
+	}
+
+	/**
+	 * Best-seller rows, or a sentence when the window has no course sales.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Rows.
+	 */
+	private static function bestsellers_table( array $rows ): void {
+		if ( ! $rows ) {
+			echo '<p class="lr-empty">در این بازه فروشی ثبت نشده است.</p>';
+			return;
+		}
+		echo '<table class="widefat striped"><thead><tr><th>دوره</th><th>فروش</th><th>مبلغ</th></tr></thead><tbody>';
+		foreach ( $rows as $row ) {
+			echo '<tr><td>' . esc_html( (string) $row['title'] ) . '</td><td>' . esc_html( (string) $row['sales'] ) . '</td><td>' . esc_html( number_format_i18n( (int) $row['amount'] ) ) . '</td></tr>';
+		}
+		echo '</tbody></table>';
+	}
+
+	/**
+	 * Latest orders this user is allowed to see.
+	 */
+	private static function recent_orders(): void {
+		global $wpdb;
+		$table = Db::table( 'orders' );
+		$rows  = $wpdb->get_results( "SELECT * FROM `{$table}` ORDER BY id DESC LIMIT 20", ARRAY_A );
+		$shown = 0;
+		echo '<table class="widefat striped"><thead><tr><th>کد</th><th>وضعیت</th><th>مبلغ</th></tr></thead><tbody>';
+		foreach ( (array) $rows as $row ) {
+			if ( ! self::can_see_order( (int) $row['id'] ) ) {
+				continue;
+			}
+			echo '<tr><td>' . esc_html( (string) $row['code'] ) . '</td><td>' . esc_html( (string) $row['status'] ) . '</td><td>' . esc_html( number_format_i18n( (int) $row['total'] ) ) . '</td></tr>';
+			++$shown;
+			if ( $shown >= 6 ) {
+				break;
+			}
+		}
+		if ( 0 === $shown ) {
+			echo '<tr><td colspan="3">سفارش اخیری نیست.</td></tr>';
+		}
+		echo '</tbody></table>';
 	}
 
 	/**

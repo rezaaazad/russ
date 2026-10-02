@@ -628,8 +628,9 @@ class LeadAdmin {
 		}
 		$after  = isset( $_GET['lr_after'] ) ? sanitize_text_field( wp_unslash( $_GET['lr_after'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$before = isset( $_GET['lr_before'] ) ? sanitize_text_field( wp_unslash( $_GET['lr_before'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		echo '<input type="text" name="lr_after" value="' . esc_attr( $after ) . '" placeholder="' . esc_attr__( 'از ۱۴۰۴/۰۱/۰۱', 'liferuss-core' ) . '" inputmode="numeric"> ';
-		echo '<input type="text" name="lr_before" value="' . esc_attr( $before ) . '" placeholder="' . esc_attr__( 'تا ۱۴۰۴/۱۲/۲۹', 'liferuss-core' ) . '" inputmode="numeric"> ';
+		$hint   = Jalali::year_hint();
+		echo '<input type="text" name="lr_after" value="' . esc_attr( $after ) . '" placeholder="' . esc_attr( 'از ' . $hint[0] ) . '" inputmode="numeric"> ';
+		echo '<input type="text" name="lr_before" value="' . esc_attr( $before ) . '" placeholder="' . esc_attr( 'تا ' . $hint[1] ) . '" inputmode="numeric"> ';
 		submit_button( __( 'فیلتر', 'liferuss-core' ), 'secondary', '', false );
 		echo '</form>';
 	}

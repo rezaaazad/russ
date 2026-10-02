@@ -132,7 +132,7 @@ class Seed {
 			}
 		}
 		if ( ! empty( $made['a2'] ) ) {
-			self::post( 'lr_lesson', 'shop', 'در فروشگاه', 'Сколько стоит برای پرسیدن قیمت است.', $made['a2'], 1 );
+			self::post( 'lr_lesson', 'shop', 'گفتگو در فروشگاه', 'Сколько стоит برای پرسیدن قیمت است.', $made['a2'], 1 );
 		}
 		if ( ! empty( $made['b1'] ) ) {
 			self::post( 'lr_lesson', 'opinion', 'نظر خودم', 'Я думаю, что… برای شروع یک نظر است.', $made['b1'], 1 );

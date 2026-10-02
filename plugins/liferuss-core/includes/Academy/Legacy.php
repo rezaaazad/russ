@@ -36,6 +36,48 @@ class Legacy {
 	}
 
 	/**
+	 * The in-store dialogue lesson keeps the slug shop and a clearer title.
+	 */
+	public static function relabel_shop(): void {
+		if ( get_option( 'lr_academy_shop_label' ) ) {
+			return;
+		}
+		$posts = get_posts(
+			array(
+				'name'           => 'shop',
+				'post_type'      => 'lr_lesson',
+				'post_status'    => 'any',
+				'posts_per_page' => 20,
+			)
+		);
+		foreach ( $posts as $post ) {
+			if ( 'در فروشگاه' === $post->post_title ) {
+				wp_update_post(
+					array(
+						'ID'         => $post->ID,
+						'post_title' => 'گفتگو در فروشگاه',
+					)
+				);
+			}
+		}
+		global $wpdb;
+		$table  = Db::table( 'course_lessons' );
+		$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
+		if ( $exists !== $table ) {
+			return;
+		}
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE `{$table}` SET title = %s WHERE slug = %s AND title = %s",
+				'گفتگو در فروشگاه',
+				'shop',
+				'در فروشگاه'
+			)
+		);
+		update_option( 'lr_academy_shop_label', '1', false );
+	}
+
+	/**
 	 * Build the course and the redirects.
 	 */
 	private static function course(): void {
@@ -157,12 +199,16 @@ class Legacy {
 			return (int) $found['id'];
 		}
 		$placement = '1' === (string) get_post_meta( $post->ID, '_lr_placement', true );
-		$id        = Db::insert(
+		$title     = $post->post_title;
+		if ( 'shop' === $post->post_name && 'در فروشگاه' === $title ) {
+			$title = 'گفتگو در فروشگاه';
+		}
+		$id = Db::insert(
 			'course_lessons',
 			array(
 				'module_id'      => $module_id,
 				'slug'           => $post->post_name,
-				'title'          => $post->post_title,
+				'title'          => $title,
 				'content'        => $post->post_content,
 				'type'           => $placement ? 'quiz' : 'video',
 				'sort_order'     => $order,

@@ -30,6 +30,27 @@ class Seo {
 	 */
 	public static function schema(): void {
 		$context = Front::context();
+		if ( 'landing' === ( $context['screen'] ?? '' ) ) {
+			$entities = array();
+			foreach ( Catalog::faq() as $item ) {
+				$entities[] = array(
+					'@type'          => 'Question',
+					'name'           => $item['q'],
+					'acceptedAnswer' => array(
+						'@type' => 'Answer',
+						'text'  => $item['a'],
+					),
+				);
+			}
+			self::print_schema(
+				array(
+					'@context'   => 'https://schema.org',
+					'@type'      => 'FAQPage',
+					'mainEntity' => $entities,
+				)
+			);
+			return;
+		}
 		if ( 'course' !== ( $context['screen'] ?? '' ) || empty( $context['course'] ) ) {
 			return;
 		}
@@ -47,6 +68,15 @@ class Seo {
 			'inLanguage'  => 'fa',
 			'url'         => home_url( '/academy/courses/' . $course['slug'] . '/' ),
 		);
+		self::print_schema( $data );
+	}
+
+	/**
+	 * One JSON-LD script.
+	 *
+	 * @param array<string, mixed> $data Schema.
+	 */
+	private static function print_schema( array $data ): void {
 		echo '<script type="application/ld+json">' . wp_json_encode( $data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
 	}
 
