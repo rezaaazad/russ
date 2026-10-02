@@ -7,6 +7,8 @@
 
 namespace LifeRuss\Core\Settings;
 
+use LifeRuss\Core\Admin\Chrome;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -111,8 +113,7 @@ class SettingsPage {
 		$tab       = isset( $visible[ $requested ] ) ? $requested : (string) array_key_first( $visible );
 		$notice    = self::maybe_save( $tab );
 
-		echo '<div class="wrap lr-wrap">';
-		echo '<h1>' . esc_html__( 'تنظیمات لایف‌روس', 'liferuss-core' ) . '</h1>';
+		Chrome::open( __( 'تنظیمات لایف‌روس', 'liferuss-core' ), 'تنظیمات' );
 		if ( $notice ) {
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html( $notice ) . '</p></div>';
 		}

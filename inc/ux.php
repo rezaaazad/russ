@@ -528,6 +528,13 @@ function liferuss_default_contact_notice() {
 	if ( ! current_user_can( 'edit_theme_options' ) ) {
 		return;
 	}
+	$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( ! in_array( $page, array( 'liferuss', 'lr-academy' ), true ) ) {
+		return;
+	}
+	if ( (int) get_user_meta( get_current_user_id(), 'lr_notice_contacts', true ) > time() ) {
+		return;
+	}
 	$pending = array();
 	$labels  = array(
 		'phone'        => 'تلفن',
@@ -550,9 +557,11 @@ function liferuss_default_contact_notice() {
 		return;
 	}
 	$url = admin_url( 'themes.php?page=liferuss-options' );
-	echo '<div class="notice notice-warning"><p>';
-	echo esc_html( 'این مقدارهای تماس هنوز پیش‌فرض قالب‌اند و در سایت عمومی نشان داده نمی‌شوند: ' . implode( '، ', $pending ) . '. ' );
+	$bye = wp_nonce_url( admin_url( 'admin-post.php?action=lr_dismiss_notice&key=contacts' ), 'lr_dismiss_notice' );
+	echo '<div class="notice notice-warning lr-compact-notice"><p>';
+	echo esc_html( 'مقدارهای تماس هنوز پیش‌فرض‌اند: ' . implode( '، ', $pending ) . '. ' );
 	echo '<a href="' . esc_url( $url ) . '">' . esc_html( 'تنظیمات قالب' ) . '</a>';
+	echo ' <a href="' . esc_url( $bye ) . '">' . esc_html( 'بستن برای ۷ روز' ) . '</a>';
 	echo '</p></div>';
 }
 add_action( 'admin_notices', 'liferuss_default_contact_notice' );

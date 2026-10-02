@@ -7,6 +7,7 @@
 
 namespace LifeRuss\Core\Academy;
 
+use LifeRuss\Core\Admin\Chrome;
 use LifeRuss\Core\CRM\Jalali;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,9 +25,10 @@ class Admin {
 	 * Hooks.
 	 */
 	public static function hooks(): void {
-		add_action( 'admin_menu', array( self::class, 'menu' ) );
+		add_action( 'admin_menu', array( self::class, 'menu' ), 20 );
 		add_action( 'admin_enqueue_scripts', array( self::class, 'assets' ) );
 		add_action( 'admin_post_lr_academy_save', array( self::class, 'save' ) );
+		Actions::hooks();
 		add_action( 'admin_post_lr_academy_export', array( self::class, 'export' ) );
 		add_action( 'admin_post_lr_finance_export', array( self::class, 'export_finance' ) );
 	}
@@ -35,181 +37,47 @@ class Admin {
 	 * Top-level menu.
 	 */
 	public static function menu(): void {
-		add_menu_page( 'آکادمی', 'آکادمی', 'lr_academy_access', 'lr-academy', array( self::class, 'dashboard' ), 'dashicons-welcome-learn-more', 26 );
-		add_submenu_page( 'lr-academy', 'داشبورد آکادمی', 'داشبورد', 'lr_academy_access', 'lr-academy', array( self::class, 'dashboard' ) );
-		add_submenu_page( 'lr-academy', 'دوره‌ها', 'دوره‌ها', 'lr_academy_access', 'lr-academy-courses', array( self::class, 'courses' ) );
-		add_submenu_page( 'lr-academy', 'سفارش‌ها', 'سفارش‌ها', 'lr_academy_access', 'lr-academy-orders', array( self::class, 'orders' ) );
-		add_submenu_page( 'lr-academy', 'طرح و کلاس', 'طرح و کلاس', 'lr_academy_manage', 'lr-academy-catalog', array( self::class, 'catalog' ) );
-		add_submenu_page( 'lr-academy', 'گزارش مالی', 'گزارش مالی', 'lr_view_finance', 'lr-academy-finance', array( self::class, 'finance' ) );
+		add_menu_page( 'آکادمی', 'آکادمی', 'lr_academy_access', 'lr-academy', array( Desk::class, 'hub' ), 'dashicons-welcome-learn-more', 28 );
+		add_submenu_page( 'lr-academy', 'پیشخوان', 'پیشخوان', 'lr_academy_access', 'lr-academy', array( Desk::class, 'hub' ) );
+		add_submenu_page( 'lr-academy', 'دوره‌ها', 'دوره‌ها', 'lr_academy_access', 'lr-academy-courses', array( Desk::class, 'courses' ) );
+		add_submenu_page( null, 'ویرایش دوره', 'ویرایش دوره', 'lr_academy_access', 'lr-academy-course', array( Desk::class, 'editor' ) );
+		add_submenu_page( 'lr-academy', 'دانشجوها', 'دانشجوها', 'lr_academy_access', 'lr-academy-students', array( People::class, 'students' ) );
+		add_submenu_page( null, 'دانشجو', 'دانشجو', 'lr_academy_access', 'lr-academy-student', array( People::class, 'student' ) );
+		add_submenu_page( 'lr-academy', 'سفارش‌ها و پرداخت‌ها', 'سفارش‌ها و پرداخت‌ها', 'lr_academy_access', 'lr-academy-orders', array( People::class, 'orders' ) );
+		add_submenu_page( null, 'سفارش', 'سفارش', 'lr_academy_access', 'lr-academy-order', array( People::class, 'order' ) );
+		add_submenu_page( 'lr-academy', 'اشتراک‌ها و طرح‌ها', 'اشتراک‌ها و طرح‌ها', 'lr_academy_access', 'lr-academy-plans', array( Commerce::class, 'plans' ) );
+		add_submenu_page( 'lr-academy', 'پرسش و پاسخ و نظرات', 'پرسش و پاسخ و نظرات', 'lr_academy_access', 'lr-academy-qa', array( People::class, 'questions' ) );
+		add_submenu_page( 'lr-academy', 'کلاس‌ها و مدرسان', 'کلاس‌ها و مدرسان', 'lr_academy_access', 'lr-academy-instructors', array( People::class, 'instructors' ) );
+		add_submenu_page( 'lr-academy', 'گزارش‌ها', 'گزارش‌ها', 'lr_academy_access', 'lr-academy-reports', array( Commerce::class, 'reports' ) );
+		add_submenu_page( 'lr-academy', 'تنظیمات', 'تنظیمات', 'lr_academy_manage', 'lr-academy-settings', array( Commerce::class, 'settings' ) );
 	}
 
 	/**
 	 * Dashboard with a Jalali range and the previous period.
 	 */
 	public static function dashboard(): void {
-		self::guard( 'lr_academy_access' );
-		$range = self::range();
-		$data  = Metrics::summary( $range[0], $range[1], self::instructor_scope() );
-		$now   = $data['current'];
-		$prev  = $data['previous'];
-		echo '<div class="wrap lr-academy-dash"><h1>داشبورد آکادمی</h1>';
-		self::range_form( 'lr-academy', $range[2], $range[3] );
-		if ( current_user_can( 'lr_export_academy' ) ) {
-			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-			wp_nonce_field( 'lr_academy_save' );
-			echo '<input type="hidden" name="action" value="lr_academy_export"><input type="hidden" name="from" value="' . esc_attr( $range[2] ) . '"><input type="hidden" name="to" value="' . esc_attr( $range[3] ) . '">';
-			submit_button( 'خروجی CSV', 'secondary', 'submit', false );
-			echo '</form>';
-		}
-		echo '<div class="lr-kpis">';
-		self::kpi( 'درآمد آکادمی', number_format_i18n( (int) $now['revenue'] ), (int) $now['revenue'], (int) $prev['revenue'], false );
-		self::kpi( 'فروش دوره', number_format_i18n( (int) $now['courses'] ), (int) $now['courses'], (int) $prev['courses'], false );
-		self::kpi( 'اشتراک', number_format_i18n( (int) $now['subscriptions'] ), (int) $now['subscriptions'], (int) $prev['subscriptions'], false );
-		self::kpi( 'کلاس خصوصی', number_format_i18n( (int) $now['private'] ), (int) $now['private'], (int) $prev['private'], false );
-		self::kpi( 'کلاس گروهی', number_format_i18n( (int) $now['group'] ), (int) $now['group'], (int) $prev['group'], false );
-		self::kpi( 'بازپرداخت', number_format_i18n( (int) $now['refunds'] ), (int) $now['refunds'], (int) $prev['refunds'], true );
-		self::kpi( 'دانشجوی جدید', number_format_i18n( (int) $now['new_students'] ), (int) $now['new_students'], (int) $prev['new_students'], false );
-		self::kpi( 'نرخ تبدیل', (string) $now['conversion'] . '٪', (float) $now['conversion'], (float) $prev['conversion'], false );
-		echo '</div>';
-		echo '<div class="lr-charts">';
-		echo '<section class="lr-panel"><h2>درآمد در طول زمان</h2>';
-		self::revenue_chart( (array) $now['days'] );
-		echo '</section>';
-		echo '<section class="lr-panel"><h2>درآمد به تفکیک مدل</h2>';
-		self::model_chart( $now );
-		echo '</section></div>';
-		echo '<div class="lr-split">';
-		echo '<section class="lr-panel"><h2>پرفروش‌ها</h2>';
-		self::bestsellers_table( (array) $now['bestsellers'] );
-		echo '</section>';
-		echo '<section class="lr-panel"><h2>سفارش‌های اخیر</h2>';
-		self::recent_orders();
-		echo '</section></div>';
-		echo '</div>';
+		Desk::hub();
 	}
 
 	/**
-	 * Course list, save form, and the draft demo generator.
+	 * Kept so older bookmarks still open the hub.
 	 */
 	public static function courses(): void {
-		self::guard( 'lr_academy_access' );
-		$scope = self::instructor_scope();
-		global $wpdb;
-		$table = Db::table( 'courses' );
-		if ( $scope > 0 ) {
-			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `{$table}` WHERE instructor_id = %d ORDER BY id DESC LIMIT 50", $scope ), ARRAY_A );
-		} elseif ( -1 === $scope ) {
-			$rows = array();
-		} else {
-			$rows = $wpdb->get_results( "SELECT * FROM `{$table}` ORDER BY id DESC LIMIT 50", ARRAY_A );
-		}
-		echo '<div class="wrap"><h1>دوره‌ها</h1>';
-		if ( current_user_can( 'lr_academy_manage' ) ) {
-			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-			wp_nonce_field( 'lr_academy_save' );
-			echo '<input type="hidden" name="action" value="lr_academy_save"><input type="hidden" name="lr_do" value="demo">';
-			submit_button( 'ساخت دورهٔ آزمایشی (پیش‌نویس)', 'secondary', 'submit', false );
-			echo '</form>';
-		}
-		echo '<table class="widefat striped"><thead><tr><th>عنوان</th><th>وضعیت</th><th>قیمت</th></tr></thead><tbody>';
-		foreach ( (array) $rows as $row ) {
-			echo '<tr><td>' . esc_html( (string) $row['title'] ) . '</td><td>' . esc_html( (string) $row['status'] ) . '</td><td>' . esc_html( (string) $row['price'] ) . '</td></tr>';
-		}
-		echo '</tbody></table>';
-		self::course_form();
-		echo '</div>';
+		Desk::courses();
 	}
 
 	/**
-	 * Orders and refunds. Instructors see orders of their own courses and cannot refund.
+	 * Kept so older bookmarks still open orders.
 	 */
 	public static function orders(): void {
-		self::guard( 'lr_academy_access' );
-		global $wpdb;
-		$table = Db::table( 'orders' );
-		$rows  = $wpdb->get_results( "SELECT * FROM `{$table}` ORDER BY id DESC LIMIT 40", ARRAY_A );
-		echo '<div class="wrap"><h1>سفارش‌های آکادمی</h1><table class="widefat striped"><thead><tr><th>کد</th><th>وضعیت</th><th>مبلغ</th><th>خالص</th></tr></thead><tbody>';
-		foreach ( (array) $rows as $row ) {
-			if ( ! self::can_see_order( (int) $row['id'] ) ) {
-				continue;
-			}
-			echo '<tr><td>' . esc_html( (string) $row['code'] ) . '</td><td>' . esc_html( (string) $row['status'] ) . '</td><td>' . esc_html( (string) $row['total'] ) . '</td><td>' . esc_html( (string) Orders::net( (int) $row['id'] ) ) . '</td></tr>';
-		}
-		echo '</tbody></table>';
-		if ( current_user_can( 'lr_academy_manage' ) ) {
-			echo '<h2>بازپرداخت</h2><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-			wp_nonce_field( 'lr_academy_save' );
-			echo '<input type="hidden" name="action" value="lr_academy_save"><input type="hidden" name="lr_do" value="refund">';
-			echo '<input name="order_id" type="number" min="1" placeholder="شناسه سفارش" required> ';
-			echo '<input name="amount" type="number" min="1" placeholder="مبلغ تومان" required> ';
-			echo '<input name="reason" type="text" class="regular-text" placeholder="دلیل" required> ';
-			submit_button( 'ثبت بازپرداخت', 'secondary', 'submit', false );
-			echo '</form>';
-		}
-		echo '</div>';
+		People::orders();
 	}
 
 	/**
-	 * Plans, coupons, classes, instructors, and bundles.
+	 * Older catalog URL now opens plans.
 	 */
 	public static function catalog(): void {
-		self::guard( 'lr_academy_manage' );
-		echo '<div class="wrap"><h1>طرح، کوپن، کلاس</h1>';
-		self::simple_form(
-			'plan',
-			'طرح اشتراک',
-			array(
-				'title'    => 'عنوان',
-				'slug'     => 'نامک',
-				'price'    => 'قیمت',
-				'interval' => 'month یا year',
-				'tier'     => 'standard یا premium',
-			)
-		);
-		self::simple_form(
-			'coupon',
-			'کد تخفیف',
-			array(
-				'code'      => 'کد',
-				'type'      => 'percent یا fixed',
-				'amount'    => 'مقدار',
-				'scope'     => 'all یا courses یا plans',
-				'scope_ids' => 'شناسه‌ها با ویرگول',
-			)
-		);
-		self::simple_form(
-			'session',
-			'کلاس',
-			array(
-				'title'    => 'عنوان',
-				'kind'     => 'private یا group',
-				'starts'   => 'شروع میلادی Y-m-d H:i',
-				'capacity' => 'ظرفیت',
-				'price'    => 'قیمت',
-				'meeting'  => 'لینک جلسه',
-			)
-		);
-		self::simple_form(
-			'instructor',
-			'مدرس',
-			array(
-				'name'    => 'نام',
-				'slug'    => 'نامک',
-				'user_id' => 'شناسه کاربر وردپرس',
-			)
-		);
-		self::simple_form(
-			'bundle',
-			'بسته',
-			array(
-				'title'      => 'عنوان',
-				'slug'       => 'نامک',
-				'price'      => 'قیمت',
-				'course_ids' => 'شناسه دوره‌ها',
-				'note'       => 'یادداشت مشاوره',
-			)
-		);
-		echo '</div>';
+		Commerce::plans();
 	}
 
 	/**
@@ -223,8 +91,9 @@ class Admin {
 		$prev_to   = gmdate( 'Y-m-d H:i:s', strtotime( $range[0] . ' UTC' ) - 1 );
 		$prev_from = gmdate( 'Y-m-d H:i:s', strtotime( $prev_to . ' UTC' ) - $seconds );
 		$previous  = Finance::report( $prev_from, $prev_to );
-		echo '<div class="wrap lr-academy-dash"><h1>گزارش مالی لایف‌روس</h1>';
-		self::range_form( 'lr-academy-finance', $range[2], $range[3] );
+		$page      = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : 'lr-finance-report'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		Chrome::open( 'گزارش مالی', 'مالی' );
+		self::range_form( $page, $range[2], $range[3] );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		wp_nonce_field( 'lr_academy_save' );
 		echo '<input type="hidden" name="action" value="lr_finance_export"><input type="hidden" name="from" value="' . esc_attr( $range[2] ) . '"><input type="hidden" name="to" value="' . esc_attr( $range[3] ) . '">';
@@ -239,7 +108,8 @@ class Admin {
 		echo '</div>';
 		echo '<section class="lr-panel"><h2>درآمد خط‌ها در طول زمان</h2>';
 		self::finance_chart( $report['days'] );
-		echo '</section></div>';
+		echo '</section>';
+		Chrome::close();
 	}
 
 	/**
@@ -250,6 +120,9 @@ class Admin {
 			wp_die( esc_html__( 'نشست منقضی شده است.', 'liferuss-core' ) );
 		}
 		$do = isset( $_POST['lr_do'] ) ? sanitize_key( wp_unslash( (string) $_POST['lr_do'] ) ) : '';
+		if ( Actions::maybe( $do ) ) {
+			return;
+		}
 		if ( 'demo' === $do && current_user_can( 'lr_academy_manage' ) ) {
 			Catalog::demo( get_current_user_id() );
 		}
@@ -451,8 +324,9 @@ class Admin {
 	 * @param string $hook Admin hook suffix.
 	 */
 	public static function assets( string $hook ): void {
-		$finance = str_ends_with( $hook, '_page_lr-academy-finance' );
-		if ( 'toplevel_page_lr-academy' !== $hook && ! $finance ) {
+		unset( $hook );
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! in_array( $page, array( 'lr-finance-report', 'lr-academy-finance', 'lr-academy-reports' ), true ) ) {
 			return;
 		}
 		wp_enqueue_style( 'lr-academy-admin', LIFERUSS_CORE_URL . 'assets/academy-admin.css', array(), LIFERUSS_CORE_VERSION );
@@ -537,7 +411,7 @@ class Admin {
 				admin_url( 'admin.php' )
 			);
 			$class = ( $from === $preset['from'] && $to === $preset['to'] ) ? 'button button-primary' : 'button';
-			echo '<a class="' . esc_attr( $class ) . '" href="' . esc_url( $url ) . '">' . esc_html( $preset['label'] ) . '</a>';
+			echo '<a class="' . esc_attr( $class ) . '" href="' . esc_url( $url ) . '"><bdi dir="rtl">' . esc_html( $preset['label'] ) . '</bdi></a>';
 		}
 		echo '</div>';
 		echo '<form class="lr-range" method="get"><input type="hidden" name="page" value="' . esc_attr( $page ) . '">';

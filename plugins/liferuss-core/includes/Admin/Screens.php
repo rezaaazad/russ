@@ -25,7 +25,7 @@ class Screens {
 	 */
 	public static function dashboard(): void {
 		self::guard( 'lr_view_dashboard' );
-		echo '<div class="wrap lr-wrap"><h1>' . esc_html__( 'داشبورد لایف‌روس', 'liferuss-core' ) . '</h1>';
+		Chrome::open( __( 'پیشخوان لایف‌روس', 'liferuss-core' ), 'لایف‌روس' );
 		echo '<div class="lr-kpis">';
 		$lead_scope = null;
 		if ( current_user_can( 'lr_manage_leads' ) || current_user_can( 'lr_view_own_leads' ) ) {
@@ -214,8 +214,8 @@ class Screens {
 			'intakes'                => 'ورودی',
 			'admission_requirements' => 'شرایط پذیرش',
 		);
-		echo '<div class="wrap lr-wrap"><h1>' . esc_html__( 'داده‌های نیازمند بررسی', 'liferuss-core' ) . '</h1>';
-		echo '<p>' . esc_html__( 'رکوردهایی که last_verified_at آن‌ها بیش از ۱۲ ماه قبل است.', 'liferuss-core' ) . '</p><ul>';
+		Chrome::open( __( 'داده‌های نیازمند بررسی', 'liferuss-core' ), 'دانشگاه‌ها' );
+		echo '<p>' . esc_html__( 'رکوردهایی که بیش از ۱۲ ماه بررسی نشده‌اند. از ورود CSV یا فهرست همان جدول آن‌ها را تازه کنید.', 'liferuss-core' ) . '</p><ul class="lr-work">';
 		foreach ( $tables as $suffix => $label ) {
 			$count = Repository::for( $suffix )->count( array( 'stale_before' => $before ) );
 			echo '<li>' . esc_html( $label ) . ': <strong>' . esc_html( (string) $count ) . '</strong></li>';
@@ -228,8 +228,9 @@ class Screens {
 	 */
 	public static function placeholder(): void {
 		self::guard( 'lr_view_dashboard' );
-		echo '<div class="wrap lr-wrap"><h1>' . esc_html( get_admin_page_title() ) . '</h1>';
-		echo '<p>' . esc_html__( 'ساختار این بخش آماده است. فرم کامل در نسخهٔ بعدی می‌آید.', 'liferuss-core' ) . '</p></div>';
+		Chrome::open( get_admin_page_title(), 'لایف‌روس' );
+		Chrome::empty( __( 'فرم این بخش هنوز ساخته نشده. از فهرست کناری یک بخش آماده را باز کنید.', 'liferuss-core' ) );
+		Chrome::close();
 	}
 
 	/**
@@ -264,13 +265,14 @@ class Screens {
 			)
 		);
 		$table->prepare_items();
-		echo '<div class="wrap lr-wrap"><h1>' . esc_html( get_admin_page_title() ) . '</h1>';
-		echo '<p class="description">' . esc_html__( 'لیست خواندنی. ویرایش کامل در نسخهٔ بعدی به همین جدول وصل می‌شود.', 'liferuss-core' ) . '</p>';
-		echo '<form method="get">';
+		Chrome::open( get_admin_page_title(), self::crumb() );
+		echo '<form class="lr-filters" method="get">';
 		echo '<input type="hidden" name="page" value="' . esc_attr( isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '' ) . '">'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$table->search_box( __( 'جستجو', 'liferuss-core' ), $suffix );
+		echo '<div class="lr-scroll">';
 		$table->display();
-		echo '</form></div>';
+		echo '</div></form>';
+		Chrome::close();
 	}
 
 	/**
@@ -349,6 +351,17 @@ class Screens {
 	 * @param int    $value Value.
 	 */
 	private static function kpi( string $label, int $value ): void {
-		echo '<div class="lr-kpi"><span>' . esc_html( $label ) . '</span><strong>' . esc_html( (string) $value ) . '</strong></div>';
+		echo '<article class="lr-kpi"><span>' . esc_html( $label ) . '</span><strong>' . esc_html( Chrome::num( $value ) ) . '</strong></article>';
+	}
+
+	/**
+	 * Breadcrumb for the current list.
+	 */
+	private static function crumb(): string {
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( in_array( $page, array( 'lr-uni', 'lr-universities', 'lr-tuition', 'lr-stale', 'lr-programs' ), true ) ) {
+			return 'دانشگاه‌ها';
+		}
+		return 'لایف‌روس';
 	}
 }

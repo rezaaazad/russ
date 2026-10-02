@@ -118,13 +118,23 @@ class RecordListTable extends \WP_List_Table {
 		if ( ! isset( $item[ $column_name ] ) || null === $item[ $column_name ] || '' === $item[ $column_name ] ) {
 			return '—';
 		}
-		return esc_html( (string) $item[ $column_name ] );
+		$value = (string) $item[ $column_name ];
+		if ( in_array( $column_name, array( 'status', 'stage' ), true ) ) {
+			return Chrome::pill( sanitize_html_class( $value ), Chrome::status( $value ) );
+		}
+		if ( str_ends_with( $column_name, '_at' ) || 'stat_date' === $column_name ) {
+			return esc_html( Chrome::date( $value ) );
+		}
+		if ( is_numeric( $value ) && ! in_array( $column_name, array( 'phone', 'lead_code' ), true ) ) {
+			return esc_html( Chrome::num( $value ) );
+		}
+		return esc_html( $value );
 	}
 
 	/**
 	 * Empty state.
 	 */
 	public function no_items(): void {
-		esc_html_e( 'رکوردی پیدا نشد.', 'liferuss-core' );
+		echo '<div class="lr-empty"><p>' . esc_html__( 'رکوردی نیست. یک مورد تازه اضافه کنید یا فیلتر را بردارید.', 'liferuss-core' ) . '</p></div>';
 	}
 }

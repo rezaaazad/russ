@@ -34,7 +34,7 @@ class RedirectScreen {
 			wp_die( esc_html__( 'اجازه ندارید.', 'liferuss-core' ) );
 		}
 		$edit = isset( $_GET['id'] ) ? Store::find( absint( $_GET['id'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		echo '<div class="wrap lr-wrap"><h1>ریدایرکت‌ها</h1>';
+		Chrome::open( 'ریدایرکت‌ها', 'تنظیمات' );
 		if ( isset( $_GET['updated'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			echo '<div class="notice notice-success"><p>ذخیره شد.</p></div>';
 		}

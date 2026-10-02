@@ -7,6 +7,7 @@
 
 namespace LifeRuss\Core\Payments;
 
+use LifeRuss\Core\Admin\Chrome;
 use LifeRuss\Core\CRM\Jalali;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -41,7 +42,7 @@ class Admin {
 		$before = isset( $_GET['lr_before'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['lr_before'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$status = isset( $_GET['lr_status'] ) ? sanitize_key( wp_unslash( (string) $_GET['lr_status'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$rows   = self::query( $after, $before, $status );
-		echo '<div class="wrap lr-wrap"><h1>' . esc_html__( 'پرداخت‌های خدمات', 'liferuss-core' ) . '</h1>';
+		Chrome::open( __( 'پرداخت‌های خدمات', 'liferuss-core' ), 'مالی' );
 		echo '<form method="get">';
 		echo '<input type="hidden" name="page" value="lr-payments">';
 		$hint = Jalali::year_hint();

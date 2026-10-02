@@ -25,7 +25,7 @@ class SearchScreen {
 		if ( ! current_user_can( 'lr_edit_seo' ) ) {
 			wp_die( esc_html__( 'اجازه ندارید.', 'liferuss-core' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap lr-wrap"><h1>آمار جستجو</h1>';
+		Chrome::open( 'آمار جستجو', 'تنظیمات' );
 		echo '<h2>پرسش‌های پرتکرار</h2>';
 		self::table( Stats::top() );
 		echo '<h2>بدون نتیجه</h2>';

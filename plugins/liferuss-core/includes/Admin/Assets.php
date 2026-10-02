@@ -56,6 +56,21 @@ class Assets {
 			$deps,
 			LIFERUSS_CORE_VERSION
 		);
+		wp_enqueue_script(
+			'liferuss-admin-ui',
+			LIFERUSS_CORE_URL . 'assets/admin-ui.js',
+			array(),
+			LIFERUSS_CORE_VERSION,
+			true
+		);
+		wp_localize_script(
+			'liferuss-admin-ui',
+			'lrAdmin',
+			array(
+				'ajax'  => admin_url( 'admin-ajax.php' ),
+				'nonce' => wp_create_nonce( 'lr_academy_ui' ),
+			)
+		);
 
 		if ( 'lr-kanban' !== $page ) {
 			return;

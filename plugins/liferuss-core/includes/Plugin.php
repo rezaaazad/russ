@@ -18,6 +18,8 @@ use LifeRuss\Core\Account\Portal;
 use LifeRuss\Core\Course\Editor as CourseEditor;
 use LifeRuss\Core\Course\Front as CourseFront;
 use LifeRuss\Core\Course\Seed as CourseSeed;
+use LifeRuss\Core\Admin\Chrome;
+use LifeRuss\Core\Admin\Locale;
 use LifeRuss\Core\Admin\CompareScreen;
 use LifeRuss\Core\Catalog\Demo;
 use LifeRuss\Core\Catalog\Editor;
@@ -67,6 +69,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Wires hooks after plugins_loaded.
  */
 class Plugin {
+
 
 	/**
 	 * Boot services.
@@ -118,6 +121,8 @@ class Plugin {
 			SearchCli::hooks();
 		}
 
+		Locale::hooks();
+
 		if ( is_admin() ) {
 			Menu::hooks();
 			RedirectScreen::hooks();
@@ -129,6 +134,7 @@ class Plugin {
 			Kanban::hooks();
 			SettingsPage::hooks();
 			Assets::hooks();
+			Chrome::hooks();
 		}
 	}
 }

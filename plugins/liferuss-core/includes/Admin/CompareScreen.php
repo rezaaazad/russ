@@ -35,7 +35,7 @@ class CompareScreen {
 		}
 		$id   = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$page = $id ? Pages::by_id( $id ) : null;
-		echo '<div class="wrap lr-wrap"><h1>مقایسه دانشگاه‌ها</h1>';
+		Chrome::open( 'مقایسه دانشگاه‌ها', 'تنظیمات' );
 		if ( isset( $_GET['saved'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			echo '<div class="notice notice-success"><p>ذخیره شد.</p></div>';
 		}

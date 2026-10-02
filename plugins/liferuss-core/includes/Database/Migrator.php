@@ -52,6 +52,7 @@ class Migrator {
 		}
 
 		self::add_foreign_keys( $errors );
+		self::lesson_file_type();
 
 		update_option( 'lr_db_version', LIFERUSS_CORE_DB_VERSION, false );
 		update_option( 'lr_core_version', LIFERUSS_CORE_VERSION, false );
@@ -154,6 +155,20 @@ class Migrator {
 	 */
 	public static function catalogue(): array {
 		return array_merge( Tables::all(), AcademySchema::tables() );
+	}
+
+	/**
+	 * Lesson type gains a file value. dbDelta does not alter enums.
+	 */
+	private static function lesson_file_type(): void {
+		global $wpdb;
+		$table = $wpdb->prefix . 'lr_academy_course_lessons';
+		$col   = $wpdb->get_row( "SHOW COLUMNS FROM `{$table}` LIKE 'type'", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( ! is_array( $col ) || ! isset( $col['Type'] ) || str_contains( (string) $col['Type'], 'file' ) ) {
+			return;
+		}
+		$wpdb->query( "ALTER TABLE `{$table}` MODIFY `type` enum('video','text','quiz','live','file') NOT NULL DEFAULT 'video'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->last_error = '';
 	}
 
 	/**

@@ -281,7 +281,7 @@ class Jalali {
 				'to'    => $to,
 			),
 			'30'    => array(
-				'label' => '۳۰ روز',
+				'label' => "\u{200F}۳۰ روز",
 				'from'  => self::ymd( self::tehran_parts( -29 ) ),
 				'to'    => $to,
 			),
