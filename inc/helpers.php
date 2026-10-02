@@ -31,53 +31,13 @@ function liferuss_bundled_webp_sources( $file ) {
 		return array();
 	}
 
-	static $known = array(
-		'st-basil.jpg'             => array(
-			array( 'file' => 'st-basil-800.webp', 'w' => 800 ),
-			array( 'file' => 'st-basil.webp', 'w' => 933 ),
-		),
-		'hero-student.jpg'         => array(
-			array( 'file' => 'hero-student-400.webp', 'w' => 400 ),
-			array( 'file' => 'hero-student.webp', 'w' => 640 ),
-		),
-		'consult-student.jpg'      => array(
-			array( 'file' => 'consult-student.webp', 'w' => 720 ),
-		),
-		'universities/bauman.jpg'  => array(
-			array( 'file' => 'universities/bauman.webp', 'w' => 720 ),
-		),
-		'universities/hse.jpg'     => array(
-			array( 'file' => 'universities/hse.webp', 'w' => 524 ),
-		),
-		'universities/msu.jpg'     => array(
-			array( 'file' => 'universities/msu.webp', 'w' => 720 ),
-		),
-		'universities/rudn.jpg'    => array(
-			array( 'file' => 'universities/rudn.webp', 'w' => 720 ),
-		),
-		'universities/sechenov.jpg' => array(
-			array( 'file' => 'universities/sechenov.webp', 'w' => 446 ),
-		),
-		'universities/spbu.jpg'    => array(
-			array( 'file' => 'universities/spbu.webp', 'w' => 524 ),
-		),
-		'students/student-1.jpg'   => array(
-			array( 'file' => 'students/student-1.webp', 'w' => 160 ),
-		),
-		'students/student-2.jpg'   => array(
-			array( 'file' => 'students/student-2.webp', 'w' => 160 ),
-		),
-		'students/student-3.jpg'   => array(
-			array( 'file' => 'students/student-3.webp', 'w' => 160 ),
-		),
-	);
-
-	if ( isset( $known[ $file ] ) ) {
-		$candidates = $known[ $file ];
-	} else {
-		$sibling = preg_replace( '/\.(jpe?g|png)$/i', '.webp', $file );
-		$candidates = ( $sibling && $sibling !== $file ) ? array( array( 'file' => $sibling, 'w' => 0 ) ) : array();
+	$slug = liferuss_photo_slug_from_file( $file );
+	if ( $slug ) {
+		return liferuss_photo_variants( $slug, 'webp' );
 	}
+
+	$sibling    = preg_replace( '/\.(jpe?g|png)$/i', '.webp', $file );
+	$candidates = ( $sibling && $sibling !== $file ) ? array( array( 'file' => $sibling, 'w' => 0 ) ) : array();
 
 	$dir    = LIFERUSS_DIR . '/assets/images/';
 	$sources = array();
@@ -125,6 +85,12 @@ function liferuss_print_image_preload( $id, $fallback = '', $sizes = '100vw' ) {
 		return;
 	}
 
+	$slug = liferuss_photo_slug_from_file( $fallback );
+	if ( $slug ) {
+		liferuss_print_photo_preload( $slug, $sizes );
+		return;
+	}
+
 	$sources = liferuss_bundled_webp_sources( $fallback );
 	if ( $sources ) {
 		$href   = liferuss_img( $sources[0]['file'] );
@@ -149,7 +115,7 @@ function liferuss_print_image_preload( $id, $fallback = '', $sizes = '100vw' ) {
  * @param int    $id       Attachment ID.
  * @param string $fallback Bundled fallback path.
  */
-function liferuss_the_hero_lcp( $id, $fallback = 'st-basil.jpg' ) {
+function liferuss_the_hero_lcp( $id, $fallback = 'saint-basil.jpg' ) {
 	echo '<div class="hero-media" aria-hidden="true">';
 	$id = absint( $id );
 	if ( $id && function_exists( 'wp_attachment_is_image' ) && wp_attachment_is_image( $id ) ) {

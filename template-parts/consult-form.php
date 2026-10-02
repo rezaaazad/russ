@@ -198,7 +198,7 @@ if ( 'admission' === $type ) {
 			liferuss_the_image(
 				array(
 					'id'       => liferuss_opt( 'form_image_id' ),
-					'fallback' => 'consult-student.jpg',
+					'fallback' => liferuss_photo_file( liferuss_photo_aside() ),
 					'alt'      => liferuss_t( 'form_alt' ),
 					'width'    => 720,
 					'height'   => 480,

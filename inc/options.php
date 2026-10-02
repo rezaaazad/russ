@@ -221,6 +221,12 @@ function liferuss_the_image( $args ) {
 		return;
 	}
 
+	$slug = liferuss_photo_slug_from_file( (string) $args['fallback'] );
+	if ( $slug ) {
+		liferuss_photo_markup( $slug, $args );
+		return;
+	}
+
 	$src = $args['fallback'] ? liferuss_img( $args['fallback'] ) : '';
 	if ( ! $src ) {
 		return;

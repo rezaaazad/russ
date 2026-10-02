@@ -25,9 +25,7 @@ get_header();
 			</header>
 			<div class="container single-layout">
 				<div class="prose">
-					<?php if ( has_post_thumbnail() ) : ?>
-						<figure class="single-thumb"><?php the_post_thumbnail( 'liferuss-wide' ); ?></figure>
-					<?php endif; ?>
+					<figure class="single-thumb"><?php liferuss_the_entry_image( 'single' ); ?></figure>
 					<?php $toc = liferuss_toc_items(); ?>
 					<?php if ( $toc ) : ?>
 						<nav class="lr-toc" aria-label="<?php echo esc_attr( liferuss_t( 'toc' ) ); ?>">

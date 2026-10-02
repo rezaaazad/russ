@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.11.1' );
+define( 'LIFERUSS_VERSION', '1.11.2' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -19,6 +19,7 @@ require_once LIFERUSS_DIR . '/inc/landing-i18n.php';
 require_once LIFERUSS_DIR . '/inc/i18n-defaults.php';
 require_once LIFERUSS_DIR . '/inc/i18n.php';
 require_once LIFERUSS_DIR . '/inc/helpers.php';
+require_once LIFERUSS_DIR . '/inc/photos.php';
 require_once LIFERUSS_DIR . '/inc/options.php';
 require_once LIFERUSS_DIR . '/inc/landings.php';
 require_once LIFERUSS_DIR . '/inc/customizer.php';
@@ -184,24 +185,28 @@ function liferuss_form_tracking_fields() {
 function liferuss_preload() {
 	$font = LIFERUSS_URI . '/assets/fonts/vazirmatn-700.woff2';
 	echo '<link rel="preload" as="font" type="font/woff2" href="' . esc_url( $font ) . '" crossorigin>' . "\n";
+	$id       = 0;
+	$fallback = '';
+	$sizes    = '100vw';
 	if ( is_front_page() ) {
-		$hero_id = absint( liferuss_opt( 'hero_bg_id' ) );
-		if ( ! $hero_id ) {
-			$hero_id = absint( liferuss_opt( 'hero_image_id' ) );
+		$id = absint( liferuss_opt( 'hero_bg_id' ) );
+		if ( ! $id ) {
+			$id = absint( liferuss_opt( 'hero_image_id' ) );
 		}
-		liferuss_print_image_preload( $hero_id, 'st-basil.jpg', '100vw' );
+		$fallback = 'saint-basil.jpg';
 	} elseif ( is_page_template( 'templates/freight.php' ) ) {
-		liferuss_print_image_preload(
-			liferuss_opt( 'freight_hero_image_id' ),
-			liferuss_opt( 'freight_hero_image', 'st-basil.jpg' ),
-			'(max-width: 860px) 92vw, 560px'
-		);
+		$id       = absint( liferuss_opt( 'freight_hero_image_id' ) );
+		$fallback = (string) liferuss_opt( 'freight_hero_image', 'moscow-night.jpg' );
+		$sizes    = '(max-width: 860px) 92vw, 560px';
 	} elseif ( is_page_template( 'templates/trade.php' ) ) {
-		liferuss_print_image_preload(
-			liferuss_opt( 'trade_hero_image_id' ),
-			liferuss_opt( 'trade_hero_image', 'st-basil.jpg' ),
-			'(max-width: 860px) 92vw, 560px'
-		);
+		$id       = absint( liferuss_opt( 'trade_hero_image_id' ) );
+		$fallback = (string) liferuss_opt( 'trade_hero_image', 'moscow-night.jpg' );
+		$sizes    = '(max-width: 860px) 92vw, 560px';
+	} elseif ( ! is_admin() ) {
+		$fallback = liferuss_photo_file( liferuss_photo_scene() );
+	}
+	if ( $id || $fallback ) {
+		liferuss_print_image_preload( $id, $fallback, $sizes );
 	}
 }
 add_action( 'wp_head', 'liferuss_preload', 1 );

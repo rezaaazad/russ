@@ -140,7 +140,7 @@ $choices     = (array) liferuss_opt( $choices_key, array() );
 			liferuss_the_image(
 				array(
 					'id'       => liferuss_opt( $prefix . '_form_banner_image_id' ),
-					'fallback' => liferuss_opt( $prefix . '_form_banner_image', 'consult-student.jpg' ),
+					'fallback' => liferuss_opt( $prefix . '_form_banner_image', 'saint-basil.jpg' ),
 					'alt'      => liferuss_opt( $prefix . '_form_banner_title' ),
 					'width'    => 720,
 					'height'   => 480,

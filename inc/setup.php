@@ -353,14 +353,31 @@ function liferuss_buffer_public_html() {
 	if ( is_admin() || wp_doing_ajax() || wp_doing_cron() ) {
 		return;
 	}
-	ob_start( 'liferuss_strip_public_placeholders' );
+	ob_start( 'liferuss_filter_public_html' );
 }
 add_action( 'template_redirect', 'liferuss_buffer_public_html', 0 );
 
 /**
- * Flush rewrite rules once after multilingual 1.2.0.
+ * Strip seed markers and add the page-hero photograph.
+ *
+ * @param string $html Buffered document.
+ * @return string
+ */
+function liferuss_filter_public_html( $html ) {
+	$html = liferuss_strip_public_placeholders( $html );
+	if ( function_exists( 'liferuss_inject_page_hero_photo' ) ) {
+		$html = liferuss_inject_page_hero_photo( $html );
+	}
+	return $html;
+}
+
+/**
+ * Flush rewrite rules once after a theme update, and import owner photos.
  */
 function liferuss_maybe_flush_i18n() {
+	if ( function_exists( 'liferuss_install_brand_photos' ) ) {
+		liferuss_install_brand_photos();
+	}
 	if ( get_option( 'liferuss_version' ) === LIFERUSS_VERSION ) {
 		return;
 	}

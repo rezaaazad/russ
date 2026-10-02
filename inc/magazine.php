@@ -294,9 +294,7 @@ function liferuss_magazine_json_ld() {
 		),
 		'mainEntityOfPage' => get_permalink( $post_id ),
 	);
-	if ( $image ) {
-		$node['image'] = $image;
-	}
+	$node['image'] = $image ? $image : liferuss_og_image_url();
 	echo '<script type="application/ld+json">' . wp_json_encode(
 		array(
 			'@context' => 'https://schema.org',

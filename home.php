@@ -26,6 +26,7 @@ get_header();
 			<?php while ( have_posts() ) : ?>
 				<?php the_post(); ?>
 				<article <?php post_class( 'post-card' ); ?>>
+					<a class="post-thumb" href="<?php the_permalink(); ?>"><?php liferuss_the_entry_image(); ?></a>
 					<div class="post-card-body">
 						<p class="post-date"><?php echo esc_html( get_the_date() ); ?> · <?php echo esc_html( liferuss_reading_minutes( get_the_ID() ) ); ?> <?php echo esc_html( liferuss_t( 'reading_min' ) ); ?></p>
 						<h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>

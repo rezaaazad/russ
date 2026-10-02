@@ -729,19 +729,79 @@ body.nav-open .nav-toggle-bars::after {
 
 .hero-lcp {
   object-fit: cover;
-  object-position: center 40%;
+  object-position: center 50%;
   z-index: 0;
   pointer-events: none;
 }
+
+.lr-pos-basil { object-position: center 62%; }
+.lr-pos-night { object-position: center 38%; }
+.lr-pos-peter { object-position: center 42%; }
+.lr-pos-couple { object-position: center 28%; }
+.lr-pos-dolls { object-position: center 50%; }
+.lr-pos-borscht { object-position: center 55%; }
 
 .hero-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(100deg, rgba(7, 22, 39, 0.82) 0%, rgba(11, 35, 65, 0.55) 48%, rgba(11, 35, 65, 0.35) 100%),
-    linear-gradient(180deg, rgba(7, 22, 39, 0.25) 0%, rgba(7, 22, 39, 0.55) 100%);
+    linear-gradient(to left, rgba(7, 22, 39, 0.9) 0%, rgba(7, 22, 39, 0.72) 42%, rgba(11, 35, 65, 0.46) 100%),
+    linear-gradient(180deg, rgba(7, 22, 39, 0.34) 0%, rgba(7, 22, 39, 0.5) 100%);
   pointer-events: none;
+}
+
+.scene-basil .hero-overlay,
+.page-hero-photo.scene-basil .hero-overlay {
+  background:
+    linear-gradient(to left, rgba(7, 22, 39, 0.94) 0%, rgba(7, 22, 39, 0.86) 48%, rgba(11, 35, 65, 0.58) 100%),
+    linear-gradient(180deg, rgba(7, 22, 39, 0.62) 0%, rgba(7, 22, 39, 0.34) 46%, rgba(7, 22, 39, 0.55) 100%);
+}
+
+.scene-night .hero-overlay,
+.page-hero-photo.scene-night .hero-overlay {
+  background:
+    linear-gradient(to left, rgba(7, 22, 39, 0.9) 0%, rgba(7, 22, 39, 0.5) 48%, rgba(7, 22, 39, 0.22) 100%),
+    linear-gradient(180deg, rgba(7, 22, 39, 0.28) 0%, rgba(7, 22, 39, 0.4) 100%);
+}
+
+.scene-dolls .hero-overlay,
+.page-hero-photo.scene-dolls .hero-overlay,
+.scene-couple .hero-overlay,
+.page-hero-photo.scene-couple .hero-overlay {
+  background:
+    linear-gradient(to left, rgba(7, 22, 39, 0.9) 0%, rgba(7, 22, 39, 0.62) 46%, rgba(11, 35, 65, 0.34) 100%),
+    linear-gradient(180deg, rgba(7, 22, 39, 0.3) 0%, rgba(7, 22, 39, 0.48) 100%);
+}
+
+html[dir="ltr"] .hero-overlay,
+html[dir="ltr"] .page-hero-photo .hero-overlay {
+  background:
+    linear-gradient(to right, rgba(7, 22, 39, 0.9) 0%, rgba(7, 22, 39, 0.72) 42%, rgba(11, 35, 65, 0.46) 100%),
+    linear-gradient(180deg, rgba(7, 22, 39, 0.34) 0%, rgba(7, 22, 39, 0.5) 100%);
+}
+
+html[dir="ltr"] .scene-basil .hero-overlay,
+html[dir="ltr"] .page-hero-photo.scene-basil .hero-overlay {
+  background:
+    linear-gradient(to right, rgba(7, 22, 39, 0.94) 0%, rgba(7, 22, 39, 0.86) 48%, rgba(11, 35, 65, 0.58) 100%),
+    linear-gradient(180deg, rgba(7, 22, 39, 0.62) 0%, rgba(7, 22, 39, 0.34) 46%, rgba(7, 22, 39, 0.55) 100%);
+}
+
+html[dir="ltr"] .scene-night .hero-overlay,
+html[dir="ltr"] .page-hero-photo.scene-night .hero-overlay {
+  background:
+    linear-gradient(to right, rgba(7, 22, 39, 0.9) 0%, rgba(7, 22, 39, 0.5) 48%, rgba(7, 22, 39, 0.22) 100%),
+    linear-gradient(180deg, rgba(7, 22, 39, 0.28) 0%, rgba(7, 22, 39, 0.4) 100%);
+}
+
+html[dir="ltr"] .scene-dolls .hero-overlay,
+html[dir="ltr"] .page-hero-photo.scene-dolls .hero-overlay,
+html[dir="ltr"] .scene-couple .hero-overlay,
+html[dir="ltr"] .page-hero-photo.scene-couple .hero-overlay {
+  background:
+    linear-gradient(to right, rgba(7, 22, 39, 0.9) 0%, rgba(7, 22, 39, 0.62) 46%, rgba(11, 35, 65, 0.34) 100%),
+    linear-gradient(180deg, rgba(7, 22, 39, 0.3) 0%, rgba(7, 22, 39, 0.48) 100%);
 }
 
 .hero-grid {
@@ -823,7 +883,7 @@ body.nav-open .nav-toggle-bars::after {
 }
 
 .hero-student img {
-  object-position: center 20%;
+  object-position: center 28%;
 }
 
 .uni-photo,
@@ -1728,6 +1788,68 @@ body.nav-open .nav-toggle-bars::after {
     linear-gradient(180deg, #0b2341 0%, #14325a 100%);
   color: #fff;
   padding: 64px 0 56px;
+}
+
+.page-hero-photo {
+  position: relative;
+  overflow: hidden;
+  background-color: #0b2341;
+  min-height: 280px;
+}
+
+.page-hero-photo .hero-media,
+.page-hero-photo .hero-media picture,
+.page-hero-photo .hero-lcp {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.post-thumb picture,
+.single-thumb picture,
+.academy-thumb picture,
+.guide-culture-grid picture,
+.page-hero-photo .hero-media picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.post-thumb img,
+.single-thumb img,
+.guide-culture-grid img {
+  max-width: 100%;
+}
+
+.page-hero-photo .hero-lcp {
+  object-fit: cover;
+}
+
+.page-hero-photo .container {
+  position: relative;
+  z-index: 2;
+}
+
+.guide-culture-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 28px;
+  align-items: center;
+}
+
+.guide-culture-grid figure {
+  margin: 0;
+  height: 320px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--navy);
+}
+
+.guide-culture-grid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .page-hero h1,
@@ -4505,6 +4627,22 @@ body.has-compare-bar {
   object-fit: cover;
 }
 
+.academy-thumb-fallback {
+  position: relative;
+}
+
+.academy-thumb-title {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  left: 16px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
 .academy-course-body {
   display: flex;
   flex-direction: column;
@@ -4855,6 +4993,16 @@ body.has-compare-bar {
   .academy-buybar .btn {
     flex: 0 0 auto;
     min-height: 44px;
+  }
+}
+
+@media (max-width: 800px) {
+  .guide-culture-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .guide-culture-grid figure {
+    height: 220px;
   }
 }
 

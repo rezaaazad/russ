@@ -32,6 +32,7 @@ $terms = get_terms(
 		</nav>
 	</div>
 </header>
+<?php liferuss_the_guide_culture(); ?>
 <section class="section">
 	<div class="container">
 		<div class="lr-cards">

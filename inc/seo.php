@@ -349,8 +349,31 @@ function liferuss_head_meta() {
 		$og_title = $title;
 		$og_desc  = $desc;
 	}
-	$og_id = absint( liferuss_opt( 'og_image_id', 0 ) );
-	$image = $og_id ? wp_get_attachment_image_url( $og_id, 'liferuss-wide' ) : liferuss_img( 'st-basil.jpg' );
+	$og_id    = absint( liferuss_opt( 'og_image_id', 0 ) );
+	$image    = '';
+	$og_width = 0;
+	$og_height = 0;
+	if ( is_singular() && has_post_thumbnail() ) {
+		$thumb = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full' );
+		if ( $thumb ) {
+			$image     = $thumb[0];
+			$og_width  = (int) $thumb[1];
+			$og_height = (int) $thumb[2];
+		}
+	}
+	if ( ! $image && $og_id ) {
+		$chosen = wp_get_attachment_image_src( $og_id, 'full' );
+		if ( $chosen ) {
+			$image     = $chosen[0];
+			$og_width  = (int) $chosen[1];
+			$og_height = (int) $chosen[2];
+		}
+	}
+	if ( ! $image ) {
+		$image     = liferuss_og_image_url();
+		$og_width  = 1200;
+		$og_height = 630;
+	}
 	$brand = liferuss_brand();
 	$rank  = liferuss_rank_math_active();
 
@@ -386,6 +409,10 @@ function liferuss_head_meta() {
 	echo '<meta property="og:description" content="' . esc_attr( $og_desc ) . '">' . "\n";
 	echo '<meta property="og:url" content="' . esc_url( $url ) . '">' . "\n";
 	echo '<meta property="og:image" content="' . esc_url( $image ) . '">' . "\n";
+	if ( $og_width && $og_height ) {
+		echo '<meta property="og:image:width" content="' . (int) $og_width . '">' . "\n";
+		echo '<meta property="og:image:height" content="' . (int) $og_height . '">' . "\n";
+	}
 	echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
 	echo '<meta name="twitter:title" content="' . esc_attr( $og_title ) . '">' . "\n";
 	echo '<meta name="twitter:description" content="' . esc_attr( $og_desc ) . '">' . "\n";
@@ -418,7 +445,7 @@ function liferuss_json_ld() {
 	$address = liferuss_opt( 'address' );
 	$logo    = liferuss_media_url( liferuss_opt( 'logo_id' ), '', 'full' );
 	if ( ! $logo ) {
-		$logo = liferuss_img( 'st-basil.jpg' );
+		$logo = liferuss_og_image_url();
 	}
 
 	$same_as = array_values(

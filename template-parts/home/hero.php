@@ -15,8 +15,8 @@ if ( ! $hero_bg_id ) {
 }
 ?>
 
-<section class="hero" id="about">
-	<?php liferuss_the_hero_lcp( $hero_bg_id, 'st-basil.jpg' ); ?>
+<section class="hero scene-basil" id="about">
+	<?php liferuss_the_hero_lcp( $hero_bg_id, 'saint-basil.jpg' ); ?>
 	<div class="hero-overlay" aria-hidden="true"></div>
 	<div class="container hero-grid">
 		<div class="hero-copy">
@@ -41,10 +41,10 @@ if ( ! $hero_bg_id ) {
 				liferuss_the_image(
 					array(
 						'id'       => liferuss_opt( 'hero_student_id' ),
-						'fallback' => 'hero-student.jpg',
+						'fallback' => 'russian-couple.jpg',
 						'alt'      => liferuss_t( 'hero_alt_student' ),
-						'width'    => 400,
-						'height'   => 535,
+						'width'    => 810,
+						'height'   => 1080,
 						'size'     => 'medium_large',
 						'lazy'     => true,
 						'priority' => false,

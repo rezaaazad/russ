@@ -2,7 +2,7 @@
 
 قالب ۱.۱۱.۱ و افزونهٔ هسته ۱.۹.۱ (پایگاه ۱.۱۰.۰). Rank Math و Polylang اختیاری‌اند و داخل بسته نیستند. لایف‌روس فروشگاه نیست و کالا نمی‌فروشد؛ ووکامرس و کاتالوگ محصول ندارد. آکادمی داخل هسته است و افزونهٔ LMS ندارد.
 
-Theme 1.11.1 and core plugin 1.9.1 (database 1.10.0). Rank Math and Polylang are optional and are not bundled. LifeRuss is not a store and sells no goods. Academy lives in the core plugin and does not use an LMS.
+Theme 1.11.2 and core plugin 1.9.1 (database 1.10.0). Rank Math and Polylang are optional and are not bundled. LifeRuss is not a store and sells no goods. Academy lives in the core plugin and does not use an LMS.
 
 ## کش بعد از به‌روزرسانی / Purge the cache
 

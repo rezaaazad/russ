@@ -81,11 +81,11 @@ $card = static function ( $course ) use ( $lesson_meta, $by_teacher ) {
 	$cut      = empty( $course['is_free'] ) && $sale > 0 && $sale < $list;
 	$thumb    = trim( (string) ( $course['thumbnail'] ?? '' ) );
 	echo '<a class="academy-course-card" href="' . esc_url( liferuss_url( '/academy/courses/' . $course['slug'] . '/' ) ) . '">';
-	echo '<span class="academy-thumb">';
+	echo '<span class="academy-thumb' . ( '' === $thumb ? ' academy-thumb-fallback' : '' ) . '">';
 	if ( '' !== $thumb ) {
-		echo '<img src="' . esc_url( $thumb ) . '" alt="">';
+		echo '<img src="' . esc_url( $thumb ) . '" alt="" width="640" height="360" loading="lazy" decoding="async">';
 	} else {
-		echo '<svg viewBox="0 0 640 360" role="img" aria-label="' . esc_attr( (string) $course['title'] ) . '"><rect width="640" height="360" fill="#0b2341"/><circle cx="320" cy="150" r="54" fill="none" stroke="#e8b923" stroke-width="6"/><path d="M300 128l48 28-48 28z" fill="#e8b923"/><text x="320" y="250" text-anchor="middle" fill="#ffffff" font-size="28" font-family="Vazirmatn, Tahoma, sans-serif">آکادمی لایف‌روس</text></svg>';
+		liferuss_the_course_fallback( (string) $course['title'] );
 	}
 	echo '</span><span class="academy-course-body">';
 	echo '<h3>' . esc_html( (string) $course['title'] ) . '</h3>';
@@ -113,7 +113,8 @@ $lines = class_exists( '\LifeRuss\Core\Academy\Catalog' ) ? \LifeRuss\Core\Acade
 ?>
 <?php if ( 'landing' === $screen && empty( $context['missing'] ) ) : ?>
 	<?php $stats = class_exists( '\LifeRuss\Core\Academy\Catalog' ) ? \LifeRuss\Core\Academy\Catalog::stats() : array( 'courses' => 0, 'lessons' => 0, 'free' => 0, 'categories' => 0 ); ?>
-	<header class="hero academy-hero">
+	<header class="hero academy-hero scene-dolls">
+		<?php liferuss_photo_hero_html( 'matryoshka-samovar', true ); ?>
 		<div class="container hero-copy">
 			<p class="eyebrow"><?php echo esc_html( liferuss_t( 'nav_academy' ) ); ?></p>
 			<h1>آکادمی لایف‌روس</h1>

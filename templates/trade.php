@@ -34,7 +34,7 @@ get_header();
 			liferuss_the_image(
 				array(
 					'id'       => liferuss_opt( 'trade_hero_image_id' ),
-					'fallback' => liferuss_opt( 'trade_hero_image', 'st-basil.jpg' ),
+					'fallback' => liferuss_opt( 'trade_hero_image', 'moscow-night.jpg' ),
 					'alt'      => liferuss_opt( 'trade_hero_headline' ),
 					'width'    => 720,
 					'height'   => 480,
