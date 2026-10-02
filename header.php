@@ -80,7 +80,16 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 					<?php echo liferuss_icon( 'close' ); ?>
 				</button>
 			</div>
-			<a class="header-account" href="<?php echo esc_url( liferuss_url( '/account/' ) ); ?>"><?php echo is_user_logged_in() ? esc_html( liferuss_t( 'account_mine' ) ) : esc_html( liferuss_t( 'account_login' ) ); ?></a>
+			<?php
+			$account_in    = is_user_logged_in();
+			$account_label = $account_in ? liferuss_t( 'account_aria_user' ) : liferuss_t( 'account_aria_guest' );
+			?>
+			<a class="header-account<?php echo $account_in ? ' is-in' : ''; ?>" href="<?php echo esc_url( liferuss_url( '/account/' ) ); ?>" aria-label="<?php echo esc_attr( $account_label ); ?>" data-tip="<?php echo esc_attr( $account_label ); ?>">
+				<?php echo liferuss_icon( 'user' ); ?>
+				<?php if ( $account_in ) : ?>
+					<span class="header-account-dot" aria-hidden="true"></span>
+				<?php endif; ?>
+			</a>
 			<?php liferuss_language_switcher( 'header' ); ?>
 			<?php if ( $show_phone && $phone ) : ?>
 				<a class="header-phone" href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>">

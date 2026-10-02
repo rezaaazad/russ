@@ -334,6 +334,7 @@ function liferuss_icon( $name ) {
 		'home'      => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-8.5z"/></svg>',
 		'docs'      => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h7l5 5v11a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M14 4v5h5"/><path d="M9 13h6M9 16h6"/></svg>',
 		'plane'     => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13.2 10.4 12 21 4.8c.5-.3 1 .4.6.9L14.2 14l-1.1 6.2-3.2-4.4L5.2 17 3 13.2z"/></svg>',
+		'user'      => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M6.2 19.2v-.6a4.2 4.2 0 0 1 4.2-4.2h3.2a4.2 4.2 0 0 1 4.2 4.2v.6"/></svg>',
 		'users'     => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.8 18.5c.7-2.6 2.7-4 5.2-4s4.5 1.4 5.2 4"/><circle cx="17" cy="9" r="2.3"/><path d="M16.2 14.6c2 .3 3.4 1.5 4 3.4"/></svg>',
 		'shield'    => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 19 6.2v6.1c0 4.2-2.8 7-7 8.7-4.2-1.7-7-4.5-7-8.7V6.2L12 3.5z"/><path d="m8.8 12 2.2 2.2 4.4-4.4"/></svg>',
 		'chat'      => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H9l-4 3v-3H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z"/></svg>',
