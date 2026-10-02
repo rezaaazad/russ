@@ -19,6 +19,7 @@ use LifeRuss\Core\Course\Editor as CourseEditor;
 use LifeRuss\Core\Course\Front as CourseFront;
 use LifeRuss\Core\Course\Seed as CourseSeed;
 use LifeRuss\Core\Admin\Chrome;
+use LifeRuss\Core\Admin\Locale;
 use LifeRuss\Core\Admin\CompareScreen;
 use LifeRuss\Core\Catalog\Demo;
 use LifeRuss\Core\Catalog\Editor;
@@ -69,6 +70,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Plugin {
 
+
 	/**
 	 * Boot services.
 	 */
@@ -118,6 +120,8 @@ class Plugin {
 			CatalogCli::hooks();
 			SearchCli::hooks();
 		}
+
+		Locale::hooks();
 
 		if ( is_admin() ) {
 			Menu::hooks();

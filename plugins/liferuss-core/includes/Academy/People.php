@@ -20,6 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class People {
 
+
 	/**
 	 * Student list.
 	 */
@@ -69,8 +70,10 @@ class People {
 				continue;
 			}
 			$pct = Progress::percent( $id, (int) $course['id'] );
-			echo '<p><strong>' . esc_html( (string) $course['title'] ) . '</strong> ' . Chrome::pill( (string) $enrollment['status'], Chrome::status( (string) $enrollment['status'] ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo '<br>' . esc_html( 'پیشرفت ' . Chrome::num( $pct ) . '٪' ) . '</p>';
+			echo '<div class="lr-task"><div><strong>' . esc_html( (string) $course['title'] ) . '</strong><small>پیشرفت ' . esc_html( Chrome::num( $pct ) ) . '٪</small>';
+			echo '<div class="lr-bar"><span style="width:' . esc_attr( (string) $pct ) . '%"></span></div></div>';
+			echo Chrome::pill( (string) $enrollment['status'], Chrome::status( (string) $enrollment['status'] ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '</div>';
 		}
 		echo '<h2>آزمون‌ها</h2>';
 		$scores = Db::where_id( 'quiz_results', 'student_id', $id );
@@ -391,7 +394,7 @@ class People {
 	/**
 	 * CRM lead with the same phone.
 	 *
-	 * @param string $phone Phone.
+	 * @param  string $phone Phone.
 	 * @return array<string, mixed>|null
 	 */
 	private static function lead( string $phone ): ?array {

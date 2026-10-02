@@ -22,6 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Commerce {
 
+
 	/**
 	 * Plans and subscribers.
 	 */
@@ -32,15 +33,16 @@ class Commerce {
 		$plans = $wpdb->get_results( 'SELECT * FROM `' . Db::table( 'subscription_plans' ) . '` ORDER BY id DESC', ARRAY_A );
 		echo '<div class="lr-split"><section>';
 		if ( ! $plans ) {
-			Chrome::empty( 'طرحی نیست. فرم کنار صفحه اولین طرح را می‌سازد.' );
+			Chrome::empty( 'طرحی نیست. فرم کنار صفحه اولین طرح را می‌سازد.', '' );
 		}
+		echo '<div class="lr-cards">';
 		foreach ( (array) $plans as $plan ) {
 			$ids = Db::where_id( 'plan_courses', 'plan_id', (int) $plan['id'] );
 			echo '<article class="lr-card"><strong>' . esc_html( (string) $plan['title'] ) . '</strong>';
 			echo '<span>' . esc_html( Chrome::toman( (int) $plan['price'] ) . ' / ' . ( 'year' === $plan['billing_interval'] ? 'سال' : 'ماه' ) ) . '</span>';
 			echo '<span>' . esc_html( Chrome::num( count( $ids ) ) . ' دوره' ) . '</span></article>';
 		}
-		echo '<h2>مشترک‌ها</h2>';
+		echo '</div><h2>مشترک‌ها</h2>';
 		$subs = $wpdb->get_results( 'SELECT s.*, st.display_name FROM `' . Db::table( 'subscriptions' ) . '` s JOIN `' . Db::table( 'students' ) . '` st ON st.id = s.student_id ORDER BY s.ends_at ASC LIMIT 40', ARRAY_A );
 		if ( ! $subs ) {
 			Chrome::empty( 'مشترک فعالی نیست.' );

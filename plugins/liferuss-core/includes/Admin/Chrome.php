@@ -18,6 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Chrome {
 
+
 	/**
 	 * Hooks.
 	 */
@@ -166,7 +167,8 @@ class Chrome {
 	 * @param string $action Safe HTML link or button.
 	 */
 	public static function empty( string $text, string $action = '' ): void {
-		echo '<div class="lr-empty"><p>' . esc_html( $text ) . '</p>';
+		echo '<div class="lr-empty"><span class="lr-empty-ico" aria-hidden="true"><svg viewBox="0 0 48 48" width="28" height="28"><rect x="8" y="6" width="24" height="32" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16h8M16 22h12M16 28h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="34" cy="34" r="8" fill="#e8b923"/><path d="M31 34h6M34 31v6" stroke="#0b2341" stroke-width="2" stroke-linecap="round"/></svg></span>';
+		echo '<p>' . esc_html( $text ) . '</p>';
 		if ( '' !== $action ) {
 			echo $action; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Caller passes escaped markup.
 		}

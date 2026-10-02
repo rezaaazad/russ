@@ -21,11 +21,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Actions {
 
+
 	/**
 	 * Hooks.
 	 */
 	public static function hooks(): void {
 		add_action( 'wp_ajax_lr_academy_sort', array( self::class, 'sort' ) );
+		add_action( 'wp_ajax_lr_academy_lesson', array( self::class, 'ajax_lesson' ) );
+		add_action( 'wp_ajax_lr_academy_lesson_copy', array( self::class, 'ajax_copy' ) );
+		add_action( 'wp_ajax_lr_academy_lesson_remove', array( self::class, 'ajax_remove' ) );
+		add_action( 'wp_ajax_lr_academy_module', array( self::class, 'ajax_module' ) );
 		add_action( 'admin_init', array( Flow::class, 'publish_due' ) );
 	}
 
@@ -52,6 +57,7 @@ class Actions {
 			'session'      => 'session',
 			'settings'     => 'settings',
 			'dismiss'      => 'dismiss',
+			'remind'       => 'remind',
 		);
 		if ( ! isset( $map[ $task ] ) ) {
 			return false;
@@ -90,6 +96,144 @@ class Actions {
 			++$order;
 		}
 		wp_send_json_success();
+	}
+
+	/**
+	 * Save a lesson from the drawer and return the row payload.
+	 */
+	public static function ajax_lesson(): void {
+		self::ajax_guard();
+		$course = self::course_json();
+		$result = self::save_lesson( $course );
+		if ( is_string( $result ) ) {
+			wp_send_json_error( array( 'message' => $result ), 400 );
+		}
+		$lesson = Db::find( 'course_lessons', $result );
+		$module = $lesson ? Db::find( 'course_modules', (int) $lesson['module_id'] ) : null;
+		if ( ! $lesson || ! $module ) {
+			wp_send_json_error( array( 'message' => 'درس ذخیره نشد.' ), 500 );
+		}
+		wp_send_json_success( array( 'lesson' => Desk::lesson_payload( $module, $lesson ) ) );
+	}
+
+	/**
+	 * Duplicate one lesson into the same section.
+	 */
+	public static function ajax_copy(): void {
+		self::ajax_guard();
+		$id     = absint( $_POST['lesson_id'] ?? 0 );
+		$lesson = Db::find( 'course_lessons', $id );
+		if ( ! $lesson || ! self::owns_row( 'lessons', $lesson ) ) {
+			wp_send_json_error( array( 'message' => 'درس پیدا نشد.' ), 404 );
+		}
+		$copy = Db::insert(
+			'course_lessons',
+			array(
+				'module_id'        => (int) $lesson['module_id'],
+				'title'            => (string) $lesson['title'] . ' (کپی)',
+				'slug'             => sanitize_title( (string) $lesson['slug'] ) . '-copy-' . strtolower( wp_generate_password( 4, false, false ) ),
+				'type'             => (string) $lesson['type'],
+				'content'          => (string) $lesson['content'],
+				'duration_seconds' => (int) $lesson['duration_seconds'],
+				'is_preview'       => (int) $lesson['is_preview'],
+				'status'           => (string) $lesson['status'],
+				'sort_order'       => (int) $lesson['sort_order'] + 1,
+			)
+		);
+		if ( $copy < 1 ) {
+			wp_send_json_error( array( 'message' => 'کپی نشد.' ), 500 );
+		}
+		foreach ( Db::where_id( 'lesson_videos', 'lesson_id', $id ) as $video ) {
+			Db::insert(
+				'lesson_videos',
+				array(
+					'lesson_id'   => $copy,
+					'provider'    => (string) $video['provider'],
+					'external_id' => (string) $video['external_id'],
+					'duration'    => (int) $video['duration'],
+					'status'      => (string) $video['status'],
+				)
+			);
+		}
+		$fresh  = Db::find( 'course_lessons', $copy );
+		$module = $fresh ? Db::find( 'course_modules', (int) $fresh['module_id'] ) : null;
+		if ( ! $fresh || ! $module ) {
+			wp_send_json_error( array( 'message' => 'کپی نشد.' ), 500 );
+		}
+		wp_send_json_success( array( 'lesson' => Desk::lesson_payload( $module, $fresh ) ) );
+	}
+
+	/**
+	 * Delete a lesson the current user can edit.
+	 */
+	public static function ajax_remove(): void {
+		self::ajax_guard();
+		global $wpdb;
+		$id     = absint( $_POST['lesson_id'] ?? 0 );
+		$lesson = Db::find( 'course_lessons', $id );
+		if ( ! $lesson || ! self::owns_row( 'lessons', $lesson ) ) {
+			wp_send_json_error( array( 'message' => 'درس پیدا نشد.' ), 404 );
+		}
+		$wpdb->delete( Db::table( 'lesson_videos' ), array( 'lesson_id' => $id ), array( '%d' ) );
+		$wpdb->delete( Db::table( 'lesson_attachments' ), array( 'lesson_id' => $id ), array( '%d' ) );
+		$wpdb->delete( Db::table( 'course_progress' ), array( 'lesson_id' => $id ), array( '%d' ) );
+		$wpdb->delete( Db::table( 'course_lessons' ), array( 'id' => $id ), array( '%d' ) );
+		wp_send_json_success();
+	}
+
+	/**
+	 * Add a section without leaving the outline.
+	 */
+	public static function ajax_module(): void {
+		self::ajax_guard();
+		$course = self::course_json();
+		$title  = self::text( 'title' );
+		if ( '' === $title ) {
+			wp_send_json_error( array( 'message' => 'عنوان بخش را بنویسید.' ), 400 );
+		}
+		$id = Db::insert(
+			'course_modules',
+			array(
+				'course_id' => (int) $course['id'],
+				'title'     => $title,
+				'status'    => 'published',
+			)
+		);
+		if ( $id < 1 ) {
+			wp_send_json_error( array( 'message' => 'فصل اضافه نشد.' ), 500 );
+		}
+		wp_send_json_success(
+			array(
+				'module' => array(
+					'id'    => $id,
+					'title' => $title,
+				),
+			)
+		);
+	}
+
+	/**
+	 * Shared ajax permission check.
+	 */
+	private static function ajax_guard(): void {
+		check_ajax_referer( 'lr_academy_ui', 'nonce' );
+		if ( ! current_user_can( 'lr_academy_access' ) ) {
+			wp_send_json_error( array( 'message' => 'مجوز ندارید.' ), 403 );
+		}
+	}
+
+	/**
+	 * Course posted to ajax, or a JSON error.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private static function course_json(): array {
+		$id     = absint( $_POST['course_id'] ?? 0 );
+		$course = Db::find( 'courses', $id );
+		if ( ! $course || ! Flow::can_course( $course ) ) {
+			wp_send_json_error( array( 'message' => 'به این دوره دسترسی ندارید.' ), 403 );
+		}
+		return $course;
 	}
 
 	/**
@@ -178,9 +322,23 @@ class Actions {
 	 */
 	private static function lesson(): void {
 		$course = self::posted_course();
-		$title  = self::text( 'title' );
+		$result = self::save_lesson( $course );
+		if ( is_string( $result ) ) {
+			Flow::back( $result, 'err' );
+		}
+		Flow::back( 'درس ذخیره شد.' );
+	}
+
+	/**
+	 * Insert or update a lesson. Returns the id, or an error sentence.
+	 *
+	 * @param  array<string, mixed> $course Course.
+	 * @return int|string
+	 */
+	private static function save_lesson( array $course ) {
+		$title = self::text( 'title' );
 		if ( '' === $title ) {
-			Flow::back( 'عنوان درس را بنویسید.', 'err' );
+			return 'عنوان درس را بنویسید.';
 		}
 		$type = sanitize_key( self::text( 'type' ) );
 		if ( ! in_array( $type, array( 'video', 'text', 'quiz', 'file' ), true ) ) {
@@ -189,7 +347,7 @@ class Actions {
 		$module = absint( $_POST['module_id'] ?? 0 );
 		$mod    = Db::find( 'course_modules', $module );
 		if ( ! $mod || (int) $mod['course_id'] !== (int) $course['id'] ) {
-			Flow::back( 'بخش درس پیدا نشد.', 'err' );
+			return 'بخش درس پیدا نشد.';
 		}
 		$id   = absint( $_POST['lesson_id'] ?? 0 );
 		$data = array(
@@ -208,10 +366,13 @@ class Actions {
 		} else {
 			$id = Db::insert( 'course_lessons', $data );
 		}
-		if ( 'video' === $type && $id > 0 ) {
+		if ( $id < 1 ) {
+			return 'درس ذخیره نشد.';
+		}
+		if ( 'video' === $type ) {
 			self::video( $id );
 		}
-		if ( 'file' === $type && $id > 0 && '' !== self::text( 'file_url' ) ) {
+		if ( 'file' === $type && '' !== self::text( 'file_url' ) ) {
 			Db::insert(
 				'lesson_attachments',
 				array(
@@ -222,7 +383,23 @@ class Actions {
 				)
 			);
 		}
-		Flow::back( 'درس ذخیره شد.' );
+		return $id;
+	}
+
+	/**
+	 * Mark a subscription as reminded.
+	 */
+	private static function remind(): void {
+		if ( ! current_user_can( 'lr_academy_manage' ) && ! current_user_can( 'lr_view_finance' ) ) {
+			Flow::back( 'مجوز ندارید.', 'err' );
+		}
+		$id  = absint( $_POST['subscription_id'] ?? 0 );
+		$row = Db::find( 'subscriptions', $id );
+		if ( ! $row ) {
+			Flow::back( 'اشتراک پیدا نشد.', 'err' );
+		}
+		Db::update( 'subscriptions', $id, array( 'reminded_at' => Db::now() ) );
+		Flow::back( 'یادآوری ثبت شد.' );
 	}
 
 	/**
@@ -682,7 +859,7 @@ class Actions {
 	/**
 	 * One course-scoped quiz.
 	 *
-	 * @param int $course_id Course id.
+	 * @param  int $course_id Course id.
 	 * @return array<string, mixed>
 	 */
 	private static function course_quiz( int $course_id ): array {
