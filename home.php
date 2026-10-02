@@ -28,7 +28,7 @@ get_header();
 				<article <?php post_class( 'post-card' ); ?>>
 					<a class="post-thumb" href="<?php the_permalink(); ?>"><?php liferuss_the_entry_image(); ?></a>
 					<div class="post-card-body">
-						<p class="post-date"><?php echo esc_html( get_the_date() ); ?> · <?php echo esc_html( liferuss_reading_minutes( get_the_ID() ) ); ?> <?php echo esc_html( liferuss_t( 'reading_min' ) ); ?></p>
+						<p class="post-date"><?php echo esc_html( get_the_date() ); ?> · <?php echo esc_html( number_format_i18n( liferuss_reading_minutes( get_the_ID() ) ) ); ?> <?php echo esc_html( liferuss_t( 'reading_min' ) ); ?></p>
 						<h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
 						<p><?php echo esc_html( get_the_excerpt() ); ?></p>
 						<a class="text-link" href="<?php the_permalink(); ?>"><?php echo esc_html( liferuss_t( 'read_more' ) ); ?> <?php echo liferuss_icon( 'arrow' ); ?></a>

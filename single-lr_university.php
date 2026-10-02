@@ -23,16 +23,16 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 		<h1><?php the_title(); ?></h1>
 		<?php if ( $row ) : ?>
 			<p class="lr-uni-actions">
-				<button type="button" class="btn btn-ghost lr-compare-add" data-slug="<?php echo esc_attr( (string) $row['slug'] ); ?>" data-name="<?php echo esc_attr( (string) $row['name_fa'] ); ?>" aria-pressed="false">مقایسه</button>
+				<button type="button" class="btn btn-ghost btn-ghost-light lr-compare-add" data-slug="<?php echo esc_attr( (string) $row['slug'] ); ?>" data-name="<?php echo esc_attr( (string) $row['name_fa'] ); ?>" aria-pressed="false">مقایسه</button>
 				<?php if ( is_user_logged_in() ) : ?>
 					<form method="post" action="<?php echo esc_url( liferuss_url( '/account/saved/' ) ); ?>">
 						<?php wp_nonce_field( 'lr_account', 'lr_account_nonce' ); ?>
 						<input type="hidden" name="lr_account_action" value="save_uni">
 						<input type="hidden" name="slug" value="<?php echo esc_attr( (string) $row['slug'] ); ?>">
-						<button class="btn btn-ghost" type="submit">ذخیره در حساب</button>
+						<button class="btn btn-ghost btn-ghost-light" type="submit">ذخیره در حساب</button>
 					</form>
 				<?php else : ?>
-					<a class="btn btn-ghost" href="<?php echo esc_url( liferuss_url( '/account/' ) ); ?>">ذخیره در حساب</a>
+					<a class="btn btn-ghost btn-ghost-light" href="<?php echo esc_url( liferuss_url( '/account/' ) ); ?>">ذخیره در حساب</a>
 				<?php endif; ?>
 			</p>
 		<?php endif; ?>
@@ -45,11 +45,11 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 			<p>این دانشگاه هنوز منتشر نشده است.</p>
 		<?php else : ?>
 			<ul class="lr-facts">
-				<?php if ( ! empty( $row['founded_year'] ) ) : ?><li>تأسیس <?php echo esc_html( (string) $row['founded_year'] ); ?></li><?php endif; ?>
+				<?php if ( ! empty( $row['founded_year'] ) ) : ?><li>تأسیس <?php echo esc_html( liferuss_local_digits( (string) $row['founded_year'] ) ); ?></li><?php endif; ?>
 				<?php if ( 'state' === $row['ownership'] ) : ?><li>دولتی</li><?php elseif ( 'private' === $row['ownership'] ) : ?><li>خصوصی</li><?php endif; ?>
 				<?php if ( (int) get_post_meta( $post_id, '_lr_students_total', true ) ) : ?><li><?php echo esc_html( number_format_i18n( (int) get_post_meta( $post_id, '_lr_students_total', true ) ) ); ?> دانشجو</li><?php endif; ?>
 				<?php $usd = liferuss_catalog_usd( $row['min_tuition_usd'], true ); if ( $usd ) : ?><li>شهریه از <?php echo esc_html( $usd ); ?></li><?php endif; ?>
-				<?php if ( ! empty( $row['best_world_rank'] ) ) : ?><li>بهترین رتبه جهانی <?php echo esc_html( (string) $row['best_world_rank'] ); ?></li><?php endif; ?>
+				<?php if ( ! empty( $row['best_world_rank'] ) ) : ?><li>بهترین رتبه جهانی <?php echo esc_html( liferuss_local_digits( (string) $row['best_world_rank'] ) ); ?></li><?php endif; ?>
 				<?php if ( 'approved' === $row['health_ministry_status'] ) : ?><li>تأیید وزارت بهداشت</li><?php endif; ?>
 				<?php if ( 'approved' === $row['science_ministry_status'] ) : ?><li>تأیید وزارت علوم</li><?php endif; ?>
 				<?php if ( ! empty( $row['has_dormitory'] ) ) : ?><li>خوابگاه</li><?php endif; ?>
@@ -59,6 +59,7 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 			<?php endif; ?>
 			<?php if ( ! empty( $row['rankings'] ) ) : ?>
 				<h2>رتبه‌بندی</h2>
+				<?php liferuss_table_scroll_open(); ?>
 				<table class="lr-table">
 					<thead><tr><th>مرجع</th><th>محدوده</th><th>رتبه</th><th>سال</th></tr></thead>
 					<tbody>
@@ -72,9 +73,11 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 					<?php endforeach; ?>
 					</tbody>
 				</table>
+				<?php liferuss_table_scroll_close(); ?>
 			<?php endif; ?>
 			<?php if ( ! empty( $row['programs'] ) ) : ?>
 				<h2>رشته‌ها و شهریه</h2>
+				<?php liferuss_table_scroll_open(); ?>
 				<table class="lr-table">
 					<thead><tr><th>رشته</th><th>مقطع</th><th>زبان</th><th>مدت</th><th>شهریه</th><th>دلار</th></tr></thead>
 					<tbody>
@@ -90,6 +93,7 @@ $faqs    = liferuss_catalog_faqs( $post_id );
 					<?php endforeach; ?>
 					</tbody>
 				</table>
+				<?php liferuss_table_scroll_close(); ?>
 			<?php endif; ?>
 			<?php if ( $row && class_exists( '\LifeRuss\Core\Scholarships\Store' ) ) : ?>
 				<?php $scholarships = \LifeRuss\Core\Scholarships\Store::for_university( (int) $row['id'] ); ?>

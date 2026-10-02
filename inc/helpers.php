@@ -210,7 +210,7 @@ function liferuss_default_nav_items() {
  */
 function liferuss_nav_tree() {
 	$blog = get_option( 'page_for_posts' ) ? get_permalink( (int) get_option( 'page_for_posts' ) ) : liferuss_url( '/blog/' );
-	return array(
+	$tree = array(
 		array(
 			'title'    => liferuss_t( 'nav_home' ),
 			'url'      => liferuss_home(),
@@ -249,7 +249,7 @@ function liferuss_nav_tree() {
 			'class'    => '',
 			'children' => array(
 				array( 'title' => liferuss_t( 'nav_language' ), 'url' => liferuss_url( '/academy/courses/russian-language/' ) ),
-				array( 'title' => 'طرح‌ها', 'url' => liferuss_url( '/academy/plans/' ) ),
+				array( 'title' => liferuss_t( 'nav_plans' ) !== 'nav_plans' ? liferuss_t( 'nav_plans' ) : 'طرح‌ها', 'url' => liferuss_url( '/academy/plans/' ) ),
 			),
 		),
 		array(
@@ -279,6 +279,10 @@ function liferuss_nav_tree() {
 			'children' => array(),
 		),
 	);
+	if ( function_exists( 'liferuss_filter_nav_tree' ) ) {
+		return liferuss_filter_nav_tree( $tree );
+	}
+	return $tree;
 }
 
 /**
@@ -454,7 +458,10 @@ function liferuss_fallback_menu() {
 function liferuss_cta_url( $link ) {
 	$link = trim( (string) $link );
 	if ( '' === $link ) {
-		return liferuss_home() . '#consultation';
+		return liferuss_url( '/contact/' ) . '#consultation';
+	}
+	if ( '#consultation' === $link || str_starts_with( $link, '#consultation' ) ) {
+		return liferuss_url( '/contact/' ) . $link;
 	}
 	if ( isset( $link[0] ) && '#' === $link[0] ) {
 		return $link;

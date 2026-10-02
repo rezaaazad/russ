@@ -21,6 +21,7 @@ get_header();
 </header>
 <section class="section">
 	<div class="container">
+		<?php if ( have_posts() || ! empty( $_GET ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
 		<form class="lr-filters lr-compare-filters" method="get" action="<?php echo esc_url( get_post_type_archive_link( 'lr_scholarship' ) ); ?>">
 			<label>
 				<span>مقطع</span>
@@ -61,6 +62,7 @@ get_header();
 			</label>
 			<button class="btn btn-gold" type="submit">فیلتر</button>
 		</form>
+		<?php endif; ?>
 		<div class="lr-cards">
 			<?php if ( have_posts() ) : ?>
 				<?php while ( have_posts() ) : ?>
@@ -87,7 +89,7 @@ get_header();
 					</article>
 				<?php endwhile; ?>
 			<?php else : ?>
-				<?php liferuss_empty_catalog( 'بورسیه‌ای منتشر نشده است' ); ?>
+				<?php liferuss_empty_catalog( liferuss_t( 'nav_scholarships' ) ); ?>
 			<?php endif; ?>
 		</div>
 	</div>

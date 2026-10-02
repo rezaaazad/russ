@@ -23,7 +23,7 @@ $result = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::fields( $page
 <div class="section">
 	<div class="container">
 		<?php if ( empty( $result['items'] ) ) : ?>
-			<?php liferuss_empty_catalog( 'رشته‌ای منتشر نشده است' ); ?>
+			<?php liferuss_empty_catalog( liferuss_t( 'nav_fields' ) ); ?>
 		<?php else : ?>
 		<div class="lr-cards">
 			<?php foreach ( $result['items'] as $item ) : ?>

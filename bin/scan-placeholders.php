@@ -59,6 +59,9 @@ $needles = array(
 	'a stronger tomorrow',
 	'Global connections',
 	'>صافی<',
+	'دادهٔ نمایشی',
+	'989120000000',
+	'wa.me/989120000000',
 );
 $failed = 0;
 foreach ( $paths as $path ) {

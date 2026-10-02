@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.11.2' );
+define( 'LIFERUSS_VERSION', '1.12.0' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -33,6 +33,7 @@ require_once LIFERUSS_DIR . '/inc/home-sections.php';
 require_once LIFERUSS_DIR . '/inc/compare.php';
 require_once LIFERUSS_DIR . '/inc/admin-landings.php';
 require_once LIFERUSS_DIR . '/inc/admin-options.php';
+require_once LIFERUSS_DIR . '/inc/ux.php';
 
 /**
  * Theme supports, menus, and image sizes.
@@ -110,10 +111,12 @@ function liferuss_assets() {
 			'suggestUrl'  => rest_url( 'liferuss/v1/search/suggest' ),
 			'compareBase' => liferuss_url( '/compare/' ),
 			'uniBase'     => liferuss_url( '/universities/' ),
+			'searchBase'  => liferuss_url( '/search/' ),
+			'contactUrl'  => liferuss_url( '/contact/' ),
 			'strings'     => array(
 				'add'    => 'مقایسه',
 				'remove' => 'حذف از مقایسه',
-				'need'   => 'حداقل دو دانشگاه',
+				'need'   => 'حداقل یک دانشگاه دیگر اضافه کنید',
 				'full'   => 'حداکثر ۴ دانشگاه',
 				'open'   => 'مشاهده مقایسه',
 			),

@@ -32,6 +32,7 @@ class Documents {
 			'lr_scholarship' => 'scholarship',
 			'lr_guide'       => 'guide',
 			'post'           => 'post',
+			'page'           => 'page',
 		);
 	}
 
@@ -151,19 +152,22 @@ class Documents {
 		if ( '' === $kind ) {
 			return null;
 		}
-		$title     = $post->post_title;
+		if ( '1' === (string) get_post_meta( $post->ID, '_lr_demo', true ) && ! ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
+			return null;
+		}
+		$title     = self::clean_title( $post->post_title );
 		$slug      = $post->post_name;
 		$city      = '';
 		$city_slug = '';
 		$aliases   = Aliases::for_slug( $slug );
-		$extra     = $post->post_excerpt . ' ' . wp_strip_all_tags( $post->post_content );
+		$extra     = self::plain( $post->post_excerpt . ' ' . $post->post_content );
 
 		if ( in_array( $post->post_type, array( 'lr_university', 'lr_field', 'lr_city' ), true ) ) {
 			$row = self::catalog_row( $post );
 			if ( ! $row ) {
 				return null;
 			}
-			$title    = (string) $row['name_fa'];
+			$title    = self::clean_title( (string) $row['name_fa'] );
 			$slug     = (string) $row['slug'];
 			$aliases .= ' ' . (string) ( $row['name_en'] ?? '' ) . ' ' . (string) ( $row['name_ru'] ?? '' ) . ' ' . (string) ( $row['short_name'] ?? '' ) . ' ' . $slug;
 			$aliases .= ' ' . Aliases::for_slug( $slug );
@@ -179,7 +183,8 @@ class Documents {
 		if ( '' === $text ) {
 			return null;
 		}
-		$excerpt = $city ? $city : wp_trim_words( wp_strip_all_tags( $post->post_excerpt ? $post->post_excerpt : $post->post_content ), 22, '…' );
+		$source  = $post->post_excerpt ? $post->post_excerpt : $post->post_content;
+		$excerpt = $city ? $city : wp_trim_words( self::plain( $source ), 22, '…' );
 		return array(
 			'id'        => $kind . '_' . $post->ID,
 			'type'      => $kind,
@@ -192,6 +197,34 @@ class Documents {
 			'city'      => $city,
 			'city_slug' => $city_slug,
 		);
+	}
+
+	/**
+	 * Published catalog row joined to its city when the post is a university.
+	 *
+	 * @param \WP_Post $post Post.
+	 * @return array<string, mixed>|null
+	 */
+	/**
+	 * Insert spaces before block tags so excerpts do not glue words.
+	 *
+	 * @param string $html HTML.
+	 */
+	private static function plain( string $html ): string {
+		$html = preg_replace( '#</(p|div|li|h[1-6]|tr|td|blockquote)>#i', ' ', $html );
+		$html = preg_replace( '#<br\s*/?>#i', ' ', (string) $html );
+		$text = wp_strip_all_tags( (string) $html );
+		$text = preg_replace( '/\s+/u', ' ', $text );
+		return trim( (string) $text );
+	}
+
+	/**
+	 * Drop the seed marker from a title.
+	 *
+	 * @param string $title Title.
+	 */
+	private static function clean_title( string $title ): string {
+		return str_replace( array( ' (نمونه)', '(نمونه)' ), '', $title );
 	}
 
 	/**

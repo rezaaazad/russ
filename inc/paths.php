@@ -219,7 +219,7 @@ function liferuss_path_live( $post_id ) {
 		echo '<section class="section path-live"><div class="container"><div class="path-children">';
 		foreach ( $children as $child ) {
 			echo '<a class="path-child" href="' . esc_url( get_permalink( $child ) ) . '">';
-			echo '<strong>' . esc_html( get_the_title( $child ) ) . '</strong>';
+			echo '<strong>' . esc_html( get_the_title( $child ) ) . '</strong><span class="path-child-arrow" aria-hidden="true">‹</span>';
 			$lead = (string) get_post_meta( $child->ID, '_lr_lead', true );
 			if ( $lead && ! liferuss_is_placeholder_copy( $lead ) ) {
 				echo '<span>' . esc_html( $lead ) . '</span>';
@@ -276,13 +276,12 @@ function liferuss_path_live( $post_id ) {
 	echo '<section class="section path-live"><div class="container">';
 	echo '<h2>' . esc_html( liferuss_t( 'path_live_title' ) ) . '</h2>';
 	echo '<ul class="lr-facts">';
-	echo '<li>' . esc_html( liferuss_t( 'path_count' ) ) . ' ' . (int) $snap['total'] . '</li>';
-	if ( $snap['min_usd'] > 0 ) {
-		$range = liferuss_catalog_usd( $snap['min_usd'] );
-		if ( $snap['max_usd'] > $snap['min_usd'] ) {
-			$range .= ' – ' . liferuss_catalog_usd( $snap['max_usd'] );
-		}
+	echo '<li>' . esc_html( liferuss_t( 'path_count' ) ) . ' ' . esc_html( liferuss_local_digits( (string) (int) $snap['total'] ) ) . '</li>';
+	if ( $snap['min_usd'] > 0 && (int) $snap['total'] >= 3 && (float) $snap['max_usd'] > (float) $snap['min_usd'] ) {
+		$range = liferuss_catalog_usd( $snap['min_usd'] ) . ' – ' . liferuss_catalog_usd( $snap['max_usd'] );
 		echo '<li>' . esc_html( liferuss_t( 'path_tuition' ) ) . ' ' . esc_html( $range ) . '</li>';
+	} elseif ( $snap['min_usd'] > 0 && (int) $snap['total'] >= 3 ) {
+		echo '<li>' . esc_html( liferuss_t( 'path_tuition' ) ) . ' ' . esc_html( liferuss_catalog_usd( $snap['min_usd'] ) ) . '</li>';
 	}
 	echo '</ul>';
 	if ( 'tuition' !== $mode ) {
@@ -308,15 +307,17 @@ function liferuss_path_tuition_block() {
 		return;
 	}
 	$snap = \LifeRuss\Core\Catalog\Query::snapshot( array() );
-	if ( (int) $snap['total'] < 1 ) {
+	if ( (int) $snap['total'] < 3 ) {
 		return;
 	}
 	echo '<section class="section path-live"><div class="container">';
 	echo '<h2>' . esc_html( liferuss_t( 'path_tuition' ) ) . '</h2>';
 	echo '<ul class="lr-facts">';
-	echo '<li>' . esc_html( liferuss_t( 'path_count' ) ) . ' ' . (int) $snap['total'] . '</li>';
-	if ( $snap['min_usd'] > 0 ) {
+	echo '<li>' . esc_html( liferuss_t( 'path_count' ) ) . ' ' . esc_html( liferuss_local_digits( (string) (int) $snap['total'] ) ) . '</li>';
+	if ( $snap['min_usd'] > 0 && (float) $snap['max_usd'] > (float) $snap['min_usd'] ) {
 		echo '<li>' . esc_html( liferuss_catalog_usd( $snap['min_usd'] ) ) . ' – ' . esc_html( liferuss_catalog_usd( $snap['max_usd'] ) ) . '</li>';
+	} elseif ( $snap['min_usd'] > 0 ) {
+		echo '<li>' . esc_html( liferuss_catalog_usd( $snap['min_usd'] ) ) . '</li>';
 	}
 	echo '</ul></div></section>';
 }
@@ -566,7 +567,7 @@ function liferuss_hub_children() {
 	}
 	echo '<section class="section"><div class="container path-children">';
 	foreach ( $children as $child ) {
-		echo '<a class="path-child" href="' . esc_url( get_permalink( $child ) ) . '"><strong>' . esc_html( get_the_title( $child ) ) . '</strong></a>';
+		echo '<a class="path-child" href="' . esc_url( get_permalink( $child ) ) . '"><strong>' . esc_html( get_the_title( $child ) ) . '</strong><span class="path-child-arrow" aria-hidden="true">‹</span></a>';
 	}
 	echo '</div></section>';
 }

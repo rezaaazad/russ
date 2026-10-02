@@ -18,7 +18,7 @@ get_header();
 		<article <?php post_class( 'single-article' ); ?>>
 			<header class="page-hero">
 				<div class="container">
-					<p class="eyebrow"><?php echo esc_html( get_the_date() ); ?> · <?php echo esc_html( liferuss_reading_minutes( get_the_ID() ) ); ?> <?php echo esc_html( liferuss_t( 'reading_min' ) ); ?></p>
+					<p class="eyebrow"><?php echo esc_html( get_the_date() ); ?> · <?php echo esc_html( number_format_i18n( liferuss_reading_minutes( get_the_ID() ) ) ); ?> <?php echo esc_html( liferuss_t( 'reading_min' ) ); ?></p>
 					<h1><?php the_title(); ?></h1>
 					<?php liferuss_breadcrumbs(); ?>
 				</div>
@@ -63,7 +63,10 @@ get_header();
 						<?php endif; ?>
 						<div>
 							<strong><?php echo esc_html( $author_name ); ?></strong>
-							<p><?php echo esc_html( get_the_author_meta( 'description' ) ? get_the_author_meta( 'description' ) : liferuss_t( 'author_fallback' ) ); ?></p>
+							<?php $bio = trim( (string) get_the_author_meta( 'description' ) ); ?>
+							<?php if ( $bio && $bio !== $author_name ) : ?>
+								<p><?php echo esc_html( $bio ); ?></p>
+							<?php endif; ?>
 						</div>
 					</aside>
 					<?php $related = liferuss_related_posts( get_the_ID() ); ?>
@@ -78,10 +81,16 @@ get_header();
 						</section>
 					<?php endif; ?>
 					<p class="lr-inline-cta"><a class="btn btn-gold" href="#consultation"><?php echo esc_html( liferuss_t( 'magazine_cta' ) ); ?></a></p>
+					<?php if ( get_previous_post() || get_next_post() ) : ?>
 					<nav class="post-nav">
-						<?php previous_post_link( '%link', liferuss_t( 'post_prev' ) ); ?>
-						<?php next_post_link( '%link', liferuss_t( 'post_next' ) ); ?>
+						<?php if ( get_previous_post() ) : ?>
+							<?php previous_post_link( '%link', liferuss_t( 'post_prev' ) ); ?>
+						<?php endif; ?>
+						<?php if ( get_next_post() ) : ?>
+							<?php next_post_link( '%link', liferuss_t( 'post_next' ) ); ?>
+						<?php endif; ?>
 					</nav>
+					<?php endif; ?>
 				</div>
 			</div>
 		</article>

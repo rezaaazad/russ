@@ -20,8 +20,7 @@ $base  = liferuss_url( '/search/' );
 ?>
 <header class="page-hero">
 	<div class="container">
-		<p class="eyebrow"><?php echo esc_html( liferuss_t( 'search_open' ) ); ?></p>
-		<h1>جستجو</h1>
+		<h1><?php echo esc_html( liferuss_t( 'search_title' ) ); ?></h1>
 	</div>
 </header>
 <article class="section">
@@ -78,10 +77,12 @@ $base  = liferuss_url( '/search/' );
 				<ul class="lr-find-results">
 					<?php foreach ( $data['items'] as $item ) : ?>
 						<li>
-							<a href="<?php echo esc_url( (string) $item['url'] ); ?>"><?php echo esc_html( (string) $item['title'] ); ?></a>
-							<?php if ( ! empty( $item['excerpt'] ) ) : ?>
-								<p><?php echo esc_html( (string) $item['excerpt'] ); ?></p>
-							<?php endif; ?>
+							<a href="<?php echo esc_url( (string) $item['url'] ); ?>">
+								<strong><?php echo esc_html( (string) $item['title'] ); ?></strong>
+								<?php if ( ! empty( $item['excerpt'] ) ) : ?>
+									<span><?php echo esc_html( (string) $item['excerpt'] ); ?></span>
+								<?php endif; ?>
+							</a>
 						</li>
 					<?php endforeach; ?>
 				</ul>

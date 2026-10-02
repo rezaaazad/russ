@@ -63,7 +63,13 @@ class Access {
 	 * @param array<string, mixed> $lesson  Lesson.
 	 */
 	public static function can_watch( int $user_id, array $course, array $lesson ): bool {
-		if ( ! empty( $lesson['is_preview'] ) && 'published' === ( $lesson['status'] ?? '' ) ) {
+		if ( 'published' !== ( $lesson['status'] ?? '' ) ) {
+			return false;
+		}
+		if ( ! empty( $lesson['is_preview'] ) ) {
+			return true;
+		}
+		if ( ! empty( $course['is_free'] ) && 'published' === ( $course['status'] ?? '' ) ) {
 			return true;
 		}
 		return '' !== self::tier( $user_id, $course );

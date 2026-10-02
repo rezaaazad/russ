@@ -18,11 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</header>
 		<div class="majors-grid">
 			<?php foreach ( liferuss_majors() as $major ) : ?>
-				<?php $tag = ! empty( $major['link'] ) ? 'a' : 'article'; ?>
-				<<?php echo $tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> class="major-card"<?php echo ! empty( $major['link'] ) ? ' href="' . esc_url( liferuss_cta_url( $major['link'] ) ) . '"' : ''; ?>>
+				<a class="major-card" href="<?php echo esc_url( liferuss_major_href( $major ) ); ?>">
 					<span class="major-orb"><?php echo liferuss_icon( $major['icon'] ); ?></span>
 					<h3><?php echo esc_html( $major['title'] ); ?></h3>
-				</<?php echo $tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+				</a>
 			<?php endforeach; ?>
 		</div>
 	</div>

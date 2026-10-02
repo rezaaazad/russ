@@ -108,7 +108,7 @@ if ( 'admission' === $type ) {
 				</label>
 				<label>
 					<span><?php echo esc_html( liferuss_opt( 'form_phone_label' ) ); ?></span>
-					<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" placeholder="<?php echo esc_attr( liferuss_opt( 'form_phone_ph' ) ); ?>">
+					<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" maxlength="16" pattern="^(\+?98|0)?9\d{9}$|^\+?\d{8,15}$" placeholder="<?php echo esc_attr( liferuss_opt( 'form_phone_ph' ) ); ?>">
 				</label>
 				<?php if ( $needs_level ) : ?>
 				<label>
@@ -174,7 +174,25 @@ if ( 'admission' === $type ) {
 				</label>
 				<label>
 					<span><?php echo esc_html( liferuss_t( 'form_visa_expiry' ) ); ?></span>
-					<input type="text" name="consult_visa_expiry" placeholder="1405/07/01">
+					<input type="hidden" name="consult_visa_expiry" value="">
+					<span class="lr-date-parts">
+						<select name="consult_visa_expiry_y" aria-label="<?php echo esc_attr( liferuss_t( 'form_visa_expiry' ) ); ?>">
+							<option value="">سال</option>
+							<?php for ( $year = 1404; $year <= 1412; $year++ ) : ?>
+								<option value="<?php echo esc_attr( (string) $year ); ?>"><?php echo esc_html( liferuss_local_digits( (string) $year ) ); ?></option>
+							<?php endfor; ?>
+						</select>
+						<select name="consult_visa_expiry_m">
+							<?php for ( $month = 1; $month <= 12; $month++ ) : ?>
+								<option value="<?php echo esc_attr( (string) $month ); ?>"><?php echo esc_html( liferuss_local_digits( (string) $month ) ); ?></option>
+							<?php endfor; ?>
+						</select>
+						<select name="consult_visa_expiry_d">
+							<?php for ( $day = 1; $day <= 31; $day++ ) : ?>
+								<option value="<?php echo esc_attr( (string) $day ); ?>"><?php echo esc_html( liferuss_local_digits( (string) $day ) ); ?></option>
+							<?php endfor; ?>
+						</select>
+					</span>
 				</label>
 				<label>
 					<span><?php echo esc_html( liferuss_t( 'form_documents' ) ); ?></span>

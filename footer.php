@@ -19,7 +19,7 @@ $telegram  = liferuss_social_url( liferuss_opt( 'telegram' ), 'telegram' );
 $instagram = liferuss_social_url( liferuss_opt( 'instagram' ), 'instagram' );
 $linkedin  = esc_url( liferuss_opt( 'linkedin' ) );
 $youtube   = esc_url( liferuss_opt( 'youtube' ) );
-$copy      = str_replace( '{year}', gmdate( 'Y' ), liferuss_opt( 'footer_copyright' ) );
+$copy      = str_replace( '{year}', liferuss_local_digits( gmdate( 'Y' ) ), liferuss_opt( 'footer_copyright' ) );
 $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 ?>
 </main>

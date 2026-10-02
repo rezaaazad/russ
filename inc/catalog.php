@@ -140,7 +140,9 @@ function liferuss_catalog_usd( $amount, $with_stamp = false ) {
 	if ( null === $amount || '' === (string) $amount || (float) $amount <= 0 ) {
 		return '';
 	}
-	$text = '$' . number_format_i18n( (float) $amount, 0 );
+	$digits = number_format_i18n( (float) $amount, 0 );
+	$lang   = function_exists( 'liferuss_current_lang' ) ? liferuss_current_lang() : 'fa';
+	$text   = ( 'fa' === $lang || 'ar' === $lang ) ? $digits . ' دلار' : '$' . $digits;
 	if ( $with_stamp && function_exists( 'liferuss_fx_stamp_text' ) ) {
 		$stamp = liferuss_fx_stamp_text();
 		if ( '' !== $stamp ) {
@@ -224,8 +226,8 @@ function liferuss_catalog_lang( $lang ) {
 function liferuss_empty_catalog( $title ) {
 	echo '<div class="lr-empty-state">';
 	echo '<h2>' . esc_html( $title ) . '</h2>';
-	echo '<p>هنوز موردی اینجا منتشر نشده است. برای انتخاب دانشگاه و مسیر، مشاوره رایگان بگیرید.</p>';
-	echo '<a class="btn btn-gold" href="' . esc_url( liferuss_url( '/contact/' ) ) . '">درخواست مشاوره</a>';
+	echo '<p>' . esc_html( liferuss_t( 'catalog_empty_lead' ) ) . '</p>';
+	echo '<a class="btn btn-gold" href="' . esc_url( liferuss_url( '/contact/' ) . '#consultation' ) . '">' . esc_html( liferuss_t( 'catalog_empty_cta' ) ) . '</a>';
 	echo '</div>';
 }
 
@@ -252,7 +254,7 @@ function liferuss_home_universities( $limit = 8 ) {
 function liferuss_catalog_cards( $items ) {
 	echo '<div class="lr-cards" id="lr-catalog-results">';
 	if ( ! $items ) {
-		liferuss_empty_catalog( 'موردی در این فهرست نیست' );
+		liferuss_empty_catalog( liferuss_t( 'nav_universities' ) );
 	}
 	foreach ( $items as $item ) {
 		$url  = $item['url'] ?? '';
@@ -272,7 +274,7 @@ function liferuss_catalog_cards( $items ) {
 			$bits[] = 'از ' . $usd;
 		}
 		if ( ! empty( $item['best_world_rank'] ) ) {
-			$bits[] = 'رتبه ' . (int) $item['best_world_rank'];
+			$bits[] = 'رتبه ' . liferuss_local_digits( (string) (int) $item['best_world_rank'] );
 		}
 		if ( 'approved' === ( $item['health'] ?? '' ) || 'approved' === ( $item['science'] ?? '' ) ) {
 			$bits[] = 'تأیید وزارتخانه';

@@ -47,7 +47,7 @@ $terms = get_terms(
 					</div></article>
 				<?php endwhile; ?>
 			<?php else : ?>
-				<?php liferuss_empty_catalog( 'راهنمایی منتشر نشده است' ); ?>
+				<?php liferuss_empty_catalog( liferuss_t( 'nav_guide' ) ); ?>
 			<?php endif; ?>
 		</div>
 	</div>

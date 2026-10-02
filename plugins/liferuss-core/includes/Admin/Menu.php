@@ -121,6 +121,14 @@ class Menu {
 			'lr-vocab',
 			array( Screens::class, 'placeholder' )
 		);
+		add_submenu_page(
+			'liferuss',
+			'نسخه‌های تکراری',
+			'ابزار — نسخه‌های تکراری',
+			'edit_posts',
+			'lr-duplicates',
+			array( Duplicates::class, 'render' )
+		);
 	}
 
 	/**

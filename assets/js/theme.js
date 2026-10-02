@@ -1,3 +1,13 @@
+function latinDigits(value) {
+  var fa = "۰۱۲۳۴۵۶۷۸۹";
+  var ar = "٠١٢٣٤٥٦٧٨٩";
+  return String(value).replace(/[۰-۹]/g, function (digit) {
+    return String(fa.indexOf(digit));
+  }).replace(/[٠-٩]/g, function (digit) {
+    return String(ar.indexOf(digit));
+  });
+}
+
 (function () {
   "use strict";
 
@@ -59,7 +69,20 @@
       if (!item) {
         return;
       }
-      var open = item.classList.toggle("is-open");
+      var open = !item.classList.contains("is-open");
+      var parent = item.parentElement;
+      if (parent && open) {
+        parent.querySelectorAll(".menu-item.is-open").forEach(function (sibling) {
+          if (sibling !== item) {
+            sibling.classList.remove("is-open");
+            var toggle = sibling.querySelector(".submenu-toggle");
+            if (toggle) {
+              toggle.setAttribute("aria-expanded", "false");
+            }
+          }
+        });
+      }
+      item.classList.toggle("is-open", open);
       button.setAttribute("aria-expanded", open ? "true" : "false");
     });
   });
@@ -410,6 +433,23 @@
 
       form.addEventListener("submit", function (event) {
         event.preventDefault();
+        var phone = form.querySelector("[name='consult_phone']");
+        if (phone) {
+          phone.value = latinDigits(phone.value).replace(/\s+/g, "");
+          var valid = /^(\+?98|0)?9\d{9}$/.test(phone.value) || /^\+?\d{8,15}$/.test(phone.value);
+          phone.setCustomValidity(valid ? "" : "شماره را با ارقام درست وارد کنید.");
+          if (!valid) {
+            phone.reportValidity();
+            return;
+          }
+        }
+        var visaYear = form.querySelector("[name='consult_visa_expiry_y']");
+        var visaHidden = form.querySelector("[name='consult_visa_expiry']");
+        if (visaYear && visaHidden && visaYear.value) {
+          var visaMonth = form.querySelector("[name='consult_visa_expiry_m']");
+          var visaDay = form.querySelector("[name='consult_visa_expiry_d']");
+          visaHidden.value = visaYear.value + "/" + (visaMonth ? visaMonth.value : "") + "/" + (visaDay ? visaDay.value : "");
+        }
         applyTracking(form);
         var data = new FormData(form);
         data.set("action", "liferuss_consult");
@@ -500,4 +540,55 @@
   } else if (mq.addListener) {
     mq.addListener(syncFooter);
   }
+})();
+
+(function () {
+  document.querySelectorAll(".lr-file-input").forEach(function (input) {
+    input.addEventListener("change", function () {
+      var name = input.parentElement ? input.parentElement.querySelector(".lr-file-name") : null;
+      if (!name) {
+        return;
+      }
+      name.textContent = input.files && input.files[0] ? input.files[0].name : name.getAttribute("data-empty") || name.textContent;
+    });
+  });
+
+  document.querySelectorAll(".lr-filter-toggle").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var form = button.closest("form");
+      if (!form) {
+        return;
+      }
+      var open = form.classList.toggle("is-open");
+      button.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  });
+
+  document.querySelectorAll(".lr-account-form select[name='channel']").forEach(function (select) {
+    var form = select.closest("form");
+    var field = form ? form.querySelector("[name='target']") : null;
+    var label = form ? form.querySelector(".lr-otp-label") : null;
+    if (!field) {
+      return;
+    }
+    function sync() {
+      if (select.value === "email") {
+        field.type = "email";
+        field.inputMode = "email";
+        field.autocomplete = "email";
+        if (label) {
+          label.textContent = "ایمیل";
+        }
+        return;
+      }
+      field.type = "tel";
+      field.inputMode = "tel";
+      field.autocomplete = "tel";
+      if (label) {
+        label.textContent = "شماره موبایل";
+      }
+    }
+    select.addEventListener("change", sync);
+    sync();
+  });
 })();

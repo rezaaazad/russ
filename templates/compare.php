@@ -25,7 +25,7 @@ if ( ! empty( $data['slugs'] ) && is_array( $data['slugs'] ) ) {
 				<?php wp_nonce_field( 'lr_account', 'lr_account_nonce' ); ?>
 				<input type="hidden" name="lr_account_action" value="save_uni">
 				<input type="hidden" name="slugs" value="<?php echo esc_attr( $slug ); ?>">
-				<button class="btn btn-ghost" type="submit">ذخیره در حساب</button>
+				<button class="btn btn-ghost btn-ghost-light" type="submit">ذخیره در حساب</button>
 			</form>
 		<?php endif; ?>
 	</div>
@@ -40,7 +40,7 @@ if ( ! empty( $data['slugs'] ) && is_array( $data['slugs'] ) ) {
 		}
 		?>
 		<?php if ( $catalog_total < 1 ) : ?>
-			<?php liferuss_empty_catalog( 'دانشگاهی برای مقایسه منتشر نشده' ); ?>
+			<?php liferuss_empty_catalog( liferuss_t( 'nav_compare' ) ); ?>
 		<?php elseif ( empty( $data['ok'] ) ) : ?>
 			<div class="lr-empty-state">
 				<h2>مقایسه دانشگاه</h2>

@@ -91,14 +91,14 @@ $card = static function ( $course ) use ( $lesson_meta, $by_teacher ) {
 	echo '<h3>' . esc_html( (string) $course['title'] ) . '</h3>';
 	echo '<p class="academy-course-meta">';
 	if ( ! empty( $course['level'] ) ) {
-		echo '<span>' . esc_html( (string) $course['level'] ) . '</span>';
+		echo '<span><bdi>' . esc_html( (string) $course['level'] ) . '</bdi></span>';
 	}
-	echo '<span>' . esc_html( sprintf( '%s درس', number_format_i18n( (int) $meta['n'] ) ) ) . '</span>';
+	echo '<span><bdi>' . esc_html( sprintf( '%s درس', number_format_i18n( (int) $meta['n'] ) ) ) . '</bdi></span>';
 	if ( '' !== $duration ) {
 		echo '<span>' . esc_html( $duration ) . '</span>';
 	}
 	echo '</p>';
-	echo '<p class="academy-course-foot"><span>' . esc_html( $teacher ? (string) $teacher['name'] : 'آکادمی لایف‌روس' ) . '</span>';
+	echo '<span class="academy-course-foot"><span>' . esc_html( $teacher ? (string) $teacher['name'] : 'آکادمی لایف‌روس' ) . '</span>';
 	if ( ! empty( $course['is_free'] ) || $sale < 1 ) {
 		echo '<b class="academy-free">رایگان</b>';
 	} elseif ( $cut ) {
@@ -118,12 +118,15 @@ $lines = class_exists( '\LifeRuss\Core\Academy\Catalog' ) ? \LifeRuss\Core\Acade
 		<div class="container hero-copy">
 			<p class="eyebrow"><?php echo esc_html( liferuss_t( 'nav_academy' ) ); ?></p>
 			<h1>آکادمی لایف‌روس</h1>
-			<p class="hero-lead">دوره‌های روسی، پادفک و زندگی در روسیه. قیمت‌ها تومان است و پرداخت با زرین‌پال انجام می‌شود.</p>
+			<p class="hero-lead">دوره‌های روسی، پادفک و زندگی در روسیه.</p>
 			<div class="hero-actions">
 				<a class="btn btn-gold" href="<?php echo esc_url( liferuss_url( '/academy/courses/' ) ); ?>">مشاهده دوره‌ها</a>
-				<a class="btn btn-ghost-light" href="<?php echo esc_url( liferuss_url( '/academy/plans/' ) ); ?>">اشتراک</a>
+				<?php if ( function_exists( 'liferuss_has_public_plans' ) && liferuss_has_public_plans() ) : ?>
+					<a class="btn btn-ghost-light" href="<?php echo esc_url( liferuss_url( '/academy/plans/' ) ); ?>">اشتراک</a>
+				<?php endif; ?>
 			</div>
 		</div>
+		<?php if ( (int) $stats['courses'] >= 3 ) : ?>
 		<div class="hero-trust">
 			<div class="container">
 				<div class="trust-grid">
@@ -134,6 +137,7 @@ $lines = class_exists( '\LifeRuss\Core\Academy\Catalog' ) ? \LifeRuss\Core\Acade
 				</div>
 			</div>
 		</div>
+		<?php endif; ?>
 	</header>
 	<article class="section academy">
 		<div class="container">
@@ -141,12 +145,15 @@ $lines = class_exists( '\LifeRuss\Core\Academy\Catalog' ) ? \LifeRuss\Core\Acade
 				<p class="lr-notice" role="status"><?php echo esc_html( $error ); ?></p>
 			<?php endif; ?>
 			<section class="academy-block">
-				<div class="section-head"><h2>دسته‌ها</h2><p>هر دسته یک مسیر جداست. اگر دوره‌ای هنوز منتشر نشده، همان کارت با نشان به‌زود می‌ماند.</p></div>
+				<div class="section-head"><h2>دسته‌ها</h2><p>هر دسته یک مسیر جداست.</p></div>
 				<div class="academy-cat-grid">
 					<?php $course_counts = class_exists( '\LifeRuss\Core\Academy\Catalog' ) ? \LifeRuss\Core\Academy\Catalog::course_counts() : array(); ?>
 					<?php foreach ( (array) ( $context['categories'] ?? array() ) as $category ) : ?>
 						<?php
 						$count = (int) ( $course_counts[ (int) $category['id'] ] ?? 0 );
+						if ( $count < 1 ) {
+							continue;
+						}
 						$blurb = trim( (string) ( $category['description'] ?? '' ) );
 						if ( '' === $blurb ) {
 							$blurb = (string) ( $lines[ $category['slug'] ] ?? '' );
@@ -254,10 +261,12 @@ $lines = class_exists( '\LifeRuss\Core\Academy\Catalog' ) ? \LifeRuss\Core\Acade
 	<section class="academy-final">
 		<div class="container">
 			<h2>از یک درس رایگان شروع کنید</h2>
-			<p>دوره‌ها و اشتراک همین‌جا هستند. لایف‌روس فروشگاه نیست.</p>
+			<p>دوره‌ها همین‌جا هستند. لایف‌روس فروشگاه نیست.</p>
 			<div class="hero-actions">
 				<a class="btn btn-gold" href="<?php echo esc_url( liferuss_url( '/academy/courses/' ) ); ?>">مشاهده دوره‌ها</a>
-				<a class="btn btn-ghost-light" href="<?php echo esc_url( liferuss_url( '/academy/plans/' ) ); ?>">اشتراک</a>
+				<?php if ( function_exists( 'liferuss_has_public_plans' ) && liferuss_has_public_plans() ) : ?>
+					<a class="btn btn-ghost-light" href="<?php echo esc_url( liferuss_url( '/academy/plans/' ) ); ?>">اشتراک</a>
+				<?php endif; ?>
 			</div>
 		</div>
 	</section>
@@ -361,16 +370,11 @@ $lines = class_exists( '\LifeRuss\Core\Academy\Catalog' ) ? \LifeRuss\Core\Acade
 			?>
 			<div class="academy-layout">
 				<div class="academy-main">
-					<div class="academy-player">
-						<?php if ( ! empty( $course['intro_video'] ) ) : ?>
+					<?php if ( ! empty( $course['intro_video'] ) ) : ?>
+						<div class="academy-player">
 							<?php echo \LifeRuss\Core\Academy\Playback::intro( (string) $course['intro_video'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						<?php else : ?>
-							<div class="academy-intro-fallback">
-								<?php $icon( 'video', 'icon-circle' ); ?>
-								<p>ویدیوی معرفی این دوره به‌زودی همین‌جا می‌نشیند.</p>
-							</div>
-						<?php endif; ?>
-					</div>
+						</div>
+					<?php endif; ?>
 					<div class="academy-copy"><?php echo wp_kses_post( wpautop( (string) $course['description'] ) ); ?></div>
 					<section class="academy-panel">
 						<h2>این دوره مناسب چه کسانی است</h2>
@@ -495,11 +499,19 @@ $lines = class_exists( '\LifeRuss\Core\Academy\Catalog' ) ? \LifeRuss\Core\Acade
 					<div class="academy-player"><iframe src="<?php echo esc_url( \LifeRuss\Core\Academy\Playback::url( (int) $context['video']['id'], get_current_user_id() ) ); ?>" title="پخش درس" allowfullscreen></iframe></div>
 				<?php endif; ?>
 				<div class="academy-copy"><?php echo wp_kses_post( wpautop( (string) $context['lesson']['content'] ) ); ?></div>
-				<form method="post">
-					<?php wp_nonce_field( 'lr_academy', 'lr_academy_nonce' ); ?>
-					<input type="hidden" name="lr_academy_action" value="done">
-					<button class="btn btn-navy" type="submit">این درس را تمام کردم</button>
-				</form>
+				<?php if ( is_user_logged_in() ) : ?>
+					<form method="post">
+						<?php wp_nonce_field( 'lr_academy', 'lr_academy_nonce' ); ?>
+						<input type="hidden" name="lr_academy_action" value="done">
+						<button class="btn btn-navy" type="submit">این درس را تمام کردم</button>
+					</form>
+				<?php else : ?>
+					<?php
+					$request = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( (string) $_SERVER['REQUEST_URI'] ) : '/';
+					$back    = home_url( $request );
+					?>
+					<p class="academy-login-prompt"><a class="btn btn-navy" href="<?php echo esc_url( add_query_arg( 'redirect_to', $back, liferuss_url( '/account/' ) ) ); ?>"><?php echo esc_html( liferuss_t( 'lesson_save_login' ) ); ?></a></p>
+				<?php endif; ?>
 				<?php if ( ! empty( $context['premium'] ) ) : ?>
 					<?php if ( ! empty( $context['files'] ) ) : ?>
 						<h2>جزوه‌ها</h2>
@@ -542,7 +554,7 @@ $lines = class_exists( '\LifeRuss\Core\Academy\Catalog' ) ? \LifeRuss\Core\Acade
 			<?php endif; ?>
 		<?php elseif ( 'plans' === $screen ) : ?>
 			<?php if ( empty( $context['plans'] ) ) : ?>
-				<div class="academy-empty"><h2>به‌زودی</h2><p>طرح‌های اشتراک به‌زودی اعلام می‌شوند.</p></div>
+				<div class="lr-empty-state"><h2><?php echo esc_html( liferuss_t( 'plans_empty_title' ) ); ?></h2><p><?php echo esc_html( liferuss_t( 'plans_empty_lead' ) ); ?></p><a class="btn btn-gold" href="<?php echo esc_url( liferuss_url( '/contact/' ) ); ?>#consultation"><?php echo esc_html( liferuss_t( 'catalog_empty_cta' ) ); ?></a></div>
 			<?php else : ?>
 				<div class="academy-plan-grid">
 					<?php foreach ( $context['plans'] as $plan ) : ?>

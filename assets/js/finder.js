@@ -79,16 +79,22 @@
 		paintAccount(items);
 		if (items.length < 2) {
 			open.setAttribute('aria-disabled', 'true');
+			open.classList.add('is-disabled');
 			open.setAttribute('href', '#');
-			text.textContent += ' — ' + ((cfg.strings && cfg.strings.need) || 'حداقل دو دانشگاه');
+			text.textContent += ' — ' + ((cfg.strings && cfg.strings.need) || 'حداقل یک دانشگاه دیگر اضافه کنید');
 			return;
 		}
 		open.removeAttribute('aria-disabled');
+		open.classList.remove('is-disabled');
 		var base = cfg.compareBase || '/compare/';
 		open.setAttribute('href', base + (base.indexOf('?') === -1 ? '?' : '&') + 'u=' + encodeURIComponent(items.map(function (item) { return item.slug; }).join(',')));
 	}
 
 	document.addEventListener('click', function (event) {
+		var locked = event.target.closest ? event.target.closest('#lr-compare-open') : null;
+		if (locked && locked.getAttribute('aria-disabled') === 'true') {
+			event.preventDefault();
+		}
 		var button = event.target.closest ? event.target.closest('.lr-compare-add') : null;
 		if (!button) {
 			return;
@@ -161,8 +167,25 @@
 	function render(next) {
 		items = next;
 		list.innerHTML = '';
+		var query = input.value.trim();
+		var searchBase = (cfg.searchBase || '/search/');
+		var contact = (cfg.contactUrl || '/contact/');
 		if (!next.length) {
-			closeList();
+			var empty = document.createElement('li');
+			empty.className = 'is-empty';
+			empty.textContent = 'نتیجه‌ای پیدا نشد — ';
+			var full = document.createElement('a');
+			full.href = searchBase + (searchBase.indexOf('?') === -1 ? '?' : '&') + 'q=' + encodeURIComponent(query);
+			full.textContent = 'جستجوی کامل';
+			var consult = document.createElement('a');
+			consult.href = contact + '#consultation';
+			consult.textContent = 'مشاوره رایگان';
+			empty.appendChild(full);
+			empty.appendChild(document.createTextNode(' · '));
+			empty.appendChild(consult);
+			list.appendChild(empty);
+			list.hidden = false;
+			input.setAttribute('aria-expanded', 'true');
 			return;
 		}
 		next.forEach(function (item, index) {
@@ -177,6 +200,13 @@
 			});
 			list.appendChild(option);
 		});
+		var more = document.createElement('li');
+		more.className = 'is-more';
+		var moreLink = document.createElement('a');
+		moreLink.href = searchBase + (searchBase.indexOf('?') === -1 ? '?' : '&') + 'q=' + encodeURIComponent(query);
+		moreLink.textContent = 'مشاهده همه نتایج';
+		more.appendChild(moreLink);
+		list.appendChild(more);
 		list.hidden = false;
 		input.setAttribute('aria-expanded', 'true');
 		choose(0);

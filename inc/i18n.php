@@ -411,6 +411,12 @@ function liferuss_t( $key ) {
 	if ( isset( $strings[ $lang ][ $key ] ) && '' !== $strings[ $lang ][ $key ] ) {
 		return $strings[ $lang ][ $key ];
 	}
+	if ( function_exists( 'liferuss_ui_extra' ) ) {
+		$extra = liferuss_ui_extra();
+		if ( isset( $extra[ $lang ][ $key ] ) && '' !== $extra[ $lang ][ $key ] ) {
+			return $extra[ $lang ][ $key ];
+		}
+	}
 	if ( isset( $strings['fa'][ $key ] ) ) {
 		return $strings['fa'][ $key ];
 	}

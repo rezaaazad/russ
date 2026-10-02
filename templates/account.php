@@ -56,8 +56,8 @@ $current = 'request' === $screen ? 'requests' : $screen;
 					</select>
 				</label>
 				<label>
-					<span>شماره یا ایمیل</span>
-					<input type="text" name="target" required autocomplete="username">
+					<span class="lr-otp-label">شماره یا ایمیل</span>
+					<input type="text" name="target" required autocomplete="username" inputmode="tel">
 				</label>
 				<button class="btn btn-gold" type="submit">دریافت کد</button>
 			</form>

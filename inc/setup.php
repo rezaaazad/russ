@@ -343,7 +343,9 @@ function liferuss_strip_public_placeholders( $html ) {
 	if ( ! is_string( $html ) || '' === $html ) {
 		return $html;
 	}
-	return str_replace( array( ' (نمونه)', '(نمونه)' ), '', $html );
+	$html = str_replace( array( ' (نمونه)', '(نمونه)' ), '', $html );
+	$html = str_replace( 'دادهٔ نمایشی. منتشر نکنید مگر برای آزمون.', '', $html );
+	return str_replace( 'دادهٔ نمایشی', '', $html );
 }
 
 /**

@@ -25,7 +25,7 @@ class Engine {
 	 * @return string[]
 	 */
 	public static function type_slugs(): array {
-		return array( 'university', 'field', 'city', 'scholarship', 'guide', 'post' );
+		return array( 'university', 'field', 'city', 'scholarship', 'guide', 'post', 'page' );
 	}
 
 	/**
@@ -41,6 +41,7 @@ class Engine {
 			'scholarship' => 'بورسیه',
 			'guide'       => 'دانستنی',
 			'post'        => 'مجله',
+			'page'        => 'صفحه',
 		);
 		return $labels[ $type ] ?? $type;
 	}

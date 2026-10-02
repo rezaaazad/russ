@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $unis = liferuss_home_universities( 8 );
-if ( ! $unis ) {
+if ( count( $unis ) < 3 ) {
 	return;
 }
 ?>

@@ -60,6 +60,12 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 			<?php
 			// Designed mega menu. A saved flat menu of 13 items overlaps the header at 1024–1440.
 			liferuss_fallback_menu();
+			?>
+			<p class="drawer-consult"><a class="btn btn-gold" href="<?php echo esc_url( liferuss_url( '/contact/' ) ); ?>#consultation"><?php echo esc_html( liferuss_t( 'drawer_consult' ) ); ?></a></p>
+			<?php if ( $show_phone && $phone ) : ?>
+				<p class="drawer-phone"><a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>"><bdi dir="ltr"><?php echo esc_html( $phone ); ?></bdi></a></p>
+			<?php endif; ?>
+			<?php
 			liferuss_language_switcher( 'drawer' );
 			?>
 		</nav>
@@ -74,7 +80,7 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 					<?php echo liferuss_icon( 'close' ); ?>
 				</button>
 			</div>
-			<a class="header-account" href="<?php echo esc_url( liferuss_url( '/account/' ) ); ?>"><?php echo is_user_logged_in() ? 'حساب من' : 'ورود'; ?></a>
+			<a class="header-account" href="<?php echo esc_url( liferuss_url( '/account/' ) ); ?>"><?php echo is_user_logged_in() ? esc_html( liferuss_t( 'account_mine' ) ) : esc_html( liferuss_t( 'account_login' ) ); ?></a>
 			<?php liferuss_language_switcher( 'header' ); ?>
 			<?php if ( $show_phone && $phone ) : ?>
 				<a class="header-phone" href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>">

@@ -9,6 +9,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( function_exists( 'liferuss_section_untranslated' ) && liferuss_section_untranslated( 'home_landings_title' ) ) {
+	return;
+}
 if ( liferuss_section_on( 'home_landings_enabled' ) ) :
 	?>
 <section class="section home-landings-section" id="landings">

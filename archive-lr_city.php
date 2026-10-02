@@ -23,7 +23,7 @@ $result = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::cities( $page
 <div class="section">
 	<div class="container">
 		<?php if ( empty( $result['items'] ) ) : ?>
-			<?php liferuss_empty_catalog( 'شهری منتشر نشده است' ); ?>
+			<?php liferuss_empty_catalog( liferuss_t( 'nav_cities' ) ); ?>
 		<?php else : ?>
 		<div class="lr-cards">
 			<?php foreach ( $result['items'] as $item ) : ?>

@@ -340,6 +340,10 @@ class Rates {
 	 * @param float $value Units per one USD.
 	 */
 	private static function amount( float $value ): string {
-		return rtrim( rtrim( number_format( $value, 4, '.', '' ), '0' ), '.' );
+		$text = rtrim( rtrim( number_format( $value, 2, '.', '' ), '0' ), '.' );
+		if ( class_exists( '\LifeRuss\Core\CRM\Jalali' ) ) {
+			return Jalali::fa_digits( $text );
+		}
+		return $text;
 	}
 }

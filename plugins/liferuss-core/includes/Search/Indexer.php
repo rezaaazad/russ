@@ -57,14 +57,14 @@ class Indexer {
 	 * Build the local index once after the tables exist.
 	 */
 	public static function maybe_bootstrap(): void {
-		if ( '1' === (string) get_option( 'lr_search_local_ready', '' ) ) {
+		if ( LIFERUSS_CORE_VERSION === (string) get_option( 'lr_search_local_ready', '' ) ) {
 			return;
 		}
 		if ( ! self::table_ready() ) {
 			return;
 		}
 		Documents::rebuild();
-		update_option( 'lr_search_local_ready', '1', false );
+		update_option( 'lr_search_local_ready', LIFERUSS_CORE_VERSION, false );
 		delete_transient( 'lr_search_typo_pool' );
 		if ( Meili::configured() ) {
 			self::queue_all();
@@ -187,7 +187,7 @@ class Indexer {
 		}
 		$count = Documents::rebuild();
 		delete_transient( 'lr_search_typo_pool' );
-		update_option( 'lr_search_local_ready', '1', false );
+		update_option( 'lr_search_local_ready', LIFERUSS_CORE_VERSION, false );
 		if ( Meili::configured() ) {
 			Meili::ensure();
 			self::queue_all();
