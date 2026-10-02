@@ -416,15 +416,22 @@ class People {
 		echo '<input type="hidden" name="student_id" value="' . esc_attr( (string) $student_id ) . '">';
 		echo '<label>دوره <select name="course_id"><option value="0">انتخاب</option>';
 		global $wpdb;
-		$courses = $wpdb->get_results( 'SELECT id, title FROM `' . Db::table( 'courses' ) . '` ORDER BY id DESC LIMIT 40', ARRAY_A );
+		$courses = $wpdb->get_results( 'SELECT id, title, slug FROM `' . Db::table( 'courses' ) . '` ORDER BY id DESC LIMIT 40', ARRAY_A );
 		foreach ( (array) $courses as $course ) {
-			echo '<option value="' . esc_attr( (string) $course['id'] ) . '">' . esc_html( (string) $course['title'] ) . '</option>';
+			$label = trim( (string) $course['title'] );
+			if ( '' === $label ) {
+				$label = (string) $course['slug'];
+			}
+			echo '<option value="' . esc_attr( (string) $course['id'] ) . '">' . esc_html( $label ) . '</option>';
 		}
 		echo '</select></label>';
 		$subs = Db::where_id( 'subscriptions', 'student_id', $student_id );
 		echo '<label>اشتراک <select name="subscription_id">';
 		foreach ( $subs as $sub ) {
-			echo '<option value="' . esc_attr( (string) $sub['id'] ) . '">' . esc_html( (string) $sub['id'] ) . '</option>';
+			$plan  = Db::find( 'subscription_plans', (int) $sub['plan_id'] );
+			$name  = $plan ? (string) $plan['title'] : 'طرح';
+			$label = $name . ' تا ' . Chrome::date( (string) $sub['ends_at'] );
+			echo '<option value="' . esc_attr( (string) $sub['id'] ) . '">' . esc_html( $label ) . '</option>';
 		}
 		echo '</select></label><div class="lr-actions">';
 		echo '<button class="button button-primary" name="student_do" value="grant">دادن دسترسی</button>';

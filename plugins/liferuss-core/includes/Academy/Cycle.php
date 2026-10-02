@@ -41,7 +41,8 @@ class Cycle {
 	private static function merchant(): void {
 		$payments = CoreSettings::get( 'payments' );
 		$current  = trim( (string) ( $payments['merchant_id'] ?? '' ) );
-		if ( '' !== $current && 'mock' !== $current ) {
+		$standin  = array( '', 'mock', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee' );
+		if ( ! in_array( $current, $standin, true ) ) {
 			return;
 		}
 		$payments['merchant_id'] = 'mock';
@@ -208,6 +209,11 @@ class Cycle {
 			)
 		);
 		if ( $bought > 0 ) {
+			$order = self::latest_order( (int) $student['id'], (int) $course['id'] );
+			if ( $order && 'paid' === $order['status'] && Orders::refund( (int) $order['id'], (int) $order['total'], 'بازپرداخت آزمایشی چرخه آکادمی' ) ) {
+				Flow::audit( 'student', (int) $student['id'], 'cycle', 'خرید آزمایشی، پیشرفت، گواهی و بازپرداخت ثبت شد.' );
+				return array( 'refunded ' . $order['code'] );
+			}
 			return array( 'purchase already recorded' );
 		}
 		wp_set_current_user( (int) $user->ID );
@@ -233,7 +239,7 @@ class Cycle {
 		foreach ( Catalog::lessons( (int) $course['id'], true ) as $lesson ) {
 			Progress::complete( (int) $student['id'], (int) $course['id'], (int) $lesson['id'] );
 		}
-		$cert    = Certificates::for_course( (int) $student['id'], (int) $course['id'] );
+		$cert    = Certificates::issue( (int) $student['id'], (int) $course['id'] );
 		$lines[] = $cert ? 'certificate ' . $cert['code'] : 'certificate missing';
 		self::score( (int) $course['id'], (int) $student['id'] );
 		if ( $order && Orders::refund( (int) $order['id'], (int) $order['total'], 'بازپرداخت آزمایشی چرخه آکادمی' ) ) {
