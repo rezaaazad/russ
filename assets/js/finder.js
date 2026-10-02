@@ -173,7 +173,8 @@
 		if (!next.length) {
 			var empty = document.createElement('li');
 			empty.className = 'is-empty';
-			empty.textContent = 'نتیجه‌ای پیدا نشد — ';
+			empty.setAttribute('role', 'option');
+			empty.appendChild(document.createTextNode('نتیجه‌ای پیدا نشد — '));
 			var full = document.createElement('a');
 			full.href = searchBase + (searchBase.indexOf('?') === -1 ? '?' : '&') + 'q=' + encodeURIComponent(query);
 			full.textContent = 'جستجوی کامل';
