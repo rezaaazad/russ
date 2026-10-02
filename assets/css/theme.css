@@ -1881,7 +1881,7 @@ html[dir="ltr"] .page-hero-photo.scene-couple .hero-overlay {
   position: relative;
   overflow: hidden;
   background-color: #0b2341;
-  min-height: 280px;
+  min-height: 360px;
 }
 
 .page-hero-photo .hero-media,
@@ -2303,8 +2303,13 @@ html[dir="ltr"] .page-hero-photo.scene-couple .hero-overlay {
   }
 
   .hero {
-    min-height: 0;
+    min-height: 550px;
     padding-top: 40px;
+  }
+
+  .hero-trust {
+    height: 188px;
+    overflow: hidden;
   }
 
   .hero-grid,
@@ -2380,6 +2385,7 @@ html[dir="ltr"] .page-hero-photo.scene-couple .hero-overlay {
 
   .hero {
     padding: 36px 0 0;
+    min-height: 550px;
   }
 
   .hero-overlay {
@@ -4469,7 +4475,7 @@ body.has-compare-bar {
 
 @media (max-width: 640px) {
   .hero {
-    min-height: 0;
+    min-height: 550px;
   }
 
   .hero-visual {

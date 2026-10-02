@@ -173,29 +173,36 @@ function liferuss_async_style( $html, $handle ) {
 	if ( 'liferuss-theme' !== $handle ) {
 		return $html;
 	}
-	if ( ! preg_match( '/href=("|\')([^"\']+)\\1/', $html, $match ) ) {
-		return $html;
-	}
-	$href = esc_url( $match[2] );
-	return '<link rel="preload" as="style" id="liferuss-theme-css" href="' . $href . '" onload="this.onload=null;this.rel=\'stylesheet\'">' . "\n"
-		. '<noscript><link rel="stylesheet" href="' . $href . '"></noscript>' . "\n";
+	return '';
 }
+
+/**
+ * Load theme.css after the hero has painted so it is not on the LCP path.
+ */
+function liferuss_footer_css() {
+	if ( is_admin() ) {
+		return;
+	}
+	$href = LIFERUSS_URI . '/assets/css/theme.css?ver=' . rawurlencode( LIFERUSS_VERSION );
+	echo '<noscript><link rel="stylesheet" href="' . esc_url( $href ) . '"></noscript>';
+	echo '<script id="lr-css-loader">';
+	echo '(function(){var href=' . wp_json_encode( $href ) . ';function go(){var l=document.createElement("link");l.rel="preload";l.as="style";l.href=href;l.onload=function(){this.onload=null;this.rel="stylesheet";document.documentElement.classList.add("lr-css");};document.head.appendChild(l);}function later(){setTimeout(go,200);}var img=document.querySelector("img.hero-lcp");if(img&&!img.complete){img.addEventListener("load",later,{once:true});setTimeout(later,2500);}else{later();}})();';
+	echo '</script>' . "\n";
+}
+add_action( 'wp_footer', 'liferuss_footer_css', 1 );
 add_filter( 'style_loader_tag', 'liferuss_async_style', 10, 2 );
 
 /**
  * Critical above-the-fold CSS for the current template.
  */
 function liferuss_critical_css() {
-	$font400 = esc_url( LIFERUSS_URI . '/assets/fonts/vazirmatn-400.woff2' );
-	$font700 = esc_url( LIFERUSS_URI . '/assets/fonts/vazirmatn-700.woff2' );
-	$home    = is_front_page();
-	$uni     = is_singular( 'lr_university' );
+	$home = is_front_page();
+	$uni  = is_singular( 'lr_university' );
 	echo '<style id="lr-critical">';
-	echo '@font-face{font-family:Vazirmatn;src:url("' . $font400 . '") format("woff2");font-weight:400;font-style:normal;font-display:swap}';
-	echo '@font-face{font-family:Vazirmatn;src:url("' . $font700 . '") format("woff2");font-weight:700;font-style:normal;font-display:swap}';
 	echo ':root{--navy:#0b2341;--navy-mid:#14325a;--navy-deep:#071627;--navy-soft:#e8eef6;--gold:#e8b923;--gold-soft:#fff4c8;--white:#fff;--bg:#f5f7fb;--text:#1b2a3a;--muted:#5b6b7c;--line:#e4eaf2;--shadow:0 12px 36px rgba(11,35,65,.08);--radius:18px;--radius-sm:12px;--header:64px;--max:1180px}';
-	echo '*,*::before,*::after{box-sizing:border-box}html{max-width:100%;overflow-x:clip}body.liferuss-theme{margin:0;font-family:Vazirmatn,Tahoma,sans-serif;color:var(--text);background:#fff;line-height:1.8;direction:rtl;text-align:right;max-width:100%;overflow-x:clip}';
+	echo '*,*::before,*::after{box-sizing:border-box}html{max-width:100%;overflow-x:clip}body.liferuss-theme{margin:0;font-family:Tahoma,sans-serif;color:var(--text);background:#fff;line-height:1.8;direction:rtl;text-align:right;max-width:100%;overflow-x:clip}';
 	echo 'img{max-width:100%}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}h1,h2,h3{font-weight:700;line-height:1.35;color:var(--navy);margin:0 0 .6em}p{margin:0 0 1em}';
+	echo 'html:not(.lr-css) .site-footer,html:not(.lr-css) .lr-bottom-nav,html:not(.lr-css) .lr-float,html:not(.lr-css) .site-main>*:not(.hero):not(.page-hero){display:none}';
 	echo '.container{width:min(var(--max),calc(100% - 32px));max-width:100%;min-width:0;margin-inline:auto}';
 	echo '.skip-link{position:absolute;right:12px;top:-60px}.screen-reader-text{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}';
 	echo '.site-header{position:sticky;top:0;z-index:50;background:var(--navy);border-bottom:1px solid rgba(255,255,255,.08)}';
@@ -216,7 +223,7 @@ function liferuss_critical_css() {
 		echo '.btn-ghost-light{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.55)}.hero-visual{position:relative;min-height:420px}.hero-student{position:relative;width:min(320px,88%);height:380px;border-radius:28px;overflow:hidden;margin-inline-start:auto}.hero-cathedral{display:none}';
 		echo '.hero-trust{position:relative;z-index:2;background:rgba(7,22,39,.82);border-top:1px solid rgba(255,255,255,.1)}.trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px 0}.trust-item{display:flex;gap:12px;align-items:flex-start}.trust-item strong{color:#fff;font-size:.95rem}.trust-item p{margin:0;color:rgba(255,255,255,.7);font-size:.82rem}.icon-circle{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--gold);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}';
 	} else {
-		echo '.page-hero{position:relative;background:linear-gradient(180deg,#0b2341,#14325a);color:#fff;padding:64px 0 56px;min-height:280px;overflow:hidden}';
+		echo '.page-hero{position:relative;background:linear-gradient(180deg,#0b2341,#14325a);color:#fff;padding:64px 0 56px;min-height:360px;overflow:hidden}';
 		echo '.page-hero-photo{background-color:#0b2341}.page-hero-photo .container{position:relative;z-index:2}';
 		echo '.page-hero .hero-overlay{background:linear-gradient(to left,rgba(7,22,39,.94) 0%,rgba(7,22,39,.86) 48%,rgba(11,35,65,.58) 100%),linear-gradient(180deg,rgba(7,22,39,.62),rgba(7,22,39,.34) 46%,rgba(7,22,39,.55))}';
 		echo '.page-hero h1,.page-hero .eyebrow,.page-hero p{color:#fff}.page-hero h1{font-size:clamp(1.45rem,2.2vw,2rem)}.page-hero .eyebrow{color:var(--gold);font-weight:700;margin-bottom:10px}.page-hero p{max-width:40em;color:#d7e0ec}';
@@ -238,12 +245,12 @@ function liferuss_critical_css() {
 	echo '}';
 	echo '@media(max-width:860px){.site-nav{position:fixed;top:var(--header);right:0;left:0;bottom:0;z-index:80;background:var(--navy-deep);opacity:0;visibility:hidden;pointer-events:none;margin:0}.header-inner{height:64px;min-height:64px;max-height:64px;justify-content:space-between;gap:8px}.brand{flex:1 1 auto;min-width:0}.brand-text strong{font-size:.95rem;max-width:9rem;overflow:hidden;text-overflow:ellipsis}.nav-toggle{display:inline-flex;align-items:center;justify-content:center}.header-actions .btn,.lang-switch--header{display:none}.header-search{display:none}.header-search-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.06);color:#fff}.menu-item--home{display:list-item}';
 	if ( $home ) {
-		echo '.hero{min-height:0;padding-top:40px}.hero-grid,.trust-grid{grid-template-columns:1fr}.hero-visual{min-height:0}';
+		echo '.hero{min-height:550px;padding-top:40px}.hero-grid,.trust-grid{grid-template-columns:1fr}.hero-visual{min-height:0}.hero-trust{height:188px;overflow:hidden}';
 	}
 	echo '}';
 	echo '@media(max-width:640px){.container{width:min(var(--max),calc(100% - 24px))}';
 	if ( $home ) {
-		echo '.hero{padding:36px 0 0;min-height:0}.hero h1{font-size:clamp(1.55rem,7vw,2.1rem)}.hero-visual{display:none}.hero-overlay{background:linear-gradient(180deg,rgba(7,22,39,.42),rgba(7,22,39,.62) 55%,rgba(7,22,39,.78))}';
+		echo '.hero{padding:36px 0 0;min-height:550px}.hero h1{font-size:clamp(1.55rem,7vw,2.1rem)}.hero-visual{display:none}.hero-overlay{background:linear-gradient(180deg,rgba(7,22,39,.42),rgba(7,22,39,.62) 55%,rgba(7,22,39,.78))}';
 	}
 	echo '.brand-text small{display:none}}';
 	if ( $uni ) {
@@ -278,8 +285,6 @@ function liferuss_form_tracking_fields() {
  * Preload the 700-weight font and LCP hero image.
  */
 function liferuss_preload() {
-	$font = LIFERUSS_URI . '/assets/fonts/vazirmatn-700.woff2';
-	echo '<link rel="preload" as="font" type="font/woff2" href="' . esc_url( $font ) . '" crossorigin>' . "\n";
 	$id       = 0;
 	$fallback = '';
 	$sizes    = '100vw';

@@ -111,6 +111,17 @@ $source = static function ( $type, $id, $key, $uni ) {
 				$dorm_label = 'دارد';
 			}
 			$tuition_label = $picked ? liferuss_catalog_amount( $picked['tuition'], (string) $picked['currency'], $picked['amount_usd'] ?? null ) : '';
+			$tuition_main  = '—';
+			$tuition_note  = '';
+			if ( '' !== $tuition_label ) {
+				$bits          = explode( ' (', $tuition_label, 2 );
+				$tuition_main  = $bits[0];
+				$tuition_note  = isset( $bits[1] ) ? rtrim( $bits[1], ')' ) : '';
+				if ( $picked && ! empty( $picked['academic_year'] ) && class_exists( '\LifeRuss\Core\Seo\Facts' ) ) {
+					$year_note    = \LifeRuss\Core\Seo\Facts::display_year( (string) $picked['academic_year'] );
+					$tuition_note = '' !== $tuition_note ? $tuition_note . ' · ' . $year_note : $year_note;
+				}
+			}
 			$toc           = array(
 				'intro'     => 'معرفی',
 				'tuition'   => 'شهریه',
@@ -141,9 +152,9 @@ $source = static function ( $type, $id, $key, $uni ) {
 				</li>
 				<li>
 					<span>شهریه امسال</span>
-					<strong><?php echo esc_html( '' !== $tuition_label ? $tuition_label : '—' ); ?></strong>
-					<?php if ( $picked && ! empty( $picked['academic_year'] ) && class_exists( '\LifeRuss\Core\Seo\Facts' ) ) : ?>
-						<small><?php echo esc_html( \LifeRuss\Core\Seo\Facts::display_year( (string) $picked['academic_year'] ) ); ?></small>
+					<strong><?php echo esc_html( $tuition_main ); ?></strong>
+					<?php if ( '' !== $tuition_note ) : ?>
+						<small><?php echo esc_html( $tuition_note ); ?></small>
 					<?php endif; ?>
 				</li>
 				<li>

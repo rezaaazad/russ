@@ -203,11 +203,12 @@ function liferuss_photo_markup( $slug, $args = array() ) {
 		}
 	}
 	$class   = trim( (string) $args['class'] . ' ' . $photo['pos'] );
-	$loading = ! empty( $args['priority'] ) ? 'eager' : ( ! empty( $args['lazy'] ) ? 'lazy' : 'eager' );
-	$fetch   = ! empty( $args['priority'] ) ? ' fetchpriority="high"' : '';
+	$loading  = ! empty( $args['priority'] ) ? 'eager' : ( ! empty( $args['lazy'] ) ? 'lazy' : 'eager' );
+	$fetch    = ! empty( $args['priority'] ) ? ' fetchpriority="high"' : '';
+	$decoding = ! empty( $args['priority'] ) ? 'sync' : 'async';
 	$sizes   = (string) $args['sizes'];
 	$img     = sprintf(
-		'<img src="%s" srcset="%s" sizes="%s" alt="%s" width="%d" height="%d" class="%s" loading="%s" decoding="async"%s>',
+		'<img src="%s" srcset="%s" sizes="%s" alt="%s" width="%d" height="%d" class="%s" loading="%s" decoding="%s"%s>',
 		esc_url( $src ),
 		esc_attr( liferuss_photo_srcset( $jpg ) ),
 		esc_attr( $sizes ),
@@ -216,6 +217,7 @@ function liferuss_photo_markup( $slug, $args = array() ) {
 		(int) $photo['h'],
 		esc_attr( $class ),
 		esc_attr( $loading ),
+		esc_attr( $decoding ),
 		$fetch
 	);
 	if ( $webp ) {
