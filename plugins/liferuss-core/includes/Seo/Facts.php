@@ -288,6 +288,6 @@ class Facts {
 		if ( '' === $year ) {
 			$year = self::academic_year();
 		}
-		return Jalali::fa_digits( str_replace( '/', '–', $year ) );
+		return Jalali::fa_digits( str_replace( array( '/', '-' ), '–', $year ) );
 	}
 }
