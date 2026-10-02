@@ -32,6 +32,10 @@ function liferuss_front_template( $template ) {
 		$custom = locate_template( 'templates/pay.php' );
 		return $custom ? $custom : $template;
 	}
+	if ( get_query_var( 'lr_academy' ) ) {
+		$custom = locate_template( 'templates/academy.php' );
+		return $custom ? $custom : $template;
+	}
 	if ( get_query_var( 'lr_learn' ) || is_singular( array( 'lr_course', 'lr_lesson' ) ) ) {
 		$custom = locate_template( 'templates/language.php' );
 		return $custom ? $custom : $template;

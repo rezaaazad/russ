@@ -230,3 +230,9 @@ erDiagram
   LR_QUIZZES ||--o{ LR_QUIZ_QUESTIONS : "quiz_id"
   WP_POSTS ||--o{ LR_RELATIONS : "from/to"
   WP_POSTS ||--o{ LR_VIEW_STATS_DAILY : "object_id"
+  LR_PAYMENTS {
+    BIGINT id PK
+    VARCHAR revenue_line
+  }
+  LR_ACADEMY_COURSES ||--o{ LR_ACADEMY_COURSE_MODULES : "course_id"
+  LR_ACADEMY_COURSE_MODULES ||--o{ LR_ACADEMY_COURSE_LESSONS : "module_id"

@@ -13,6 +13,7 @@ use LifeRuss\Core\Admin\LeadAdmin;
 use LifeRuss\Core\Admin\Menu;
 use LifeRuss\Core\Admin\NotFoundScreen;
 use LifeRuss\Core\Admin\RedirectScreen;
+use LifeRuss\Core\Academy\Module as AcademyModule;
 use LifeRuss\Core\Account\Portal;
 use LifeRuss\Core\Course\Editor as CourseEditor;
 use LifeRuss\Core\Course\Front as CourseFront;
@@ -86,6 +87,7 @@ class Plugin {
 		Checkout::hooks();
 		ScholarshipAdmin::hooks();
 		Portal::hooks();
+		AcademyModule::hooks();
 		CourseEditor::hooks();
 		CourseFront::hooks();
 		CourseSeed::hooks();

@@ -519,6 +519,15 @@ class Portal {
 	 * @param int    $id     Lead id.
 	 */
 	private static function redirect( string $screen, string $notice, int $id = 0 ): void {
+		if ( 'in' === $notice && ! empty( $_COOKIE['lr_academy_next'] ) ) {
+			$next = esc_url_raw( wp_unslash( (string) $_COOKIE['lr_academy_next'] ) );
+			$path = (string) wp_parse_url( $next, PHP_URL_PATH );
+			setcookie( 'lr_academy_next', '', time() - HOUR_IN_SECONDS, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, is_ssl(), true );
+			if ( str_starts_with( $path, '/academy/' ) ) {
+				wp_safe_redirect( $next );
+				exit;
+			}
+		}
 		$path = '/account/';
 		if ( 'requests' === $screen ) {
 			$path = '/account/requests/';

@@ -39,7 +39,7 @@ class Zarinpal implements Gateway {
 			'merchant_id'  => $merchant,
 			'amount'       => (int) $payment['amount_toman'],
 			'currency'     => 'IRT',
-			'callback_url' => home_url( '/pay/' . $payment['token'] . '/' ),
+			'callback_url' => self::callback( $payment ),
 			'description'  => substr( (string) $payment['description'], 0, 255 ),
 			'metadata'     => array(
 				'order_id' => (string) $payment['id'],
@@ -109,6 +109,19 @@ class Zarinpal implements Gateway {
 			'ref_id'  => (string) ( $data['data']['ref_id'] ?? '' ),
 			'message' => '',
 		);
+	}
+
+	/**
+	 * Academy charges pass their own callback. Service invoices stay on /pay/{token}/.
+	 *
+	 * @param array<string, mixed> $payment Payment row.
+	 */
+	private static function callback( array $payment ): string {
+		$custom = isset( $payment['callback_url'] ) ? esc_url_raw( (string) $payment['callback_url'] ) : '';
+		if ( '' !== $custom ) {
+			return $custom;
+		}
+		return home_url( '/pay/' . $payment['token'] . '/' );
 	}
 
 	/**

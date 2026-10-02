@@ -278,10 +278,13 @@ function liferuss_nav_tree() {
 			),
 		),
 		array(
-			'title'    => liferuss_t( 'nav_language' ),
-			'url'      => liferuss_url( '/russian-language/' ),
+			'title'    => liferuss_t( 'nav_academy' ),
+			'url'      => liferuss_url( '/academy/' ),
 			'class'    => '',
-			'children' => array(),
+			'children' => array(
+				array( 'title' => liferuss_t( 'nav_language' ), 'url' => liferuss_url( '/academy/courses/russian-language/' ) ),
+				array( 'title' => 'طرح‌ها', 'url' => liferuss_url( '/academy/plans/' ) ),
+			),
 		),
 		array(
 			'title'    => liferuss_t( 'nav_migration' ),

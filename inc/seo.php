@@ -201,6 +201,12 @@ function liferuss_post_excluded_from_sitemap( $post_id ) {
  * Title override from our SEO fields. Empty means leave the default.
  */
 function liferuss_seo_title() {
+	if ( get_query_var( 'lr_academy' ) && class_exists( '\LifeRuss\Core\Academy\Seo' ) ) {
+		$academy = \LifeRuss\Core\Academy\Seo::plain();
+		if ( '' !== $academy ) {
+			return $academy;
+		}
+	}
 	if ( is_front_page() ) {
 		return (string) liferuss_opt( 'seo_title', '' );
 	}
@@ -234,6 +240,12 @@ function liferuss_seo_description() {
 	}
 	if ( get_query_var( 'lr_account' ) ) {
 		return 'پیگیری درخواست، مدارک و گفتگو با مشاور.';
+	}
+	if ( get_query_var( 'lr_academy' ) && class_exists( '\LifeRuss\Core\Academy\Seo' ) ) {
+		$academy = \LifeRuss\Core\Academy\Seo::description();
+		if ( '' !== $academy ) {
+			return $academy;
+		}
 	}
 	if ( 'index' === (string) get_query_var( 'lr_learn' ) ) {
 		return 'دوره‌های زبان روسی از A1 تا B2، با درس، تمرین و تعیین سطح.';
@@ -284,6 +296,9 @@ function liferuss_seo_canonical() {
 	}
 	if ( 'certificate' === $learn ) {
 		return liferuss_url( '/russian-language/certificate/' );
+	}
+	if ( get_query_var( 'lr_academy' ) && class_exists( '\LifeRuss\Core\Academy\Seo' ) ) {
+		return liferuss_url( \LifeRuss\Core\Academy\Seo::path() );
 	}
 	if ( get_query_var( 'lr_account' ) ) {
 		$screen = (string) get_query_var( 'lr_account' );

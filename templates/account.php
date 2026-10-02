@@ -27,6 +27,7 @@ $links   = array(
 	'requests'  => array( 'درخواست‌ها', liferuss_url( '/account/requests/' ) ),
 	'saved'     => array( 'دانشگاه‌ها', liferuss_url( '/account/saved/' ) ),
 	'profile'   => array( 'پروفایل', liferuss_url( '/account/profile/' ) ),
+	'academy'   => array( 'آکادمی', liferuss_url( '/account/academy/' ) ),
 );
 $current = 'request' === $screen ? 'requests' : $screen;
 ?>
@@ -78,6 +79,15 @@ $current = 'request' === $screen ? 'requests' : $screen;
 				<?php endforeach; ?>
 				<a href="<?php echo esc_url( wp_logout_url( liferuss_url( '/account/' ) ) ); ?>">خروج</a>
 			</nav>
+
+			<?php if ( 'academy' === $screen && class_exists( '\LifeRuss\Core\Academy\AccountPanel' ) ) : ?>
+				<?php
+				$academy = \LifeRuss\Core\Academy\AccountPanel::data( $user_id );
+				$tab     = (string) get_query_var( 'lr_academy_tab' );
+				$tab     = $tab ? $tab : 'courses';
+				require LIFERUSS_DIR . '/template-parts/account/academy.php';
+				?>
+			<?php endif; ?>
 
 			<?php if ( 'requests' === $screen || 'dashboard' === $screen ) : ?>
 				<?php $leads = \LifeRuss\Core\Account\Portal::leads( $user_id ); ?>

@@ -4271,3 +4271,90 @@ body.has-compare-bar {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.academy-lead,
+.academy-empty,
+.academy-copy {
+  max-width: 46rem;
+}
+
+.academy-empty {
+  padding: 28px;
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.academy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.academy-card,
+.academy-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 44px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--shadow);
+  color: var(--navy);
+}
+
+.academy-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.academy-cats a,
+.academy-list a,
+.academy .btn {
+  min-height: 44px;
+}
+
+.academy-cats a {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--navy);
+}
+
+.academy-player {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 16px 0;
+  aspect-ratio: 16 / 9;
+  background: var(--navy);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.academy-player iframe,
+.academy-player .lr-embed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.academy-certificate {
+  max-width: 36rem;
+  padding: 28px;
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.academy-certificate svg {
+  display: block;
+  margin: 16px 0;
+}

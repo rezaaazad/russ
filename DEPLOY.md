@@ -1,14 +1,22 @@
 # استقرار فاز ۴ / Phase 4 deployment
 
-قالب ۱.۱۰.۱ و افزونهٔ هسته ۱.۸.۲ (پایگاه ۱.۹.۰). Rank Math و Polylang اختیاری‌اند و داخل بسته نیستند. لایف‌روس فروشگاه نیست و کالا نمی‌فروشد؛ ووکامرس و کاتالوگ محصول ندارد.
+قالب ۱.۱۱.۰ و افزونهٔ هسته ۱.۹.۰ (پایگاه ۱.۱۰.۰). Rank Math و Polylang اختیاری‌اند و داخل بسته نیستند. لایف‌روس فروشگاه نیست و کالا نمی‌فروشد؛ ووکامرس و کاتالوگ محصول ندارد. آکادمی داخل هسته است و افزونهٔ LMS ندارد.
 
-Theme 1.10.1 and core plugin 1.8.2 (database 1.9.0). Rank Math and Polylang are optional and are not bundled. LifeRuss is not a store and sells no goods.
+Theme 1.11.0 and core plugin 1.9.0 (database 1.10.0). Rank Math and Polylang are optional and are not bundled. LifeRuss is not a store and sells no goods. Academy lives in the core plugin and does not use an LMS.
 
 ## کش بعد از به‌روزرسانی / Purge the cache
 
 بعد از جایگزینی قالب یا افزونه، کش صفحه و آبجکت را خالی کنید. در غیر این صورت بعضی آدرس‌ها هنوز هدر یا متن نسخهٔ قبلی را نشان می‌دهند، حتی اگر `style.css` نسخهٔ جدید را بگوید. WCDN اگر `NOCACHE` برگرداند، کش روی خود سرور (افزونهٔ کش، Redis، یا nginx fastcgi) است. یک بار صفحهٔ اصلی، `/study-russia/`، `/direct-course/` و `/admission/` را بعد از پاک‌سازی با یک مرورگر ناشناس باز کنید.
 
 After replacing the theme or plugin, purge the page cache and the object cache. Otherwise some URLs keep the previous header or copy even when `style.css` already shows the new version. If WCDN answers `NOCACHE`, the stale copy is on the origin (a cache plugin, Redis, or nginx fastcgi). After the purge, open the homepage, `/study-russia/`, `/direct-course/`, and `/admission/` once in a private window.
+
+## آکادمی / Academy
+
+- آدرس‌ها: `/academy/`، `/academy/courses/`، `/academy/plans/`، `/academy/checkout/` و پنل دانشجو در `/account/academy/`.
+- فعال‌سازی یا اولین درخواست، جدول‌های `lr_academy_*` را می‌سازد، نه دستهٔ منتشرشده می‌سازد و دورهٔ رایگان زبان روسی را از دورهٔ قبلی منتقل می‌کند. آدرس‌های `/russian-language/...` با ۳۰۱ در مدیر ریدایرکت به آکادمی می‌روند.
+- پرداخت آکادمی همان زرین‌پال فاز ۳ است و مبلغ به تومان (IRT) است. اشتراک تمدید خودکار ندارد: سه روز قبل ایمیل و پیامک (همان لایهٔ اعلان؛ پیامک هنوز آزمایشی است) می‌رود و سه روز بعد از پایان دسترسی می‌ماند.
+- دورهٔ آزمایشی فقط پیش‌نویس است و از پیشخوان آکادمی ساخته می‌شود. تا وقتی دوره‌ای منتشر نشود، صفحه «به‌زودی» نشان می‌دهد.
+- گزارش مالی سراسری فقط برای مدیر و نقش مالی است. مشاور آن را نمی‌بیند.
 
 ## فاز ۴ / Phase 4 UI
 
