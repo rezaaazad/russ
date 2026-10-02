@@ -1333,6 +1333,11 @@ body.lr-ui button.lr-mini:hover {
 	overflow-wrap: anywhere;
 }
 
+.lr-spark,
+.lr-axis {
+	direction: ltr;
+}
+
 .lr-spark {
 	display: block;
 	height: 88px;
