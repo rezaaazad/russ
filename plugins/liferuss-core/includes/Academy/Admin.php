@@ -451,7 +451,8 @@ class Admin {
 	 * @param string $hook Admin hook suffix.
 	 */
 	public static function assets( string $hook ): void {
-		if ( 'toplevel_page_lr-academy' !== $hook && 'lr-academy_page_lr-academy-finance' !== $hook ) {
+		$finance = str_ends_with( $hook, '_page_lr-academy-finance' );
+		if ( 'toplevel_page_lr-academy' !== $hook && ! $finance ) {
 			return;
 		}
 		wp_enqueue_style( 'lr-academy-admin', LIFERUSS_CORE_URL . 'assets/academy-admin.css', array(), LIFERUSS_CORE_VERSION );
@@ -584,7 +585,7 @@ class Admin {
 		$labels = array();
 		$values = array();
 		foreach ( $days as $day ) {
-			$labels[] = (string) $day['day'];
+			$labels[] = self::axis_label( (string) $day['day'] );
 			$values[] = (int) $day['amount'];
 		}
 		self::chart_canvas(
@@ -675,7 +676,10 @@ class Admin {
 			echo '<p class="lr-empty">در این بازه درآمدی ثبت نشده است.</p>';
 			return;
 		}
-		$labels = array_keys( $days );
+		$labels = array();
+		foreach ( array_keys( $days ) as $day ) {
+			$labels[] = self::axis_label( (string) $day );
+		}
 		$colors = array(
 			'study'    => '#0b2341',
 			'academy'  => '#e8b923',
@@ -736,6 +740,19 @@ class Admin {
 				),
 			),
 		);
+	}
+
+	/**
+	 * Gregorian Y-m-d from MySQL as a Jalali axis label.
+	 *
+	 * @param string $day Date.
+	 */
+	private static function axis_label( string $day ): string {
+		$parts = explode( '-', $day );
+		if ( 3 !== count( $parts ) ) {
+			return $day;
+		}
+		return Jalali::ymd( Jalali::to_jalali( (int) $parts[0], (int) $parts[1], (int) $parts[2] ) );
 	}
 
 	/**

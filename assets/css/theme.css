@@ -4840,11 +4840,11 @@ body.has-compare-bar {
   }
 
   body.has-bottom-nav .academy-buybar {
-    bottom: calc(var(--lr-nav-h, 64px) + env(safe-area-inset-bottom, 0px));
+    bottom: calc(var(--lr-nav-h, 64px) + 10px + env(safe-area-inset-bottom, 0px));
   }
 
   body.has-bottom-nav .academy-course-page {
-    padding-bottom: calc(var(--lr-nav-h, 64px) + 92px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--lr-nav-h, 64px) + 102px + env(safe-area-inset-bottom, 0px));
   }
 
   .academy-buybar p {
