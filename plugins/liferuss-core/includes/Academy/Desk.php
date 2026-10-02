@@ -8,6 +8,7 @@
 namespace LifeRuss\Core\Academy;
 
 use LifeRuss\Core\Admin\Chrome;
+use LifeRuss\Core\CRM\Jalali;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -74,7 +75,7 @@ class Desk {
 			}
 			echo '</select></label>';
 		}
-		echo '<button class="button">اعمال فیلتر</button></form>';
+		echo '<button class="button lr-btn">اعمال فیلتر</button></form>';
 		$rows = self::course_rows( $scope, $status, $cat, $inst );
 		if ( ! $rows ) {
 			Chrome::empty( 'دوره‌ای با این فیلتر نیست.', $scope >= 0 ? self::button( 'اولین دوره را بسازید', 'new_course' ) : '' );
@@ -83,20 +84,31 @@ class Desk {
 		}
 		echo '<div class="lr-scroll"><table class="widefat lr-table"><thead><tr><th>دوره</th><th>وضعیت</th><th>کامل بودن</th><th>دانشجو</th><th>درآمد</th><th>مدرس</th></tr></thead><tbody>';
 		foreach ( $rows as $row ) {
-			$pill = Flow::pill( $row );
-			$pct  = Flow::percent( $row );
-			$url  = Chrome::url(
+			$pill     = Flow::pill( $row );
+			$pct      = Flow::percent( $row );
+			$url      = Chrome::url(
 				'lr-academy-course',
 				array(
 					'id'   => (int) $row['id'],
 					'step' => 'info',
 				)
 			);
-			echo '<tr><td><a href="' . esc_url( $url ) . '"><strong>' . esc_html( self::title_of( $row ) ) . '</strong></a></td>';
+			$preview  = home_url( '/academy/courses/' . $row['slug'] . '/' );
+			$students = Chrome::url( 'lr-academy-students', array( 'course' => (int) $row['id'] ) );
+			$free     = ! empty( $row['is_free'] ) || (int) $row['price'] < 1;
+			echo '<tr class="lr-course-row"><td class="lr-course-title"><a href="' . esc_url( $url ) . '"><strong>' . esc_html( self::title_of( $row ) ) . '</strong></a>';
+			echo '<div class="lr-hover-bar"><a class="lr-mini" href="' . esc_url( $url ) . '">ویرایش</a>';
+			echo '<a class="lr-mini" target="_blank" rel="noopener" href="' . esc_url( $preview ) . '">پیش‌نمایش</a>';
+			echo '<a class="lr-mini" href="' . esc_url( $students ) . '">شاگردان</a>';
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+			wp_nonce_field( 'lr_academy_save' );
+			echo '<input type="hidden" name="action" value="lr_academy_save"><input type="hidden" name="lr_do" value="copy_course">';
+			echo '<input type="hidden" name="course_id" value="' . esc_attr( (string) $row['id'] ) . '">';
+			echo '<button class="lr-mini" type="submit">کپی</button></form></div></td>';
 			echo '<td>' . Chrome::pill( $pill[0], $pill[1] ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo '<td><div class="lr-bar"><span style="width:' . esc_attr( (string) $pct ) . '%"></span></div><small>' . esc_html( Chrome::num( $pct ) ) . '٪</small></td>';
 			echo '<td>' . esc_html( Chrome::num( (int) $row['students'] ) ) . '</td>';
-			echo '<td>' . esc_html( Chrome::toman( (int) $row['revenue_show'] ) ) . '</td>';
+			echo '<td>' . esc_html( $free ? '—' : Chrome::toman( (int) $row['revenue_show'] ) ) . '</td>';
 			echo '<td>' . esc_html( (string) $row['instructor_name'] ) . '</td></tr>';
 		}
 		echo '</tbody></table></div>';
@@ -232,8 +244,8 @@ class Desk {
 			echo '<li class="lr-section" data-id="' . esc_attr( (string) $module['id'] ) . '" draggable="true">';
 			echo '<header class="lr-section-head"><button type="button" class="lr-handle" aria-label="جابه‌جایی">⋮⋮</button>';
 			echo '<button type="button" class="lr-fold" aria-expanded="' . esc_attr( $first ? 'true' : 'false' ) . '">' . esc_html( (string) $module['title'] ) . '</button>';
-			echo '<span class="lr-lesson-count lr-count">' . esc_html( Chrome::num( count( $lessons ) ) ) . '</span>';
-			echo '<span class="lr-dur">' . esc_html( Chrome::num( (int) floor( $seconds / 60 ) ) . ' دقیقه' ) . '</span></header>';
+			echo '<span class="lr-meta"><span class="lr-lesson-count lr-count">' . esc_html( Chrome::num( count( $lessons ) ) . ' درس' ) . '</span>';
+			echo '<span class="lr-dur">' . esc_html( Chrome::num( (int) floor( $seconds / 60 ) ) . ' دقیقه' ) . '</span></span></header>';
 			echo '<ul class="lr-lessons lr-sort" data-kind="lessons" data-module="' . esc_attr( (string) $module['id'] ) . '"' . ( $first ? '' : ' hidden' ) . '>';
 			foreach ( $lessons as $lesson ) {
 				self::lesson_row( $module, $lesson );
@@ -362,14 +374,14 @@ class Desk {
 		echo '<button type="button" class="lr-handle" aria-label="جابه‌جایی">⋮⋮</button>';
 		echo '<span class="lr-type" title="' . esc_attr( (string) $payload['type_label'] ) . '">' . esc_html( (string) $payload['type_icon'] ) . '</span>';
 		echo '<span class="lr-row-title">' . esc_html( (string) $lesson['title'] ) . '</span>';
-		echo '<span class="lr-row-dur">' . esc_html( $payload['duration_label'] ) . '</span>';
+		echo '<span class="lr-row-end"><span class="lr-row-dur">' . esc_html( $payload['duration_label'] ) . '</span>';
 		echo Chrome::pill( (string) $payload['badge_key'], (string) $payload['badge'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		if ( ! empty( $lesson['is_preview'] ) ) {
 			echo Chrome::pill( 'ready', 'پیش‌نمایش' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 		echo '<button type="button" class="lr-icon" data-act="edit" aria-label="ویرایش">✎</button>';
 		echo '<button type="button" class="lr-icon" data-act="copy" aria-label="کپی">⧉</button>';
-		echo '<button type="button" class="lr-icon" data-act="delete" aria-label="حذف">✕</button>';
+		echo '<button type="button" class="lr-icon" data-act="delete" aria-label="حذف">✕</button></span>';
 		echo '</li>';
 	}
 
@@ -380,20 +392,23 @@ class Desk {
 	 */
 	private static function drawer( int $course_id ): void {
 		echo '<div class="lr-drawer-back" data-act="close-drawer" hidden></div>';
-		echo '<aside class="lr-drawer" hidden><h2>درس</h2>';
+		echo '<aside class="lr-drawer" hidden>';
+		echo '<header class="lr-drawer-head"><h2>درس</h2><button type="button" class="lr-icon" data-act="close-drawer" aria-label="بستن">✕</button></header>';
 		self::form_open( 'lesson', $course_id );
 		echo '<input type="hidden" name="module_id" value="0"><input type="hidden" name="lesson_id" value="0">';
-		echo '<div id="lr-lesson-form">';
+		echo '<div class="lr-drawer-body" id="lr-lesson-form">';
 		self::field( 'title', 'عنوان درس', '' );
 		echo '<label>نوع <select name="type"><option value="video">ویدیو</option><option value="text">متن</option><option value="quiz">آزمون</option><option value="file">فایل</option></select></label>';
 		echo '<label>ارائه‌دهنده <select name="provider"><option value="arvan_vod">آروان‌کلاد</option><option value="upload">بارگذاری</option><option value="aparat">آپارات</option></select></label>';
 		self::field( 'external_id', 'شناسه آروان یا نشانی ویدیو', '' );
+		echo '<div class="lr-video-box" hidden><div class="lr-thumb" aria-hidden="true"><span>▶</span></div><div><span class="lr-pill" data-role="video-badge"></span><small data-role="video-id"></small></div></div>';
 		self::field( 'file_url', 'نشانی فایل', '' );
 		self::field( 'duration', 'مدت (دقیقه)', '0' );
 		self::area( 'content', 'متن درس', '' );
 		echo '<label><input type="checkbox" name="is_preview" value="1"> پیش‌نمایش رایگان</label>';
-		echo '<div class="lr-actions"><button class="button button-primary" type="submit">ذخیره درس</button>';
-		echo '<button class="button" type="button" data-act="close-drawer">بستن</button></div></div></form></aside>';
+		echo '</div>';
+		echo '<footer class="lr-drawer-foot"><button class="button button-primary" type="submit">ذخیره درس</button>';
+		echo '<button class="button" type="button" data-act="close-drawer">بستن</button></footer></form></aside>';
 	}
 
 	/**
@@ -628,32 +643,51 @@ class Desk {
 		$from    = gmdate( 'Y-m-d H:i:s', time() - ( 30 * DAY_IN_SECONDS ) );
 		$summary = Metrics::summary( $from, Db::now(), $scope > 0 ? $scope : 0 );
 		$days    = isset( $summary['current']['days'] ) && is_array( $summary['current']['days'] ) ? $summary['current']['days'] : array();
-		echo '<section class="lr-panel"><h2>فروش ۳۰ روز</h2>';
-		if ( ! $days ) {
-			Chrome::empty( 'در این بازه فروشی ثبت نشده.', '<a class="button" href="' . esc_url( Chrome::url( 'lr-academy-reports' ) ) . '">گزارش‌ها</a>' );
-			echo '</section>';
-			return;
+		$by_day  = array();
+		foreach ( $days as $day ) {
+			$by_day[ (string) $day['day'] ] = (int) $day['amount'];
+		}
+		$series = array();
+		for ( $i = 29; $i >= 0; $i-- ) {
+			$stamp    = strtotime( gmdate( 'Y-m-d', time() - ( $i * DAY_IN_SECONDS ) ) . ' 12:00:00 UTC' );
+			$key      = gmdate( 'Y-m-d', (int) $stamp );
+			$local    = (int) $stamp + (int) ( 3.5 * HOUR_IN_SECONDS );
+			$parts    = Jalali::to_jalali( (int) gmdate( 'Y', $local ), (int) gmdate( 'n', $local ), (int) gmdate( 'j', $local ) );
+			$series[] = array(
+				'amount' => $by_day[ $key ] ?? 0,
+				'label'  => Jalali::fa_digits( (int) $parts[1] . '/' . (int) $parts[2] ),
+			);
 		}
 		$values = array();
-		foreach ( $days as $day ) {
-			$values[] = (int) $day['amount'];
+		foreach ( $series as $point ) {
+			$values[] = (int) $point['amount'];
 		}
 		$max    = max( 1, max( $values ) );
-		$width  = 280;
-		$height = 72;
-		$count  = count( $values );
+		$width  = 320;
+		$height = 88;
+		$count  = count( $series );
 		$slot   = $width / $count;
 		$bars   = '';
-		foreach ( $values as $index => $value ) {
-			$bar_h = max( 4, ( $value / $max ) * ( $height - 6 ) );
-			$x     = ( $index * $slot ) + 6;
-			$w     = max( 8, $slot - 12 );
+		foreach ( $series as $index => $point ) {
+			$value = (int) $point['amount'];
+			$bar_h = $value > 0 ? max( 4, ( $value / $max ) * ( $height - 8 ) ) : 2;
+			$x     = ( $index * $slot ) + 1;
+			$w     = max( 4, $slot - 2 );
 			$y     = $height - $bar_h;
-			$bars .= '<rect x="' . esc_attr( (string) round( $x, 1 ) ) . '" y="' . esc_attr( (string) round( $y, 1 ) ) . '" width="' . esc_attr( (string) round( $w, 1 ) ) . '" height="' . esc_attr( (string) round( $bar_h, 1 ) ) . '" rx="3"></rect>';
+			$class = $value > 0 ? '' : ' class="is-zero"';
+			$bars .= '<rect' . $class . ' x="' . esc_attr( (string) round( $x, 1 ) ) . '" y="' . esc_attr( (string) round( $y, 1 ) ) . '" width="' . esc_attr( (string) round( $w, 1 ) ) . '" height="' . esc_attr( (string) round( $bar_h, 1 ) ) . '" rx="1"></rect>';
 		}
+		echo '<section class="lr-panel lr-chart"><h2>فروش ۳۰ روز</h2>';
 		echo '<strong class="lr-chart-total">' . esc_html( Chrome::toman( (int) array_sum( $values ) ) ) . '</strong>';
-		echo '<svg class="lr-spark" viewBox="0 0 ' . esc_attr( (string) $width ) . ' ' . esc_attr( (string) $height ) . '" role="img" aria-label="نمودار فروش">' . $bars . '</svg>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Attributes escaped above.
-		echo '</section>';
+		echo '<svg class="lr-spark" viewBox="0 0 ' . esc_attr( (string) $width ) . ' ' . esc_attr( (string) $height ) . '" role="img" aria-label="نمودار فروش سی روز">' . $bars . '</svg>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Attributes escaped above.
+		echo '<div class="lr-axis">';
+		foreach ( $series as $index => $point ) {
+			if ( 0 !== $index % 7 && 29 !== $index ) {
+				continue;
+			}
+			echo '<span>' . esc_html( (string) $point['label'] ) . '</span>';
+		}
+		echo '</div></section>';
 	}
 
 	/**

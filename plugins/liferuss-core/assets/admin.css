@@ -1038,3 +1038,333 @@ body.lr-ui textarea {
 	box-shadow: none;
 	line-height: 1;
 }
+
+/* 1.13.2: active pills, drawer, rows, chart, course list, overflow. */
+body.lr-ui .lr-app .lr-tabs a.is-on,
+body.lr-ui .lr-app .lr-tabs a.is-on:hover,
+body.lr-ui .lr-app .lr-tabs a.is-on:focus,
+body.lr-ui .lr-app .lr-tabs a.is-on:focus-visible,
+body.lr-ui .lr-app .lr-tabs a.is-on:visited,
+body.lr-ui .lr-app .lr-tabs a.is-on:active,
+body.lr-ui .lr-app .lr-rail li.is-on > a,
+body.lr-ui .lr-app .lr-rail li.is-on > a:hover,
+body.lr-ui .lr-app .lr-rail li.is-on > a:focus,
+body.lr-ui .lr-app .lr-rail li.is-on > a:focus-visible,
+body.lr-ui .lr-app .lr-rail li.is-on > a:visited,
+body.lr-ui .lr-app .lr-rail li.is-on > a:active {
+	background: #0b2341;
+	border-color: #0b2341;
+	color: #fff;
+	box-shadow: none;
+}
+
+body.lr-ui .lr-app .lr-rail li.is-on > a .lr-mark {
+	color: #8a1f1f;
+}
+
+body.lr-ui .lr-app .lr-rail li.is-on > a .lr-mark.is-ok {
+	color: #0d6b3a;
+}
+
+body.lr-ui #wpbody-content,
+body.lr-ui .wrap,
+.lr-app,
+.lr-scroll,
+.lr-filters,
+.lr-editor-layout,
+.lr-hub-grid,
+.lr-split,
+.lr-work-grid,
+.lr-kanban,
+.lr-outline,
+.lr-steps,
+.lr-kpis,
+.lr-cards {
+	min-width: 0;
+	max-width: 100%;
+}
+
+.lr-scroll,
+.lr-kanban {
+	overflow-x: auto;
+}
+
+.lr-ui .lr-filters label {
+	min-width: 0;
+	flex: 1 1 140px;
+	max-width: 220px;
+}
+
+.lr-ui .lr-filters input,
+.lr-ui .lr-filters select {
+	width: 100%;
+	max-width: 220px;
+}
+
+body.lr-ui .button.lr-btn,
+body.lr-ui .button.lr-btn:hover,
+body.lr-ui .button.lr-btn:focus,
+body.lr-ui .lr-app .button-primary,
+body.lr-ui .lr-app .button-primary:hover,
+body.lr-ui .lr-app .button-primary:focus {
+	background: #e8b923;
+	border-color: #c9a01a;
+	color: #0b2341;
+	box-shadow: none;
+}
+
+body.lr-ui .lr-app .button:not(.button-primary):not(.lr-btn),
+body.lr-ui .lr-app .button:not(.button-primary):not(.lr-btn):hover,
+body.lr-ui .lr-app .button:not(.button-primary):not(.lr-btn):focus {
+	background: #fff;
+	border-color: #d5dde6;
+	color: #0b2341;
+	box-shadow: none;
+}
+
+.lr-table {
+	table-layout: fixed;
+}
+
+.lr-course-title {
+	position: relative;
+	white-space: normal;
+	overflow-wrap: anywhere;
+}
+
+.lr-course-title strong {
+	display: block;
+	font-weight: 700;
+}
+
+.lr-hover-bar {
+	display: none;
+	position: absolute;
+	inset-inline-start: 0;
+	top: calc(100% - 4px);
+	z-index: 4;
+	align-items: center;
+	gap: 4px;
+	padding: 4px;
+	border: 1px solid #e3e8ee;
+	border-radius: 10px;
+	background: #fff;
+	box-shadow: 0 6px 16px rgba(11, 35, 65, 0.08);
+}
+
+.lr-course-row:hover .lr-hover-bar,
+.lr-course-row:focus-within .lr-hover-bar {
+	display: flex;
+}
+
+.lr-hover-bar form {
+	display: inline-flex;
+	margin: 0;
+}
+
+body.lr-ui .lr-app a.lr-mini,
+body.lr-ui .lr-app a.lr-mini:hover,
+body.lr-ui .lr-app a.lr-mini:focus,
+body.lr-ui .lr-app a.lr-mini:visited,
+body.lr-ui button.lr-mini,
+body.lr-ui button.lr-mini:hover,
+body.lr-ui button.lr-mini:focus {
+	display: inline-flex;
+	align-items: center;
+	min-height: 28px;
+	margin: 0;
+	padding: 2px 8px;
+	border: 1px solid #e3e8ee;
+	border-radius: 8px;
+	background: #fff;
+	color: #0b2341;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1.4;
+	text-decoration: none;
+	box-shadow: none;
+	cursor: pointer;
+}
+
+body.lr-ui .lr-app a.lr-mini:hover,
+body.lr-ui button.lr-mini:hover {
+	border-color: #e8b923;
+	background: #fff8e4;
+	color: #0b2341;
+}
+
+.lr-fold {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.lr-section-head .lr-meta {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
+	margin-inline-start: auto;
+}
+
+.lr-dur {
+	color: #5c6b7a;
+	font-size: 13px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.lr-row-end {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-inline-start: auto;
+	flex-shrink: 0;
+}
+
+.lr-inline-add {
+	margin-top: 12px;
+	padding: 12px;
+	border: 1px dashed #d5dde6;
+	border-radius: 14px;
+	background: #fff;
+}
+
+.lr-inline-add input {
+	border: 1px solid #d5dde6;
+	border-radius: 10px;
+	padding: 8px 10px;
+	background: #fff;
+}
+
+.lr-drawer {
+	display: flex;
+	flex-direction: column;
+	width: min(480px, 100%);
+	overflow: hidden;
+	padding: 0;
+}
+
+.lr-drawer-head,
+.lr-drawer-foot {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+	gap: 12px;
+	padding: 16px 24px;
+	background: #fff;
+}
+
+.lr-drawer-head {
+	justify-content: space-between;
+	border-bottom: 1px solid #e3e8ee;
+}
+
+.lr-drawer-head h2 {
+	margin: 0;
+	color: #0b2341;
+	font-size: 18px;
+}
+
+.lr-drawer-foot {
+	justify-content: flex-start;
+	border-top: 1px solid #e3e8ee;
+}
+
+.lr-drawer > .lr-form {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-height: 0;
+	overflow: hidden;
+	gap: 0;
+}
+
+.lr-drawer-body {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: auto;
+	padding: 8px 24px 24px;
+}
+
+.lr-drawer-body label {
+	gap: 6px;
+	margin-top: 16px;
+}
+
+.lr-drawer-body > label:first-child {
+	margin-top: 0;
+}
+
+.lr-video-box {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 16px;
+	padding: 12px;
+	border: 1px solid #e3e8ee;
+	border-radius: 12px;
+	background: #f7f9fb;
+}
+
+.lr-video-box[hidden] {
+	display: none !important;
+}
+
+.lr-thumb {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 120px;
+	height: 72px;
+	border-radius: 10px;
+	background: #0b2341;
+	color: #e8b923;
+	font-size: 22px;
+}
+
+.lr-video-box small {
+	display: block;
+	margin-top: 6px;
+	color: #5c6b7a;
+	font-size: 12px;
+	overflow-wrap: anywhere;
+}
+
+.lr-spark {
+	display: block;
+	height: 88px;
+}
+
+.lr-spark rect.is-zero {
+	fill: #e3e8ee;
+}
+
+.lr-axis {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	margin-top: 6px;
+	color: #5c6b7a;
+	font-size: 13px;
+}
+
+body.lr-ui .lr-compact-notice {
+	margin: 8px 20px 0 2px;
+	padding: 2px 12px;
+}
+
+body.lr-ui .lr-compact-notice p {
+	margin: 6px 0;
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+body.lr-ui .lr-compact-notice a {
+	margin-inline-start: 8px;
+	color: #0b2341;
+	font-weight: 700;
+	text-decoration: none;
+}

@@ -58,6 +58,7 @@ class Actions {
 			'settings'     => 'settings',
 			'dismiss'      => 'dismiss',
 			'remind'       => 'remind',
+			'copy_course'  => 'copy_course',
 		);
 		if ( ! isset( $map[ $task ] ) ) {
 			return false;
@@ -257,6 +258,73 @@ class Actions {
 			)
 		);
 		wp_safe_redirect( admin_url( 'admin.php?page=lr-academy-course&id=' . $id . '&step=info&lr_note=' . rawurlencode( 'پیش‌نویس ساخته شد.' ) ) );
+		exit;
+	}
+
+	/**
+	 * Duplicate a course as a new draft, including its outline.
+	 */
+	private static function copy_course(): void {
+		$course = self::posted_course();
+		$slug   = self::unique_slug( sanitize_title( (string) $course['slug'] . '-copy' ), 0 );
+		$id     = Db::insert(
+			'courses',
+			array(
+				'title'               => (string) $course['title'] . ' (کپی)',
+				'slug'                => $slug,
+				'status'              => 'draft',
+				'currency'            => 'IRT',
+				'price'               => (int) $course['price'],
+				'is_free'             => (int) $course['is_free'],
+				'instructor_id'       => $course['instructor_id'] ? (int) $course['instructor_id'] : null,
+				'category_id'         => $course['category_id'] ? (int) $course['category_id'] : null,
+				'level'               => (string) $course['level'],
+				'thumbnail'           => (string) $course['thumbnail'],
+				'excerpt'             => (string) ( $course['excerpt'] ?? '' ),
+				'description'         => (string) $course['description'],
+				'certificate_enabled' => (int) $course['certificate_enabled'],
+			)
+		);
+		foreach ( Db::sorted( 'course_modules', 'course_id', (int) $course['id'] ) as $module ) {
+			$module_id = Db::insert(
+				'course_modules',
+				array(
+					'course_id'  => $id,
+					'title'      => (string) $module['title'],
+					'status'     => (string) $module['status'],
+					'sort_order' => (int) $module['sort_order'],
+				)
+			);
+			foreach ( Db::sorted( 'course_lessons', 'module_id', (int) $module['id'] ) as $lesson ) {
+				$lesson_id = Db::insert(
+					'course_lessons',
+					array(
+						'module_id'        => $module_id,
+						'title'            => (string) $lesson['title'],
+						'slug'             => sanitize_title( (string) $lesson['slug'] ) . '-c' . $id,
+						'type'             => (string) $lesson['type'],
+						'content'          => (string) $lesson['content'],
+						'duration_seconds' => (int) $lesson['duration_seconds'],
+						'is_preview'       => (int) $lesson['is_preview'],
+						'status'           => (string) $lesson['status'],
+						'sort_order'       => (int) $lesson['sort_order'],
+					)
+				);
+				foreach ( Db::where_id( 'lesson_videos', 'lesson_id', (int) $lesson['id'] ) as $video ) {
+					Db::insert(
+						'lesson_videos',
+						array(
+							'lesson_id'   => $lesson_id,
+							'provider'    => (string) $video['provider'],
+							'external_id' => (string) $video['external_id'],
+							'duration'    => (int) $video['duration'],
+							'status'      => (string) $video['status'],
+						)
+					);
+				}
+			}
+		}
+		wp_safe_redirect( admin_url( 'admin.php?page=lr-academy-course&id=' . $id . '&step=outline&lr_note=' . rawurlencode( 'دوره کپی شد.' ) ) );
 		exit;
 	}
 

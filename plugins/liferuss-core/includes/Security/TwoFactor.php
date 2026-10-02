@@ -41,6 +41,7 @@ class TwoFactor {
 		add_action( 'login_form_lr_2fa', array( self::class, 'form' ) );
 		add_action( 'admin_init', array( self::class, 'force_enroll' ) );
 		add_action( 'admin_notices', array( self::class, 'grace_notice' ) );
+		add_action( 'admin_post_lr_dismiss_notice', array( self::class, 'dismiss_notice' ) );
 		add_action( 'admin_menu', array( self::class, 'menu' ) );
 		add_action( 'admin_post_lr_2fa_enroll', array( self::class, 'enroll' ) );
 		add_action( 'admin_post_lr_2fa_reset', array( self::class, 'reset_user' ) );
@@ -150,13 +151,47 @@ class TwoFactor {
 	 * Reminder while the grace window is still open.
 	 */
 	public static function grace_notice(): void {
+		if ( ! self::notice_screen() ) {
+			return;
+		}
 		$user = wp_get_current_user();
 		if ( ! self::required( $user ) || self::enrolled( $user->ID ) || ! self::grace_open( $user->ID ) ) {
 			return;
 		}
+		if ( (int) get_user_meta( $user->ID, 'lr_notice_2fa', true ) > time() ) {
+			return;
+		}
 		$url = admin_url( 'admin.php?page=lr-2fa' );
-		echo '<div class="notice notice-warning"><p>' . esc_html__( 'ورود دومرحله‌ای برای این نقش لازم است. تا پایان مهلت آن را فعال کنید.', 'liferuss-core' );
-		echo ' <a href="' . esc_url( $url ) . '">' . esc_html__( 'فعال‌سازی', 'liferuss-core' ) . '</a></p></div>';
+		$bye = wp_nonce_url( admin_url( 'admin-post.php?action=lr_dismiss_notice&key=2fa' ), 'lr_dismiss_notice' );
+		echo '<div class="notice notice-warning lr-compact-notice"><p>' . esc_html__( 'ورود دومرحله‌ای برای این نقش لازم است. تا پایان مهلت آن را فعال کنید.', 'liferuss-core' );
+		echo ' <a href="' . esc_url( $url ) . '">' . esc_html__( 'فعال‌سازی', 'liferuss-core' ) . '</a>';
+		echo ' <a href="' . esc_url( $bye ) . '">' . esc_html__( 'بستن برای ۷ روز', 'liferuss-core' ) . '</a></p></div>';
+	}
+
+	/**
+	 * Hide a compact notice for this user for seven days.
+	 */
+	public static function dismiss_notice(): void {
+		if ( ! is_user_logged_in() ) {
+			wp_die( esc_html__( 'مجوز ندارید.', 'liferuss-core' ), '', array( 'response' => 403 ) );
+		}
+		check_admin_referer( 'lr_dismiss_notice' );
+		$key = isset( $_GET['key'] ) ? sanitize_key( wp_unslash( (string) $_GET['key'] ) ) : '';
+		if ( ! in_array( $key, array( '2fa', 'contacts' ), true ) ) {
+			wp_die( esc_html__( 'نامعتبر.', 'liferuss-core' ), '', array( 'response' => 400 ) );
+		}
+		update_user_meta( get_current_user_id(), 'lr_notice_' . $key, time() + ( 7 * DAY_IN_SECONDS ) );
+		$back = wp_get_referer();
+		wp_safe_redirect( $back ? $back : admin_url() );
+		exit;
+	}
+
+	/**
+	 * LifeRuss dashboard and the Academy hub only.
+	 */
+	private static function notice_screen(): bool {
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return in_array( $page, array( 'liferuss', 'lr-academy' ), true );
 	}
 
 	/**

@@ -127,6 +127,7 @@
 					return;
 				}
 				source.parentNode.appendChild(renderRow(payload.data.lesson));
+				refreshCount(source.parentNode);
 				toast('درس کپی شد.');
 			});
 		}
@@ -150,7 +151,23 @@
 	});
 
 	var form = document.querySelector('.lr-drawer form');
+	var videoState = { label: 'آماده', key: 'ok', id: '' };
 	if (form) {
+		form.addEventListener('input', function (event) {
+			var target = event.target;
+			if (!target || !target.name) {
+				return;
+			}
+			if (target.name === 'title') {
+				var heading = document.querySelector('.lr-drawer-head h2');
+				if (heading) {
+					heading.textContent = target.value || 'درس';
+				}
+			}
+			if (target.name === 'title' || target.name === 'type' || target.name === 'external_id') {
+				paintVideo();
+			}
+		});
 		form.addEventListener('submit', function (event) {
 			event.preventDefault();
 			var data = new window.FormData(form);
@@ -226,6 +243,16 @@
 		if (preview) {
 			preview.checked = String(lesson.preview) === '1';
 		}
+		videoState = {
+			label: lesson.badge || 'آماده',
+			key: lesson.badge_key || 'ok',
+			id: String(lesson.external_id || '')
+		};
+		var heading = drawer.querySelector('.lr-drawer-head h2');
+		if (heading) {
+			heading.textContent = lesson.title || 'درس';
+		}
+		paintVideo();
 		drawer.hidden = false;
 		if (back) {
 			back.hidden = false;
@@ -250,12 +277,44 @@
 		}
 	}
 
+	function faNum(value) {
+		return String(value).replace(/\d/g, function (digit) {
+			return '۰۱۲۳۴۵۶۷۸۹'[digit];
+		});
+	}
+
+	function paintVideo() {
+		var box = form ? form.querySelector('.lr-video-box') : null;
+		if (!box) {
+			return;
+		}
+		var type = form.elements.namedItem('type');
+		var external = form.elements.namedItem('external_id');
+		var id = external ? String(external.value || '').trim() : '';
+		var isVideo = type && type.value === 'video' && id !== '';
+		if (!isVideo) {
+			box.hidden = true;
+			return;
+		}
+		box.hidden = false;
+		var badge = box.querySelector('[data-role="video-badge"]');
+		var idNode = box.querySelector('[data-role="video-id"]');
+		var same = id === videoState.id && videoState.id !== '';
+		if (badge) {
+			badge.textContent = same ? (videoState.label || 'آماده') : 'آماده';
+			badge.className = 'lr-pill lr-pill-' + (same ? (videoState.key || 'ok') : 'ok');
+		}
+		if (idNode) {
+			idNode.textContent = id;
+		}
+	}
+
 	function renderSection(module) {
 		var item = document.createElement('li');
 		item.className = 'lr-section';
 		item.setAttribute('data-id', String(module.id));
 		item.setAttribute('draggable', 'true');
-		item.innerHTML = '<header class="lr-section-head"><button type="button" class="lr-handle" aria-label="جابه‌جایی">⋮⋮</button><button type="button" class="lr-fold" aria-expanded="true"></button><span class="lr-lesson-count lr-count">۰</span><span class="lr-dur">۰ دقیقه</span></header><ul class="lr-lessons lr-sort" data-kind="lessons"></ul><button type="button" class="button lr-add" data-act="add-lesson">+ درس</button>';
+		item.innerHTML = '<header class="lr-section-head"><button type="button" class="lr-handle" aria-label="جابه‌جایی">⋮⋮</button><button type="button" class="lr-fold" aria-expanded="true"></button><span class="lr-meta"><span class="lr-lesson-count lr-count">۰ درس</span><span class="lr-dur">۰ دقیقه</span></span></header><ul class="lr-lessons lr-sort" data-kind="lessons"></ul><button type="button" class="button lr-add" data-act="add-lesson">+ درس</button>';
 		item.querySelector('.lr-fold').textContent = module.title;
 		item.querySelector('.lr-lessons').setAttribute('data-module', String(module.id));
 		item.querySelector('[data-act="add-lesson"]').setAttribute('data-module', String(module.id));
@@ -268,7 +327,7 @@
 		row.setAttribute('data-id', String(lesson.id));
 		row.setAttribute('data-lesson', JSON.stringify(lesson));
 		row.setAttribute('draggable', 'true');
-		row.innerHTML = '<button type="button" class="lr-handle" aria-label="جابه‌جایی">⋮⋮</button><span class="lr-type"></span><span class="lr-row-title"></span><span class="lr-row-dur"></span><span class="lr-video-badge lr-pill"></span><span class="lr-preview-badge lr-pill lr-pill-ready">پیش‌نمایش</span><button type="button" class="lr-icon" data-act="edit" aria-label="ویرایش">✎</button><button type="button" class="lr-icon" data-act="copy" aria-label="کپی">⧉</button><button type="button" class="lr-icon" data-act="delete" aria-label="حذف">✕</button>';
+		row.innerHTML = '<button type="button" class="lr-handle" aria-label="جابه‌جایی">⋮⋮</button><span class="lr-type"></span><span class="lr-row-title"></span><span class="lr-row-end"><span class="lr-row-dur"></span><span class="lr-video-badge lr-pill"></span><span class="lr-preview-badge lr-pill lr-pill-ready">پیش‌نمایش</span><button type="button" class="lr-icon" data-act="edit" aria-label="ویرایش">✎</button><button type="button" class="lr-icon" data-act="copy" aria-label="کپی">⧉</button><button type="button" class="lr-icon" data-act="delete" aria-label="حذف">✕</button></span>';
 		row.querySelector('.lr-row-title').textContent = lesson.title;
 		row.querySelector('.lr-row-dur').textContent = lesson.duration_label;
 		var type = row.querySelector('.lr-type');
@@ -291,10 +350,23 @@
 		if (!section) {
 			return;
 		}
-		var count = list.querySelectorAll('.lr-row').length;
+		var rows = list.querySelectorAll('.lr-row');
 		var node = section.querySelector('.lr-lesson-count');
 		if (node) {
-			node.textContent = String(count);
+			node.textContent = faNum(rows.length) + ' درس';
+		}
+		var minutes = 0;
+		Array.prototype.forEach.call(rows, function (row) {
+			try {
+				var data = JSON.parse(row.getAttribute('data-lesson') || '{}');
+				minutes += parseInt(data.minutes, 10) || 0;
+			} catch (error) {
+				minutes += 0;
+			}
+		});
+		var duration = section.querySelector('.lr-dur');
+		if (duration) {
+			duration.textContent = faNum(minutes) + ' دقیقه';
 		}
 	}
 })();

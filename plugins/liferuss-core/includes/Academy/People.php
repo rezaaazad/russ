@@ -26,8 +26,9 @@ class People {
 	 */
 	public static function students(): void {
 		self::guard();
+		$course = isset( $_GET['course'] ) ? absint( $_GET['course'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		Chrome::open( 'دانشجوها', 'آکادمی' );
-		$rows = self::student_rows();
+		$rows = self::student_rows( $course );
 		if ( ! $rows ) {
 			Chrome::empty( 'هنوز دانشجویی ثبت نشده. اولین خرید یا ثبت‌نام آزاد این فهرست را پر می‌کند.' );
 			Chrome::close();
@@ -120,7 +121,7 @@ class People {
 		foreach ( array( 'pending', 'paid', 'failed', 'refunded', 'cancelled' ) as $key ) {
 			echo '<option value="' . esc_attr( $key ) . '" ' . selected( $status, $key, false ) . '>' . esc_html( Chrome::status( $key ) ) . '</option>';
 		}
-		echo '</select></label><button class="button">اعمال فیلتر</button></form>';
+		echo '</select></label><button class="button lr-btn">اعمال فیلتر</button></form>';
 		global $wpdb;
 		$sql  = 'SELECT * FROM `' . Db::table( 'orders' ) . '` WHERE 1=1';
 		$args = array();
@@ -299,12 +300,17 @@ class People {
 	/**
 	 * Students visible to this user.
 	 *
+	 * @param int $course Optional course filter.
 	 * @return array<int, array<string, mixed>>
 	 */
-	private static function student_rows(): array {
+	private static function student_rows( int $course = 0 ): array {
 		global $wpdb;
-		$sql  = 'SELECT s.*, (SELECT COUNT(*) FROM `' . Db::table( 'enrollments' ) . "` e WHERE e.student_id = s.id AND e.status = 'active') AS courses, (SELECT MAX(updated_at) FROM `" . Db::table( 'course_progress' ) . '` p WHERE p.student_id = s.id) AS last_seen FROM `' . Db::table( 'students' ) . '` s ORDER BY s.id DESC LIMIT 80';
-		$rows = $wpdb->get_results( $sql, ARRAY_A );
+		$sql = 'SELECT s.*, (SELECT COUNT(*) FROM `' . Db::table( 'enrollments' ) . "` e WHERE e.student_id = s.id AND e.status = 'active') AS courses, (SELECT MAX(updated_at) FROM `" . Db::table( 'course_progress' ) . '` p WHERE p.student_id = s.id) AS last_seen FROM `' . Db::table( 'students' ) . '` s';
+		if ( $course > 0 ) {
+			$sql .= $wpdb->prepare( ' WHERE EXISTS (SELECT 1 FROM `' . Db::table( 'enrollments' ) . '` e2 WHERE e2.student_id = s.id AND e2.course_id = %d)', $course );
+		}
+		$sql .= ' ORDER BY s.id DESC LIMIT 80';
+		$rows = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Placeholders are prepared above when present.
 		$out  = array();
 		foreach ( (array) $rows as $row ) {
 			if ( self::sees_student( $row ) ) {
