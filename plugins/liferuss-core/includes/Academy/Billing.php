@@ -33,7 +33,7 @@ class Billing {
 			return;
 		}
 		$start = time();
-		$end   = strtotime( 'year' === $plan['interval'] ? '+1 year' : '+1 month', $start );
+		$end   = strtotime( 'year' === $plan['billing_interval'] ? '+1 year' : '+1 month', $start );
 		if ( ! $end ) {
 			return;
 		}
@@ -63,7 +63,7 @@ class Billing {
 		$plans = Db::table( 'subscription_plans' );
 		$row   = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT s.*, p.tier, p.title AS plan_title, p.interval AS plan_interval, p.price AS plan_price
+				"SELECT s.*, p.tier, p.title AS plan_title, p.billing_interval AS plan_interval, p.price AS plan_price
 				FROM `{$subs}` s
 				INNER JOIN `{$plans}` p ON p.id = s.plan_id
 				WHERE s.student_id = %d AND s.status IN ('active','past_due') AND s.grace_until >= %s

@@ -250,12 +250,12 @@ class Admin {
 			Db::insert(
 				'subscription_plans',
 				array(
-					'title'    => sanitize_text_field( wp_unslash( (string) ( $_POST['title'] ?? '' ) ) ),
-					'slug'     => sanitize_title( wp_unslash( (string) ( $_POST['slug'] ?? '' ) ) ),
-					'price'    => absint( $_POST['price'] ?? 0 ),
-					'interval' => 'year' === $interval ? 'year' : 'month',
-					'tier'     => 'premium' === $tier ? 'premium' : 'standard',
-					'status'   => 'published',
+					'title'            => sanitize_text_field( wp_unslash( (string) ( $_POST['title'] ?? '' ) ) ),
+					'slug'             => sanitize_title( wp_unslash( (string) ( $_POST['slug'] ?? '' ) ) ),
+					'price'            => absint( $_POST['price'] ?? 0 ),
+					'billing_interval' => 'year' === $interval ? 'year' : 'month',
+					'tier'             => 'premium' === $tier ? 'premium' : 'standard',
+					'status'           => 'published',
 				)
 			);
 		}

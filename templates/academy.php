@@ -178,7 +178,7 @@ $buy = static function ( $type, $id, $label ) {
 					<?php foreach ( $context['plans'] as $plan ) : ?>
 						<article class="academy-card">
 							<h2><?php echo esc_html( (string) $plan['title'] ); ?></h2>
-							<p><?php echo esc_html( number_format_i18n( (int) $plan['price'] ) ); ?> تومان / <?php echo 'year' === $plan['interval'] ? 'سال' : 'ماه'; ?></p>
+							<p><?php echo esc_html( number_format_i18n( (int) $plan['price'] ) ); ?> تومان / <?php echo 'year' === $plan['billing_interval'] ? 'سال' : 'ماه'; ?></p>
 							<?php $buy( 'plan', (string) $plan['id'], 'خرید اشتراک' ); ?>
 						</article>
 					<?php endforeach; ?>

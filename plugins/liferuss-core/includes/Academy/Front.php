@@ -106,7 +106,9 @@ class Front {
 		}
 		self::load( $screen );
 		global $wp_query;
-		$wp_query->is_404 = false;
+		$wp_query->is_404        = false;
+		$wp_query->is_home       = false;
+		$wp_query->is_posts_page = false;
 		status_header( 200 );
 	}
 

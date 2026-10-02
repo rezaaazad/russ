@@ -43,6 +43,13 @@ function liferuss_current_canonical( $lang = null ) {
  * @return array
  */
 function liferuss_document_title( $parts ) {
+	if ( get_query_var( 'lr_academy' ) && class_exists( '\LifeRuss\Core\Academy\Seo' ) ) {
+		$academy = \LifeRuss\Core\Academy\Seo::plain();
+		if ( '' !== $academy ) {
+			$parts['title'] = $academy;
+			return $parts;
+		}
+	}
 	if ( is_front_page() ) {
 		$parts['title']   = liferuss_opt( 'seo_title', liferuss_brand() );
 		$parts['site']    = '';
