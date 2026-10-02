@@ -48,26 +48,56 @@ class Links {
 				return self::field_rank( (array) $left ) <=> self::field_rank( (array) $right );
 			}
 		);
-		echo '<nav class="lr-auto-links" aria-label="پیوندهای دانشگاه"><h2>در این دانشگاه</h2><ul>';
-		echo '<li><a href="#tuition">شهریه سال جاری</a></li>';
-		echo '<li><a href="#dorm">خوابگاه</a></li>';
-		echo '<li><a href="#admission">شرایط پذیرش</a></li>';
-		echo '<li><a href="#moh">وضعیت وزارت بهداشت</a></li>';
+		$groups = array(
+			'رشته‌ها'     => array(),
+			'شهر و پادفک' => array(),
+			'خوشه'        => array(
+				array(
+					'url'   => home_url( '/universities/' ),
+					'label' => 'دانشگاه‌های روسیه',
+				),
+				array(
+					'url'   => home_url( '/padfak/' ),
+					'label' => 'پادفک',
+				),
+				array(
+					'url'   => home_url( '/study-russia/' ),
+					'label' => 'تحصیل در روسیه',
+				),
+			),
+		);
 		foreach ( $programs as $program ) {
 			$field_slug = (string) ( $program['field_slug'] ?? '' );
 			if ( '' === $field_slug ) {
 				continue;
 			}
-			$url = home_url( '/universities/' . rawurlencode( $slug ) . '/' . rawurlencode( $field_slug ) . '/' );
-			echo '<li><a href="' . esc_url( $url ) . '">' . esc_html( (string) $program['field_name'] ) . '</a></li>';
+			$groups['رشته‌ها'][] = array(
+				'url'   => home_url( '/universities/' . rawurlencode( $slug ) . '/' . rawurlencode( $field_slug ) . '/' ),
+				'label' => (string) $program['field_name'],
+			);
 		}
 		if ( ! empty( $row['city']['post_id'] ) ) {
-			echo '<li><a href="' . esc_url( (string) get_permalink( (int) $row['city']['post_id'] ) ) . '">' . esc_html( (string) $row['city']['name_fa'] ) . '</a></li>';
+			$groups['شهر و پادفک'][] = array(
+				'url'   => (string) get_permalink( (int) $row['city']['post_id'] ),
+				'label' => (string) $row['city']['name_fa'],
+			);
 		}
-		echo '<li><a href="' . esc_url( home_url( '/padfak/' ) ) . '">پادفک</a></li>';
-		echo '<li><a href="' . esc_url( home_url( '/universities/' ) ) . '">دانشگاه‌های روسیه</a></li>';
-		echo '</ul></nav>';
-		self::similar( $row );
+		$groups['شهر و پادفک'][] = array(
+			'url'   => home_url( '/padfak/' ),
+			'label' => 'پادفک',
+		);
+		echo '<nav class="lr-chip-groups" aria-label="پیوندهای دانشگاه">';
+		foreach ( $groups as $label => $links ) {
+			if ( ! $links ) {
+				continue;
+			}
+			echo '<div class="lr-chip-group"><h3>' . esc_html( $label ) . '</h3><ul>';
+			foreach ( $links as $link ) {
+				echo '<li><a class="lr-chip" href="' . esc_url( $link['url'] ) . '">' . esc_html( $link['label'] ) . '</a></li>';
+			}
+			echo '</ul></div>';
+		}
+		echo '</nav>';
 	}
 
 	/**
@@ -85,26 +115,58 @@ class Links {
 		if ( ! empty( $row['programs'][0]['field_id'] ) ) {
 			$field_id = (int) $row['programs'][0]['field_id'];
 		}
-		$sql  = "SELECT id, post_id, name_fa, slug, min_tuition_usd FROM `{$unis}` WHERE id <> %d AND status = 'published' AND deleted_at IS NULL AND (city_id = %d";
-		$args = array( $id, $city );
+		$cities = $wpdb->prefix . 'lr_cities';
+		$progs  = $wpdb->prefix . 'lr_university_fields';
+		$sql    = "SELECT u.id, u.post_id, u.name_fa, u.slug, u.min_tuition_usd, c.name_fa AS city_name, fee.tuition, fee.currency
+			FROM `{$unis}` u
+			LEFT JOIN `{$cities}` c ON c.id = u.city_id AND c.deleted_at IS NULL
+			LEFT JOIN (
+				SELECT university_id, MIN(tuition) AS tuition,
+					SUBSTRING_INDEX(GROUP_CONCAT(currency ORDER BY tuition ASC SEPARATOR ','), ',', 1) AS currency
+				FROM `{$progs}`
+				WHERE status = 'active' AND deleted_at IS NULL AND tuition IS NOT NULL
+				GROUP BY university_id
+			) fee ON fee.university_id = u.id
+			WHERE u.id <> %d AND u.status = 'published' AND u.deleted_at IS NULL AND (u.city_id = %d";
+		$args   = array( $id, $city );
 		if ( $field_id > 0 ) {
-			$programs = $wpdb->prefix . 'lr_university_fields';
-			$sql     .= " OR id IN (SELECT university_id FROM `{$programs}` WHERE field_id = %d AND status = 'active' AND deleted_at IS NULL)";
-			$args[]   = $field_id;
+			$sql   .= " OR u.id IN (SELECT university_id FROM `{$progs}` WHERE field_id = %d AND status = 'active' AND deleted_at IS NULL)";
+			$args[] = $field_id;
 		}
-		$sql   .= ') ORDER BY ABS(IFNULL(min_tuition_usd, 0) - %f) ASC LIMIT 4';
+		$sql   .= ') ORDER BY ABS(IFNULL(u.min_tuition_usd, 0) - %f) ASC LIMIT 4';
 		$args[] = $tuition;
 		$rows   = $wpdb->get_results( $wpdb->prepare( $sql, $args ), ARRAY_A );
-		echo '<section class="lr-similar" id="compare-similar"><h2>مقایسه با دانشگاه‌های مشابه</h2>';
+		echo '<section class="lr-uni-card lr-similar" id="compare-similar"><header class="lr-uni-card-head"><span class="lr-uni-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V5M4 19h16"/><path d="M8 15l3-4 3 2 4-6"/></svg></span><h2>مقایسه با دانشگاه‌های مشابه</h2></header>';
 		if ( ! $rows ) {
-			echo '<p>دانشگاه منتشرشدهٔ نزدیکی برای مقایسه نیست.</p></section>';
+			echo '<p>دانشگاه منتشرشدهٔ نزدیکی برای مقایسه نیست.</p>';
+			self::freshness( 'university', $id );
+			echo '</section>';
 			return;
 		}
-		echo '<ul>';
+		echo '<div class="table-scroll"><table class="lr-table"><thead><tr><th>دانشگاه</th><th>شهر</th><th>شهریه</th></tr></thead><tbody>';
 		foreach ( $rows as $item ) {
-			echo '<li><a href="' . esc_url( (string) get_permalink( (int) $item['post_id'] ) ) . '">' . esc_html( (string) $item['name_fa'] ) . '</a></li>';
+			$money = self::money( $item['tuition'] ?? null, (string) ( $item['currency'] ?? 'RUB' ), $item['min_tuition_usd'] ?? null );
+			echo '<tr><td><a href="' . esc_url( (string) get_permalink( (int) $item['post_id'] ) ) . '">' . esc_html( (string) $item['name_fa'] ) . '</a></td>';
+			echo '<td>' . esc_html( (string) ( $item['city_name'] ? $item['city_name'] : '—' ) ) . '</td>';
+			echo '<td>' . esc_html( '' !== $money ? $money : '—' ) . '</td></tr>';
 		}
-		echo '</ul></section>';
+		echo '</tbody></table></div>';
+		self::freshness( 'university', $id );
+		echo '</section>';
+	}
+
+	/**
+	 * Persian amount with a currency name and a dollar equivalent.
+	 *
+	 * @param mixed  $amount   Native amount.
+	 * @param string $currency Currency code.
+	 * @param mixed  $usd      Optional dollar amount.
+	 */
+	private static function money( $amount, string $currency, $usd ): string {
+		if ( function_exists( 'liferuss_catalog_amount' ) ) {
+			return liferuss_catalog_amount( $amount, $currency, $usd );
+		}
+		return '';
 	}
 
 	/**
@@ -133,7 +195,7 @@ class Links {
 	/**
 	 * Published catalog and article URLs with no inbound link.
 	 *
-	 * @return array<int, array{title: string, url: string}>
+	 * @return array<int, array{id: int, title: string, url: string}>
 	 */
 	public static function orphans(): array {
 		$linked = self::linked_ids();
@@ -156,6 +218,7 @@ class Links {
 				continue;
 			}
 			$out[] = array(
+				'id'    => $post_id,
 				'title' => get_the_title( $post_id ),
 				'url'   => (string) get_permalink( $post_id ),
 			);

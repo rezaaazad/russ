@@ -70,15 +70,31 @@ class Health {
 		}
 		$counts = self::counts();
 		$total  = array_sum( $counts );
-		Chrome::open( 'سلامت سئو', 'تنظیمات' );
-		echo '<p class="lr-lead">صفحات قابل ایندکس ' . esc_html( self::digits( $total ) ) . ' از هدف ۱۵۰ تا ۲۵۰.</p>';
+		$goal   = 150;
+		$pct    = min( 100, (int) round( ( $total / $goal ) * 100 ) );
+		$circ   = 289;
+		$dash   = (int) round( $circ * $pct / 100 );
+		$ring   = '<div class="lr-ring' . ( $total >= $goal ? ' is-ok' : '' ) . '" role="img" aria-label="' . esc_attr( self::digits( $total ) . ' / ' . self::digits( $goal ) ) . '">';
+		$ring  .= '<svg viewBox="0 0 120 120" aria-hidden="true"><circle class="lr-ring-track" cx="60" cy="60" r="46"></circle><circle class="lr-ring-value" cx="60" cy="60" r="46" stroke-dasharray="' . esc_attr( (string) $dash ) . ' ' . esc_attr( (string) $circ ) . '"></circle></svg>';
+		$ring  .= '<div class="lr-ring-label"><strong>' . esc_html( self::digits( $total ) ) . '</strong><span>/ ' . esc_html( self::digits( $goal ) ) . '</span></div></div>';
+		Chrome::open( 'سلامت سئو', 'تنظیمات', $ring );
+		echo '<p class="lr-lead">هدف کل صفحات قابل ایندکس ۱۵۰ تا ۲۵۰ است.</p>';
 		echo '<div class="lr-kpis">';
 		foreach ( self::targets() as $key => $target ) {
 			$count = (int) ( $counts[ $key ] ?? 0 );
 			$width = $target['max'] > 0 ? min( 100, (int) round( ( $count / $target['max'] ) * 100 ) ) : 0;
-			echo '<div><span>' . esc_html( $target['label'] ) . '</span><strong>' . esc_html( self::digits( $count ) ) . '</strong>';
+			$state = 'is-bad';
+			if ( $count >= (int) $target['min'] ) {
+				$state = 'is-ok';
+			} elseif ( $count > 0 ) {
+				$state = 'is-warn';
+			}
+			echo '<article class="lr-kpi ' . esc_attr( $state ) . '">';
+			echo '<span>' . esc_html( $target['label'] ) . '</span>';
+			echo '<strong>' . esc_html( self::digits( $count ) ) . '</strong>';
+			echo '<span class="lr-kpi-goal">از هدف ' . esc_html( self::digits( (string) $target['min'] . '–' . (string) $target['max'] ) ) . '</span>';
 			echo '<div class="lr-bar" role="progressbar" aria-valuenow="' . esc_attr( (string) $count ) . '" aria-valuemin="0" aria-valuemax="' . esc_attr( (string) $target['max'] ) . '"><span style="width:' . esc_attr( (string) $width ) . '%"></span></div>';
-			echo '<small>' . esc_html( self::digits( $target['min'] ) . '–' . self::digits( $target['max'] ) ) . '</small></div>';
+			echo '</article>';
 		}
 		echo '</div>';
 		self::clusters();
@@ -206,35 +222,106 @@ class Health {
 		$schema  = self::missing_schema();
 		$broken  = self::broken();
 		$misses  = NotFound::all();
+		$cards   = array(
+			array(
+				'label' => 'دادهٔ قدیمی',
+				'count' => count( $stale ),
+				'href'  => Chrome::url( 'lr-stale' ),
+			),
+			array(
+				'label' => 'صفحهٔ یتیم',
+				'count' => count( $orphans ),
+				'href'  => '#lr-orphans',
+			),
+			array(
+				'label' => 'متای ناقص',
+				'count' => count( $meta ),
+				'href'  => '#lr-missing-meta',
+			),
+			array(
+				'label' => 'اسکیما ناقص',
+				'count' => count( $schema ),
+				'href'  => '#lr-missing-schema',
+			),
+			array(
+				'label' => 'پیوند شکسته',
+				'count' => count( $broken ),
+				'href'  => '#lr-broken',
+			),
+			array(
+				'label' => '۴۰۴',
+				'count' => count( $misses ),
+				'href'  => current_user_can( 'lr_manage_redirects' ) ? Chrome::url( 'lr-404' ) : '#lr-misses',
+			),
+		);
 		echo '<h2>ایرادها</h2><div class="lr-kpis">';
-		echo '<div><span>دادهٔ قدیمی</span><strong>' . esc_html( self::digits( count( $stale ) ) ) . '</strong></div>';
-		echo '<div><span>صفحهٔ یتیم</span><strong>' . esc_html( self::digits( count( $orphans ) ) ) . '</strong></div>';
-		echo '<div><span>متای ناقص</span><strong>' . esc_html( self::digits( $meta ) ) . '</strong></div>';
-		echo '<div><span>اسکیما ناقص</span><strong>' . esc_html( self::digits( $schema ) ) . '</strong></div>';
-		echo '<div><span>پیوند شکسته</span><strong>' . esc_html( self::digits( count( $broken ) ) ) . '</strong></div>';
-		echo '<div><span>۴۰۴</span><strong>' . esc_html( self::digits( count( $misses ) ) ) . '</strong></div>';
+		foreach ( $cards as $card ) {
+			echo '<a class="lr-kpi lr-issue" href="' . esc_url( $card['href'] ) . '"><span>' . esc_html( $card['label'] ) . '</span><strong>' . esc_html( self::digits( (int) $card['count'] ) ) . '</strong></a>';
+		}
 		echo '</div>';
-		if ( $orphans ) {
-			echo '<h3>صفحات یتیم</h3><ul class="lr-work">';
-			foreach ( array_slice( $orphans, 0, 8 ) as $item ) {
-				echo '<li><a href="' . esc_url( $item['url'] ) . '">' . esc_html( $item['title'] ) . '</a></li>';
+		self::issue_posts( 'lr-orphans', 'صفحات یتیم', $orphans, true );
+		self::issue_posts( 'lr-missing-meta', 'متای ناقص', $meta, false );
+		self::issue_posts( 'lr-missing-schema', 'اسکیما ناقص', $schema, false );
+		echo '<section class="lr-issue-list" id="lr-broken"><h3>پیوند شکسته</h3>';
+		if ( ! $broken ) {
+			echo '<p>پیوند شکسته‌ای در نوشته‌های منتشرشده نیست.</p>';
+		} else {
+			echo '<ul class="lr-work">';
+			foreach ( array_slice( $broken, 0, 12 ) as $path ) {
+				echo '<li><span>' . esc_html( (string) $path ) . '</span></li>';
 			}
 			echo '</ul>';
 		}
-		if ( $misses ) {
-			echo '<h3>۴۰۴های پایش</h3><ul class="lr-work">';
-			foreach ( array_slice( $misses, 0, 8 ) as $row ) {
-				echo '<li>' . esc_html( (string) $row['path'] ) . ' — ' . esc_html( self::digits( (int) $row['hits'] ) ) . '</li>';
+		echo '</section>';
+		echo '<section class="lr-issue-list" id="lr-misses"><h3>۴۰۴های پایش</h3>';
+		if ( ! $misses ) {
+			echo '<p>۴۰۴ تازه‌ای ثبت نشده است.</p>';
+		} else {
+			echo '<ul class="lr-work">';
+			foreach ( array_slice( $misses, 0, 12 ) as $row ) {
+				echo '<li><span>' . esc_html( (string) $row['path'] ) . '</span><span>' . esc_html( self::digits( (int) $row['hits'] ) ) . '</span></li>';
 			}
 			echo '</ul>';
 		}
+		echo '</section>';
+	}
+
+	/**
+	 * A short filtered list under an issue card.
+	 *
+	 * @param string                                                    $id      Anchor.
+	 * @param string                                                    $title   Heading.
+	 * @param array<int, array{title?: string, url?: string, id?: int}> $items Rows.
+	 * @param bool                                                      $orphan  Whether to offer an add-link action.
+	 */
+	private static function issue_posts( string $id, string $title, array $items, bool $orphan ): void {
+		echo '<section class="lr-issue-list" id="' . esc_attr( $id ) . '"><h3>' . esc_html( $title ) . '</h3>';
+		if ( ! $items ) {
+			echo '<p>موردی نیست.</p></section>';
+			return;
+		}
+		echo '<ul class="lr-work">';
+		foreach ( array_slice( $items, 0, 12 ) as $item ) {
+			$edit = ! empty( $item['id'] ) ? (string) get_edit_post_link( (int) $item['id'], 'raw' ) : '';
+			echo '<li><a href="' . esc_url( (string) ( $item['url'] ?? '#' ) ) . '">' . esc_html( (string) ( $item['title'] ?? '' ) ) . '</a><span class="lr-issue-actions">';
+			if ( '' !== $edit ) {
+				echo '<a class="button" href="' . esc_url( $edit ) . '">ویرایش</a>';
+				if ( $orphan ) {
+					echo '<a class="button" href="' . esc_url( $edit . '#lr_seo_quality' ) . '">افزودن لینک</a>';
+				}
+			}
+			echo '</span></li>';
+		}
+		echo '</ul></section>';
 	}
 
 	/**
 	 * Published gated posts without a title override.
+	 *
+	 * @return array<int, array{id: int, title: string, url: string}>
 	 */
-	private static function missing_meta(): int {
-		$count = 0;
+	private static function missing_meta(): array {
+		$out = array();
 		foreach ( Quality::types() as $type ) {
 			$ids = get_posts(
 				array(
@@ -246,22 +333,29 @@ class Health {
 				)
 			);
 			foreach ( $ids as $id ) {
-				if ( '1' === (string) get_post_meta( (int) $id, '_lr_demo', true ) ) {
+				$id = (int) $id;
+				if ( '1' === (string) get_post_meta( $id, '_lr_demo', true ) ) {
 					continue;
 				}
-				if ( '' === (string) get_post_meta( (int) $id, '_lr_seo_title', true ) ) {
-					++$count;
+				if ( '' === (string) get_post_meta( $id, '_lr_seo_title', true ) ) {
+					$out[] = array(
+						'id'    => $id,
+						'title' => get_the_title( $id ),
+						'url'   => (string) get_permalink( $id ),
+					);
 				}
 			}
 		}
-		return $count;
+		return $out;
 	}
 
 	/**
 	 * Entities without an FAQ, which the schema and the gate both require.
+	 *
+	 * @return array<int, array{id: int, title: string, url: string}>
 	 */
-	private static function missing_schema(): int {
-		$count = 0;
+	private static function missing_schema(): array {
+		$out = array();
 		foreach ( array( 'lr_university', 'lr_field', 'lr_city', 'lr_scholarship' ) as $type ) {
 			$ids = get_posts(
 				array(
@@ -273,15 +367,20 @@ class Health {
 				)
 			);
 			foreach ( $ids as $id ) {
-				if ( '1' === (string) get_post_meta( (int) $id, '_lr_demo', true ) ) {
+				$id = (int) $id;
+				if ( '1' === (string) get_post_meta( $id, '_lr_demo', true ) ) {
 					continue;
 				}
-				if ( '' === (string) get_post_meta( (int) $id, '_lr_faq_ids', true ) ) {
-					++$count;
+				if ( '' === (string) get_post_meta( $id, '_lr_faq_ids', true ) ) {
+					$out[] = array(
+						'id'    => $id,
+						'title' => get_the_title( $id ),
+						'url'   => (string) get_permalink( $id ),
+					);
 				}
 			}
 		}
-		return $count;
+		return $out;
 	}
 
 	/**

@@ -118,9 +118,10 @@ class Facts {
 	 *
 	 * @param string $entity_type Type.
 	 * @param int    $entity_id   Id.
+	 * @param string $fact_key    Optional key such as tuition or profile.
 	 */
-	public static function line( string $entity_type, int $entity_id ): string {
-		$row = self::latest( $entity_type, $entity_id );
+	public static function line( string $entity_type, int $entity_id, string $fact_key = '' ): string {
+		$row = self::latest( $entity_type, $entity_id, $fact_key );
 		if ( ! $row ) {
 			return '';
 		}

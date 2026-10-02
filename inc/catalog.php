@@ -131,9 +131,51 @@ function liferuss_catalog_paged() {
 }
 
 /**
+ * Native amount in Persian digits, named currency, and a dollar equivalent.
+ *
+ * @param mixed  $amount   Native amount.
+ * @param string $currency Currency code. RUB is written as روبل.
+ * @param mixed  $usd      Dollar amount when the fee row already has one.
+ * @return string
+ */
+function liferuss_catalog_amount( $amount, $currency = 'RUB', $usd = null ) {
+	if ( null === $amount || '' === (string) $amount || (float) $amount <= 0 ) {
+		$usd_only = liferuss_catalog_usd( $usd, false );
+		return '' !== $usd_only ? liferuss_local_digits( $usd_only ) : '';
+	}
+	$labels = array(
+		'RUB' => 'روبل',
+		'USD' => 'دلار',
+		'EUR' => 'یورو',
+		'IRR' => 'ریال',
+		'IRT' => 'تومان',
+	);
+	$code   = strtoupper( (string) $currency );
+	$unit   = $labels[ $code ] ?? '';
+	$digits = liferuss_local_digits( number_format( (float) $amount, 0 ) );
+	$text   = '' !== $unit ? $digits . ' ' . $unit : $digits;
+	if ( 'USD' === $code ) {
+		return $text;
+	}
+	$usd_amount = $usd;
+	if ( ( null === $usd_amount || '' === (string) $usd_amount || (float) $usd_amount <= 0 ) && class_exists( '\LifeRuss\Core\Settings\Settings' ) ) {
+		$rate = \LifeRuss\Core\Settings\Settings::usd_per_unit( $code );
+		if ( null !== $rate && $rate > 0 ) {
+			$usd_amount = (float) $amount * $rate;
+		}
+	}
+	$usd_text = liferuss_catalog_usd( $usd_amount, false );
+	if ( '' !== $usd_text ) {
+		$text .= ' (' . liferuss_local_digits( $usd_text ) . ')';
+	}
+	return $text;
+}
+
+/**
  * Format a USD amount.
  *
  * @param mixed $amount Amount.
+ * @param bool  $with_stamp Whether to append the rate stamp.
  * @return string
  */
 function liferuss_catalog_usd( $amount, $with_stamp = false ) {
