@@ -74,12 +74,18 @@ class LimitedAdmin {
 		remove_submenu_page( 'themes.php', 'themes.php' );
 		remove_submenu_page( 'plugins.php', 'plugin-editor.php' );
 
+		remove_menu_page( 'index.php' );
 		remove_menu_page( 'edit.php' );
 		remove_menu_page( 'edit.php?post_type=page' );
 		remove_menu_page( 'upload.php' );
 		remove_menu_page( 'edit-comments.php' );
 		remove_menu_page( 'tools.php' );
 		remove_menu_page( 'options-general.php' );
+		remove_menu_page( 'themes.php' );
+		remove_menu_page( 'plugins.php' );
+		if ( ! current_user_can( 'list_users' ) ) {
+			remove_menu_page( 'users.php' );
+		}
 	}
 
 	/**
@@ -90,6 +96,13 @@ class LimitedAdmin {
 			return;
 		}
 		global $pagenow;
+		if ( 'index.php' === $pagenow ) {
+			$target = current_user_can( 'lr_view_dashboard' ) ? 'liferuss' : 'lr-academy';
+			if ( current_user_can( 'lr_view_dashboard' ) || current_user_can( 'lr_academy_access' ) ) {
+				wp_safe_redirect( admin_url( 'admin.php?page=' . $target ) );
+				exit;
+			}
+		}
 		if ( in_array( $pagenow, self::blocked_pages(), true ) ) {
 			wp_die( esc_html__( 'به این بخش از مدیریت دسترسی ندارید.', 'liferuss-core' ), '', array( 'response' => 403 ) );
 		}

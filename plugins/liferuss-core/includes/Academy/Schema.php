@@ -46,16 +46,17 @@ class Schema {
 			),
 			'academy_instructors'        => self::def(
 				array(
-					'id'         => $id,
-					'user_id'    => $fkn,
-					'slug'       => 'varchar(80) NOT NULL',
-					'name'       => 'varchar(190) NOT NULL',
-					'bio'        => 'text',
-					'photo'      => 'varchar(500) NOT NULL DEFAULT \'\'',
-					'sort_order' => 'int(11) NOT NULL DEFAULT 0',
-					'status'     => $on,
-					'created_at' => $dt,
-					'updated_at' => $dt,
+					'id'            => $id,
+					'user_id'       => $fkn,
+					'slug'          => 'varchar(80) NOT NULL',
+					'name'          => 'varchar(190) NOT NULL',
+					'bio'           => 'text',
+					'photo'         => 'varchar(500) NOT NULL DEFAULT \'\'',
+					'share_percent' => 'tinyint(3) unsigned NOT NULL DEFAULT 0',
+					'sort_order'    => 'int(11) NOT NULL DEFAULT 0',
+					'status'        => $on,
+					'created_at'    => $dt,
+					'updated_at'    => $dt,
 				),
 				array( 'UNIQUE KEY slug (slug)', 'UNIQUE KEY user_id (user_id)', 'KEY status_sort (status, sort_order)' )
 			),
@@ -65,8 +66,16 @@ class Schema {
 					'slug'                     => 'varchar(120) NOT NULL',
 					'title'                    => 'varchar(190) NOT NULL',
 					'description'              => 'longtext',
+					'excerpt'                  => 'longtext',
+					'outcomes'                 => 'longtext',
+					'prerequisites'            => 'longtext',
 					'price'                    => 'bigint(20) unsigned NOT NULL DEFAULT 0',
 					'discount_price'           => $fkn,
+					'discount_starts'          => $dtn,
+					'discount_ends'            => $dtn,
+					'access_days'              => 'int(10) unsigned NOT NULL DEFAULT 0',
+					'scheduled_at'             => $dtn,
+					'workflow'                 => "varchar(20) NOT NULL DEFAULT ''",
 					'currency'                 => "char(3) NOT NULL DEFAULT 'IRT'",
 					'instructor_id'            => $fkn,
 					'category_id'              => $fkn,
@@ -429,6 +438,45 @@ class Schema {
 					self::fk( 'ac_cert_stu', 'student_id', 'academy_students' ),
 					self::fk( 'ac_cert_course', 'course_id', 'academy_courses' ),
 				)
+			),
+			'academy_plan_courses'       => self::def(
+				array(
+					'id'         => $id,
+					'plan_id'    => $fk,
+					'course_id'  => $fk,
+					'created_at' => $dt,
+					'updated_at' => $dt,
+				),
+				array( 'UNIQUE KEY plan_course (plan_id, course_id)', 'KEY course_id (course_id)' )
+			),
+			'academy_questions'          => self::def(
+				array(
+					'id'         => $id,
+					'course_id'  => $fkn,
+					'student_id' => $fkn,
+					'user_id'    => $fkn,
+					'kind'       => "enum('question','review') NOT NULL DEFAULT 'question'",
+					'body'       => 'text',
+					'rating'     => 'tinyint(3) unsigned NOT NULL DEFAULT 0',
+					'answer'     => 'text',
+					'status'     => "enum('pending','published','hidden') NOT NULL DEFAULT 'pending'",
+					'created_at' => $dt,
+					'updated_at' => $dt,
+				),
+				array( 'KEY status_created (status, created_at)', 'KEY course_id (course_id)' )
+			),
+			'academy_audit'              => self::def(
+				array(
+					'id'           => $id,
+					'actor_id'     => $fkn,
+					'subject_type' => 'varchar(40) NOT NULL',
+					'subject_id'   => 'bigint(20) unsigned NOT NULL DEFAULT 0',
+					'action'       => 'varchar(40) NOT NULL',
+					'detail'       => 'text',
+					'created_at'   => $dt,
+					'updated_at'   => $dt,
+				),
+				array( 'KEY subject (subject_type, subject_id)', 'KEY created_at (created_at)' )
 			),
 			'academy_course_views_daily' => self::def(
 				array(

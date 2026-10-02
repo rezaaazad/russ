@@ -39,7 +39,7 @@ class Kanban {
 		if ( null === $scope ) {
 			wp_die( esc_html__( 'به کانبان دسترسی ندارید.', 'liferuss-core' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap lr-wrap"><h1>' . esc_html__( 'کانبان لیدها', 'liferuss-core' ) . '</h1>';
+		Chrome::open( __( 'کانبان لیدها', 'liferuss-core' ), 'CRM' );
 		echo '<div class="lr-kanban">';
 		foreach ( Catalog::lead_statuses() as $key => $label ) {
 			$rows = Repository::for( 'leads' )->paginate(

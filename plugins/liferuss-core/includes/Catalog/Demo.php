@@ -33,7 +33,7 @@ class Demo {
 	 */
 	public static function menu(): void {
 		add_submenu_page(
-			'liferuss',
+			'lr-uni',
 			'انتشار کاتالوگ نمونه',
 			'انتشار کاتالوگ نمونه',
 			'lr_manage_university_data',

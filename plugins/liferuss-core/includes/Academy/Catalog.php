@@ -176,10 +176,39 @@ class Catalog {
 		if ( ! empty( $course['is_free'] ) ) {
 			return 0;
 		}
-		if ( null !== $course['discount_price'] && '' !== (string) $course['discount_price'] && (int) $course['discount_price'] > 0 ) {
-			return (int) $course['discount_price'];
+		$base = (int) $course['price'];
+		$sale = isset( $course['discount_price'] ) ? (int) $course['discount_price'] : 0;
+		if ( $sale < 1 || ( $base > 0 && $sale >= $base ) || ! self::discount_open( $course ) ) {
+			return $base;
 		}
-		return (int) $course['price'];
+		return $sale;
+	}
+
+	/**
+	 * Whether the discount window includes now. Empty bounds stay open.
+	 *
+	 * @param array<string, mixed> $course Course.
+	 */
+	private static function discount_open( array $course ): bool {
+		$now   = Db::now();
+		$start = (string) ( $course['discount_starts'] ?? '' );
+		$end   = (string) ( $course['discount_ends'] ?? '' );
+		if ( self::stamp( $start ) && $now < $start ) {
+			return false;
+		}
+		if ( self::stamp( $end ) && $now > $end ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * A stored datetime that should be compared.
+	 *
+	 * @param string $value MySQL datetime.
+	 */
+	private static function stamp( string $value ): bool {
+		return '' !== $value && '0000-00-00 00:00:00' !== $value;
 	}
 
 	/**

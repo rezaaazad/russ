@@ -33,7 +33,7 @@ class NotFoundScreen {
 		if ( ! current_user_can( 'lr_manage_redirects' ) ) {
 			wp_die( esc_html__( 'اجازه ندارید.', 'liferuss-core' ) );
 		}
-		echo '<div class="wrap lr-wrap"><h1>پایش ۴۰۴</h1>';
+		Chrome::open( 'پایش ۴۰۴', 'تنظیمات' );
 		if ( isset( $_GET['made'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			echo '<div class="notice notice-success"><p>ریدایرکت ساخته شد.</p></div>';
 		}

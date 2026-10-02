@@ -18,6 +18,7 @@ use LifeRuss\Core\Account\Portal;
 use LifeRuss\Core\Course\Editor as CourseEditor;
 use LifeRuss\Core\Course\Front as CourseFront;
 use LifeRuss\Core\Course\Seed as CourseSeed;
+use LifeRuss\Core\Admin\Chrome;
 use LifeRuss\Core\Admin\CompareScreen;
 use LifeRuss\Core\Catalog\Demo;
 use LifeRuss\Core\Catalog\Editor;
@@ -129,6 +130,7 @@ class Plugin {
 			Kanban::hooks();
 			SettingsPage::hooks();
 			Assets::hooks();
+			Chrome::hooks();
 		}
 	}
 }

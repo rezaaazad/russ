@@ -35,6 +35,21 @@ class Zarinpal implements Gateway {
 		if ( '' === $merchant ) {
 			return $empty;
 		}
+		if ( $this->mock() ) {
+			$authority = 'MOCK' . strtoupper( bin2hex( random_bytes( 8 ) ) );
+			return array(
+				'ok'        => true,
+				'url'       => add_query_arg(
+					array(
+						'Authority' => $authority,
+						'Status'    => 'OK',
+					),
+					self::callback( $payment )
+				),
+				'authority' => $authority,
+				'message'   => '',
+			);
+		}
 		$body = array(
 			'merchant_id'  => $merchant,
 			'amount'       => (int) $payment['amount_toman'],
@@ -87,6 +102,13 @@ class Zarinpal implements Gateway {
 		if ( '' !== $known && ! hash_equals( $known, $authority ) ) {
 			return $fail;
 		}
+		if ( $this->mock() && str_starts_with( $authority, 'MOCK' ) ) {
+			return array(
+				'ok'      => true,
+				'ref_id'  => 'mock-' . substr( $authority, 4, 8 ),
+				'message' => '',
+			);
+		}
 		$data = $this->post(
 			'/verify.json',
 			array(
@@ -138,6 +160,13 @@ class Zarinpal implements Gateway {
 	private function sandbox(): bool {
 		$settings = Settings::get( 'payments' );
 		return '1' === (string) ( $settings['sandbox'] ?? '1' );
+	}
+
+	/**
+	 * Offline sandbox. Merchant id "mock" never calls Zarinpal.
+	 */
+	private function mock(): bool {
+		return $this->sandbox() && 'mock' === $this->merchant();
 	}
 
 	/**

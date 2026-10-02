@@ -178,6 +178,7 @@ class Db {
 				'session_id',
 				'instructor_id',
 				'category_id',
+				'plan_id',
 				'legacy_post_id',
 				'scope_type',
 			),

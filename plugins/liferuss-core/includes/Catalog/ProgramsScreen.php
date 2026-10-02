@@ -7,6 +7,7 @@
 
 namespace LifeRuss\Core\Catalog;
 
+use LifeRuss\Core\Admin\Chrome;
 use LifeRuss\Core\Repositories\Repository;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -90,7 +91,8 @@ class ProgramsScreen {
 		global $wpdb;
 		$table = $wpdb->prefix . 'lr_universities';
 		$rows  = $wpdb->get_results( "SELECT id, name_fa FROM `{$table}` WHERE deleted_at IS NULL ORDER BY name_fa ASC", ARRAY_A );
-		echo '<div class="wrap lr-wrap"><h1>' . esc_html__( 'رشته‌های دانشگاه', 'liferuss-core' ) . '</h1><ul>';
+		Chrome::open( __( 'رشته‌های دانشگاه', 'liferuss-core' ), 'دانشگاه‌ها' );
+		echo '<ul class="lr-work">';
 		foreach ( (array) $rows as $row ) {
 			$url = admin_url( 'admin.php?page=lr-programs&university=' . (int) $row['id'] );
 			echo '<li><a href="' . esc_url( $url ) . '">' . esc_html( (string) $row['name_fa'] ) . '</a></li>';

@@ -43,7 +43,7 @@ class Access {
 		}
 		$tier       = '';
 		$enrollment = self::enrollment( (int) $student['id'], (int) $course['id'] );
-		if ( $enrollment && 'active' === $enrollment['status'] ) {
+		if ( $enrollment && 'active' === $enrollment['status'] && ! self::expired( $enrollment, $course ) ) {
 			$tier = (string) $enrollment['tier'];
 		}
 		if ( ! empty( $course['included_in_subscription'] ) ) {
@@ -164,6 +164,25 @@ class Access {
 			ARRAY_A
 		);
 		return is_array( $row ) ? $row : null;
+	}
+
+	/**
+	 * A purchased enrollment ends after the course access length. Zero days stays open.
+	 *
+	 * @param array<string, mixed> $enrollment Enrollment.
+	 * @param array<string, mixed> $course     Course.
+	 */
+	private static function expired( array $enrollment, array $course ): bool {
+		$days = (int) ( $course['access_days'] ?? 0 );
+		if ( $days < 1 || ! in_array( (string) ( $enrollment['source'] ?? '' ), array( 'purchase', 'bundle' ), true ) ) {
+			return false;
+		}
+		$granted = strtotime( (string) $enrollment['granted_at'] . ' UTC' );
+		if ( ! $granted ) {
+			return false;
+		}
+		$limit = gmdate( 'Y-m-d H:i:s', $granted + ( $days * DAY_IN_SECONDS ) );
+		return Db::now() > $limit;
 	}
 
 	/**

@@ -1,12 +1,13 @@
 <?php
 /**
- * LifeRuss admin menu.
+ * LifeRuss admin menu, grouped by job.
  *
  * @package LifeRussCore
  */
 
 namespace LifeRuss\Core\Admin;
 
+use LifeRuss\Core\Academy\Admin as AcademyAdmin;
 use LifeRuss\Core\Catalog\ImportScreen;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -14,7 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Top-level menu and module links, gated by capability.
+ * Top-level menus: dashboard, CRM, universities, finance, and settings.
+ * Academy registers its own menu.
  */
 class Menu {
 
@@ -26,127 +28,97 @@ class Menu {
 	}
 
 	/**
-	 * Add the menu tree from the admin-panel spec.
+	 * Add the grouped menu tree.
 	 */
 	public static function register(): void {
-		add_menu_page(
-			'لایف‌روس',
-			'لایف‌روس',
-			'lr_view_dashboard',
-			'liferuss',
-			array( Screens::class, 'dashboard' ),
-			'dashicons-welcome-learn-more',
-			25
-		);
+		add_menu_page( 'پیشخوان لایف‌روس', 'پیشخوان لایف‌روس', 'lr_view_dashboard', 'liferuss', array( Screens::class, 'dashboard' ), 'dashicons-dashboard', 25 );
+		add_submenu_page( 'liferuss', 'پیشخوان', 'پیشخوان', 'lr_view_dashboard', 'liferuss', array( Screens::class, 'dashboard' ) );
+		self::link( 'liferuss', 'برگه‌ها', 'edit_pages', 'edit.php?post_type=page' );
+		self::link( 'liferuss', 'مجله — نوشته‌ها', 'edit_posts', 'edit.php' );
+		self::link( 'liferuss', 'مجله — دسته‌ها', 'manage_categories', 'edit-tags.php?taxonomy=category' );
+		self::link( 'liferuss', 'دانستنی‌ها', 'edit_lr_guides', 'edit.php?post_type=lr_guide' );
+		self::link( 'liferuss', 'سؤالات متداول', 'edit_lr_faqs', 'edit.php?post_type=lr_faq' );
+		self::link( 'liferuss', 'نظرات مشتریان', 'edit_lr_testimonials', 'edit.php?post_type=lr_testimonial' );
+		self::link( 'liferuss', 'رسانه', 'upload_files', 'upload.php' );
 
-		$items = array(
-			array( 'liferuss', 'داشبورد', 'lr_view_dashboard', array( Screens::class, 'dashboard' ) ),
-			array( 'lr-leads-queue', 'CRM — صف مشترک', 'lr_assign_leads', array( LeadAdmin::class, 'queue' ) ),
-			array( 'lr-leads', 'CRM — همه لیدها', 'lr_manage_leads', array( LeadAdmin::class, 'all' ) ),
-			array( 'lr-my-leads', 'CRM — لیدهای من', 'lr_view_own_leads', array( LeadAdmin::class, 'mine' ) ),
-			array( 'lr-kanban', 'CRM — کانبان', 'lr_access_crm', array( Kanban::class, 'render' ) ),
-			array( 'lr-tasks', 'CRM — وظایف و پیگیری', 'lr_access_crm', array( LeadAdmin::class, 'tasks' ) ),
-			array( 'lr-funnel', 'CRM — گزارش قیف', 'lr_manage_leads', array( LeadAdmin::class, 'funnel' ) ),
-			array( 'lr-export', 'CRM — خروجی', 'lr_export_leads', array( LeadAdmin::class, 'export_screen' ) ),
-			array( 'lr-payments', 'پرداخت‌های خدمات', 'lr_manage_leads', array( \LifeRuss\Core\Payments\Admin::class, 'screen' ) ),
-			array( 'lr-req-admission', 'درخواست‌ها — پذیرش', 'lr_access_admission', array( LeadAdmin::class, 'admission' ) ),
-			array( 'lr-req-exchange', 'درخواست‌ها — صرافی', 'lr_manage_exchange_requests', array( LeadAdmin::class, 'exchange' ) ),
-			array( 'lr-req-cargo', 'درخواست‌ها — کارگو', 'lr_manage_cargo_requests', array( LeadAdmin::class, 'cargo' ) ),
-			array( 'lr-req-trade', 'درخواست‌ها — تجارت', 'lr_manage_trade_requests', array( LeadAdmin::class, 'trade' ) ),
-			array( 'lr-req-immigration', 'درخواست‌ها — مهاجرت', 'lr_manage_immigration_requests', array( LeadAdmin::class, 'immigration' ) ),
-			array( 'lr-universities', 'دانشگاه‌ها — داده‌ها', 'lr_view_university_data', array( Screens::class, 'universities' ) ),
-			array( 'lr-tuition', 'دانشگاه‌ها — شهریه‌ها', 'lr_view_university_data', array( Screens::class, 'tuition' ) ),
-			array( 'lr-programs', 'دانشگاه‌ها — رشته‌ها', 'lr_manage_university_data', array( \LifeRuss\Core\Catalog\ProgramsScreen::class, 'render' ) ),
-			array( 'lr-approvals', 'دانشگاه‌ها — تأییدیه‌ها', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
-			array( 'lr-rankings', 'دانشگاه‌ها — رتبه‌بندی', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
-			array( 'lr-prep', 'دانشگاه‌ها — پادفک و کورس', 'lr_manage_academic_data', array( Screens::class, 'placeholder' ) ),
-			array( 'lr-intakes', 'دانشگاه‌ها — ورودی‌ها', 'lr_manage_academic_data', array( Screens::class, 'placeholder' ) ),
-			array( 'lr-uni-csv', 'دانشگاه‌ها — ورود/خروج CSV', 'lr_manage_university_data', array( ImportScreen::class, 'render' ) ),
-			array( 'lr-stale', 'دانشگاه‌ها — نیازمند بررسی', 'lr_manage_university_data', array( Screens::class, 'stale' ) ),
-			array( 'lr-services', 'خدمات و فرم‌ها', 'lr_manage_services', array( Screens::class, 'placeholder' ) ),
-			array( 'lr-redirects', 'سئو — ریدایرکت‌ها', 'lr_view_redirects', array( RedirectScreen::class, 'render' ) ),
-			array( 'lr-404', 'سئو — پایش ۴۰۴', 'lr_manage_redirects', array( NotFoundScreen::class, 'render' ) ),
-			array( 'lr-compare', 'سئو — مقایسه دانشگاه', 'lr_edit_seo', array( CompareScreen::class, 'render' ) ),
-			array( 'lr-search-stats', 'سئو — آمار جستجو', 'lr_edit_seo', array( SearchScreen::class, 'render' ) ),
-			array( 'lr-activity', 'گزارش فعالیت', 'lr_view_activity_log', array( Screens::class, 'placeholder' ) ),
-			array( 'lr-roles', 'نقش‌ها و مجوزها', 'lr_manage_roles', array( Screens::class, 'placeholder' ) ),
+		add_menu_page( 'CRM', 'CRM', 'lr_access_crm', 'lr-crm', array( LeadAdmin::class, 'queue' ), 'dashicons-groups', 26 );
+		$crm = array(
+			array( 'lr-crm', 'صف مشترک', 'lr_assign_leads', array( LeadAdmin::class, 'queue' ) ),
+			array( 'lr-leads', 'همه لیدها', 'lr_manage_leads', array( LeadAdmin::class, 'all' ) ),
+			array( 'lr-my-leads', 'لیدهای من', 'lr_view_own_leads', array( LeadAdmin::class, 'mine' ) ),
+			array( 'lr-kanban', 'کانبان', 'lr_access_crm', array( Kanban::class, 'render' ) ),
+			array( 'lr-tasks', 'وظایف و پیگیری', 'lr_access_crm', array( LeadAdmin::class, 'tasks' ) ),
+			array( 'lr-funnel', 'گزارش قیف', 'lr_manage_leads', array( LeadAdmin::class, 'funnel' ) ),
+			array( 'lr-export', 'خروجی', 'lr_export_leads', array( LeadAdmin::class, 'export_screen' ) ),
+			array( 'lr-req-admission', 'پذیرش', 'lr_access_admission', array( LeadAdmin::class, 'admission' ) ),
+			array( 'lr-req-exchange', 'صرافی', 'lr_manage_exchange_requests', array( LeadAdmin::class, 'exchange' ) ),
+			array( 'lr-req-cargo', 'کارگو', 'lr_manage_cargo_requests', array( LeadAdmin::class, 'cargo' ) ),
+			array( 'lr-req-trade', 'تجارت', 'lr_manage_trade_requests', array( LeadAdmin::class, 'trade' ) ),
+			array( 'lr-req-immigration', 'مهاجرت', 'lr_manage_immigration_requests', array( LeadAdmin::class, 'immigration' ) ),
 		);
-
-		foreach ( $items as $item ) {
-			add_submenu_page( 'liferuss', $item[1], $item[1], $item[2], $item[0], $item[3] );
+		foreach ( $crm as $item ) {
+			add_submenu_page( 'lr-crm', $item[1], $item[1], $item[2], $item[0], $item[3] );
 		}
 
-		self::link( 'دانشگاه‌ها — فهرست', 'edit_lr_universities', 'edit.php?post_type=lr_university' );
-		self::link( 'دانشگاه‌ها — افزودن', 'create_lr_universities', 'post-new.php?post_type=lr_university' );
-		self::link( 'رشته‌ها', 'edit_lr_fields', 'edit.php?post_type=lr_field' );
-		self::link( 'گروه‌های رشته', 'manage_lr_field_groups', 'edit-tags.php?taxonomy=lr_field_group&post_type=lr_field' );
-		self::link( 'شهرها', 'edit_lr_cities', 'edit.php?post_type=lr_city' );
-		self::link( 'بورسیه‌ها', 'edit_lr_scholarships', 'edit.php?post_type=lr_scholarship' );
-		add_submenu_page( 'liferuss', 'انتقال بورسیه‌ها', 'بورسیه‌ها — انتقال جدول', 'edit_lr_scholarships', 'lr-scholarship-migrate', array( \LifeRuss\Core\Scholarships\Admin::class, 'screen' ) );
-		self::link( 'برگه‌ها', 'edit_pages', 'edit.php?post_type=page' );
-		self::link( 'مجله — نوشته‌ها', 'edit_posts', 'edit.php' );
-		self::link( 'مجله — دسته‌ها', 'manage_categories', 'edit-tags.php?taxonomy=category' );
-		self::link( 'دانستنی‌ها', 'edit_lr_guides', 'edit.php?post_type=lr_guide' );
-		self::link( 'دسته‌های دانستنی', 'manage_lr_guide_cats', 'edit-tags.php?taxonomy=lr_guide_cat&post_type=lr_guide' );
-		self::link( 'زبان — دوره‌ها', 'edit_lr_courses', 'edit.php?post_type=lr_course' );
-		self::link( 'زبان — درس‌ها', 'edit_lr_lessons', 'edit.php?post_type=lr_lesson' );
-		self::link( 'زبان — سطوح', 'manage_lr_levels', 'edit-tags.php?taxonomy=lr_level&post_type=lr_lesson' );
-		self::link( 'سؤالات متداول', 'edit_lr_faqs', 'edit.php?post_type=lr_faq' );
-		self::link( 'نظرات مشتریان', 'edit_lr_testimonials', 'edit.php?post_type=lr_testimonial' );
-		self::link( 'رسانه', 'upload_files', 'upload.php' );
-		self::link( 'کاربران', 'list_users', 'users.php' );
+		add_menu_page( 'دانشگاه‌ها', 'دانشگاه‌ها', 'lr_view_university_data', 'lr-uni', array( Screens::class, 'universities' ), 'dashicons-bank', 27 );
+		add_submenu_page( null, 'دانشگاه‌ها', 'دانشگاه‌ها', 'lr_view_university_data', 'lr-universities', array( Screens::class, 'universities' ) );
+		$uni = array(
+			array( 'lr-uni', 'داده‌ها', 'lr_view_university_data', array( Screens::class, 'universities' ) ),
+			array( 'lr-tuition', 'شهریه‌ها', 'lr_view_university_data', array( Screens::class, 'tuition' ) ),
+			array( 'lr-programs', 'رشته‌ها', 'lr_manage_university_data', array( \LifeRuss\Core\Catalog\ProgramsScreen::class, 'render' ) ),
+			array( 'lr-uni-csv', 'ورود و خروج CSV', 'lr_manage_university_data', array( ImportScreen::class, 'render' ) ),
+			array( 'lr-stale', 'نیازمند بررسی', 'lr_manage_university_data', array( Screens::class, 'stale' ) ),
+			array( 'lr-approvals', 'تأییدیه‌ها', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
+			array( 'lr-rankings', 'رتبه‌بندی', 'lr_manage_university_data', array( Screens::class, 'placeholder' ) ),
+			array( 'lr-prep', 'پادفک و کورس', 'lr_manage_academic_data', array( Screens::class, 'placeholder' ) ),
+			array( 'lr-intakes', 'ورودی‌ها', 'lr_manage_academic_data', array( Screens::class, 'placeholder' ) ),
+		);
+		foreach ( $uni as $item ) {
+			add_submenu_page( 'lr-uni', $item[1], $item[1], $item[2], $item[0], $item[3] );
+		}
+		self::link( 'lr-uni', 'فهرست دانشگاه‌ها', 'edit_lr_universities', 'edit.php?post_type=lr_university' );
+		self::link( 'lr-uni', 'افزودن دانشگاه', 'create_lr_universities', 'post-new.php?post_type=lr_university' );
+		self::link( 'lr-uni', 'رشته‌ها', 'edit_lr_fields', 'edit.php?post_type=lr_field' );
+		self::link( 'lr-uni', 'شهرها', 'edit_lr_cities', 'edit.php?post_type=lr_city' );
+		self::link( 'lr-uni', 'بورسیه‌ها', 'edit_lr_scholarships', 'edit.php?post_type=lr_scholarship' );
+		add_submenu_page( 'lr-uni', 'انتقال بورسیه‌ها', 'انتقال بورسیه‌ها', 'edit_lr_scholarships', 'lr-scholarship-migrate', array( \LifeRuss\Core\Scholarships\Admin::class, 'screen' ) );
 
-		add_submenu_page(
-			'liferuss',
-			'تنظیمات لایف‌روس',
-			'تنظیمات لایف‌روس',
-			'lr_access_settings',
-			'lr-settings',
-			array( \LifeRuss\Core\Settings\SettingsPage::class, 'render' )
-		);
+		add_menu_page( 'مالی', 'مالی', 'lr_view_finance', 'lr-finance', array( AcademyAdmin::class, 'finance' ), 'dashicons-chart-area', 29 );
+		add_submenu_page( 'lr-finance', 'گزارش', 'گزارش', 'lr_view_finance', 'lr-finance', array( AcademyAdmin::class, 'finance' ) );
+		add_submenu_page( 'lr-finance', 'گزارش خط‌ها', 'گزارش خط‌ها', 'lr_view_finance', 'lr-finance-report', array( AcademyAdmin::class, 'finance' ) );
+		add_submenu_page( 'lr-finance', 'پرداخت‌های خدمات', 'پرداخت‌های خدمات', 'lr_manage_leads', 'lr-payments', array( \LifeRuss\Core\Payments\Admin::class, 'screen' ) );
 
-		add_submenu_page(
-			'liferuss',
-			'رشته‌ها و شهرها',
-			'رشته‌ها و شهرها — مشاهده',
-			'lr_view_academic_data',
-			'lr-fields-view',
-			array( Screens::class, 'placeholder' )
-		);
-		add_submenu_page(
-			'liferuss',
-			'واژگان',
-			'واژگان',
-			'lr_edit_vocab',
-			'lr-vocab',
-			array( Screens::class, 'placeholder' )
-		);
-		add_submenu_page(
-			'liferuss',
-			'نسخه‌های تکراری',
-			'ابزار — نسخه‌های تکراری',
-			'edit_posts',
-			'lr-duplicates',
-			array( Duplicates::class, 'render' )
-		);
+		add_menu_page( 'تنظیمات', 'تنظیمات', 'lr_access_settings', 'lr-settings', array( \LifeRuss\Core\Settings\SettingsPage::class, 'render' ), 'dashicons-admin-generic', 30 );
+		add_submenu_page( 'lr-settings', 'لایف‌روس', 'لایف‌روس', 'lr_access_settings', 'lr-settings', array( \LifeRuss\Core\Settings\SettingsPage::class, 'render' ) );
+		add_submenu_page( 'lr-settings', 'ریدایرکت‌ها', 'ریدایرکت‌ها', 'lr_view_redirects', 'lr-redirects', array( RedirectScreen::class, 'render' ) );
+		add_submenu_page( 'lr-settings', 'پایش ۴۰۴', 'پایش ۴۰۴', 'lr_manage_redirects', 'lr-404', array( NotFoundScreen::class, 'render' ) );
+		add_submenu_page( 'lr-settings', 'مقایسه دانشگاه', 'مقایسه دانشگاه', 'lr_edit_seo', 'lr-compare', array( CompareScreen::class, 'render' ) );
+		add_submenu_page( 'lr-settings', 'آمار جستجو', 'آمار جستجو', 'lr_edit_seo', 'lr-search-stats', array( SearchScreen::class, 'render' ) );
+		add_submenu_page( 'lr-settings', 'نسخه‌های تکراری', 'نسخه‌های تکراری', 'edit_posts', 'lr-duplicates', array( Duplicates::class, 'render' ) );
+		add_submenu_page( 'lr-settings', 'نقش‌ها', 'نقش‌ها', 'lr_manage_roles', 'lr-roles', array( Screens::class, 'placeholder' ) );
+		add_submenu_page( 'lr-settings', 'واژگان', 'واژگان', 'lr_edit_vocab', 'lr-vocab', array( Screens::class, 'placeholder' ) );
+		add_submenu_page( 'lr-settings', 'گزارش فعالیت', 'گزارش فعالیت', 'lr_view_activity_log', 'lr-activity', array( Screens::class, 'placeholder' ) );
+		self::link( 'lr-settings', 'کاربران', 'list_users', 'users.php' );
+		self::link( 'lr-settings', 'زبان — دوره‌ها', 'edit_lr_courses', 'edit.php?post_type=lr_course' );
+		self::link( 'lr-settings', 'زبان — درس‌ها', 'edit_lr_lessons', 'edit.php?post_type=lr_lesson' );
 	}
 
 	/**
 	 * Submenu entry that points at a core admin URL.
 	 *
+	 * @param string $menu  Parent slug.
 	 * @param string $title Menu title.
 	 * @param string $cap   Capability.
-	 * @param string $url   admin.php-relative or absolute admin path.
+	 * @param string $url   Admin path.
 	 */
-	private static function link( string $title, string $cap, string $url ): void {
+	private static function link( string $menu, string $title, string $cap, string $url ): void {
 		if ( ! current_user_can( $cap ) ) {
 			return;
 		}
 		global $submenu;
-		if ( ! isset( $submenu['liferuss'] ) || ! is_array( $submenu['liferuss'] ) ) {
+		if ( ! isset( $submenu[ $menu ] ) || ! is_array( $submenu[ $menu ] ) ) {
 			return;
 		}
-		// Core has no API for a submenu item that points at edit.php.
-		$submenu['liferuss'][] = array( $title, $cap, $url ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$submenu[ $menu ][] = array( $title, $cap, $url ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 	}
 }

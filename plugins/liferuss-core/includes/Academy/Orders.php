@@ -220,13 +220,7 @@ class Orders {
 			if ( ! $course || 'published' !== $course['status'] ) {
 				return null;
 			}
-			$price = (int) $course['price'];
-			if ( null !== $course['discount_price'] && '' !== (string) $course['discount_price'] && (int) $course['discount_price'] > 0 ) {
-				$price = (int) $course['discount_price'];
-			}
-			if ( ! empty( $course['is_free'] ) ) {
-				$price = 0;
-			}
+			$price = Catalog::price( $course );
 			return array(
 				'item_type' => 'course',
 				'item_id'   => $id,

@@ -471,7 +471,7 @@ class LeadAdmin {
 		$query = array_merge( $scope, self::filters_from_request() );
 		$table = new LeadListTable( $query );
 		$table->prepare_items();
-		echo '<div class="wrap lr-wrap"><h1>' . esc_html( $title ) . '</h1>';
+		Chrome::open( $title, 'CRM' );
 		self::migration_box();
 		self::filter_form();
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
