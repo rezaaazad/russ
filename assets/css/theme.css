@@ -469,6 +469,44 @@ p {
   }
 }
 
+/* Drawer extras belong in the mobile menu. On desktop they stretched the bar to two rows. */
+@media (min-width: 861px) {
+  .site-header .drawer-consult,
+  .site-header .drawer-phone {
+    display: none;
+  }
+
+  .site-header .header-inner {
+    width: min(1440px, calc(100% - 32px));
+  }
+
+  .lang-switch--header a {
+    min-width: 0;
+  }
+}
+
+@media (min-width: 861px) and (max-width: 1366px) {
+  .site-header .header-inner {
+    gap: 8px;
+  }
+
+  .nav-list {
+    gap: 2px 8px;
+  }
+
+  .nav-list > .menu-item > a,
+  .nav-list > .menu-item > .menu-row > a {
+    font-size: 0.82rem;
+    padding: 8px 1px;
+  }
+}
+
+@media (min-width: 861px) and (max-width: 1200px) {
+  .nav-list {
+    gap: 2px 6px;
+  }
+}
+
 .header-account {
   position: relative;
   display: inline-flex;
@@ -506,7 +544,7 @@ p {
   box-shadow: 0 0 0 2px #0b2341;
 }
 
-@media (hover: hover) and (min-width: 861px) {
+@media (min-width: 861px) {
   .header-account[data-tip]:hover::after,
   .header-account[data-tip]:focus-visible::after {
     content: attr(data-tip);
@@ -611,6 +649,7 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 0;
+  min-width: 0;
   padding: 2px 6px;
   margin: 0;
   border: 0 !important;
@@ -5299,7 +5338,10 @@ body.has-compare-bar .lr-float {
   .lr-filter-toggle {
     display: none;
   }
+}
 
+/* The gold consult button returns once the icon, nav, and languages fit beside it. */
+@media (min-width: 1024px) {
   .site-header .header-cta {
     display: inline-flex;
     padding-inline: 12px;
