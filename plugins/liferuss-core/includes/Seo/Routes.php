@@ -56,12 +56,13 @@ class Routes {
 	 * Flush once per release and point /immigration/ at the migration hub.
 	 */
 	public static function maybe_flush(): void {
-		if ( '1.14.0' === (string) get_option( 'lr_seo_rewrites' ) ) {
+		if ( '1.14.2' === (string) get_option( 'lr_seo_rewrites' ) ) {
 			return;
 		}
 		self::immigration_hub();
+		\LifeRuss\Core\Redirects\Duplicates::ensure();
 		flush_rewrite_rules( false );
-		update_option( 'lr_seo_rewrites', '1.14.0', false );
+		update_option( 'lr_seo_rewrites', '1.14.2', false );
 	}
 
 	/**

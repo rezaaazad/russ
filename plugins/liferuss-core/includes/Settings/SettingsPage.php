@@ -188,9 +188,13 @@ class SettingsPage {
 	 * @param string $value Value.
 	 * @param string $type  Input type.
 	 */
-	private static function text_row( string $name, string $label, string $value, string $type = 'text' ): void {
+	private static function text_row( string $name, string $label, string $value, string $type = 'text', string $placeholder = '' ): void {
 		echo '<tr><th scope="row"><label for="' . esc_attr( $name ) . '">' . esc_html( $label ) . '</label></th><td>';
-		echo '<input class="regular-text" type="' . esc_attr( $type ) . '" id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '">';
+		echo '<input class="regular-text" type="' . esc_attr( $type ) . '" id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '"';
+		if ( '' !== $placeholder ) {
+			echo ' placeholder="' . esc_attr( $placeholder ) . '"';
+		}
+		echo '>';
 		echo '</td></tr>';
 	}
 
@@ -262,11 +266,12 @@ class SettingsPage {
 	 */
 	private static function fields_contact(): void {
 		$v = Settings::get( 'contact' );
-		self::text_row( 'phone', __( 'تلفن', 'liferuss-core' ), (string) $v['phone'] );
-		self::text_row( 'whatsapp', __( 'واتساپ', 'liferuss-core' ), (string) $v['whatsapp'] );
-		self::text_row( 'telegram', __( 'تلگرام', 'liferuss-core' ), (string) $v['telegram'] );
-		self::text_row( 'instagram', __( 'اینستاگرام', 'liferuss-core' ), (string) $v['instagram'] );
-		self::text_row( 'email', __( 'ایمیل', 'liferuss-core' ), (string) $v['email'], 'email' );
+		echo '<tr><td colspan="2"><p>' . esc_html__( 'اگر فیلد تماس در تنظیمات قالب خالی باشد، همین مقدار در صفحه تماس، فوتر و دکمه شناور استفاده می‌شود. فیلد خالی در سایت نشان داده نمی‌شود.', 'liferuss-core' ) . '</p></td></tr>';
+		self::text_row( 'phone', __( 'تلفن', 'liferuss-core' ), (string) $v['phone'], 'text', '۰۹۱۲۱۲۳۴۵۶۷' );
+		self::text_row( 'whatsapp', __( 'واتساپ', 'liferuss-core' ), (string) $v['whatsapp'], 'text', '۰۹۱۲۱۲۳۴۵۶۷' );
+		self::text_row( 'telegram', __( 'تلگرام', 'liferuss-core' ), (string) $v['telegram'], 'text', 'liferuss' );
+		self::text_row( 'instagram', __( 'اینستاگرام', 'liferuss-core' ), (string) $v['instagram'], 'text', 'liferuss' );
+		self::text_row( 'email', __( 'ایمیل', 'liferuss-core' ), (string) $v['email'], 'email', 'info@example.com' );
 		self::area_row( 'address', __( 'نشانی', 'liferuss-core' ), (string) $v['address'] );
 	}
 
@@ -394,6 +399,11 @@ class SettingsPage {
 		self::text_row( 'totp_grace_days', __( 'مهلت فعال‌سازی ورود دومرحله‌ای (روز)', 'liferuss-core' ), (string) $v['totp_grace_days'], 'number' );
 		self::text_row( 'login_limit', __( 'سقف تلاش ناموفق ورود', 'liferuss-core' ), (string) $v['login_limit'], 'number' );
 		self::text_row( 'not_found_days', __( 'نگهداری گزارش ۴۰۴ (روز)', 'liferuss-core' ), (string) $v['not_found_days'], 'number' );
+		$staff = \LifeRuss\Core\Security\PublicLogin::staff_url();
+		echo '<tr><th scope="row">' . esc_html__( 'ورود کارکنان', 'liferuss-core' ) . '</th><td>';
+		echo '<p>' . esc_html__( 'مشتری‌ها از /account/ با کد یک‌بارمصرف وارد می‌شوند. فرم وردپرس فقط از این نشانی، یا وقتی کسی به پیشخوان می‌رود، باز می‌شود.', 'liferuss-core' ) . '</p>';
+		echo '<p><code>' . esc_html( $staff ) . '</code></p>';
+		echo '</td></tr>';
 		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'ورود دومرحله‌ای برای مدیر ارشد، ادمین، مدیر محتوا، مدیر سئو و مشاور اجباری است. رمز برنامه و REST از این مرحله رد نمی‌شوند.', 'liferuss-core' ) . '</p></td></tr>';
 	}
 
@@ -573,9 +583,9 @@ class SettingsPage {
 			'contact',
 			array(
 				'phone'     => self::posted_text( 'phone' ),
-				'whatsapp'  => esc_url_raw( self::posted_text( 'whatsapp' ) ),
-				'telegram'  => esc_url_raw( self::posted_text( 'telegram' ) ),
-				'instagram' => esc_url_raw( self::posted_text( 'instagram' ) ),
+				'whatsapp'  => self::posted_text( 'whatsapp' ),
+				'telegram'  => self::posted_text( 'telegram' ),
+				'instagram' => self::posted_text( 'instagram' ),
 				'email'     => sanitize_email( self::posted_text( 'email' ) ),
 				'address'   => self::posted_area( 'address' ),
 			)

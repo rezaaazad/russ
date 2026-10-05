@@ -88,7 +88,7 @@ function liferuss_sanitize_options( $input ) {
 		'testimonials_eyebrow', 'testimonials_title', 'testimonials_subtitle', 'stat_value', 'stat_text',
 		'form_eyebrow', 'form_title', 'form_intro', 'form_name_label', 'form_name_ph',
 		'form_phone_label', 'form_phone_ph', 'form_level_label', 'form_submit', 'form_note', 'form_success',
-		'phone', 'phone_alt', 'address', 'whatsapp',
+		'phone', 'phone_alt', 'address', 'whatsapp', 'telegram', 'instagram',
 		'footer_about', 'footer_copyright', 'footer_en',
 		'seo_title', 'seo_description', 'org_name', 'org_legal',
 		'float_widget_title', 'float_widget_subtitle', 'float_widget_offset_x', 'float_widget_offset_y',
@@ -102,7 +102,7 @@ function liferuss_sanitize_options( $input ) {
 		}
 	}
 
-	$url_keys = array( 'telegram', 'instagram', 'linkedin', 'youtube', 'org_url', 'email', 'form_email' );
+	$url_keys = array( 'linkedin', 'youtube', 'org_url', 'email', 'form_email' );
 	foreach ( $url_keys as $key ) {
 		if ( ! isset( $out[ $key ] ) ) {
 			continue;
@@ -283,7 +283,7 @@ function liferuss_sanitize_repeater( $items, $schema ) {
  * @param string $label Label.
  * @param string $type  text|textarea|url|email|checkbox|color.
  */
-function liferuss_admin_field( $name, $value, $label, $type = 'text' ) {
+function liferuss_admin_field( $name, $value, $label, $type = 'text', $placeholder = '' ) {
 	$id = 'lr_' . preg_replace( '/[^a-z0-9_]+/i', '_', $name );
 	echo '<tr><th scope="row"><label for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label></th><td>';
 	if ( 'textarea' === $type ) {
@@ -294,7 +294,7 @@ function liferuss_admin_field( $name, $value, $label, $type = 'text' ) {
 		printf( '<input type="text" class="liferuss-color" id="%s" name="liferuss_options[%s]" value="%s">', esc_attr( $id ), esc_attr( $name ), esc_attr( (string) $value ) );
 	} else {
 		$input = 'email' === $type ? 'email' : ( 'url' === $type ? 'url' : 'text' );
-		printf( '<input type="%s" class="regular-text" id="%s" name="liferuss_options[%s]" value="%s">', esc_attr( $input ), esc_attr( $id ), esc_attr( $name ), esc_attr( (string) $value ) );
+		printf( '<input type="%s" class="regular-text" id="%s" name="liferuss_options[%s]" value="%s"%s>', esc_attr( $input ), esc_attr( $id ), esc_attr( $name ), esc_attr( (string) $value ), '' !== (string) $placeholder ? ' placeholder="' . esc_attr( (string) $placeholder ) . '"' : '' );
 	}
 	echo '</td></tr>';
 }
@@ -640,16 +640,25 @@ function liferuss_options_page() {
 			<div id="tab-contact" class="liferuss-tab">
 				<h2>تماس و شبکه‌های اجتماعی</h2>
 				<?php
+				$contact_empty = array();
+				foreach ( array( 'phone' => 'تلفن', 'whatsapp' => 'واتساپ', 'telegram' => 'تلگرام', 'instagram' => 'اینستاگرام', 'email' => 'ایمیل' ) as $contact_key => $contact_label ) {
+					if ( function_exists( 'liferuss_public_contact' ) && '' === liferuss_public_contact( $contact_key ) ) {
+						$contact_empty[] = $contact_label;
+					}
+				}
+				if ( $contact_empty ) {
+					echo '<div class="notice notice-warning inline"><p>' . esc_html( 'این مقدارها هنوز خالی است: ' . implode( '، ', $contact_empty ) . '. تا پر نشوند (اینجا یا در تنظیمات هستهٔ لایف‌روس) در صفحه تماس، فوتر و دکمه شناور دیده نمی‌شوند. نمونهٔ داخل کادر فقط راهنماست و منتشر نمی‌شود.' ) . '</p></div>';
+				}
 				liferuss_admin_table_start();
-				liferuss_admin_field( 'phone', $o['phone'], 'تلفن' );
-				liferuss_admin_field( 'phone_alt', $o['phone_alt'], 'تلفن دوم' );
-				liferuss_admin_field( 'email', $o['email'], 'ایمیل', 'email' );
+				liferuss_admin_field( 'phone', $o['phone'], 'تلفن', 'text', '۰۹۱۲۱۲۳۴۵۶۷' );
+				liferuss_admin_field( 'phone_alt', $o['phone_alt'], 'تلفن دوم', 'text', '۰۲۱۱۲۳۴۵۶۷۸' );
+				liferuss_admin_field( 'email', $o['email'], 'ایمیل', 'email', 'info@example.com' );
 				liferuss_admin_field( 'address', $o['address'], 'آدرس', 'textarea' );
-				liferuss_admin_field( 'whatsapp', $o['whatsapp'], 'واتساپ' );
-				liferuss_admin_field( 'telegram', $o['telegram'], 'تلگرام', 'url' );
-				liferuss_admin_field( 'instagram', $o['instagram'], 'اینستاگرام', 'url' );
-				liferuss_admin_field( 'linkedin', $o['linkedin'], 'لینکدین', 'url' );
-				liferuss_admin_field( 'youtube', $o['youtube'], 'یوتیوب', 'url' );
+				liferuss_admin_field( 'whatsapp', $o['whatsapp'], 'واتساپ', 'text', '۰۹۱۲۱۲۳۴۵۶۷' );
+				liferuss_admin_field( 'telegram', $o['telegram'], 'تلگرام', 'text', 'liferuss' );
+				liferuss_admin_field( 'instagram', $o['instagram'], 'اینستاگرام', 'text', 'liferuss' );
+				liferuss_admin_field( 'linkedin', $o['linkedin'], 'لینکدین', 'url', 'https://www.linkedin.com/company/example' );
+				liferuss_admin_field( 'youtube', $o['youtube'], 'یوتیوب', 'url', 'https://www.youtube.com/@example' );
 				liferuss_admin_table_end();
 				?>
 			</div>

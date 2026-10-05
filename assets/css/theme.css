@@ -1747,10 +1747,16 @@ html[dir="ltr"] .page-hero-photo.scene-couple .hero-overlay {
 }
 
 .hp {
-  position: absolute;
-  left: -9999px;
-  height: 0;
-  overflow: hidden;
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
 .consult-photo {
@@ -1770,9 +1776,17 @@ html[dir="ltr"] .page-hero-photo.scene-couple .hero-overlay {
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.3fr 0.8fr 0.8fr 1.1fr;
+  grid-template-columns: 1.4fr 1fr;
   gap: 28px;
   padding-bottom: 36px;
+}
+
+.footer-grid--3 {
+  grid-template-columns: 1.4fr 1fr 1fr;
+}
+
+.footer-grid--4 {
+  grid-template-columns: 1.3fr 0.8fr 0.8fr 1.1fr;
 }
 
 .footer-brand p,
@@ -3450,12 +3464,14 @@ body.ltr .lr-float__row-label {
 }
 
 .lr-empty-state {
-  margin: 8px 0 24px;
-  padding: 36px 24px;
-  border: 1px dashed var(--line);
+  margin: 8px auto 24px;
+  padding: 40px 28px;
+  max-width: 40rem;
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: var(--bg);
+  background: var(--white, #fff);
   text-align: center;
+  box-shadow: var(--shadow);
 }
 
 .lr-empty-state h2 {
@@ -3465,7 +3481,15 @@ body.ltr .lr-float__row-label {
 
 .lr-empty-state p {
   color: var(--muted);
-  margin: 0 0 16px;
+  margin: 0 auto 16px;
+  max-width: 36em;
+}
+
+.lr-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 }
 
 .lr-facts {

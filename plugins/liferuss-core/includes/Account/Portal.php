@@ -342,6 +342,7 @@ class Portal {
 		}
 		Otp::issue( $channel, $target );
 		set_transient( 'lr_otp_pending_' . self::cookie_key(), $channel . '|' . $target, 10 * MINUTE_IN_SECONDS );
+		self::remember_next();
 		self::redirect( 'login', 'sent' );
 	}
 
@@ -365,6 +366,12 @@ class Portal {
 		wp_set_current_user( $user_id );
 		wp_set_auth_cookie( $user_id, true );
 		delete_transient( 'lr_otp_pending_' . self::cookie_key() );
+		$next = get_transient( 'lr_otp_next_' . self::cookie_key() );
+		delete_transient( 'lr_otp_next_' . self::cookie_key() );
+		if ( is_string( $next ) && '' !== $next ) {
+			wp_safe_redirect( $next );
+			exit;
+		}
 		self::redirect( 'requests', 'in' );
 	}
 
@@ -500,6 +507,22 @@ class Portal {
 			)
 		);
 		return $users ? (int) $users[0] : 0;
+	}
+
+	/**
+	 * Keep a safe front-end redirect across the OTP step.
+	 */
+	private static function remember_next(): void {
+		$raw  = isset( $_POST['redirect_to'] ) ? (string) wp_unslash( $_POST['redirect_to'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$safe = wp_validate_redirect( $raw, '' );
+		if ( ! is_string( $safe ) || '' === $safe ) {
+			return;
+		}
+		$path = (string) wp_parse_url( $safe, PHP_URL_PATH );
+		if ( str_contains( $path, 'wp-admin' ) || str_contains( $path, 'wp-login.php' ) ) {
+			return;
+		}
+		set_transient( 'lr_otp_next_' . self::cookie_key(), $safe, 10 * MINUTE_IN_SECONDS );
 	}
 
 	/**

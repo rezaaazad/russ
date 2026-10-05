@@ -201,7 +201,7 @@ function liferuss_migrate_canonical_urls() {
 		'/study/'            => '/study-russia/',
 		'/podfak/'           => '/padfak/',
 		'/direct-admission/' => '/direct-course/',
-		'/immigration/'      => '/migration-russia/',
+		'/migration-russia/' => '/immigration/',
 	);
 	$opts = get_option( 'liferuss_options', array() );
 	if ( is_array( $opts ) && ! empty( $opts['footer_links'] ) && is_array( $opts['footer_links'] ) ) {
@@ -219,6 +219,140 @@ function liferuss_migrate_canonical_urls() {
 	update_option( 'liferuss_url_canon', '1', false );
 }
 add_action( 'init', 'liferuss_migrate_canonical_urls', 46 );
+
+/**
+ * 1.14.2: real contact fields, Persian phone examples, canonical immigration, no -2 menu links.
+ */
+function liferuss_migrate_ux_1142() {
+	if ( '1' === (string) get_option( 'liferuss_ux_1142' ) ) {
+		return;
+	}
+	$opts = get_option( 'liferuss_options', array() );
+	if ( ! is_array( $opts ) ) {
+		$opts = array();
+	}
+	if ( function_exists( 'liferuss_legacy_contact_values' ) ) {
+		foreach ( liferuss_legacy_contact_values() as $key => $samples ) {
+			if ( isset( $opts[ $key ] ) && in_array( (string) $opts[ $key ], $samples, true ) ) {
+				$opts[ $key ] = '';
+			}
+		}
+	}
+	$phone_keys = array( 'form_phone_ph', 'freight_form_phone_ph', 'trade_form_phone_ph' );
+	foreach ( $phone_keys as $key ) {
+		if ( isset( $opts[ $key ] ) && liferuss_phone_placeholder_needs_fix( (string) $opts[ $key ] ) ) {
+			$opts[ $key ] = '۰۹۱۲۱۲۳۴۵۶۷';
+		}
+	}
+	if ( isset( $opts['i18n'] ) && is_array( $opts['i18n'] ) ) {
+		foreach ( $opts['i18n'] as $lang => $pack ) {
+			if ( ! is_array( $pack ) ) {
+				continue;
+			}
+			foreach ( $phone_keys as $key ) {
+				if ( isset( $pack[ $key ] ) && liferuss_phone_placeholder_needs_fix( (string) $pack[ $key ] ) ) {
+					$opts['i18n'][ $lang ][ $key ] = 'ar' === $lang ? '٠٩١٢١٢٣٤٥٦٧' : ( 'fa' === $lang ? '۰۹۱۲۱۲۳۴۵۶۷' : '09121234567' );
+				}
+			}
+		}
+	}
+	if ( ! empty( $opts['footer_links'] ) && is_array( $opts['footer_links'] ) ) {
+		$kept = array();
+		foreach ( $opts['footer_links'] as $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			$url   = (string) ( $item['url'] ?? '' );
+			$label = trim( (string) ( $item['label'] ?? '' ) );
+			$path  = liferuss_migrate_path( $url );
+			if ( '/services/' === $path && 'خدمات' === $label ) {
+				continue;
+			}
+			if ( '/migration-russia/' === $path ) {
+				$item['url'] = '/immigration/';
+			}
+			$item['url'] = liferuss_migrate_drop_suffix_two( (string) ( $item['url'] ?? '' ) );
+			$kept[]      = $item;
+		}
+		$opts['footer_links'] = $kept;
+	}
+	update_option( 'liferuss_options', $opts );
+
+	$items = get_posts(
+		array(
+			'post_type'      => 'nav_menu_item',
+			'post_status'    => 'any',
+			'posts_per_page' => 300,
+		)
+	);
+	foreach ( $items as $item ) {
+		if ( ! $item instanceof WP_Post ) {
+			continue;
+		}
+		$url = (string) get_post_meta( $item->ID, '_menu_item_url', true );
+		if ( '' === $url ) {
+			continue;
+		}
+		$next = $url;
+		if ( '/migration-russia/' === liferuss_migrate_path( $url ) ) {
+			$next = '/immigration/';
+		}
+		$next = liferuss_migrate_drop_suffix_two( $next );
+		if ( $next !== $url ) {
+			update_post_meta( $item->ID, '_menu_item_url', $next );
+		}
+	}
+
+	flush_rewrite_rules( false );
+	update_option( 'liferuss_ux_1142', '1', false );
+}
+add_action( 'init', 'liferuss_migrate_ux_1142', 48 );
+
+/**
+ * True when a phone placeholder still mixes letters into the sample.
+ *
+ * @param string $value Placeholder.
+ * @return bool
+ */
+function liferuss_phone_placeholder_needs_fix( $value ) {
+	return is_string( $value ) && ( false !== stripos( $value, 'x' ) );
+}
+
+/**
+ * Path of a menu or footer URL.
+ *
+ * @param string $url URL or path.
+ * @return string
+ */
+function liferuss_migrate_path( $url ) {
+	$path = $url;
+	if ( preg_match( '#^https?://#i', $url ) ) {
+		$parsed = wp_parse_url( $url, PHP_URL_PATH );
+		$path   = is_string( $parsed ) ? $parsed : $url;
+	}
+	$path = '/' . trim( (string) $path, '/' );
+	return '/' === $path ? '/' : trailingslashit( $path );
+}
+
+/**
+ * Point a saved link at the sibling without a trailing -2 when that path is known.
+ *
+ * @param string $url URL or path.
+ * @return string
+ */
+function liferuss_migrate_drop_suffix_two( $url ) {
+	$map = array(
+		'/cargo/sea-2/'            => '/cargo/sea/',
+		'/trade/sourcing-2/'       => '/trade/sourcing/',
+		'/trade/import-export-2/'  => '/trade/import-export/',
+		'/trade/representation-2/' => '/trade/representation/',
+	);
+	$path = liferuss_migrate_path( $url );
+	if ( isset( $map[ $path ] ) ) {
+		return $map[ $path ];
+	}
+	return $url;
+}
 
 /**
  * Replace the old English homepage slogans when they are still stored.

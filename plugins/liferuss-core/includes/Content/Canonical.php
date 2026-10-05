@@ -28,7 +28,6 @@ class Canonical {
 			'study'            => 'study-russia',
 			'podfak'           => 'padfak',
 			'direct-admission' => 'direct-course',
-			'immigration'      => 'migration-russia',
 		);
 	}
 

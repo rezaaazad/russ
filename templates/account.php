@@ -15,10 +15,12 @@ $screen  = (string) get_query_var( 'lr_account' );
 $lead_id = absint( get_query_var( 'lr_account_id' ) );
 $notice  = isset( $_GET['notice'] ) ? sanitize_key( wp_unslash( $_GET['notice'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $notices = array(
-	'sent'  => 'کد ورود ارسال شد. تا ده دقیقه معتبر است.',
-	'bad'   => 'این درخواست انجام نشد. اطلاعات را دوباره بررسی کنید.',
-	'in'    => 'وارد حساب شدید. درخواست‌های مرتبط با شماره یا ایمیل تأییدشده اینجاست.',
-	'saved' => 'ذخیره شد.',
+	'sent'     => 'کد ورود ارسال شد. تا ده دقیقه معتبر است.',
+	'bad'      => 'این درخواست انجام نشد. اطلاعات را دوباره بررسی کنید.',
+	'in'       => 'وارد حساب شدید. درخواست‌های مرتبط با شماره یا ایمیل تأییدشده اینجاست.',
+	'saved'    => 'ذخیره شد.',
+	'register' => 'ثبت‌نام جداگانه لازم نیست. با شماره موبایل یا ایمیل کد بگیرید تا حساب همان لحظه ساخته شود.',
+	'password' => 'ورود لایف‌روس با رمز عبور نیست. شماره یا ایمیل را وارد کنید و کد یک‌بارمصرف بگیرید.',
 );
 $labels  = class_exists( '\LifeRuss\Core\Account\Portal' ) ? \LifeRuss\Core\Account\Portal::statuses() : array();
 $user_id = get_current_user_id();
@@ -45,9 +47,13 @@ $current = 'request' === $screen ? 'requests' : $screen;
 
 		<?php if ( ! is_user_logged_in() ) : ?>
 			<h2>ورود با کد یک‌بارمصرف</h2>
+			<?php $account_next = isset( $_GET['redirect_to'] ) ? esc_url_raw( wp_unslash( (string) $_GET['redirect_to'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
 			<form class="lr-account-form" method="post" action="<?php echo esc_url( liferuss_url( '/account/' ) ); ?>">
 				<?php wp_nonce_field( 'lr_account', 'lr_account_nonce' ); ?>
 				<input type="hidden" name="lr_account_action" value="otp">
+				<?php if ( $account_next ) : ?>
+					<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $account_next ); ?>">
+				<?php endif; ?>
 				<label>
 					<span>روش</span>
 					<select name="channel">
@@ -65,6 +71,9 @@ $current = 'request' === $screen ? 'requests' : $screen;
 				<form class="lr-account-form" method="post" action="<?php echo esc_url( liferuss_url( '/account/' ) ); ?>">
 					<?php wp_nonce_field( 'lr_account', 'lr_account_nonce' ); ?>
 					<input type="hidden" name="lr_account_action" value="verify">
+					<?php if ( $account_next ) : ?>
+						<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $account_next ); ?>">
+					<?php endif; ?>
 					<label>
 						<span>کد شش‌رقمی</span>
 						<input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" required>

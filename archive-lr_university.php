@@ -26,6 +26,7 @@ $fields  = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::options( 'lr
 </header>
 <div class="section">
 	<div class="container">
+		<?php if ( (int) $result['total'] > 0 || $filters ) : ?>
 		<form class="lr-filters" id="lr-uni-filters" method="get" action="<?php echo esc_url( get_post_type_archive_link( 'lr_university' ) ); ?>">
 			<button class="btn btn-ghost lr-filter-toggle" type="button"><?php echo esc_html( liferuss_t( 'filter_more' ) ); ?></button>
 			<label class="lr-filter-keep">شهر
@@ -74,6 +75,7 @@ $fields  = liferuss_catalog_ready() ? \LifeRuss\Core\Catalog\Query::options( 'lr
 			</div>
 			<button class="btn btn-gold" type="submit">اعمال فیلتر</button>
 		</form>
+		<?php endif; ?>
 		<?php if ( (int) $result['total'] > 0 ) : ?>
 			<p class="lr-count"><?php echo esc_html( (string) (int) $result['total'] ); ?> دانشگاه</p>
 		<?php endif; ?>

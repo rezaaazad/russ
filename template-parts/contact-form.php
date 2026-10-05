@@ -9,10 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$whatsapp  = liferuss_opt( 'whatsapp' );
-$telegram  = liferuss_social_url( liferuss_opt( 'telegram' ), 'telegram' );
-$instagram = liferuss_social_url( liferuss_opt( 'instagram' ), 'instagram' );
-$phone     = liferuss_opt( 'phone' );
 $status    = isset( $_GET['consult'] ) ? sanitize_text_field( wp_unslash( $_GET['consult'] ) ) : '';
 $message   = isset( $_GET['consult_msg'] ) ? sanitize_text_field( rawurldecode( wp_unslash( $_GET['consult_msg'] ) ) ) : '';
 ?>
@@ -22,33 +18,7 @@ $message   = isset( $_GET['consult_msg'] ) ? sanitize_text_field( rawurldecode( 
 			<p class="eyebrow"><?php echo esc_html( liferuss_t( 'contact_page_eye' ) ); ?></p>
 			<h2><?php echo esc_html( liferuss_t( 'contact_form_title' ) ); ?></h2>
 			<p><?php echo esc_html( liferuss_t( 'contact_form_intro' ) ); ?></p>
-			<div class="consult-channels">
-				<p class="screen-reader-text"><?php echo esc_html( liferuss_t( 'channels_aria' ) ); ?></p>
-				<?php if ( $whatsapp ) : ?>
-					<a class="channel" href="<?php echo esc_url( liferuss_whatsapp_url( $whatsapp ) ); ?>" target="_blank" rel="noopener noreferrer">
-						<?php echo liferuss_icon( 'whatsapp' ); ?>
-						<span><?php echo esc_html( liferuss_t( 'channel_whatsapp' ) ); ?></span>
-					</a>
-				<?php endif; ?>
-				<?php if ( $telegram ) : ?>
-					<a class="channel" href="<?php echo esc_url( $telegram ); ?>" target="_blank" rel="noopener noreferrer">
-						<?php echo liferuss_icon( 'telegram' ); ?>
-						<span><?php echo esc_html( liferuss_t( 'channel_telegram' ) ); ?></span>
-					</a>
-				<?php endif; ?>
-				<?php if ( $instagram ) : ?>
-					<a class="channel" href="<?php echo esc_url( $instagram ); ?>" target="_blank" rel="noopener noreferrer">
-						<?php echo liferuss_icon( 'instagram' ); ?>
-						<span><?php echo esc_html( liferuss_t( 'channel_instagram' ) ); ?></span>
-					</a>
-				<?php endif; ?>
-				<?php if ( $phone ) : ?>
-					<a class="channel" href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>">
-						<?php echo liferuss_icon( 'phone' ); ?>
-						<span><?php echo esc_html( liferuss_t( 'channel_phone' ) ); ?></span>
-					</a>
-				<?php endif; ?>
-			</div>
+			<?php liferuss_the_contact_channels(); ?>
 		</div>
 
 		<div class="consult-card">
@@ -70,7 +40,7 @@ $message   = isset( $_GET['consult_msg'] ) ? sanitize_text_field( rawurldecode( 
 				</label>
 				<label>
 					<span><?php echo esc_html( liferuss_opt( 'form_phone_label' ) ); ?></span>
-					<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" maxlength="16" pattern="^(\+?98|0)?9\d{9}$|^\+?\d{8,15}$" placeholder="<?php echo esc_attr( liferuss_opt( 'form_phone_ph' ) ); ?>">
+					<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" dir="ltr" maxlength="16" pattern="^(\+?98|0)?9\d{9}$|^\+?\d{8,15}$" placeholder="<?php echo esc_attr( liferuss_opt( 'form_phone_ph' ) ); ?>">
 				</label>
 				<label>
 					<span><?php echo esc_html( liferuss_t( 'contact_message_label' ) ); ?></span>

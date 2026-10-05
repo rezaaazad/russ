@@ -592,3 +592,30 @@ function latinDigits(value) {
     sync();
   });
 })();
+
+(function () {
+  var supported = window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules");
+  if (supported) {
+    return;
+  }
+  var nav = document.querySelector(".lr-bottom-nav");
+  if (!nav) {
+    return;
+  }
+  var seen = {};
+  nav.addEventListener("touchstart", function (event) {
+    var link = event.target.closest ? event.target.closest("a[href]") : null;
+    if (!link) {
+      return;
+    }
+    var href = link.getAttribute("href") || "";
+    if (!href || href.charAt(0) === "#" || seen[href]) {
+      return;
+    }
+    seen[href] = true;
+    var el = document.createElement("link");
+    el.rel = "prefetch";
+    el.href = link.href;
+    document.head.appendChild(el);
+  }, { passive: true });
+})();
