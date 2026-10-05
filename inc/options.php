@@ -105,6 +105,12 @@ function liferuss_opt( $key, $default = '' ) {
 	if ( function_exists( 'liferuss_blank_default_contact' ) ) {
 		$fa = liferuss_blank_default_contact( $fa, $key );
 	}
+	if ( function_exists( 'liferuss_contact_from_core' ) && '' === trim( (string) $fa ) ) {
+		$core = liferuss_contact_from_core( $key );
+		if ( '' !== $core ) {
+			$fa = $core;
+		}
+	}
 
 	$lang = function_exists( 'liferuss_current_lang' ) ? liferuss_current_lang() : 'fa';
 	if ( 'fa' === $lang || ! function_exists( 'liferuss_lang_overlay' ) ) {

@@ -266,11 +266,32 @@ function liferuss_catalog_lang( $lang ) {
  * @param string $title Heading.
  */
 function liferuss_empty_catalog( $title ) {
+	$filtered = false;
+	foreach ( array( 'city', 'field', 'degree', 'lang', 'language', 'coverage', 'university', 'tuition_min', 'tuition_max', 'rank', 'ministry' ) as $key ) {
+		if ( isset( $_GET[ $key ] ) && '' !== (string) wp_unslash( $_GET[ $key ] ) && '0' !== (string) wp_unslash( $_GET[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$filtered = true;
+			break;
+		}
+	}
 	echo '<div class="lr-empty-state">';
-	echo '<h2>' . esc_html( $title ) . '</h2>';
-	echo '<p>' . esc_html( liferuss_t( 'catalog_empty_lead' ) ) . '</p>';
+	echo '<p class="eyebrow">' . esc_html( $title ) . '</p>';
+	if ( $filtered ) {
+		echo '<h2>' . esc_html( liferuss_t( 'catalog_empty_filter_title' ) ) . '</h2>';
+		echo '<p>' . esc_html( liferuss_t( 'catalog_empty_filter_lead' ) ) . '</p>';
+	} else {
+		echo '<h2>' . esc_html( liferuss_t( 'catalog_empty_title' ) ) . '</h2>';
+		echo '<p>' . esc_html( liferuss_t( 'catalog_empty_lead' ) ) . '</p>';
+	}
+	echo '<p class="lr-empty-actions">';
 	echo '<a class="btn btn-gold" href="' . esc_url( liferuss_url( '/contact/' ) . '#consultation' ) . '">' . esc_html( liferuss_t( 'catalog_empty_cta' ) ) . '</a>';
-	echo '</div>';
+	if ( $filtered ) {
+		$reset = is_post_type_archive() ? get_post_type_archive_link( get_query_var( 'post_type' ) ) : '';
+		if ( ! $reset ) {
+			$reset = remove_query_arg( array( 'city', 'field', 'degree', 'lang', 'language', 'coverage', 'university', 'tuition_min', 'tuition_max', 'rank', 'ministry' ) );
+		}
+		echo ' <a class="btn btn-ghost" href="' . esc_url( $reset ) . '">' . esc_html( liferuss_t( 'catalog_empty_reset' ) ) . '</a>';
+	}
+	echo '</p></div>';
 }
 
 /**
@@ -303,7 +324,7 @@ function liferuss_catalog_cards( $items ) {
 		$name = $item['name'] ?? ( $item['name_fa'] ?? '' );
 		echo '<article class="lr-card">';
 		if ( ! empty( $item['thumbnail'] ) ) {
-			echo '<a href="' . esc_url( $url ) . '"><img src="' . esc_url( $item['thumbnail'] ) . '" alt=""></a>';
+			echo '<a href="' . esc_url( $url ) . '"><img src="' . esc_url( $item['thumbnail'] ) . '" alt="' . esc_attr( (string) $name ) . '"></a>';
 		}
 		echo '<div class="lr-card-body">';
 		echo '<h2><a href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a></h2>';

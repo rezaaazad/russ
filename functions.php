@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.14.1' );
+define( 'LIFERUSS_VERSION', '1.14.2' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -204,7 +204,7 @@ function liferuss_critical_css() {
 	echo 'img{max-width:100%}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}h1,h2,h3{font-weight:700;line-height:1.35;color:var(--navy);margin:0 0 .6em}p{margin:0 0 1em}';
 	echo 'html:not(.lr-css) .site-footer,html:not(.lr-css) .lr-bottom-nav,html:not(.lr-css) .lr-float,html:not(.lr-css) .site-main>*:not(.hero):not(.page-hero){display:none}';
 	echo '.container{width:min(var(--max),calc(100% - 32px));max-width:100%;min-width:0;margin-inline:auto}';
-	echo '.skip-link{position:absolute;right:12px;top:-60px}.screen-reader-text{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}';
+	echo '.skip-link{position:absolute;right:12px;top:-60px}.screen-reader-text,.hp{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap;border:0}';
 	echo '.site-header{position:sticky;top:0;z-index:50;background:var(--navy);border-bottom:1px solid rgba(255,255,255,.08)}';
 	echo '.header-inner{min-height:var(--header);display:flex;flex-wrap:nowrap;align-items:center;gap:12px}';
 	echo '.brand{display:flex;align-items:center;gap:10px;min-width:max-content;flex:0 0 auto;color:#fff}.brand-mark,.brand-cap,.brand img{width:42px;height:42px;display:block;object-fit:contain;flex-shrink:0}.brand-text{display:flex;flex-direction:column;line-height:1.15}.brand-text strong{color:#fff;font-size:1.1rem;white-space:nowrap}.brand-text small{color:rgba(255,255,255,.65);font-size:.7rem}';

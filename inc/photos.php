@@ -71,7 +71,7 @@ function liferuss_photo_catalog() {
 			'h'      => 900,
 			'widths' => array( 640, 1024, 1600 ),
 			'pos'    => 'lr-pos-basil',
-			'alt'    => '',
+			'alt'    => 'کلیسای سنت باسیل و کرملین',
 		),
 	);
 }
@@ -238,6 +238,24 @@ function liferuss_photo_markup( $slug, $args = array() ) {
 }
 
 /**
+ * Persian description of a catalog photograph.
+ *
+ * @param string $slug Catalog slug.
+ * @return string
+ */
+function liferuss_photo_alt( $slug ) {
+	$catalog = liferuss_photo_catalog();
+	$slug    = (string) $slug;
+	if ( isset( $catalog[ $slug ]['alt'] ) && '' !== (string) $catalog[ $slug ]['alt'] ) {
+		return (string) $catalog[ $slug ]['alt'];
+	}
+	if ( 0 === strpos( $slug, 'saint-basil' ) ) {
+		return (string) $catalog['saint-basil']['alt'];
+	}
+	return '';
+}
+
+/**
  * Full-bleed hero media and the navy scrim.
  *
  * @param string $slug     Catalog slug.
@@ -249,7 +267,7 @@ function liferuss_photo_hero_html( $slug, $priority = true, $return = false ) {
 	$image = liferuss_photo_markup(
 		$slug,
 		array(
-			'alt'      => '',
+			'alt'      => liferuss_photo_alt( $slug ),
 			'class'    => 'hero-lcp',
 			'sizes'    => '100vw',
 			'priority' => $priority,
@@ -260,7 +278,7 @@ function liferuss_photo_hero_html( $slug, $priority = true, $return = false ) {
 	if ( '' === $image ) {
 		return '';
 	}
-	$html = '<div class="hero-media" aria-hidden="true">' . $image . '</div><div class="hero-overlay" aria-hidden="true"></div>';
+	$html = '<div class="hero-media">' . $image . '</div><div class="hero-overlay" aria-hidden="true"></div>';
 	if ( $return ) {
 		return $html;
 	}
@@ -324,7 +342,7 @@ function liferuss_photo_scene() {
  */
 function liferuss_resolve_photo_scene() {
 	$study = array( 'study-russia', 'admission', 'universities', 'padfak', 'direct-course', 'fields', 'cities', 'costs', 'scholarships', 'compare' );
-	$night = array( 'migration-russia', 'exchange', 'cargo', 'trade', 'freight' );
+	$night = array( 'migration-russia', 'immigration', 'exchange', 'cargo', 'trade', 'freight' );
 	$own   = array(
 		'about'     => 'russian-couple',
 		'services'  => 'saint-petersburg',

@@ -56,6 +56,7 @@ use LifeRuss\Core\PostTypes\TaxonomyRegistrar;
 use LifeRuss\Core\Roles\LimitedAdmin;
 use LifeRuss\Core\Roles\RoleRegistrar;
 use LifeRuss\Core\Security\Hardening;
+use LifeRuss\Core\Security\PublicLogin;
 use LifeRuss\Core\Security\TwoFactor;
 use LifeRuss\Core\Seo\CatalogSitemap;
 use LifeRuss\Core\Seo\Keywords;
@@ -112,6 +113,7 @@ class Plugin {
 		Runner::hooks();
 		NotFound::hooks();
 		TwoFactor::hooks();
+		PublicLogin::hooks();
 		Hardening::hooks();
 		RankMath::hooks();
 		Polylang::hooks();

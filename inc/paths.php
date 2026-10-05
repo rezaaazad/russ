@@ -34,7 +34,7 @@ function liferuss_path_links() {
 		),
 		array(
 			'title' => liferuss_t( 'nav_immigration' ),
-			'url'   => '/migration-russia/',
+			'url'   => '/immigration/',
 		),
 		array(
 			'title' => liferuss_t( 'nav_admission' ),
@@ -209,7 +209,17 @@ function liferuss_path_live( $post_id ) {
 			array_filter(
 				$children,
 				static function ( $child ) {
-					return $child instanceof WP_Post && ! liferuss_is_placeholder_copy( $child->post_title );
+					if ( ! $child instanceof WP_Post || liferuss_is_placeholder_copy( $child->post_title ) ) {
+						return false;
+					}
+					$name = (string) $child->post_name;
+					if ( strlen( $name ) < 3 || '-2' !== substr( $name, -2 ) ) {
+						return true;
+					}
+					$base   = substr( $name, 0, -2 );
+					$parent = $child->post_parent ? (string) get_page_uri( (int) $child->post_parent ) : '';
+					$sib    = get_page_by_path( trim( $parent . '/' . $base, '/' ) );
+					return ! ( $sib instanceof WP_Post && (int) $sib->ID !== (int) $child->ID && 'publish' === $sib->post_status );
 				}
 			)
 		);

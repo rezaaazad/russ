@@ -10,21 +10,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $brand     = liferuss_brand();
-$phone     = liferuss_opt( 'phone' );
-$phone_alt = liferuss_opt( 'phone_alt' );
-$email     = liferuss_opt( 'email' );
-$address   = liferuss_opt( 'address' );
-$whatsapp  = liferuss_opt( 'whatsapp' );
-$telegram  = liferuss_social_url( liferuss_opt( 'telegram' ), 'telegram' );
-$instagram = liferuss_social_url( liferuss_opt( 'instagram' ), 'instagram' );
-$linkedin  = esc_url( liferuss_opt( 'linkedin' ) );
-$youtube   = esc_url( liferuss_opt( 'youtube' ) );
-$copy      = str_replace( '{year}', liferuss_local_digits( gmdate( 'Y' ) ), liferuss_opt( 'footer_copyright' ) );
+$phone     = liferuss_public_contact( 'phone' );
+$phone_alt = liferuss_public_contact( 'phone_alt' );
+$email     = liferuss_public_contact( 'email' );
+$address   = liferuss_public_contact( 'address' );
+$whatsapp  = liferuss_public_contact( 'whatsapp' );
+$telegram  = liferuss_social_url( liferuss_public_contact( 'telegram' ), 'telegram' );
+$instagram = liferuss_social_url( liferuss_public_contact( 'instagram' ), 'instagram' );
+$linkedin  = liferuss_public_contact( 'linkedin' );
+$youtube   = liferuss_public_contact( 'youtube' );
+$has_contact = $phone || $phone_alt || $email || $address || $whatsapp || $telegram || $instagram || $linkedin || $youtube;
+$footer_cols = 2 + ( liferuss_services() ? 1 : 0 ) + ( $has_contact ? 1 : 0 );
+$copy        = str_replace( '{year}', liferuss_local_digits( gmdate( 'Y' ) ), liferuss_opt( 'footer_copyright' ) );
 $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 ?>
 </main>
 <footer class="site-footer">
-	<div class="container footer-grid">
+	<div class="container footer-grid footer-grid--<?php echo (int) $footer_cols; ?>">
 		<div class="footer-brand">
 			<div class="brand footer-logo">
 				<?php if ( $logo_id ) : ?>
@@ -70,6 +72,13 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 				foreach ( $footer_rows as $item ) :
 					$link = $item['url'];
 					$path = untrailingslashit( (string) ( preg_match( '#^https?://#i', $link ) ? (string) wp_parse_url( $link, PHP_URL_PATH ) : $link ) );
+					if ( '/services' === $path && 'خدمات' === $item['label'] ) {
+						continue;
+					}
+					if ( '/migration-russia' === $path ) {
+						$link = '/immigration/';
+						$path = '/immigration';
+					}
 					$key  = $path . '|' . $item['label'];
 					if ( isset( $footer_seen[ $path ] ) || isset( $footer_seen[ 'label:' . $item['label'] ] ) ) {
 						continue;
@@ -83,15 +92,18 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 			</ul>
 		</details>
 
+		<?php if ( liferuss_services() ) : ?>
 		<details class="footer-col footer-acc" open>
 			<summary><h2><?php echo esc_html( liferuss_t( 'footer_services' ) ); ?></h2></summary>
 			<ul class="footer-links">
 				<?php foreach ( liferuss_services() as $service ) : ?>
-					<li><a href="<?php echo esc_url( liferuss_url( '/services/' ) ); ?>"><?php echo esc_html( $service['title'] ); ?></a></li>
+					<li><a href="<?php echo esc_url( liferuss_service_href( (string) ( $service['icon'] ?? '' ) ) ); ?>"><?php echo esc_html( $service['title'] ); ?></a></li>
 				<?php endforeach; ?>
 			</ul>
 		</details>
+		<?php endif; ?>
 
+		<?php if ( $has_contact ) : ?>
 		<details class="footer-col footer-acc" open>
 			<summary><h2><?php echo esc_html( liferuss_t( 'footer_contact' ) ); ?></h2></summary>
 			<ul class="footer-contact">
@@ -126,6 +138,7 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 				<?php endif; ?>
 			</div>
 		</details>
+		<?php endif; ?>
 	</div>
 	<div class="footer-bottom">
 		<div class="container footer-bottom-inner">

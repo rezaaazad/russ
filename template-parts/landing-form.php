@@ -49,7 +49,7 @@ $choices     = (array) liferuss_opt( $choices_key, array() );
 					</label>
 					<label>
 						<span><?php echo esc_html( liferuss_opt( $prefix . '_form_phone_label' ) ); ?></span>
-						<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" maxlength="16" pattern="^(\+?98|0)?9\d{9}$|^\+?\d{8,15}$" placeholder="<?php echo esc_attr( liferuss_opt( $prefix . '_form_phone_ph' ) ); ?>">
+						<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" dir="ltr" maxlength="16" pattern="^(\+?98|0)?9\d{9}$|^\+?\d{8,15}$" placeholder="<?php echo esc_attr( liferuss_opt( $prefix . '_form_phone_ph' ) ); ?>">
 					</label>
 
 					<?php if ( 'freight' === $prefix ) : ?>

@@ -15,7 +15,7 @@ $tiles = array(
 	array( 'title' => liferuss_t( 'nav_podfak' ), 'url' => '/padfak/', 'icon' => 'book' ),
 	array( 'title' => liferuss_t( 'nav_direct' ), 'url' => '/direct-course/', 'icon' => 'docs' ),
 	array( 'title' => liferuss_t( 'nav_scholarships' ), 'url' => '/scholarships/', 'icon' => 'star' ),
-	array( 'title' => liferuss_t( 'nav_immigration' ), 'url' => '/migration-russia/', 'icon' => 'passport' ),
+	array( 'title' => liferuss_t( 'nav_immigration' ), 'url' => '/immigration/', 'icon' => 'passport' ),
 	array( 'title' => liferuss_t( 'nav_language_course' ), 'url' => '/russian-language/', 'icon' => 'language' ),
 	array( 'title' => liferuss_t( 'nav_costs' ), 'url' => '/costs/', 'icon' => 'wallet' ),
 );

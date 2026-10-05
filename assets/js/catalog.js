@@ -35,7 +35,7 @@
     }
     var href = esc(item.url);
     var image = item.thumbnail
-      ? '<a href="' + href + '"><img src="' + esc(item.thumbnail) + '" alt=""></a>'
+      ? '<a href="' + href + '"><img src="' + esc(item.thumbnail) + '" alt="' + esc(item.name || item.name_fa || "") + '"></a>'
       : "";
     return (
       '<article class="lr-card">' +

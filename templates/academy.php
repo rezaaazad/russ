@@ -83,7 +83,7 @@ $card = static function ( $course ) use ( $lesson_meta, $by_teacher ) {
 	echo '<a class="academy-course-card" href="' . esc_url( liferuss_url( '/academy/courses/' . $course['slug'] . '/' ) ) . '">';
 	echo '<span class="academy-thumb' . ( '' === $thumb ? ' academy-thumb-fallback' : '' ) . '">';
 	if ( '' !== $thumb ) {
-		echo '<img src="' . esc_url( $thumb ) . '" alt="" width="640" height="360" loading="lazy" decoding="async">';
+		echo '<img src="' . esc_url( $thumb ) . '" alt="' . esc_attr( (string) $course['title'] ) . '" width="640" height="360" loading="lazy" decoding="async">';
 	} else {
 		liferuss_the_course_fallback( (string) $course['title'] );
 	}
@@ -424,7 +424,7 @@ $lines = class_exists( '\LifeRuss\Core\Academy\Catalog' ) ? \LifeRuss\Core\Acade
 					<?php endif; ?>
 					<section class="academy-instructor">
 						<?php if ( $teacher && ! empty( $teacher['photo'] ) ) : ?>
-							<img src="<?php echo esc_url( (string) $teacher['photo'] ); ?>" alt="">
+							<img src="<?php echo esc_url( (string) $teacher['photo'] ); ?>" alt="<?php echo esc_attr( (string) ( $teacher['name'] ?? 'مدرس' ) ); ?>">
 						<?php else : ?>
 							<?php $icon( 'users' ); ?>
 						<?php endif; ?>

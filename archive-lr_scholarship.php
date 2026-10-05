@@ -21,7 +21,16 @@ get_header();
 </header>
 <section class="section">
 	<div class="container">
-		<?php if ( have_posts() || ! empty( $_GET ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+		<?php
+		$scholarship_filtered = false;
+		foreach ( array( 'degree', 'coverage', 'language', 'university' ) as $scholarship_key ) {
+			if ( isset( $_GET[ $scholarship_key ] ) && '' !== (string) wp_unslash( $_GET[ $scholarship_key ] ) && '0' !== (string) wp_unslash( $_GET[ $scholarship_key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$scholarship_filtered = true;
+				break;
+			}
+		}
+		?>
+		<?php if ( have_posts() || $scholarship_filtered ) : ?>
 		<form class="lr-filters lr-compare-filters" method="get" action="<?php echo esc_url( get_post_type_archive_link( 'lr_scholarship' ) ); ?>">
 			<label>
 				<span>مقطع</span>

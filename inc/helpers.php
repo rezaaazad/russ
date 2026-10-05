@@ -116,7 +116,7 @@ function liferuss_print_image_preload( $id, $fallback = '', $sizes = '100vw' ) {
  * @param string $fallback Bundled fallback path.
  */
 function liferuss_the_hero_lcp( $id, $fallback = 'saint-basil.jpg' ) {
-	echo '<div class="hero-media" aria-hidden="true">';
+	echo '<div class="hero-media">';
 	$id = absint( $id );
 	if ( $id && function_exists( 'wp_attachment_is_image' ) && wp_attachment_is_image( $id ) ) {
 		echo wp_get_attachment_image(
@@ -125,7 +125,7 @@ function liferuss_the_hero_lcp( $id, $fallback = 'saint-basil.jpg' ) {
 			false,
 			array(
 				'class'         => 'hero-lcp',
-				'alt'           => '',
+				'alt'           => (string) ( get_post_meta( $id, '_wp_attachment_image_alt', true ) ?: liferuss_photo_alt( 'saint-basil' ) ),
 				'decoding'      => 'sync',
 				'fetchpriority' => 'high',
 				'loading'       => 'eager',
@@ -135,7 +135,7 @@ function liferuss_the_hero_lcp( $id, $fallback = 'saint-basil.jpg' ) {
 		liferuss_the_image(
 			array(
 				'fallback' => $fallback,
-				'alt'      => '',
+				'alt'      => liferuss_photo_alt( liferuss_photo_slug_from_file( $fallback ) ),
 				'width'    => 800,
 				'height'   => 1201,
 				'class'    => 'hero-lcp',
@@ -254,7 +254,7 @@ function liferuss_nav_tree() {
 		),
 		array(
 			'title'    => liferuss_t( 'nav_migration' ),
-			'url'      => liferuss_url( '/migration-russia/' ),
+			'url'      => liferuss_url( '/immigration/' ),
 			'class'    => '',
 			'children' => array(
 				array( 'title' => liferuss_t( 'nav_guide' ), 'url' => liferuss_url( '/russia-guide/' ) ),
