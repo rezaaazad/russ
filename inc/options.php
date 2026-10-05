@@ -340,6 +340,30 @@ function liferuss_testimonials() {
 }
 
 /**
+ * Header mark at display size. Falls back to the full attachment when a crop is unavailable.
+ *
+ * @param int    $attachment_id Attachment.
+ * @param string $alt           Accessible name.
+ */
+function liferuss_header_logo( $attachment_id, $alt ) {
+	$attachment_id = absint( $attachment_id );
+	$url           = function_exists( 'liferuss_resized_attachment_url' ) ? liferuss_resized_attachment_url( $attachment_id, 96, false ) : '';
+	if ( ! $url ) {
+		echo wp_get_attachment_image(
+			$attachment_id,
+			'thumbnail',
+			false,
+			array(
+				'class' => 'custom-logo',
+				'alt'   => $alt,
+			)
+		);
+		return;
+	}
+	echo '<img class="custom-logo" src="' . esc_url( $url ) . '" alt="' . esc_attr( $alt ) . '" width="84" height="84" decoding="async">';
+}
+
+/**
  * Output CSS custom properties from brand colors.
  */
 function liferuss_color_css() {
@@ -356,22 +380,81 @@ function liferuss_color_css() {
 add_action( 'wp_head', 'liferuss_color_css', 2 );
 
 /**
- * Site icon from Theme Options favicon.
+ * Site icon from Theme Options favicon, else the WordPress site icon.
  *
- * @param int $id Current.
- * @return int
+ * @param string $url  Current URL.
+ * @param int    $size Requested edge in pixels.
+ * @return string
  */
-function liferuss_site_icon( $id ) {
+function liferuss_filter_site_icon_url( $url, $size = 32 ) {
 	$fav = absint( liferuss_opt( 'favicon_id', 0 ) );
-	return $fav ? $fav : $id;
+	if ( ! $fav ) {
+		$fav = absint( get_option( 'site_icon' ) );
+	}
+	if ( ! $fav ) {
+		return $url;
+	}
+	$sized = liferuss_resized_attachment_url( $fav, (int) $size, true );
+	return $sized ? $sized : $url;
 }
-add_filter( 'get_site_icon_url', function ( $url ) {
-	$fav = absint( liferuss_opt( 'favicon_id', 0 ) );
-	if ( $fav ) {
-		$custom = wp_get_attachment_image_url( $fav, 'full' );
-		if ( $custom ) {
-			return $custom;
+add_filter( 'get_site_icon_url', 'liferuss_filter_site_icon_url', 10, 2 );
+
+/**
+ * A small file for an attachment. Generated once and stored beside the original.
+ *
+ * Square crop is for site icons. The header logo keeps its aspect ratio.
+ *
+ * @param int  $attachment_id Attachment.
+ * @param int  $size          Longest edge.
+ * @param bool $crop          Crop to a square.
+ * @return string
+ */
+function liferuss_resized_attachment_url( $attachment_id, $size, $crop = false ) {
+	$attachment_id = absint( $attachment_id );
+	$size          = (int) $size;
+	if ( $attachment_id < 1 || $size < 1 ) {
+		return '';
+	}
+	$size  = min( 512, max( 16, $size ) );
+	$crop  = (bool) $crop;
+	$key   = '_lr_img_' . $size . ( $crop ? 'c' : 'f' );
+	$uploads = wp_get_upload_dir();
+	if ( ! empty( $uploads['error'] ) || empty( $uploads['basedir'] ) ) {
+		return '';
+	}
+	$stored = get_post_meta( $attachment_id, $key, true );
+	if ( is_string( $stored ) && '' !== $stored ) {
+		$abs = trailingslashit( $uploads['basedir'] ) . ltrim( $stored, '/' );
+		if ( is_readable( $abs ) && filesize( $abs ) > 0 && filesize( $abs ) <= 200 * 1024 ) {
+			return trailingslashit( $uploads['baseurl'] ) . ltrim( $stored, '/' );
 		}
 	}
-	return $url;
-} );
+	$file = get_attached_file( $attachment_id );
+	if ( ! is_string( $file ) || ! is_readable( $file ) ) {
+		return '';
+	}
+	if ( filesize( $file ) > 0 && filesize( $file ) <= 24 * 1024 ) {
+		$original = wp_get_attachment_url( $attachment_id );
+		return $original ? $original : '';
+	}
+	$editor = wp_get_image_editor( $file );
+	if ( is_wp_error( $editor ) ) {
+		return '';
+	}
+	$resized = $editor->resize( $size, $size, $crop );
+	if ( is_wp_error( $resized ) ) {
+		return '';
+	}
+	$saved = $editor->save( trailingslashit( dirname( $file ) ) . 'lr-' . $attachment_id . '-' . $size . ( $crop ? 'c' : 'f' ) . '.png', 'image/png' );
+	if ( is_wp_error( $saved ) || empty( $saved['path'] ) || ! is_readable( $saved['path'] ) ) {
+		return '';
+	}
+	$basedir = trailingslashit( wp_normalize_path( $uploads['basedir'] ) );
+	$path    = wp_normalize_path( $saved['path'] );
+	if ( 0 !== strpos( $path, $basedir ) ) {
+		return '';
+	}
+	$rel = ltrim( substr( $path, strlen( $basedir ) ), '/' );
+	update_post_meta( $attachment_id, $key, $rel );
+	return trailingslashit( $uploads['baseurl'] ) . $rel;
+}

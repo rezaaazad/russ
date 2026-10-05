@@ -31,6 +31,7 @@ class Hardening {
 		add_filter( 'the_generator', '__return_empty_string' );
 		add_filter( 'wp_headers', array( self::class, 'headers' ) );
 		add_action( 'send_headers', array( self::class, 'send' ) );
+		add_action( 'template_redirect', array( self::class, 'send' ), 99 );
 		add_filter( 'rest_pre_dispatch', array( self::class, 'hide_users' ), 10, 3 );
 		add_action( 'init', array( self::class, 'block_xmlrpc' ), 0 );
 	}
@@ -95,27 +96,44 @@ class Hardening {
 				header( $name . ': ' . $value );
 			}
 		}
-		if ( is_user_logged_in() || is_admin() || is_preview() || is_404() || is_search() ) {
-			return;
-		}
-		if ( function_exists( 'liferuss_catalog_is_filtered' ) && liferuss_catalog_is_filtered() ) {
+		if ( is_user_logged_in() || is_admin() || is_preview() ) {
 			return;
 		}
 		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) : 'GET';
-		if ( 'GET' !== $method ) {
+		$public = 'GET' === $method && ! is_404() && ! is_search();
+		if ( $public && function_exists( 'liferuss_catalog_is_filtered' ) && liferuss_catalog_is_filtered() ) {
+			$public = false;
+		}
+		if ( ! $public ) {
+			self::private_cache();
 			return;
 		}
 		$cache = apply_filters(
 			'liferuss_cache_headers',
 			array(
-				'Cache-Control' => 'public, max-age=120',
+				'Cache-Control' => 'public, max-age=120, s-maxage=600',
 			)
 		);
-		if ( is_array( $cache ) ) {
-			foreach ( $cache as $name => $value ) {
-				header( $name . ': ' . $value );
-			}
+		if ( ! is_array( $cache ) || ! $cache ) {
+			self::private_cache();
+			return;
 		}
+		if ( headers_sent() ) {
+			return;
+		}
+		foreach ( $cache as $name => $value ) {
+			header( $name . ': ' . $value );
+		}
+	}
+
+	/**
+	 * Anonymous pages that must not be stored by a shared cache.
+	 */
+	private static function private_cache(): void {
+		if ( headers_sent() ) {
+			return;
+		}
+		header( 'Cache-Control: private, no-store, max-age=0' );
 	}
 
 	/**

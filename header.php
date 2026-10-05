@@ -32,9 +32,9 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 		<a class="brand" href="<?php echo esc_url( liferuss_home() ); ?>">
 			<?php
 			if ( $logo_id ) {
-				echo wp_get_attachment_image( $logo_id, 'full', false, array( 'class' => 'custom-logo', 'alt' => $brand ) );
+				liferuss_header_logo( $logo_id, $brand );
 			} elseif ( has_custom_logo() ) {
-				echo wp_get_attachment_image( (int) get_theme_mod( 'custom_logo' ), 'full', false, array( 'class' => 'custom-logo', 'alt' => $brand ) );
+				liferuss_header_logo( (int) get_theme_mod( 'custom_logo' ), $brand );
 			} else {
 				?>
 				<span class="brand-mark" aria-hidden="true">

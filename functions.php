@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.14.2' );
+define( 'LIFERUSS_VERSION', '1.14.3' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -163,34 +163,86 @@ function liferuss_assets() {
 add_action( 'wp_enqueue_scripts', 'liferuss_assets' );
 
 /**
- * Header and hero paint before theme.css. The rest of the sheet loads without blocking.
- *
- * @param string $html   Tag.
- * @param string $handle Handle.
- * @return string
+ * Discover theme.css immediately. The enqueued tag stays render-blocking.
  */
-function liferuss_async_style( $html, $handle ) {
-	if ( 'liferuss-theme' !== $handle ) {
-		return $html;
-	}
-	return '';
-}
-
-/**
- * Load theme.css after the hero has painted so it is not on the LCP path.
- */
-function liferuss_footer_css() {
+function liferuss_preload_theme_css() {
 	if ( is_admin() ) {
 		return;
 	}
 	$href = LIFERUSS_URI . '/assets/css/theme.css?ver=' . rawurlencode( LIFERUSS_VERSION );
-	echo '<noscript><link rel="stylesheet" href="' . esc_url( $href ) . '"></noscript>';
-	echo '<script id="lr-css-loader">';
-	echo '(function(){var href=' . wp_json_encode( $href ) . ';function go(){var l=document.createElement("link");l.rel="preload";l.as="style";l.href=href;l.onload=function(){this.onload=null;this.rel="stylesheet";document.documentElement.classList.add("lr-css");};document.head.appendChild(l);}function later(){setTimeout(go,200);}var img=document.querySelector("img.hero-lcp");if(img&&!img.complete){img.addEventListener("load",later,{once:true});setTimeout(later,2500);}else{later();}})();';
-	echo '</script>' . "\n";
+	echo '<link rel="preload" href="' . esc_url( $href ) . '" as="style">' . "\n";
 }
-add_action( 'wp_footer', 'liferuss_footer_css', 1 );
-add_filter( 'style_loader_tag', 'liferuss_async_style', 10, 2 );
+add_action( 'wp_head', 'liferuss_preload_theme_css', 1 );
+
+/**
+ * Front-end emoji script, style, and s.w.org prefetch.
+ */
+function liferuss_disable_emojis() {
+	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+	remove_action( 'wp_print_styles', 'print_emoji_styles' );
+	remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
+	remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
+	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+	add_filter( 'emoji_svg_url', '__return_false' );
+	add_filter( 'tiny_mce_plugins', 'liferuss_disable_emoji_plugin' );
+	add_filter( 'wp_resource_hints', 'liferuss_disable_emoji_hint', 10, 2 );
+}
+add_action( 'init', 'liferuss_disable_emojis' );
+
+/**
+ * Drop the emoji plugin from TinyMCE.
+ *
+ * @param mixed $plugins Plugin list.
+ * @return array
+ */
+function liferuss_disable_emoji_plugin( $plugins ) {
+	if ( ! is_array( $plugins ) ) {
+		return array();
+	}
+	return array_values( array_diff( $plugins, array( 'wpemoji' ) ) );
+}
+
+/**
+ * Drop the emoji CDN hint.
+ *
+ * @param array  $urls     URLs.
+ * @param string $relation Relation.
+ * @return array
+ */
+function liferuss_disable_emoji_hint( $urls, $relation ) {
+	if ( 'dns-prefetch' !== $relation ) {
+		return $urls;
+	}
+	$kept = array();
+	foreach ( (array) $urls as $url ) {
+		if ( false === strpos( (string) $url, 's.w.org' ) ) {
+			$kept[] = $url;
+		}
+	}
+	return $kept;
+}
+
+/**
+ * Prefetch bottom-nav targets after the first paint so the next tap is warm.
+ */
+function liferuss_speculation_rules() {
+	if ( is_admin() ) {
+		return;
+	}
+	$rules = array(
+		'prefetch' => array(
+			array(
+				'source'    => 'document',
+				'where'     => array(
+					'selector_matches' => '.lr-bottom-nav a',
+				),
+				'eagerness' => 'eager',
+			),
+		),
+	);
+	echo '<script type="speculationrules">' . wp_json_encode( $rules ) . '</script>' . "\n";
+}
+add_action( 'wp_footer', 'liferuss_speculation_rules', 20 );
 
 /**
  * Critical above-the-fold CSS for the current template.
@@ -202,7 +254,6 @@ function liferuss_critical_css() {
 	echo ':root{--navy:#0b2341;--navy-mid:#14325a;--navy-deep:#071627;--navy-soft:#e8eef6;--gold:#e8b923;--gold-soft:#fff4c8;--white:#fff;--bg:#f5f7fb;--text:#1b2a3a;--muted:#5b6b7c;--line:#e4eaf2;--shadow:0 12px 36px rgba(11,35,65,.08);--radius:18px;--radius-sm:12px;--header:64px;--max:1180px}';
 	echo '*,*::before,*::after{box-sizing:border-box}html{max-width:100%;overflow-x:clip}body.liferuss-theme{margin:0;font-family:Tahoma,sans-serif;color:var(--text);background:#fff;line-height:1.8;direction:rtl;text-align:right;max-width:100%;overflow-x:clip}';
 	echo 'img{max-width:100%}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}h1,h2,h3{font-weight:700;line-height:1.35;color:var(--navy);margin:0 0 .6em}p{margin:0 0 1em}';
-	echo 'html:not(.lr-css) .site-footer,html:not(.lr-css) .lr-bottom-nav,html:not(.lr-css) .lr-float,html:not(.lr-css) .site-main>*:not(.hero):not(.page-hero){display:none}';
 	echo '.container{width:min(var(--max),calc(100% - 32px));max-width:100%;min-width:0;margin-inline:auto}';
 	echo '.skip-link{position:absolute;right:12px;top:-60px}.screen-reader-text,.hp{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap;border:0}';
 	echo '.site-header{position:sticky;top:0;z-index:50;background:var(--navy);border-bottom:1px solid rgba(255,255,255,.08)}';
