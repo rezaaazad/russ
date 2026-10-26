@@ -244,13 +244,100 @@ p {
 
 .brand-mark,
 .brand-cap,
-.brand .custom-logo,
-.brand img {
+.brand .custom-logo {
   width: 42px;
   height: 42px;
   display: block;
   object-fit: contain;
   flex-shrink: 0;
+}
+
+.brand-plate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  line-height: 0;
+  padding: 3px 8px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.brand-plate--emblem {
+  width: 44px;
+  height: 44px;
+  padding: 3px;
+  border-radius: 12px;
+}
+
+.brand-logo {
+  width: 92px;
+  height: 40px;
+  max-width: 92px;
+  display: block;
+  object-fit: contain;
+}
+
+.brand-emblem {
+  width: 32px;
+  height: 37px;
+  display: block;
+  object-fit: contain;
+}
+
+/* White-background logo loop. Header and footer stay on the static mark. */
+.lr-logo-motion {
+  background: #fff;
+  padding: 18px 16px 8px;
+}
+
+.lr-logo-motion__frame {
+  width: min(320px, 100%);
+  aspect-ratio: 320 / 148;
+  margin-inline: auto;
+  display: grid;
+  place-items: center;
+  background: #fff;
+}
+
+.lr-logo-motion__video,
+.lr-logo-motion__still {
+  grid-area: 1 / 1;
+}
+
+.lr-logo-motion__video {
+  width: 320px;
+  height: 148px;
+  max-width: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+.lr-logo-motion__still {
+  display: none;
+  width: 184px;
+  height: 80px;
+  max-width: 72%;
+  object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lr-logo-motion__video {
+    display: none;
+  }
+
+  .lr-logo-motion__still {
+    display: block;
+  }
+}
+
+html.lr-logo-still .lr-logo-motion__video {
+  display: none;
+}
+
+html.lr-logo-still .lr-logo-motion__still {
+  display: block;
 }
 
 .brand-text {
@@ -2314,6 +2401,10 @@ html[dir="ltr"] .page-hero-photo.scene-couple .hero-overlay {
   .brand-text small {
     font-size: 0.62rem;
     max-width: 9rem;
+  }
+
+  .site-header .brand-text {
+    display: none;
   }
 
   .hero {

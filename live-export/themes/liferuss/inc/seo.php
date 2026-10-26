@@ -473,10 +473,7 @@ function liferuss_json_ld() {
 	$email   = liferuss_opt( 'email' );
 	$phone   = liferuss_opt( 'phone' );
 	$address = liferuss_opt( 'address' );
-	$logo    = liferuss_media_url( liferuss_opt( 'logo_id' ), '', 'full' );
-	if ( ! $logo ) {
-		$logo = liferuss_og_image_url();
-	}
+	$logo = function_exists( 'liferuss_theme_img' ) ? liferuss_theme_img( 'logo-lockup.png' ) : liferuss_og_image_url();
 
 	$same_as = array_values(
 		array_filter(

@@ -76,3 +76,4 @@ if ( ! $hero_bg_id ) {
 		</div>
 	</div>
 </section>
+<?php liferuss_the_logo_motion(); ?>
