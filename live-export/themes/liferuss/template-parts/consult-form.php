@@ -177,7 +177,7 @@ if ( 'admission' === $type ) {
 					<?php echo esc_html( liferuss_opt( 'form_submit' ) ); ?>
 					<?php echo liferuss_icon( 'arrow' ); ?>
 				</button>
-				<p class="form-note"><?php echo esc_html( liferuss_opt( 'form_note' ) ); ?></p>
+				<?php liferuss_the_form_consent( liferuss_opt( 'form_note' ) ); ?>
 			</form>
 		</div>
 

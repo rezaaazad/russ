@@ -135,7 +135,7 @@ $choices     = (array) liferuss_opt( $choices_key, array() );
 					<?php echo esc_html( liferuss_opt( $prefix . '_form_submit' ) ); ?>
 					<?php echo liferuss_icon( 'arrow' ); ?>
 				</button>
-				<p class="form-note"><?php echo esc_html( liferuss_opt( $prefix . '_form_note' ) ); ?></p>
+				<?php liferuss_the_form_consent( liferuss_opt( $prefix . '_form_note' ) ); ?>
 			</form>
 		</div>
 

@@ -143,6 +143,10 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 	<div class="footer-bottom">
 		<div class="container footer-bottom-inner">
 			<p><?php echo esc_html( $copy ); ?></p>
+			<nav class="footer-legal" aria-label="<?php echo esc_attr( liferuss_legal_label( 'terms' ) ); ?>">
+				<a href="<?php echo esc_url( liferuss_url( '/privacy-policy/' ) ); ?>"><?php echo esc_html( liferuss_legal_label( 'privacy' ) ); ?></a>
+				<a href="<?php echo esc_url( liferuss_url( '/terms/' ) ); ?>"><?php echo esc_html( liferuss_legal_label( 'terms' ) ); ?></a>
+			</nav>
 			<?php liferuss_language_switcher( 'footer' ); ?>
 			<p class="footer-en"><?php echo esc_html( liferuss_opt( 'footer_en' ) ); ?></p>
 		</div>

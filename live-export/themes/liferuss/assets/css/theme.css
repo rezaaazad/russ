@@ -1863,6 +1863,46 @@ html[dir="ltr"] .page-hero-photo.scene-couple .hero-overlay {
   font-size: 0.85rem;
 }
 
+.footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.footer-legal a {
+  color: #d5deea;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.form-note a {
+  color: var(--navy);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.legal-prose h2 {
+  font-size: 1.25rem;
+  margin-top: 1.4em;
+}
+
+.legal-review {
+  background: var(--gold-soft);
+  color: var(--navy);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.legal-contact a {
+  color: var(--navy);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .footer-links a {
   display: block;
   min-height: 44px;

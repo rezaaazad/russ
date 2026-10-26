@@ -34,6 +34,7 @@ require_once LIFERUSS_DIR . '/inc/compare.php';
 require_once LIFERUSS_DIR . '/inc/admin-landings.php';
 require_once LIFERUSS_DIR . '/inc/admin-options.php';
 require_once LIFERUSS_DIR . '/inc/ux.php';
+require_once LIFERUSS_DIR . '/inc/legal.php';
 
 /**
  * Theme supports, menus, and image sizes.
