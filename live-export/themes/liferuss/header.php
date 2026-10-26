@@ -16,7 +16,6 @@ $cta_text   = liferuss_opt( 'header_cta_text', 'دریافت مشاوره رای
 $cta_link   = liferuss_cta_url( liferuss_opt( 'header_cta_link', '#consultation' ) );
 $show_phone = '1' === (string) liferuss_opt( 'header_show_phone', '1' );
 $phone      = liferuss_opt( 'header_phone', liferuss_opt( 'phone' ) );
-$logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -30,24 +29,7 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 <header class="site-header" id="top">
 	<div class="container header-inner">
 		<a class="brand" href="<?php echo esc_url( liferuss_home() ); ?>">
-			<?php
-			if ( $logo_id ) {
-				liferuss_header_logo( $logo_id, $brand );
-			} elseif ( has_custom_logo() ) {
-				liferuss_header_logo( (int) get_theme_mod( 'custom_logo' ), $brand );
-			} else {
-				?>
-				<span class="brand-mark" aria-hidden="true">
-					<svg viewBox="0 0 48 48" class="brand-cap">
-						<circle cx="24" cy="24" r="24" fill="#0B2341"/>
-						<path d="M10 22.2 24 15.4 38 22.2 24 29 10 22.2z" fill="#E8B923"/>
-						<path d="M16 24.4v6.2c0 .7 3.4 2.6 8 2.6s8-1.9 8-2.6v-6.2" fill="none" stroke="#E8B923" stroke-width="1.8"/>
-						<circle cx="38" cy="22.2" r="1.5" fill="#F6D768"/>
-					</svg>
-				</span>
-				<?php
-			}
-			?>
+			<?php liferuss_the_wordmark(); ?>
 			<span class="brand-text">
 				<strong><?php echo esc_html( $brand ); ?></strong>
 				<?php if ( $brand_en && 0 !== strcasecmp( $brand, $brand_en ) ) : ?>

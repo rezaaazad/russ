@@ -22,29 +22,18 @@ $youtube   = liferuss_public_contact( 'youtube' );
 $has_contact = $phone || $phone_alt || $email || $address || $whatsapp || $telegram || $instagram || $linkedin || $youtube;
 $footer_cols = 2 + ( liferuss_services() ? 1 : 0 ) + ( $has_contact ? 1 : 0 );
 $copy        = str_replace( '{year}', liferuss_local_digits( gmdate( 'Y' ) ), liferuss_opt( 'footer_copyright' ) );
-$logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 ?>
 </main>
 <footer class="site-footer">
 	<div class="container footer-grid footer-grid--<?php echo (int) $footer_cols; ?>">
 		<div class="footer-brand">
-			<div class="brand footer-logo">
-				<?php if ( $logo_id ) : ?>
-					<?php echo wp_get_attachment_image( $logo_id, 'full', false, array( 'alt' => $brand ) ); ?>
-				<?php else : ?>
-					<span class="brand-mark" aria-hidden="true">
-						<svg viewBox="0 0 48 48" class="brand-cap">
-							<circle cx="24" cy="24" r="24" fill="#E8B923"/>
-							<path d="M10 22.2 24 15.4 38 22.2 24 29 10 22.2z" fill="#0B2341"/>
-							<path d="M16 24.4v6.2c0 .7 3.4 2.6 8 2.6s8-1.9 8-2.6v-6.2" fill="none" stroke="#0B2341" stroke-width="1.8"/>
-						</svg>
-					</span>
-					<span class="brand-text">
-						<strong><?php echo esc_html( $brand ); ?></strong>
-						<small><?php echo esc_html( liferuss_opt( 'tagline' ) ); ?></small>
-					</span>
-				<?php endif; ?>
-			</div>
+			<a class="brand footer-logo" href="<?php echo esc_url( liferuss_home() ); ?>">
+				<?php liferuss_the_emblem(); ?>
+				<span class="brand-text">
+					<strong><?php echo esc_html( $brand ); ?></strong>
+					<small><?php echo esc_html( liferuss_opt( 'tagline' ) ); ?></small>
+				</span>
+			</a>
 			<p><?php echo esc_html( liferuss_opt( 'footer_about' ) ); ?></p>
 		</div>
 

@@ -426,12 +426,11 @@ function liferuss_options_page() {
 			<div id="tab-general" class="liferuss-tab">
 				<h2>عمومی و برند</h2>
 				<?php
+				echo '<p class="description">لوگوی هدر، نشان فوتر و فاویکون از فایل‌های <code>assets/img</code> قالب خوانده می‌شوند. نام برند LifeRuss است. بارگذاری لوگوی گرد قدیمی در این صفحه دیگر در هدر، فوتر و آیکون سایت چاپ نمی‌شود.</p>';
 				liferuss_admin_table_start();
 				liferuss_admin_field( 'brand_name', $o['brand_name'], 'نام برند (فارسی)' );
 				liferuss_admin_field( 'brand_name_en', $o['brand_name_en'], 'نام انگلیسی' );
 				liferuss_admin_field( 'tagline', $o['tagline'], 'شعار / توضیح کوتاه', 'textarea' );
-				liferuss_admin_media( 'logo_id', $o['logo_id'], 'لوگوی هدر' );
-				liferuss_admin_media( 'favicon_id', $o['favicon_id'], 'فاویکون' );
 				liferuss_admin_field( 'color_primary', $o['color_primary'], 'رنگ اصلی (سرمه‌ای)', 'color' );
 				liferuss_admin_field( 'color_secondary', $o['color_secondary'], 'رنگ دوم (طلایی)', 'color' );
 				liferuss_admin_table_end();
@@ -442,7 +441,6 @@ function liferuss_options_page() {
 				<h2>هدر</h2>
 				<?php
 				liferuss_admin_table_start();
-				liferuss_admin_media( 'logo_id', $o['logo_id'], 'لوگو (مشترک با برند)' );
 				liferuss_admin_field( 'header_cta_text', $o['header_cta_text'], 'متن دکمه CTA' );
 				liferuss_admin_field( 'header_cta_link', $o['header_cta_link'], 'لینک دکمه CTA' );
 				liferuss_admin_field( 'header_phone', $o['header_phone'], 'تلفن هدر' );
