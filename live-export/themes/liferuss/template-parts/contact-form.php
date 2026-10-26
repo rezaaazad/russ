@@ -50,7 +50,7 @@ $message   = isset( $_GET['consult_msg'] ) ? sanitize_text_field( rawurldecode( 
 					<?php echo esc_html( liferuss_t( 'contact_send' ) ); ?>
 					<?php echo liferuss_icon( 'arrow' ); ?>
 				</button>
-				<p class="form-note"><?php echo esc_html( liferuss_opt( 'form_note' ) ); ?></p>
+				<?php liferuss_the_form_consent( liferuss_opt( 'form_note' ) ); ?>
 			</form>
 		</div>
 	</div>
