@@ -89,6 +89,7 @@ function liferuss_sanitize_options( $input ) {
 		'form_eyebrow', 'form_title', 'form_intro', 'form_name_label', 'form_name_ph',
 		'form_phone_label', 'form_phone_ph', 'form_level_label', 'form_submit', 'form_note', 'form_success',
 		'phone', 'phone_alt', 'address', 'whatsapp', 'telegram', 'instagram',
+		'phone_ru', 'whatsapp_ru', 'telegram_ru', 'phone_uk', 'whatsapp_uk', 'telegram_uk',
 		'footer_about', 'footer_copyright', 'footer_en',
 		'seo_title', 'seo_description', 'org_name', 'org_legal',
 		'float_widget_title', 'float_widget_subtitle', 'float_widget_offset_x', 'float_widget_offset_y',
@@ -659,6 +660,15 @@ function liferuss_options_page() {
 				liferuss_admin_field( 'instagram', $o['instagram'], 'اینستاگرام', 'text', 'liferuss' );
 				liferuss_admin_field( 'linkedin', $o['linkedin'], 'لینکدین', 'url', 'https://www.linkedin.com/company/example' );
 				liferuss_admin_field( 'youtube', $o['youtube'], 'یوتیوب', 'url', 'https://www.youtube.com/@example' );
+				liferuss_admin_table_end();
+				echo '<h3>روسیه و بریتانیا</h3><p class="description">هر کشور تلفن (tel:)، واتساپ (شماره یا لینک wa.me) و تلگرام (نام کاربری یا لینک t.me) جدا دارد. فیلد خالی نشان داده نمی‌شود. اگر همین فیلد در تنظیمات هسته پر شود و اینجا خالی بماند، مقدار هسته استفاده می‌شود. مقدار قالب، اگر پر باشد، مقدم است. شماره‌ای از پیش نوشته نشده است.</p>';
+				liferuss_admin_table_start();
+				liferuss_admin_field( 'phone_ru', $o['phone_ru'], 'تلفن روسیه', 'text', '+…' );
+				liferuss_admin_field( 'whatsapp_ru', $o['whatsapp_ru'], 'واتساپ روسیه', 'text', 'https://wa.me/…' );
+				liferuss_admin_field( 'telegram_ru', $o['telegram_ru'], 'تلگرام روسیه', 'text', 'https://t.me/…' );
+				liferuss_admin_field( 'phone_uk', $o['phone_uk'], 'تلفن بریتانیا', 'text', '+…' );
+				liferuss_admin_field( 'whatsapp_uk', $o['whatsapp_uk'], 'واتساپ بریتانیا', 'text', 'https://wa.me/…' );
+				liferuss_admin_field( 'telegram_uk', $o['telegram_uk'], 'تلگرام بریتانیا', 'text', 'https://t.me/…' );
 				liferuss_admin_table_end();
 				?>
 			</div>

@@ -65,6 +65,7 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 			<?php if ( $show_phone && $phone ) : ?>
 				<p class="drawer-phone"><a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>"><bdi dir="ltr"><?php echo esc_html( $phone ); ?></bdi></a></p>
 			<?php endif; ?>
+			<?php liferuss_the_contact_directory( 'drawer' ); ?>
 			<?php
 			liferuss_language_switcher( 'drawer' );
 			?>
@@ -91,6 +92,7 @@ $logo_id    = absint( liferuss_opt( 'logo_id', 0 ) );
 				<?php endif; ?>
 			</a>
 			<?php liferuss_language_switcher( 'header' ); ?>
+			<?php liferuss_the_contact_directory( 'header' ); ?>
 			<?php if ( $show_phone && $phone ) : ?>
 				<a class="header-phone" href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>">
 					<?php echo liferuss_icon( 'phone' ); ?>

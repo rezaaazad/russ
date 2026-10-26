@@ -45,6 +45,7 @@ if ( 'admission' === $type ) {
 				<?php liferuss_fx_panel(); ?>
 			<?php endif; ?>
 			<?php liferuss_the_contact_channels(); ?>
+			<?php liferuss_the_contact_directory( 'channels' ); ?>
 		</div>
 
 		<div class="consult-card">
