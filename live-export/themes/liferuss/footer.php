@@ -19,7 +19,8 @@ $telegram  = liferuss_social_url( liferuss_public_contact( 'telegram' ), 'telegr
 $instagram = liferuss_social_url( liferuss_public_contact( 'instagram' ), 'instagram' );
 $linkedin  = liferuss_public_contact( 'linkedin' );
 $youtube   = liferuss_public_contact( 'youtube' );
-$has_contact = $phone || $phone_alt || $email || $address || $whatsapp || $telegram || $instagram || $linkedin || $youtube;
+$directory   = function_exists( 'liferuss_contact_directory' ) ? liferuss_contact_directory() : array();
+$has_contact = $phone || $phone_alt || $email || $address || $whatsapp || $telegram || $instagram || $linkedin || $youtube || $directory;
 $footer_cols = 2 + ( liferuss_services() ? 1 : 0 ) + ( $has_contact ? 1 : 0 );
 $copy        = str_replace( '{year}', liferuss_local_digits( gmdate( 'Y' ) ), liferuss_opt( 'footer_copyright' ) );
 $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
@@ -120,6 +121,7 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 					<li><?php echo liferuss_icon( 'pin' ); ?><span><?php echo esc_html( $address ); ?></span></li>
 				<?php endif; ?>
 			</ul>
+			<?php liferuss_the_contact_directory( 'footer' ); ?>
 			<div class="social-row">
 				<?php if ( $whatsapp ) : ?>
 					<a class="social-btn" href="<?php echo esc_url( liferuss_whatsapp_url( $whatsapp ) ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( liferuss_t( 'channel_whatsapp' ) ); ?>"><?php echo liferuss_icon( 'whatsapp' ); ?></a>
@@ -150,6 +152,7 @@ $logo_id   = absint( liferuss_opt( 'logo_id', 0 ) );
 </footer>
 <?php
 liferuss_compare_bar();
+get_template_part( 'template-parts/call-bar' );
 get_template_part( 'template-parts/bottom-nav' );
 get_template_part( 'template-parts/contact-widget' );
 wp_footer();
