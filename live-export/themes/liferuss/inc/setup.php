@@ -1,0 +1,617 @@
+<?php
+/**
+ * First-activation pages, menu, and reading settings.
+ *
+ * @package LifeRuss
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Seed demo pages and menu once.
+ */
+function liferuss_maybe_seed() {
+	if ( get_option( 'liferuss_seeded' ) ) {
+		return;
+	}
+
+	$home_id = liferuss_ensure_page(
+		'خانه',
+		'home',
+		'',
+		''
+	);
+	$about_id = liferuss_ensure_page(
+		'درباره ما',
+		'about',
+		liferuss_about_content(),
+		'templates/about.php'
+	);
+	$uni_id = liferuss_ensure_page(
+		'دانشگاه‌ها',
+		'universities',
+		'<p>دانشگاه‌های منتخب لایف روس برای متقاضیان ایرانی.</p>',
+		'templates/universities.php'
+	);
+	$svc_id = liferuss_ensure_page(
+		'خدمات',
+		'services',
+		'<p>خدمات پذیرش، پادفک، ویزا، خوابگاه، ترجمه و استقرار.</p>',
+		'templates/services.php'
+	);
+	$cost_id = liferuss_ensure_page(
+		'هزینه‌ها',
+		'costs',
+		'<p>تصویر شفاف از شهریه، زندگی و خوابگاه در روسیه.</p>',
+		'templates/costs.php'
+	);
+	$contact_id = liferuss_ensure_page(
+		'تماس با ما',
+		'contact',
+		'<p>فرم مشاوره رایگان لایف روس.</p>',
+		'templates/contact.php'
+	);
+	$freight_id = liferuss_ensure_page(
+		'باربری و ارسال',
+		'cargo',
+		'<p>ارسال کارگو، کالای معرفی، وسایل شخصی و مدارک دانشجویی بین ایران و روسیه.</p>',
+		'templates/freight.php'
+	);
+	$trade_id = liferuss_ensure_page(
+		'تجارت و تأمین کالا',
+		'trade',
+		'<p>سورسینگ، خرید از روسیه و صادرات محصولات ایران.</p>',
+		'templates/trade.php'
+	);
+	$blog_id = liferuss_ensure_page(
+		'وبلاگ',
+		'blog',
+		'',
+		''
+	);
+
+	update_option( 'show_on_front', 'page' );
+	update_option( 'page_on_front', $home_id );
+	update_option( 'page_for_posts', $blog_id );
+
+	$menu_name = 'منوی اصلی لایف روس';
+	$menu      = wp_get_nav_menu_object( $menu_name );
+	$menu_id   = $menu ? (int) $menu->term_id : 0;
+
+	// Prefer an already-assigned primary menu so we never create a second nav source.
+	$locations = get_theme_mod( 'nav_menu_locations', array() );
+	if ( ! empty( $locations['primary'] ) ) {
+		$assigned = wp_get_nav_menu_object( (int) $locations['primary'] );
+		if ( $assigned ) {
+			$menu_id = (int) $assigned->term_id;
+		}
+	}
+
+	if ( ! $menu_id ) {
+		$menu_id = (int) wp_create_nav_menu( $menu_name );
+	}
+
+	$existing_items = $menu_id ? wp_get_nav_menu_items( $menu_id ) : array();
+	$item_count     = is_array( $existing_items ) ? count( $existing_items ) : 0;
+
+	// Only seed when the menu is completely empty — never re-add beside existing items.
+	if ( $menu_id && 0 === $item_count ) {
+		$items = array(
+			array( 'title' => 'خانه', 'object' => $home_id ),
+			array( 'title' => 'درباره ما', 'object' => $about_id ),
+			array( 'title' => 'دانشگاه‌ها', 'object' => $uni_id ),
+			array( 'title' => 'خدمات', 'object' => $svc_id ),
+			array( 'title' => 'باربری و ارسال', 'object' => $freight_id ),
+			array( 'title' => 'تجارت و تأمین', 'object' => $trade_id ),
+			array( 'title' => 'هزینه‌ها', 'object' => $cost_id ),
+			array( 'title' => 'وبلاگ', 'object' => $blog_id ),
+			array( 'title' => 'تماس با ما', 'object' => $contact_id ),
+		);
+		$order = 1;
+		foreach ( $items as $item ) {
+			wp_update_nav_menu_item(
+				$menu_id,
+				0,
+				array(
+					'menu-item-title'     => $item['title'],
+					'menu-item-object'    => 'page',
+					'menu-item-object-id' => $item['object'],
+					'menu-item-type'      => 'post_type',
+					'menu-item-status'    => 'publish',
+					'menu-item-position'  => $order,
+				)
+			);
+			++$order;
+		}
+	}
+
+	$locations            = is_array( $locations ) ? $locations : array();
+	$locations['primary'] = $menu_id;
+	$locations['footer']  = $menu_id;
+	set_theme_mod( 'nav_menu_locations', $locations );
+
+	liferuss_seed_posts();
+
+	update_option( 'liferuss_seeded', 1 );
+}
+add_action( 'after_switch_theme', 'liferuss_maybe_seed' );
+add_action( 'init', 'liferuss_maybe_seed', 30 );
+
+/**
+ * One-time rebrand of seeded content to لایف روس.
+ */
+function liferuss_maybe_rebrand() {
+	if ( get_option( 'liferuss_brand_v2' ) ) {
+		return;
+	}
+	update_option( 'blogname', 'لایف روس' );
+	update_option( 'blogdescription', 'مشاوره تحصیل و پذیرش در روسیه' );
+
+	update_option( 'liferuss_brand_v2', 1 );
+}
+add_action( 'init', 'liferuss_maybe_rebrand', 40 );
+
+
+/**
+ * One-time cleanup: remove duplicate primary-menu items (same object_id / title).
+ */
+function liferuss_maybe_dedupe_primary_menu() {
+	if ( get_option( 'liferuss_menu_deduped_v1' ) ) {
+		return;
+	}
+
+	$locations = get_theme_mod( 'nav_menu_locations', array() );
+	if ( empty( $locations['primary'] ) ) {
+		update_option( 'liferuss_menu_deduped_v1', 1 );
+		return;
+	}
+
+	$menu_id = (int) $locations['primary'];
+	$items   = wp_get_nav_menu_items( $menu_id );
+	if ( ! is_array( $items ) || count( $items ) < 2 ) {
+		update_option( 'liferuss_menu_deduped_v1', 1 );
+		return;
+	}
+
+	$seen = array();
+	foreach ( $items as $item ) {
+		$key = $item->type . ':' . (string) $item->object_id . ':' . mb_strtolower( trim( (string) $item->title ) );
+		if ( isset( $seen[ $key ] ) ) {
+			wp_delete_post( (int) $item->ID, true );
+			continue;
+		}
+		$seen[ $key ] = true;
+	}
+
+	update_option( 'liferuss_menu_deduped_v1', 1 );
+}
+add_action( 'init', 'liferuss_maybe_dedupe_primary_menu', 45 );
+
+
+/**
+ * Point saved footer and menu URLs at the canonical hubs.
+ */
+function liferuss_migrate_canonical_urls() {
+	if ( get_option( 'liferuss_url_canon' ) ) {
+		return;
+	}
+	$map  = array(
+		'/study/'            => '/study-russia/',
+		'/podfak/'           => '/padfak/',
+		'/direct-admission/' => '/direct-course/',
+		'/migration-russia/' => '/immigration/',
+	);
+	$opts = get_option( 'liferuss_options', array() );
+	if ( is_array( $opts ) && ! empty( $opts['footer_links'] ) && is_array( $opts['footer_links'] ) ) {
+		foreach ( $opts['footer_links'] as $i => $item ) {
+			if ( ! is_array( $item ) || empty( $item['url'] ) ) {
+				continue;
+			}
+			$path = trailingslashit( '/' . trim( (string) $item['url'], '/' ) );
+			if ( isset( $map[ $path ] ) ) {
+				$opts['footer_links'][ $i ]['url'] = $map[ $path ];
+			}
+		}
+		update_option( 'liferuss_options', $opts );
+	}
+	update_option( 'liferuss_url_canon', '1', false );
+}
+add_action( 'init', 'liferuss_migrate_canonical_urls', 46 );
+
+/**
+ * 1.14.2: real contact fields, Persian phone examples, canonical immigration, no -2 menu links.
+ */
+function liferuss_migrate_ux_1142() {
+	if ( '1' === (string) get_option( 'liferuss_ux_1142' ) ) {
+		return;
+	}
+	$opts = get_option( 'liferuss_options', array() );
+	if ( ! is_array( $opts ) ) {
+		$opts = array();
+	}
+	if ( function_exists( 'liferuss_legacy_contact_values' ) ) {
+		foreach ( liferuss_legacy_contact_values() as $key => $samples ) {
+			if ( isset( $opts[ $key ] ) && in_array( (string) $opts[ $key ], $samples, true ) ) {
+				$opts[ $key ] = '';
+			}
+		}
+	}
+	$phone_keys = array( 'form_phone_ph', 'freight_form_phone_ph', 'trade_form_phone_ph' );
+	foreach ( $phone_keys as $key ) {
+		if ( isset( $opts[ $key ] ) && liferuss_phone_placeholder_needs_fix( (string) $opts[ $key ] ) ) {
+			$opts[ $key ] = '۰۹۱۲۱۲۳۴۵۶۷';
+		}
+	}
+	if ( isset( $opts['i18n'] ) && is_array( $opts['i18n'] ) ) {
+		foreach ( $opts['i18n'] as $lang => $pack ) {
+			if ( ! is_array( $pack ) ) {
+				continue;
+			}
+			foreach ( $phone_keys as $key ) {
+				if ( isset( $pack[ $key ] ) && liferuss_phone_placeholder_needs_fix( (string) $pack[ $key ] ) ) {
+					$opts['i18n'][ $lang ][ $key ] = 'ar' === $lang ? '٠٩١٢١٢٣٤٥٦٧' : ( 'fa' === $lang ? '۰۹۱۲۱۲۳۴۵۶۷' : '09121234567' );
+				}
+			}
+		}
+	}
+	if ( ! empty( $opts['footer_links'] ) && is_array( $opts['footer_links'] ) ) {
+		$kept = array();
+		foreach ( $opts['footer_links'] as $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			$url   = (string) ( $item['url'] ?? '' );
+			$label = trim( (string) ( $item['label'] ?? '' ) );
+			$path  = liferuss_migrate_path( $url );
+			if ( '/services/' === $path && 'خدمات' === $label ) {
+				continue;
+			}
+			if ( '/migration-russia/' === $path ) {
+				$item['url'] = '/immigration/';
+			}
+			$item['url'] = liferuss_migrate_drop_suffix_two( (string) ( $item['url'] ?? '' ) );
+			$kept[]      = $item;
+		}
+		$opts['footer_links'] = $kept;
+	}
+	update_option( 'liferuss_options', $opts );
+
+	$items = get_posts(
+		array(
+			'post_type'      => 'nav_menu_item',
+			'post_status'    => 'any',
+			'posts_per_page' => 300,
+		)
+	);
+	foreach ( $items as $item ) {
+		if ( ! $item instanceof WP_Post ) {
+			continue;
+		}
+		$url = (string) get_post_meta( $item->ID, '_menu_item_url', true );
+		if ( '' === $url ) {
+			continue;
+		}
+		$next = $url;
+		if ( '/migration-russia/' === liferuss_migrate_path( $url ) ) {
+			$next = '/immigration/';
+		}
+		$next = liferuss_migrate_drop_suffix_two( $next );
+		if ( $next !== $url ) {
+			update_post_meta( $item->ID, '_menu_item_url', $next );
+		}
+	}
+
+	flush_rewrite_rules( false );
+	update_option( 'liferuss_ux_1142', '1', false );
+}
+add_action( 'init', 'liferuss_migrate_ux_1142', 48 );
+
+/**
+ * True when a phone placeholder still mixes letters into the sample.
+ *
+ * @param string $value Placeholder.
+ * @return bool
+ */
+function liferuss_phone_placeholder_needs_fix( $value ) {
+	return is_string( $value ) && ( false !== stripos( $value, 'x' ) );
+}
+
+/**
+ * Path of a menu or footer URL.
+ *
+ * @param string $url URL or path.
+ * @return string
+ */
+function liferuss_migrate_path( $url ) {
+	$path = $url;
+	if ( preg_match( '#^https?://#i', $url ) ) {
+		$parsed = wp_parse_url( $url, PHP_URL_PATH );
+		$path   = is_string( $parsed ) ? $parsed : $url;
+	}
+	$path = '/' . trim( (string) $path, '/' );
+	return '/' === $path ? '/' : trailingslashit( $path );
+}
+
+/**
+ * Point a saved link at the sibling without a trailing -2 when that path is known.
+ *
+ * @param string $url URL or path.
+ * @return string
+ */
+function liferuss_migrate_drop_suffix_two( $url ) {
+	$map = array(
+		'/cargo/sea-2/'            => '/cargo/sea/',
+		'/trade/sourcing-2/'       => '/trade/sourcing/',
+		'/trade/import-export-2/'  => '/trade/import-export/',
+		'/trade/representation-2/' => '/trade/representation/',
+	);
+	$path = liferuss_migrate_path( $url );
+	if ( isset( $map[ $path ] ) ) {
+		return $map[ $path ];
+	}
+	return $url;
+}
+
+/**
+ * Replace the old English homepage slogans when they are still stored.
+ */
+function liferuss_migrate_persian_copy() {
+	if ( get_option( 'liferuss_copy_fa' ) ) {
+		return;
+	}
+	$map  = array(
+		'hero_eyebrow'         => array(
+			'Higher Education · A Brighter Tomorrow' => 'تحصیل عالی · آینده‌ای روشن',
+		),
+		'hero_quote_cite'      => array(
+			'Knowledge Bridge' => 'لایف روس',
+		),
+		'universities_eyebrow' => array(
+			'Knowledge · Opportunity' => 'دانش و فرصت',
+		),
+		'footer_en'            => array(
+			'Knowledge Bridge · Higher Education · A Brighter Tomorrow' => 'مشاوره تحصیل در روسیه',
+		),
+	);
+	$opts = get_option( 'liferuss_options', array() );
+	if ( is_array( $opts ) ) {
+		foreach ( $map as $key => $pairs ) {
+			if ( isset( $opts[ $key ] ) && isset( $pairs[ $opts[ $key ] ] ) ) {
+				$opts[ $key ] = $pairs[ $opts[ $key ] ];
+			}
+		}
+		update_option( 'liferuss_options', $opts );
+	}
+	update_option( 'liferuss_copy_fa', '1', false );
+}
+add_action( 'init', 'liferuss_migrate_persian_copy', 47 );
+
+/**
+ * Replace leftover English badges on the Persian tree and drop stale i18n overlays.
+ */
+function liferuss_migrate_badge_copy() {
+	if ( get_option( 'liferuss_copy_badges' ) ) {
+		return;
+	}
+	$opts = get_option( 'liferuss_options', array() );
+	if ( ! is_array( $opts ) ) {
+		$opts = array();
+	}
+	$exact = array(
+		'freight_hero_eyebrow'     => array(
+			'Iran ↔ Russia · Cargo & Delivery' => 'ایران و روسیه · باربری و ارسال',
+			'Iran — Russia · Cargo & Delivery' => 'ایران و روسیه · باربری و ارسال',
+		),
+		'trade_hero_eyebrow'       => array(
+			'Iran ↔ Russia · Trade & Sourcing' => 'ایران و روسیه · تجارت و تأمین',
+			'Iran — Russia · Trade & Sourcing' => 'ایران و روسیه · تجارت و تأمین',
+		),
+		'freight_form_banner_text' => array(
+			'More than cargo — a stronger tomorrow' => 'فراتر از حمل بار، مسیر روشن‌تری برای همکاری',
+			'a stronger tomorrow'                   => 'فراتر از حمل بار، مسیر روشن‌تری برای همکاری',
+		),
+		'trade_form_banner_text'   => array(
+			'Global connections · Real opportunities' => 'ارتباط واقعی · فرصت‌های قابل پیگیری',
+			'Global connections'                      => 'ارتباط واقعی · فرصت‌های قابل پیگیری',
+		),
+	);
+	foreach ( $exact as $key => $pairs ) {
+		if ( isset( $opts[ $key ] ) && isset( $pairs[ $opts[ $key ] ] ) ) {
+			$opts[ $key ] = $pairs[ $opts[ $key ] ];
+		}
+	}
+	if ( isset( $opts['hero_eyebrow'] ) && is_string( $opts['hero_eyebrow'] ) && str_contains( $opts['hero_eyebrow'], 'Higher Education' ) ) {
+		$opts['hero_eyebrow'] = 'تحصیل عالی · آینده‌ای روشن';
+	}
+	$opts = liferuss_replace_public_phrases( $opts );
+	if ( isset( $opts['i18n'] ) && is_array( $opts['i18n'] ) ) {
+		foreach ( $opts['i18n'] as $lang => $pack ) {
+			if ( ! is_array( $pack ) ) {
+				continue;
+			}
+			foreach ( array( 'hero_eyebrow', 'freight_hero_eyebrow', 'trade_hero_eyebrow', 'freight_form_banner_text', 'trade_form_banner_text' ) as $key ) {
+				if ( ! isset( $pack[ $key ] ) || ! is_string( $pack[ $key ] ) ) {
+					continue;
+				}
+				if ( str_contains( $pack[ $key ], 'Higher Education' ) || str_contains( $pack[ $key ], 'Iran' ) || str_contains( $pack[ $key ], 'Global connections' ) || str_contains( $pack[ $key ], 'stronger tomorrow' ) ) {
+					unset( $opts['i18n'][ $lang ][ $key ] );
+				}
+			}
+		}
+	}
+	update_option( 'liferuss_options', $opts );
+	update_option( 'liferuss_copy_badges', '1', false );
+}
+add_action( 'init', 'liferuss_migrate_badge_copy', 47 );
+
+/**
+ * Swap leftover commercial-sample wording in saved options.
+ *
+ * @param mixed $value Option tree.
+ * @return mixed
+ */
+function liferuss_replace_public_phrases( $value ) {
+	$map = array(
+		'نمونه کالا'       => 'کالای معرفی',
+		'نمونه‌های تجاری'  => 'کالاهای معرفی',
+		'نمونه‌هایی از'    => 'فهرستی از',
+		'از نمونه تا قرارداد' => 'از معرفی کالا تا قرارداد',
+	);
+	if ( is_string( $value ) ) {
+		return str_replace( array_keys( $map ), array_values( $map ), $value );
+	}
+	if ( is_array( $value ) ) {
+		foreach ( $value as $key => $item ) {
+			$value[ $key ] = liferuss_replace_public_phrases( $item );
+		}
+	}
+	return $value;
+}
+
+/**
+ * Drop the seed marker from public HTML if a demo row was published with it.
+ */
+function liferuss_strip_public_placeholders( $html ) {
+	if ( ! is_string( $html ) || '' === $html ) {
+		return $html;
+	}
+	$html = str_replace( array( ' (نمونه)', '(نمونه)' ), '', $html );
+	$html = str_replace( 'دادهٔ نمایشی. منتشر نکنید مگر برای آزمون.', '', $html );
+	return str_replace( 'دادهٔ نمایشی', '', $html );
+}
+
+/**
+ * Buffer the front end so a published demo label cannot leak the seed marker.
+ */
+function liferuss_buffer_public_html() {
+	if ( is_admin() || wp_doing_ajax() || wp_doing_cron() ) {
+		return;
+	}
+	ob_start( 'liferuss_filter_public_html' );
+}
+add_action( 'template_redirect', 'liferuss_buffer_public_html', 0 );
+
+/**
+ * Strip seed markers and add the page-hero photograph.
+ *
+ * @param string $html Buffered document.
+ * @return string
+ */
+function liferuss_filter_public_html( $html ) {
+	$html = liferuss_strip_public_placeholders( $html );
+	if ( function_exists( 'liferuss_inject_page_hero_photo' ) ) {
+		$html = liferuss_inject_page_hero_photo( $html );
+	}
+	return $html;
+}
+
+/**
+ * Flush rewrite rules once after a theme update, and import owner photos.
+ */
+function liferuss_maybe_flush_i18n() {
+	if ( function_exists( 'liferuss_install_brand_photos' ) ) {
+		liferuss_install_brand_photos();
+	}
+	if ( get_option( 'liferuss_version' ) === LIFERUSS_VERSION ) {
+		return;
+	}
+	flush_rewrite_rules( false );
+	update_option( 'liferuss_version', LIFERUSS_VERSION );
+}
+add_action( 'init', 'liferuss_maybe_flush_i18n', 50 );
+
+/**
+ * Create a page if the slug is free.
+ *
+ * @param string $title    Title.
+ * @param string $slug     Slug.
+ * @param string $content  Content.
+ * @param string $template Relative template path.
+ * @return int
+ */
+function liferuss_ensure_page( $title, $slug, $content, $template ) {
+	$existing = get_page_by_path( $slug );
+	if ( $existing ) {
+		if ( $template ) {
+			update_post_meta( $existing->ID, '_wp_page_template', $template );
+		}
+		return (int) $existing->ID;
+	}
+
+	$page_id = wp_insert_post(
+		array(
+			'post_title'   => $title,
+			'post_name'    => $slug,
+			'post_status'  => 'publish',
+			'post_type'    => 'page',
+			'post_content' => $content,
+		)
+	);
+
+	if ( $page_id && $template ) {
+		update_post_meta( $page_id, '_wp_page_template', $template );
+	}
+
+	return (int) $page_id;
+}
+
+/**
+ * Seed a few educational posts.
+ */
+function liferuss_seed_posts() {
+	if ( get_option( 'liferuss_posts_seeded' ) ) {
+		return;
+	}
+
+	$posts = array(
+		array(
+			'title'   => 'پادفک چیست و چه کسانی به آن نیاز دارند؟',
+			'content' => '<p>دوره پادفک مسیر آمادگی زبان روسی و دروس پایه است. بیشتر متقاضیان رشته‌های پزشکی و فنی که می‌خواهند به زبان روسی درس بخوانند، یک سال پادفک می‌گذرانند و سپس وارد رشته اصلی می‌شوند.</p><p>لایف روس دانشگاه، شهر و برنامه پادفک را بر اساس هدف تحصیلی شما پیشنهاد می‌کند و ثبت‌نام تا استقرار را همراهی می‌کند.</p>',
+		),
+		array(
+			'title'   => 'هزینه تحصیل پزشکی در روسیه در یک نگاه',
+			'content' => '<p>شهریه پزشکی در دانشگاه‌های دولتی معمولاً بین ۳۵۰۰ تا ۷۰۰۰ دلار در سال است. خوابگاه دانشجویی اغلب کمتر از ۵۰ دلار در ماه تمام می‌شود و هزینه زندگی دانشجویی در شهرهای بزرگ حدود ۲۰۰ تا ۴۰۰ دلار است.</p><p>برای عدد دقیق، رشته، زبان تدریس و شهر باید مشخص شود؛ فرم مشاوره همین کار را برای شما انجام می‌دهد.</p>',
+		),
+		array(
+			'title'   => 'مدارک لازم برای پذیرش و ویزای تحصیلی روسیه',
+			'content' => '<p>پرونده معمول شامل گذرنامه معتبر، مدرک دیپلم و ریزنمرات، ترجمه رسمی، عکس و فرم درخواست دانشگاه است. پس از پذیرش، دعوتنامه صادر می‌شود و نوبت ویزای تحصیلی می‌رسد.</p><p>تیم لایف روس ترجمه، ارسال پرونده و پیگیری دعوتنامه را یک‌جا انجام می‌دهد.</p>',
+		),
+	);
+
+	foreach ( $posts as $post ) {
+		$exists = new WP_Query(
+			array(
+				'post_type'      => 'post',
+				'title'          => $post['title'],
+				'post_status'    => 'any',
+				'fields'         => 'ids',
+				'posts_per_page' => 1,
+				'no_found_rows'  => true,
+			)
+		);
+		if ( $exists->have_posts() ) {
+			continue;
+		}
+		wp_insert_post(
+			array(
+				'post_title'   => $post['title'],
+				'post_status'  => 'publish',
+				'post_type'    => 'post',
+				'post_content' => $post['content'],
+			)
+		);
+	}
+
+	update_option( 'liferuss_posts_seeded', 1 );
+}
+
+/**
+ * About page default content.
+ *
+ * @return string
+ */
+function liferuss_about_content() {
+	return '<p>لایف روس یک مؤسسه مشاوره تحصیل در روسیه است؛ فروشگاه نیستیم. کار ما همراهی متقاضی ایرانی است از انتخاب رشته تا پذیرش، ویزا، خوابگاه و روزهای اول زندگی در مسکو یا سن‌پترزبورگ.</p><p>تمرکز ما روی دانشگاه‌های معتبر، مسیر شفاف هزینه‌ها و پاسخگویی واقعی است. بیش از ۵۰۰ دانشجو این مسیر را با ما طی کرده‌اند.</p>';
+}
