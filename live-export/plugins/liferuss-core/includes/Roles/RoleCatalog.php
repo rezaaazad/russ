@@ -197,6 +197,7 @@ class RoleCatalog {
 			self::full_cpt( 'lr_guide', 'lr_guides' ),
 			self::full_cpt( 'lr_faq', 'lr_faqs' ),
 			self::full_cpt( 'lr_testimonial', 'lr_testimonials' ),
+			self::full_cpt( 'lr_case', 'lr_cases' ),
 			self::full_cpt( 'lr_course', 'lr_courses' ),
 			self::full_cpt( 'lr_lesson', 'lr_lessons' ),
 			self::full_cpt( 'lr_scholarship', 'lr_scholarships' ),
@@ -229,6 +230,7 @@ class RoleCatalog {
 			self::own_cpt( 'lr_course', 'lr_courses' ),
 			self::own_cpt( 'lr_faq', 'lr_faqs' ),
 			self::own_cpt( 'lr_testimonial', 'lr_testimonials' ),
+			self::own_cpt( 'lr_case', 'lr_cases' ),
 			self::assign_terms( 'lr_guide_cats' ),
 			self::assign_terms( 'lr_faq_groups' ),
 			self::assign_terms( 'lr_levels' )

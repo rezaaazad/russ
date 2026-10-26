@@ -33,6 +33,7 @@ use LifeRuss\Core\Content\Editor as ContentEditor;
 use LifeRuss\Core\Content\Canonical;
 use LifeRuss\Core\Content\Copy;
 use LifeRuss\Core\Content\Seed as ContentSeed;
+use LifeRuss\Core\Content\Stories;
 use LifeRuss\Core\Content\ServiceSeed;
 use LifeRuss\Core\Redirects\Runner;
 use LifeRuss\Core\Currency\Rates;
@@ -107,6 +108,7 @@ class Plugin {
 		Demo::hooks();
 		ContentEditor::hooks();
 		ContentSeed::hooks();
+		Stories::hooks();
 		Canonical::hooks();
 		ServiceSeed::hooks();
 		Copy::hooks();

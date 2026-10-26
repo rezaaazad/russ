@@ -14,6 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
+if ( function_exists( 'liferuss_the_announcement' ) ) {
+	liferuss_the_announcement();
+}
+
 foreach ( liferuss_home_sections() as $section ) {
 	if ( empty( $section['enabled'] ) ) {
 		continue;

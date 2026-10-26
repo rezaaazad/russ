@@ -30,6 +30,7 @@ require_once LIFERUSS_DIR . '/inc/catalog.php';
 require_once LIFERUSS_DIR . '/inc/paths.php';
 require_once LIFERUSS_DIR . '/inc/magazine.php';
 require_once LIFERUSS_DIR . '/inc/home-sections.php';
+require_once LIFERUSS_DIR . '/inc/home-blocks.php';
 require_once LIFERUSS_DIR . '/inc/compare.php';
 require_once LIFERUSS_DIR . '/inc/admin-landings.php';
 require_once LIFERUSS_DIR . '/inc/admin-options.php';
@@ -268,6 +269,7 @@ function liferuss_critical_css() {
 	echo '.lang-switch--header{flex-shrink:0}.lang-switch--header ul{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:0;margin:0;padding:0;list-style:none}.lang-switch--header a{display:inline-flex;padding:2px 6px;border:0;background:transparent;color:rgba(255,255,255,.78);font-size:.72rem;font-weight:700;white-space:nowrap;min-width:0;min-height:0}.lang-switch--header .lang-name{display:none}.lang-switch--drawer{display:none}.menu-item--home{display:none}';
 	echo '.hero-media,.hero-lcp,.hero-media picture{position:absolute;inset:0;width:100%;height:100%}.hero-lcp{object-fit:cover;z-index:0}.hero-overlay{position:absolute;inset:0;z-index:1;pointer-events:none}';
 	if ( $home ) {
+		echo 'html.lr-announce-off .lr-announce{display:none}.lr-announce{display:flex;align-items:center;gap:8px;min-height:48px;background:var(--gold);color:var(--navy);padding:4px 8px 4px 12px}.lr-announce__link{flex:1 1 auto;min-width:0;color:var(--navy);font-weight:700;line-height:1.45;padding:8px 4px}.lr-announce__close{flex:0 0 44px;width:44px;height:44px;margin:0;border:0;background:transparent;color:var(--navy);font-size:1.5rem;line-height:1;padding:0;cursor:pointer}';
 		echo '.hero{position:relative;padding:64px 0 0;min-height:560px;display:flex;flex-direction:column;justify-content:flex-end;background:var(--navy);color:#fff;overflow:hidden}';
 		echo '.hero-overlay{background:linear-gradient(to left,rgba(7,22,39,.9) 0%,rgba(7,22,39,.72) 42%,rgba(11,35,65,.46) 100%),linear-gradient(180deg,rgba(7,22,39,.34),rgba(7,22,39,.5))}';
 		echo '.hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.15fr .85fr;gap:36px;align-items:center;padding-bottom:40px}';

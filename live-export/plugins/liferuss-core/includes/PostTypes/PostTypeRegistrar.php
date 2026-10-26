@@ -257,6 +257,19 @@ class PostTypeRegistrar {
 					'supports'    => array( 'title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'custom-fields' ),
 				)
 			),
+			'lr_case'        => self::args(
+				'نمونه کار',
+				'نمونه‌های انجام‌شده',
+				'lr_case',
+				'lr_cases',
+				array(
+					'public'              => false,
+					'publicly_queryable'  => false,
+					'exclude_from_search' => true,
+					'rewrite'             => false,
+					'supports'            => array( 'title', 'editor', 'thumbnail', 'excerpt', 'revisions' ),
+				)
+			),
 			'lr_testimonial' => self::args(
 				'نظر',
 				'نظرات مشتریان',
@@ -267,7 +280,7 @@ class PostTypeRegistrar {
 					'publicly_queryable'  => false,
 					'exclude_from_search' => true,
 					'rewrite'             => false,
-					'supports'            => array( 'title', 'editor', 'thumbnail', 'revisions' ),
+					'supports'            => array( 'title', 'editor', 'thumbnail', 'excerpt', 'revisions' ),
 				)
 			),
 		);

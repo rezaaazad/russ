@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function liferuss_home_section_defs() {
 	return array(
 		'hero'         => array( 'label' => 'هیرو', 'enabled' => '1' ),
+		'licenses'     => array( 'label' => 'مجوزها و اعتماد', 'enabled' => '1' ),
 		'services'     => array( 'label' => 'شبکه خدمات', 'enabled' => '1' ),
 		'paths'        => array( 'label' => 'مسیرهای تحصیل و خدمات', 'enabled' => '1' ),
 		'landings'     => array( 'label' => 'لندینگ‌های خانه', 'enabled' => '1' ),
@@ -24,11 +25,12 @@ function liferuss_home_section_defs() {
 		'majors'       => array( 'label' => 'رشته‌ها', 'enabled' => '1' ),
 		'costs'        => array( 'label' => 'هزینه‌ها', 'enabled' => '1' ),
 		'roadmap'      => array( 'label' => 'نقشه راه', 'enabled' => '1' ),
+		'cases'        => array( 'label' => 'نمونه‌های انجام‌شده', 'enabled' => '1' ),
 		'testimonials' => array( 'label' => 'تجربه‌ها', 'enabled' => '1' ),
 		'cta'          => array( 'label' => 'فرم درخواست', 'enabled' => '1' ),
 		'stats'        => array( 'label' => 'آمار (جدا)', 'enabled' => '0' ),
 		'scholarships' => array( 'label' => 'بورسیه‌ها', 'enabled' => '0' ),
-		'blog'         => array( 'label' => 'تازه‌های مجله', 'enabled' => '0' ),
+		'blog'         => array( 'label' => 'تازه‌های مجله', 'enabled' => '1' ),
 		'faq'          => array( 'label' => 'سؤالات متداول', 'enabled' => '0' ),
 	);
 }
@@ -127,7 +129,7 @@ function liferuss_home_sections_screen() {
 	}
 	$rows = liferuss_home_sections();
 	echo '<div class="wrap"><h1>بخش‌های صفحهٔ اصلی</h1>';
-	echo '<p>ترتیب را بکشید. عنوان خالی همان متن فعلی بخش را نگه می‌دارد. آمار جدا، بورسیه، مجله و سؤالات در حالت پیش‌فرض خاموش‌اند تا ظاهر خانه عوض نشود.</p>';
+	echo '<p>ترتیب را بکشید. عنوان خالی همان متن فعلی بخش را نگه می‌دارد. مجوزها، نمونه‌های انجام‌شده و تازه‌های مجله روشن‌اند، ولی تا وقتی محتوایی نباشد چیزی چاپ نمی‌شود. اگر این فهرست را قبلاً ذخیره کرده‌اید، بخش‌های تازه به انتهای فهرست می‌آیند؛ آن‌ها را به جای دلخواه بکشید. آمار جدا، بورسیه و سؤالات پیش‌فرض خاموش‌اند.</p>';
 	echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 	wp_nonce_field( 'liferuss_home_sections', 'liferuss_home_nonce' );
 	echo '<input type="hidden" name="action" value="liferuss_home_sections">';
