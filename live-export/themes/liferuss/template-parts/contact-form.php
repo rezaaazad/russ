@@ -19,6 +19,7 @@ $message   = isset( $_GET['consult_msg'] ) ? sanitize_text_field( rawurldecode( 
 			<h2><?php echo esc_html( liferuss_t( 'contact_form_title' ) ); ?></h2>
 			<p><?php echo esc_html( liferuss_t( 'contact_form_intro' ) ); ?></p>
 			<?php liferuss_the_contact_channels(); ?>
+			<?php liferuss_the_contact_directory( 'channels' ); ?>
 		</div>
 
 		<div class="consult-card">

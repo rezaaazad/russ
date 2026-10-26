@@ -36,6 +36,7 @@ require_once LIFERUSS_DIR . '/inc/admin-landings.php';
 require_once LIFERUSS_DIR . '/inc/admin-options.php';
 require_once LIFERUSS_DIR . '/inc/ux.php';
 require_once LIFERUSS_DIR . '/inc/legal.php';
+require_once LIFERUSS_DIR . '/inc/contact-lines.php';
 
 /**
  * Theme supports, menus, and image sizes.
@@ -447,6 +448,9 @@ function liferuss_body_class( $classes ) {
 	}
 	if ( '1' === (string) liferuss_opt( 'bottom_nav_enabled', '1' ) ) {
 		$classes[] = 'has-bottom-nav';
+	}
+	if ( function_exists( 'liferuss_contact_directory' ) && liferuss_contact_directory() ) {
+		$classes[] = 'has-callbar';
 	}
 	return $classes;
 }
