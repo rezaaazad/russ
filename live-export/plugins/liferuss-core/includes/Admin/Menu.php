@@ -41,6 +41,7 @@ class Menu {
 		self::link( 'liferuss', 'دانستنی‌ها', 'edit_lr_guides', 'edit.php?post_type=lr_guide' );
 		self::link( 'liferuss', 'سؤالات متداول', 'edit_lr_faqs', 'edit.php?post_type=lr_faq' );
 		self::link( 'liferuss', 'نظرات مشتریان', 'edit_lr_testimonials', 'edit.php?post_type=lr_testimonial' );
+		self::link( 'liferuss', 'نمونه‌های انجام‌شده', 'edit_lr_cases', 'edit.php?post_type=lr_case' );
 		self::link( 'liferuss', 'رسانه', 'upload_files', 'upload.php' );
 
 		add_menu_page( 'CRM', 'CRM', 'lr_access_crm', 'lr-crm', array( LeadAdmin::class, 'queue' ), 'dashicons-groups', 26 );

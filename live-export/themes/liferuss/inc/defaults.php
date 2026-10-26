@@ -28,6 +28,8 @@ function liferuss_default_options() {
 		'header_cta_link'  => '#consultation',
 		'header_phone'     => '',
 		'header_show_phone'=> '0',
+		'announce_text'    => 'مشاوره رایگان تحصیل و مهاجرت به روسیه — همین حالا درخواست دهید',
+		'announce_link'    => '#consultation',
 
 		'hero_eyebrow'      => 'تحصیل عالی · آینده‌ای روشن',
 		'hero_headline'     => 'تحصیل در روسیه، شروع آینده‌ای روشن',
@@ -117,8 +119,17 @@ function liferuss_default_options() {
 			array( 'name' => 'سارا نعمتی', 'meta' => 'دندانپزشکی — سن‌پترزبورگ', 'quote' => 'مشاوره‌شان واقع‌بینانه بود؛ دانشگاه و شهریه را دقیق توضیح دادند و ویزا بدون رفت‌وبرگشت اضافه صادر شد.', 'image' => 'russian-couple.jpg', 'image_id' => 0, 'rating' => '5' ),
 			array( 'name' => 'محمد رضایی', 'meta' => 'مهندسی — باومان', 'quote' => 'استقبال فرودگاه و ثبت‌نام دانشگاه را خودشان هماهنگ کردند. برای خانواده ما این همراهی خیلی اطمینان‌بخش بود.', 'image' => 'russian-couple.jpg', 'image_id' => 0, 'rating' => '5' ),
 		),
-		'stat_value' => '+۵۰۰',
-		'stat_text'  => 'دانشجوی موفق در مسیر تحصیل و استقرار در روسیه',
+		'stat_value'   => '+۵۰۰',
+		'stat_text'    => 'دانشجوی موفق در مسیر تحصیل و استقرار در روسیه',
+		'stat_publish' => '0',
+		'licenses'     => array(
+			array( 'title' => '', 'detail' => '', 'url' => '' ),
+			array( 'title' => '', 'detail' => '', 'url' => '' ),
+			array( 'title' => '', 'detail' => '', 'url' => '' ),
+			array( 'title' => '', 'detail' => '', 'url' => '' ),
+			array( 'title' => '', 'detail' => '', 'url' => '' ),
+			array( 'title' => '', 'detail' => '', 'url' => '' ),
+		),
 
 		'form_eyebrow'     => 'مشاوره رایگان',
 		'form_title'       => 'قدم اول را با ما بردارید',

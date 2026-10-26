@@ -78,6 +78,7 @@ function liferuss_sanitize_options( $input ) {
 
 	$text_keys = array(
 		'brand_name', 'brand_name_en', 'tagline', 'header_cta_text', 'header_cta_link', 'header_phone',
+		'announce_text', 'announce_link',
 		'hero_eyebrow', 'hero_headline', 'hero_subheadline', 'hero_cta1_text', 'hero_cta1_link',
 		'hero_cta2_text', 'hero_cta2_link', 'hero_quote', 'hero_quote_cite',
 		'services_eyebrow', 'services_title', 'services_subtitle',
@@ -123,6 +124,7 @@ function liferuss_sanitize_options( $input ) {
 	}
 
 	$out['header_show_phone']      = empty( $input['header_show_phone'] ) ? '0' : '1';
+	$out['stat_publish']           = empty( $input['stat_publish'] ) ? '0' : '1';
 	$out['services_enabled']       = empty( $input['services_enabled'] ) ? '0' : '1';
 	$out['float_widget_enabled']   = empty( $input['float_widget_enabled'] ) ? '0' : '1';
 	$out['bottom_nav_enabled']     = empty( $input['bottom_nav_enabled'] ) ? '0' : '1';
@@ -162,6 +164,10 @@ function liferuss_sanitize_options( $input ) {
 		$out['trust'] ?? array(),
 		array( 'title' => 'text', 'text' => 'text', 'icon' => 'text' )
 	);
+	$out['licenses'] = liferuss_sanitize_repeater(
+		$out['licenses'] ?? array(),
+		array( 'title' => 'text', 'detail' => 'text', 'url' => 'url' )
+	);
 	$out['footer_links'] = liferuss_sanitize_repeater(
 		$out['footer_links'] ?? array(),
 		array( 'label' => 'text', 'url' => 'text' )
@@ -195,7 +201,7 @@ function liferuss_sanitize_options( $input ) {
 function liferuss_sanitize_i18n( $raw ) {
 	$clean     = array();
 	$text_keys = array(
-		'tagline', 'header_cta_text', 'hero_eyebrow', 'hero_headline', 'hero_subheadline',
+		'tagline', 'header_cta_text', 'announce_text', 'hero_eyebrow', 'hero_headline', 'hero_subheadline',
 		'hero_cta1_text', 'hero_cta2_text', 'hero_quote', 'hero_quote_cite',
 		'services_eyebrow', 'services_title', 'services_subtitle',
 		'universities_eyebrow', 'universities_title', 'universities_subtitle', 'universities_link_text',
@@ -391,6 +397,7 @@ function liferuss_options_page() {
 		'general'       => 'عمومی / برند',
 		'header'        => 'هدر',
 		'hero'          => 'هیرو',
+		'licenses'      => 'مجوزها',
 		'services'      => 'خدمات',
 		'universities'  => 'دانشگاه‌ها',
 		'majors'        => 'رشته‌ها',
@@ -447,9 +454,11 @@ function liferuss_options_page() {
 				liferuss_admin_field( 'header_cta_link', $o['header_cta_link'], 'لینک دکمه CTA' );
 				liferuss_admin_field( 'header_phone', $o['header_phone'], 'تلفن هدر' );
 				liferuss_admin_field( 'header_show_phone', $o['header_show_phone'], 'نمایش تلفن در هدر', 'checkbox' );
+				liferuss_admin_field( 'announce_text', $o['announce_text'] ?? '', 'نوار اطلاعیهٔ صفحهٔ اصلی', 'textarea' );
+				liferuss_admin_field( 'announce_link', $o['announce_link'] ?? '#consultation', 'لینک اطلاعیه' );
 				liferuss_admin_table_end();
 				?>
-				<p class="description">منوی ناوبری از نمایش ← فهرست‌ها مدیریت می‌شود.</p>
+				<p class="description">منوی ناوبری از نمایش ← فهرست‌ها مدیریت می‌شود. نوار اطلاعیه فقط در صفحهٔ اصلی است. متن خالی آن را پنهان می‌کند. مقدار <code>#consultation</code> به فرم مشاورهٔ موجود می‌رود. بستن نوار در همان مرورگر ذخیره می‌شود و با عوض شدن متن دوباره دیده می‌شود.</p>
 			</div>
 
 			<div id="tab-hero" class="liferuss-tab">
@@ -475,6 +484,25 @@ function liferuss_options_page() {
 					liferuss_admin_subfield( "trust][$i][title", $item['title'], 'عنوان' );
 					liferuss_admin_subfield( "trust][$i][text", $item['text'], 'توضیح' );
 					liferuss_admin_subfield( "trust][$i][icon", $item['icon'], 'آیکون (users, shield, chat, bolt, …)' );
+					echo '</div>';
+				}
+				echo '</div>';
+				?>
+			</div>
+
+			<div id="tab-licenses" class="liferuss-tab">
+				<h2>مجوزها و اعتماد</h2>
+				<p class="description">این ردیف جدا از نوار تیرهٔ هیرو است. عنوان خالی چاپ نمی‌شود. تا وقتی عنوانی ننویسید، صفحهٔ اصلی این بخش را نشان نمی‌دهد. عدد، نام مجوز یا تلفن نمونه نگذارید.</p>
+				<?php
+				echo '<div class="liferuss-grid">';
+				foreach ( (array) ( $o['licenses'] ?? array() ) as $i => $item ) {
+					if ( ! is_array( $item ) ) {
+						continue;
+					}
+					echo '<div class="liferuss-card"><h3>مورد ' . esc_html( (string) ( $i + 1 ) ) . '</h3>';
+					liferuss_admin_subfield( "licenses][$i][title", $item['title'] ?? '', 'عنوان' );
+					liferuss_admin_subfield( "licenses][$i][detail", $item['detail'] ?? '', 'جزئیات', 'textarea' );
+					liferuss_admin_subfield( "licenses][$i][url", $item['url'] ?? '', 'لینک (اختیاری)', 'url' );
 					echo '</div>';
 				}
 				echo '</div>';
@@ -598,9 +626,13 @@ function liferuss_options_page() {
 				liferuss_admin_field( 'testimonials_eyebrow', $o['testimonials_eyebrow'], 'خط بالا' );
 				liferuss_admin_field( 'testimonials_title', $o['testimonials_title'], 'عنوان' );
 				liferuss_admin_field( 'testimonials_subtitle', $o['testimonials_subtitle'], 'توضیح', 'textarea' );
-				liferuss_admin_field( 'stat_value', $o['stat_value'], 'عدد آمار (مثلاً +۵۰۰)' );
+				liferuss_admin_field( 'stat_value', $o['stat_value'], 'عدد آمار' );
 				liferuss_admin_field( 'stat_text', $o['stat_text'], 'متن آمار', 'textarea' );
+				liferuss_admin_field( 'stat_publish', $o['stat_publish'] ?? '0', 'نمایش آمار در صفحهٔ اصلی', 'checkbox' );
 				liferuss_admin_table_end();
+				?>
+				<p class="description">نقل‌قول‌های صفحهٔ اصلی از پیشخوان لایف‌روس ← نظرات مشتریان می‌آیند و فقط پس از انتشار دیده می‌شوند. کارت‌های نمونهٔ پایین دیگر در سایت چاپ نمی‌شوند. عدد بسته‌شدهٔ <code>+۵۰۰</code> حتی با زدن این گزینه منتشر نمی‌شود؛ عدد را عوض کنید و بعد گزینه را فعال کنید.</p>
+				<?php
 				echo '<div class="liferuss-grid">';
 				foreach ( $o['testimonials'] as $i => $item ) {
 					echo '<div class="liferuss-card"><h3>دانشجو ' . esc_html( (string) ( $i + 1 ) ) . '</h3>';
@@ -785,6 +817,7 @@ function liferuss_admin_i18n_tab() {
 	$sections = array(
 		'brand_name'             => array( 'نام برند (نمایش در هدر)', 'text' ),
 		'header_cta_text'        => array( 'هدر / CTA', 'text' ),
+		'announce_text'          => array( 'نوار اطلاعیه', 'textarea' ),
 		'tagline'                => array( 'شعار', 'textarea' ),
 		'hero_eyebrow'           => array( 'هیرو: خط بالا', 'text' ),
 		'hero_headline'          => array( 'هیرو: عنوان', 'textarea' ),
