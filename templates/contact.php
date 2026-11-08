@@ -21,7 +21,7 @@ get_header();
 	</div>
 </header>
 
-<?php get_template_part( 'template-parts/consult-form' ); ?>
+<?php get_template_part( 'template-parts/contact-form' ); ?>
 
 <?php
 get_footer();

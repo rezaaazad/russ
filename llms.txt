@@ -1,14 +1,30 @@
 # لایف روس (LifeRuss)
 
-> Multilingual study-abroad advisory for Russia, plus Iran–Russia freight and trade/sourcing landings. Domain: liferuss.com. Not an e-commerce store.
+> Multilingual study-abroad advisory for Russia, plus Iran–Russia freight and trade/sourcing landings. Domain: [liferuss.com](https://liferuss.com/). Not an e-commerce store.
 
-Place this file at the site root (https://liferuss.com/llms.txt). The theme also serves `/llms.txt` dynamically from Theme Options so the live site stays in sync.
+This file is also served at [https://liferuss.com/llms.txt](https://liferuss.com/llms.txt). The theme generates `/llms.txt` dynamically so the live site stays in sync.
 
-Organization: لایف روس
-Alternate names: LifeRuss, Life Russ
-Languages:
-- fa — Persian (default, RTL) https://liferuss.com/
-- ru — Russian (LTR) https://liferuss.com/ru/
-- ar — Arabic (RTL) https://liferuss.com/ar/
-- en — English (LTR) https://liferuss.com/en/
-hreflang: fa, ru, ar, en, x-default → fa
+## Organization
+
+- Name: لایف روس
+- Alternate names: LifeRuss, Life Russ
+- Languages (hreflang): fa (default, x-default), ru, ar, en
+
+## Language homes
+
+- [Persian (RTL)](https://liferuss.com/)
+- [Russian (LTR)](https://liferuss.com/ru/)
+- [Arabic (RTL)](https://liferuss.com/ar/)
+- [English (LTR)](https://liferuss.com/en/)
+
+## Pages
+
+- [Home](https://liferuss.com/)
+- [About](https://liferuss.com/about/)
+- [Universities](https://liferuss.com/universities/)
+- [Services](https://liferuss.com/services/)
+- [Costs](https://liferuss.com/costs/)
+- [Freight and shipping](https://liferuss.com/freight/)
+- [Trade and sourcing](https://liferuss.com/trade/)
+- [Contact](https://liferuss.com/contact/)
+- [Blog](https://liferuss.com/blog/)
