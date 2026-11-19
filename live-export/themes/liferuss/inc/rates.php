@@ -398,7 +398,7 @@ function liferuss_converter_shortcode() {
 	wp_enqueue_script(
 		'liferuss-converter',
 		LIFERUSS_URI . '/assets/js/converter.js',
-		array(),
+		array( 'liferuss-rates-live' ),
 		LIFERUSS_VERSION,
 		true
 	);

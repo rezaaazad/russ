@@ -75,7 +75,30 @@
     meta.textContent = bits.join(" · ");
   }
 
+  function applyBoard(board) {
+    if (!board || !board.items) {
+      return;
+    }
+    board.items.forEach(function (item) {
+      var quote = data.quotes[item.code];
+      if (!quote || item.unit !== "تومان" || !(item.value > 0)) {
+        return;
+      }
+      quote.toman = item.value;
+      quote.source = item.source || "";
+      quote.state = item.state || "";
+      quote.age = item.ageText || "";
+    });
+    paint();
+  }
+
   form.addEventListener("input", paint);
   form.addEventListener("change", paint);
+  document.addEventListener("lr-rates", function (event) {
+    applyBoard(event.detail);
+  });
+  if (window.lrRatesBoard) {
+    applyBoard(window.lrRatesBoard);
+  }
   paint();
 })();
