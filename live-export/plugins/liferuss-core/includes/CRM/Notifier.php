@@ -159,6 +159,32 @@ class Notifier {
 	 * @param string $subject Subject.
 	 * @param string $body    Body.
 	 */
+	/**
+	 * Email exchange operators. The service inbox still gets the normal lead notice.
+	 *
+	 * @param int $lead_id Lead id.
+	 */
+	public static function notify_exchange_operators( int $lead_id ): void {
+		$lead = Repository::for( 'leads' )->find( $lead_id );
+		if ( ! $lead || 'exchange' !== (string) ( $lead['form_type'] ?? '' ) ) {
+			return;
+		}
+		$users = get_users(
+			array(
+				'role'   => 'lr_exchange_operator',
+				'fields' => array( 'user_email' ),
+				'number' => 20,
+			)
+		);
+		$subject = 'صف صرافی: درخواست ' . (string) $lead['lead_code'];
+		$body    = self::body( $lead );
+		foreach ( $users as $user ) {
+			if ( ! empty( $user->user_email ) ) {
+				self::mail_to( (string) $user->user_email, $subject, $body );
+			}
+		}
+	}
+
 	public static function notify_admins( string $subject, string $body ): void {
 		$admins = get_users(
 			array(

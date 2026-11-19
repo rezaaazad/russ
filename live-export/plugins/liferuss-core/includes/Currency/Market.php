@@ -131,6 +131,41 @@ class Market {
 	}
 
 	/**
+	 * Codes an exchange inquiry may store. IRT is the same toman column as IRR.
+	 * USDT is four letters; the column is varchar(8).
+	 *
+	 * @var array<string, bool>
+	 */
+	public const INQUIRY_CODES = array(
+		'IRR'  => true,
+		'USD'  => true,
+		'EUR'  => true,
+		'RUB'  => true,
+		'USDT' => true,
+		'AED'  => true,
+		'CNY'  => true,
+		'TRY'  => true,
+		'GBP'  => true,
+	);
+
+	/**
+	 * Whitelisted inquiry code, or the fallback.
+	 *
+	 * @param string $code     Posted code.
+	 * @param string $fallback Used when the code is not on the list.
+	 */
+	public static function inquiry_code( string $code, string $fallback ): string {
+		$code = strtoupper( trim( $code ) );
+		if ( 'IRT' === $code ) {
+			$code = 'IRR';
+		}
+		if ( ! preg_match( '/^[A-Z]{3,8}$/', $code ) || ! isset( self::INQUIRY_CODES[ $code ] ) ) {
+			return $fallback;
+		}
+		return $code;
+	}
+
+	/**
 	 * Compact JSON for an exchange request. Empty when the board has no rows.
 	 *
 	 * @return array<string, mixed>

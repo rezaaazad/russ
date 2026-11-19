@@ -56,6 +56,18 @@ function liferuss_rate_fa( $key ) {
 		'conv_eur' => 'یورو',
 		'conv_rub' => 'روبل',
 		'conv_usdt' => 'تتر',
+		'conv_aed' => 'درهم',
+		'conv_cny' => 'یوان',
+		'conv_try' => 'لیر',
+		'conv_gbp' => 'پوند',
+		'form_pay' => 'روش پرداخت',
+		'form_pay_cash' => 'نقد',
+		'form_pay_card' => 'کارت',
+		'form_pay_transfer' => 'انتقال',
+		'form_city' => 'شهر',
+		'form_city_ph' => 'شهر تحویل یا شهر دانشگاه',
+		'form_need_pay' => 'روش پرداخت را انتخاب کنید.',
+		'form_need_city' => 'شهر را بنویسید.',
 		);
 	}
 	return isset( $map[ $key ] ) ? $map[ $key ] : $key;

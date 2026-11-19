@@ -92,23 +92,47 @@ if ( 'admission' === $type ) {
 					<span><?php echo esc_html( liferuss_t( 'form_amount' ) ); ?></span>
 					<input type="number" name="consult_amount" required min="1" step="1" inputmode="decimal">
 				</label>
+				<?php
+				$lr_currencies = array(
+					'IRR'  => liferuss_rate_fa( 'conv_irr' ),
+					'USD'  => liferuss_rate_fa( 'conv_usd' ),
+					'EUR'  => liferuss_rate_fa( 'conv_eur' ),
+					'RUB'  => liferuss_rate_fa( 'conv_rub' ),
+					'USDT' => liferuss_rate_fa( 'conv_usdt' ),
+					'AED'  => liferuss_rate_fa( 'conv_aed' ),
+					'CNY'  => liferuss_rate_fa( 'conv_cny' ),
+					'TRY'  => liferuss_rate_fa( 'conv_try' ),
+					'GBP'  => liferuss_rate_fa( 'conv_gbp' ),
+				);
+				?>
 				<label>
 					<span><?php echo esc_html( liferuss_t( 'form_currency_from' ) ); ?></span>
 					<select name="consult_currency_from">
-						<option value="IRR" selected>IRR</option>
-						<option value="RUB">RUB</option>
-						<option value="USD">USD</option>
-						<option value="EUR">EUR</option>
+						<?php foreach ( $lr_currencies as $code => $label ) : ?>
+							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( 'IRR', $code ); ?>><?php echo esc_html( $label ); ?></option>
+						<?php endforeach; ?>
 					</select>
 				</label>
 				<label>
 					<span><?php echo esc_html( liferuss_t( 'form_currency_to' ) ); ?></span>
 					<select name="consult_currency_to">
-						<option value="RUB" selected>RUB</option>
-						<option value="IRR">IRR</option>
-						<option value="USD">USD</option>
-						<option value="EUR">EUR</option>
+						<?php foreach ( $lr_currencies as $code => $label ) : ?>
+							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( 'RUB', $code ); ?>><?php echo esc_html( $label ); ?></option>
+						<?php endforeach; ?>
 					</select>
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_rate_fa( 'form_pay' ) ); ?></span>
+					<select name="consult_payment" required>
+						<option value=""><?php echo esc_html( liferuss_rate_fa( 'form_pay' ) ); ?></option>
+						<option value="cash"><?php echo esc_html( liferuss_rate_fa( 'form_pay_cash' ) ); ?></option>
+						<option value="card"><?php echo esc_html( liferuss_rate_fa( 'form_pay_card' ) ); ?></option>
+						<option value="transfer"><?php echo esc_html( liferuss_rate_fa( 'form_pay_transfer' ) ); ?></option>
+					</select>
+				</label>
+				<label>
+					<span><?php echo esc_html( liferuss_rate_fa( 'form_city' ) ); ?></span>
+					<input type="text" name="consult_city" required maxlength="100" autocomplete="address-level2" placeholder="<?php echo esc_attr( liferuss_rate_fa( 'form_city_ph' ) ); ?>">
 				</label>
 				<label>
 					<span><?php echo esc_html( liferuss_t( 'form_notes' ) ); ?></span>

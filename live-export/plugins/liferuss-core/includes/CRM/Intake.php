@@ -7,6 +7,7 @@
 
 namespace LifeRuss\Core\CRM;
 
+use LifeRuss\Core\Currency\Market;
 use LifeRuss\Core\Repositories\Repository;
 use LifeRuss\Core\Settings\Settings;
 
@@ -151,6 +152,15 @@ class Intake {
 				'message' => $level->get_error_message(),
 			);
 		}
+		if ( 'exchange' === $type ) {
+			$exchange_error = self::exchange_error();
+			if ( '' !== $exchange_error ) {
+				return array(
+					'ok'      => false,
+					'message' => $exchange_error,
+				);
+			}
+		}
 
 		$payload = array(
 			'name'           => $name,
@@ -193,6 +203,9 @@ class Intake {
 		}
 
 		Notifier::enqueue( (int) $lead_id );
+		if ( 'exchange' === $type ) {
+			Notifier::notify_exchange_operators( (int) $lead_id );
+		}
 		return array(
 			'ok'        => true,
 			'message'   => self::success_message( $type ),
@@ -300,6 +313,18 @@ class Intake {
 		if ( $level ) {
 			$lines[] = 'مقطع: ' . $level;
 		}
+		if ( 'exchange' === $type ) {
+			$pay = self::payment_method();
+			$labels = array(
+				'cash'     => 'نقد',
+				'card'     => 'کارت',
+				'transfer' => 'انتقال',
+			);
+			$lines[] = 'صف: صرافی';
+			$lines[] = 'روش پرداخت: ' . ( $labels[ $pay ] ?? $pay );
+			$lines[] = 'شهر: ' . self::text( 'consult_city' );
+			$lines[] = 'نرخ مرجع بازار کنار درخواست ذخیره شد. نرخ نهایی را در پاسخ همین درخواست بنویسید.';
+		}
 		$map = array(
 			'consult_university'  => 'دانشگاه',
 			'consult_scholarship' => 'بورسیه',
@@ -351,12 +376,16 @@ class Intake {
 		}
 		if ( 'exchange' === $type ) {
 			$amount = self::text( 'consult_amount' );
+			$city   = self::text( 'consult_city' );
 			return array(
-				'amount'        => is_numeric( $amount ) ? $amount : 0,
-				'currency_from' => self::currency( 'consult_currency_from', 'IRR' ),
-				'currency_to'   => self::currency( 'consult_currency_to', 'RUB' ),
-				'description'   => self::area( 'consult_notes' ),
-				'stage'         => 'new',
+				'amount'         => is_numeric( $amount ) ? $amount : 0,
+				'currency_from'  => self::currency( 'consult_currency_from', 'IRR' ),
+				'currency_to'    => self::currency( 'consult_currency_to', 'RUB' ),
+				'city'           => function_exists( 'mb_substr' ) ? mb_substr( $city, 0, 100 ) : substr( $city, 0, 100 ),
+				'payment_method' => self::payment_method(),
+				'description'    => self::area( 'consult_notes' ),
+				'rate_snapshot'  => wp_json_encode( Market::snapshot() ),
+				'stage'          => 'new',
 			);
 		}
 		if ( 'freight' === $type || 'cargo' === $type ) {
@@ -444,8 +473,30 @@ class Intake {
 	 * @param string $fallback Default code.
 	 */
 	private static function currency( string $key, string $fallback ): string {
-		$code = strtoupper( self::text( $key ) );
-		return preg_match( '/^[A-Z]{3}$/', $code ) ? $code : $fallback;
+		return Market::inquiry_code( self::text( $key ), $fallback );
+	}
+
+	/**
+	 * cash, card, or transfer. Anything else is empty.
+	 */
+	private static function payment_method(): string {
+		$method = sanitize_key( self::text( 'consult_payment' ) );
+		return in_array( $method, array( 'cash', 'card', 'transfer' ), true ) ? $method : '';
+	}
+
+	/**
+	 * Exchange submissions need a known payment method and a city.
+	 */
+	private static function exchange_error(): string {
+		if ( '' === self::payment_method() ) {
+			return self::t( 'form_need_pay', 'روش پرداخت را انتخاب کنید.' );
+		}
+		$city = self::text( 'consult_city' );
+		$len  = function_exists( 'mb_strlen' ) ? mb_strlen( $city ) : strlen( $city );
+		if ( $len < 2 ) {
+			return self::t( 'form_need_city', 'شهر را بنویسید.' );
+		}
+		return '';
 	}
 
 	/**
