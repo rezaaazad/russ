@@ -326,6 +326,7 @@ class Settings {
 				'turnstile_site_key'   => '',
 				'turnstile_secret'     => '',
 				'sourcing_consult_url' => '/contact/',
+				'cargo_consult_url'    => '/contact/',
 			),
 			'security'      => array(
 				'delete_data_on_uninstall' => '0',

@@ -1,0 +1,31 @@
+/* Cargo lane uses the sourcing layout. These rules only adjust this page. */
+
+.page-template-templates-cargo-lane-php .nav-list .current-menu-item > a {
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
+
+.lr-src-card em {
+  display: block;
+  margin: 0;
+  padding: 0 12px 14px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.lr-src-steps__lead {
+  margin: 0;
+  text-align: center;
+  color: var(--white);
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+@media (min-width: 800px) {
+  .page-template-templates-cargo-lane-php .lr-src-hero,
+  .page-template-templates-cargo-lane-php .lr-src-hero__scrim {
+    min-height: 460px;
+  }
+}
