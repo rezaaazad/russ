@@ -60,6 +60,20 @@ Exported read-only from the production server (Parspack / Hestia CP, Turkey). Co
         "PROXY": "caching",
         "PROXY_EXT": "css,htm,html,js,mjs,json,xml,apng,avif,bmp,cur,gif,ico,jfif,jpg,jpeg,pjp,pjpeg,png,svg,tif,tiff,webp,aac,caf,flac,m4a,midi,mp3,ogg,opus,wav,3gp,av1,avi,m4v,mkv,mov,mpg,mpeg,mp4,mp4v,webm,otf,ttf,woff,woff2,doc,docx,odf,odp,ods,odt,pdf,ppt,pptx,rtf,txt,xls,xlsx,7z,bz2,gz,rar,tar,tgz,zip,apk,appx,bin,dmg,exe,img,iso,jar,msi,webmanifest",
 
+## Rate board and the page cache
+
+nginx-helper (page cache) and redis-cache (object cache) stay enabled for the whole site. Nothing in the rate code flushes them or sets DONOTCACHEPAGE.
+
+The HTML for the rate table, converter, and ticker is a normal cached page. It is rendered with the last transient so it works without JavaScript. The browser then reads `GET /wp-json/liferuss/v1/rates` and replaces only the figures. That route sends `Cache-Control: private, no-store` and `X-Accel-Expires: 0`. The five-minute transient and the `lr_market_last_good` option are unchanged, and they live in the object cache like any other transient.
+
+The theme does not define another Nginx bypass header. If the fastcgi cache still stores this one URL, exclude only that location and leave every other rule as it is:
+
+```
+location = /wp-json/liferuss/v1/rates {
+    set $skip_cache 1;
+}
+```
+
 ## Excluded on purpose
 wp-config.php, .env files, SSH keys/tokens/API keys, database dumps, wp-content/uploads, backups, caches,
 third-party plugins (nginx-helper, redis-cache, modiriat-wordpress — listed above only), WordPress core.
