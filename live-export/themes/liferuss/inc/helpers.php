@@ -238,6 +238,7 @@ function liferuss_nav_tree() {
 			'url'      => liferuss_url( '/services/' ),
 			'class'    => '',
 			'children' => array(
+				array( 'title' => 'بازرگانی و سورسینگ', 'url' => liferuss_url( '/bazargani/' ) ),
 				array( 'title' => liferuss_t( 'nav_exchange' ), 'url' => liferuss_url( '/exchange/' ) ),
 				array( 'title' => 'پرداخت شهریه', 'url' => liferuss_url( '/exchange/tuition-payment/' ) ),
 				array( 'title' => 'حواله به روسیه', 'url' => liferuss_url( '/exchange/transfer-to-russia/' ) ),

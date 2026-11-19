@@ -384,7 +384,8 @@ class SettingsPage {
 		self::text_row( 'notify_email', __( 'ایمیل اطلاع‌رسانی پیش‌فرض', 'liferuss-core' ), (string) $v['notify_email'], 'email' );
 		self::text_row( 'turnstile_site_key', 'Turnstile site key', (string) $v['turnstile_site_key'] );
 		self::text_row( 'turnstile_secret', 'Turnstile secret', (string) $v['turnstile_secret'] );
-		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'اگر هر دو کلید خالی باشند، فرم عمومی بدون Turnstile ثبت می‌شود.', 'liferuss-core' ) . '</p></td></tr>';
+		self::text_row( 'sourcing_consult_url', __( 'مقصد دکمهٔ مشاورهٔ بازرگانی', 'liferuss-core' ), (string) ( $v['sourcing_consult_url'] ?? '/contact/' ) );
+		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'اگر هر دو کلید خالی باشند، فرم عمومی بدون Turnstile ثبت می‌شود. مقصد مشاوره یک مسیر صفحه است، مثل /contact/، و شمارهٔ تلفن نیست.', 'liferuss-core' ) . '</p></td></tr>';
 	}
 
 	/**
@@ -675,6 +676,17 @@ class SettingsPage {
 	}
 
 	/**
+	 * Contact-page path for the sourcing consultation button. Rejects phone links.
+	 */
+	private static function sourcing_consult_url(): string {
+		$url = trim( self::posted_text( 'sourcing_consult_url' ) );
+		if ( '' === $url || str_starts_with( strtolower( $url ), 'tel:' ) ) {
+			return '/contact/';
+		}
+		return $url;
+	}
+
+	/**
 	 * Save form copy.
 	 */
 	private static function save_forms(): void {
@@ -683,8 +695,9 @@ class SettingsPage {
 			array(
 				'success_message'    => self::posted_area( 'success_message' ),
 				'notify_email'       => sanitize_email( self::posted_text( 'notify_email' ) ),
-				'turnstile_site_key' => self::posted_text( 'turnstile_site_key' ),
-				'turnstile_secret'   => self::posted_text( 'turnstile_secret' ),
+				'turnstile_site_key'   => self::posted_text( 'turnstile_site_key' ),
+				'turnstile_secret'     => self::posted_text( 'turnstile_secret' ),
+				'sourcing_consult_url' => self::sourcing_consult_url(),
 			)
 		);
 	}

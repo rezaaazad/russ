@@ -161,6 +161,15 @@ class Intake {
 				);
 			}
 		}
+		if ( 'sourcing' === $type ) {
+			$sourcing_error = self::sourcing_error();
+			if ( '' !== $sourcing_error ) {
+				return array(
+					'ok'      => false,
+					'message' => $sourcing_error,
+				);
+			}
+		}
 
 		$payload = array(
 			'name'           => $name,
@@ -190,7 +199,27 @@ class Intake {
 			);
 		}
 
-		if ( ! empty( $_FILES['consult_file']['name'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( 'sourcing' === $type ) {
+			$stored = Files::store_many(
+				(int) $lead_id,
+				'consult_files',
+				'trade_doc',
+				Files::SOURCING_MAX_FILES,
+				Files::sourcing_limit(),
+				array(
+					'image/jpeg'      => 'jpg',
+					'image/png'       => 'png',
+					'image/webp'      => 'webp',
+					'application/pdf' => 'pdf',
+				)
+			);
+			if ( is_wp_error( $stored ) ) {
+				return array(
+					'ok'      => false,
+					'message' => $stored->get_error_message(),
+				);
+			}
+		} elseif ( ! empty( $_FILES['consult_file']['name'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$doc  = ( 'freight' === $type || 'cargo' === $type ) ? 'cargo_doc' : ( 'trade' === $type ? 'trade_doc' : 'other' );
 			$file = Files::store_upload( (int) $lead_id, 'consult_file', $doc );
 			if ( is_wp_error( $file ) ) {
@@ -313,6 +342,18 @@ class Intake {
 		if ( $level ) {
 			$lines[] = 'مقطع: ' . $level;
 		}
+		if ( 'sourcing' === $type ) {
+			$lines[] = 'هدف: سورسینگ کالا';
+			$lines[] = 'کالا: ' . self::text( 'consult_product' );
+			$lines[] = 'دسته: ' . self::text( 'consult_category' );
+			$lines[] = 'کشور خرید: ' . self::text( 'consult_buy_country' );
+			$lines[] = 'کشور مقصد: ' . self::text( 'consult_dest_country' );
+			$lines[] = 'حجم: ' . self::text( 'consult_volume' );
+			$specs   = self::text( 'consult_specs' );
+			if ( '' !== $specs ) {
+				$lines[] = 'مشخصات: ' . $specs;
+			}
+		}
 		if ( 'exchange' === $type ) {
 			$pay = self::payment_method();
 			$labels = array(
@@ -432,13 +473,22 @@ class Intake {
 				'stage'        => 'new',
 			);
 		}
-		if ( 'trade' === $type ) {
+		if ( 'trade' === $type || 'sourcing' === $type ) {
+			$buy  = self::text( 'consult_buy_country' );
+			$dest = self::text( 'consult_dest_country' );
+			$dir  = ( 'روسیه' === $buy && 'ایران' === $dest ) ? 'ru_to_ir' : 'ir_to_ru';
+			$note = trim( self::text( 'consult_product' ) . "\n" . self::text( 'consult_specs' ) . "\n" . self::area( 'consult_notes' ) );
+			if ( 'sourcing' === $type ) {
+				$note = trim( $note . "\nخرید: " . $buy . "\nمقصد: " . $dest . "\nحجم: " . self::text( 'consult_volume' ) );
+			}
 			return array(
-				'direction'           => self::direction(),
+				'direction'           => 'sourcing' === $type ? $dir : self::direction(),
 				'request_type'        => 'sourcing',
 				'product_category'    => self::text( 'consult_category' ),
-				'product_description' => trim( self::text( 'consult_product' ) . "\n" . self::text( 'consult_specs' ) . "\n" . self::area( 'consult_notes' ) ),
-				'quantity'            => self::decimal( 'consult_qty' ),
+				'product_description' => $note,
+				'company_name'        => self::text( 'consult_name' ),
+				'timeline'            => substr( self::text( 'consult_volume' ), 0, 100 ),
+				'quantity'            => 'sourcing' === $type ? null : self::decimal( 'consult_qty' ),
 				'stage'               => 'new',
 			);
 		}
@@ -523,6 +573,80 @@ class Intake {
 	}
 
 	/**
+	 * Sourcing fields. Countries are only Iran and Russia.
+	 */
+	private static function sourcing_error(): string {
+		$product = self::text( 'consult_product' );
+		if ( ( function_exists( 'mb_strlen' ) ? mb_strlen( $product ) : strlen( $product ) ) < 2 ) {
+			return 'نام کالا را بنویسید.';
+		}
+		$allowed = array( 'pistachio', 'dates', 'food', 'raw', 'spices', 'grains', 'cosmetics', 'russian', 'other' );
+		if ( ! in_array( sanitize_key( self::text( 'consult_category' ) ), $allowed, true ) ) {
+			return 'دسته‌بندی کالا را انتخاب کنید.';
+		}
+		foreach ( array( 'consult_buy_country', 'consult_dest_country' ) as $key ) {
+			if ( ! in_array( self::text( $key ), array( 'ایران', 'روسیه' ), true ) ) {
+				return 'کشور را از بین ایران و روسیه انتخاب کنید.';
+			}
+		}
+		if ( '' === self::text( 'consult_volume' ) ) {
+			return 'حجم یا تعداد را بنویسید.';
+		}
+		return self::sourcing_files_error();
+	}
+
+	/**
+	 * Check sourcing uploads before a lead row is written.
+	 */
+	private static function sourcing_files_error(): string {
+		if ( empty( $_FILES['consult_files']['name'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return '';
+		}
+		$names = $_FILES['consult_files']['name']; // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$errors = $_FILES['consult_files']['error'] ?? array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$sizes  = $_FILES['consult_files']['size'] ?? array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$tmps   = $_FILES['consult_files']['tmp_name'] ?? array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! is_array( $names ) ) {
+			$names  = array( $names );
+			$errors = array( $errors );
+			$sizes  = array( $sizes );
+			$tmps   = array( $tmps );
+		}
+		$count = 0;
+		$limit = Files::sourcing_limit();
+		$allow = array( 'image/jpeg', 'image/png', 'image/webp', 'application/pdf' );
+		foreach ( $errors as $index => $error ) {
+			$error = (int) $error;
+			if ( UPLOAD_ERR_NO_FILE === $error ) {
+				continue;
+			}
+			++$count;
+			if ( $count > Files::SOURCING_MAX_FILES ) {
+				return 'حداکثر ۵ فایل می‌توانید بفرستید.';
+			}
+			if ( UPLOAD_ERR_INI_SIZE === $error || UPLOAD_ERR_FORM_SIZE === $error ) {
+				return 'حجم فایل از سقف سرور بیشتر است.';
+			}
+			if ( UPLOAD_ERR_OK !== $error ) {
+				return 'آپلود ناموفق بود.';
+			}
+			if ( (int) ( $sizes[ $index ] ?? 0 ) > $limit ) {
+				return 'هر فایل باید کوچک‌تر از سقف مجاز باشد.';
+			}
+			$tmp = (string) ( $tmps[ $index ] ?? '' );
+			$finfo = function_exists( 'finfo_open' ) ? finfo_open( FILEINFO_MIME_TYPE ) : false;
+			$mime  = $finfo ? (string) finfo_file( $finfo, $tmp ) : '';
+			if ( $finfo ) {
+				finfo_close( $finfo );
+			}
+			if ( ! in_array( $mime, $allow, true ) ) {
+				return 'فقط JPG، PNG، WEBP یا PDF پذیرفته می‌شود.';
+			}
+		}
+		return '';
+	}
+
+	/**
 	 * cash, card, or transfer. Anything else is empty.
 	 */
 	private static function payment_method(): string {
@@ -582,6 +706,7 @@ class Intake {
 			'freight'     => 'freight_form_success',
 			'cargo'       => 'freight_form_success',
 			'trade'       => 'trade_form_success',
+			'sourcing'    => 'trade_form_success',
 			'contact'     => 'contact_form_success',
 			'exchange'    => 'form_success',
 			'immigration' => 'form_success',

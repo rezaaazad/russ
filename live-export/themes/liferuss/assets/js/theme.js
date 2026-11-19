@@ -457,6 +457,27 @@ function latinDigits(value) {
         return "این فیلد را کامل کنید.";
       }
 
+      function fileProblem(input) {
+        var maxFiles = parseInt(input.getAttribute("data-lr-max-files") || "0", 10);
+        var maxBytes = parseInt(input.getAttribute("data-lr-max-bytes") || "0", 10);
+        var files = input.files || [];
+        if (maxFiles && files.length > maxFiles) {
+          return "حداکثر ۵ فایل می‌توانید بفرستید.";
+        }
+        var allowed = { "image/jpeg": 1, "image/png": 1, "image/webp": 1, "application/pdf": 1 };
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          var name = String(file.name || "").toLowerCase();
+          if (!allowed[file.type] || !/\.(jpe?g|png|webp|pdf)$/.test(name)) {
+            return "فقط JPG، PNG، WEBP یا PDF پذیرفته می‌شود.";
+          }
+          if (maxBytes && file.size > maxBytes) {
+            return "هر فایل باید کوچک‌تر از سقف مجاز باشد.";
+          }
+        }
+        return "";
+      }
+
       function stampValidity(target) {
         target.querySelectorAll("input, select, textarea").forEach(function (field) {
           field.setCustomValidity("");
@@ -495,6 +516,18 @@ function latinDigits(value) {
           visaHidden.value = visaYear.value + "/" + (visaMonth ? visaMonth.value : "") + "/" + (visaDay ? visaDay.value : "");
         }
         stampValidity(form);
+        var upload = form.querySelector("[data-lr-max-files]");
+        if (upload) {
+          var problem = fileProblem(upload);
+          if (problem) {
+            upload.setCustomValidity(problem);
+          }
+        }
+        if (upload && upload.validationMessage) {
+          showStatus(false, upload.validationMessage);
+          upload.reportValidity();
+          return;
+        }
         if (typeof form.checkValidity === "function" && !form.checkValidity()) {
           var first = form.querySelector(":invalid");
           var message = first && first.validationMessage ? first.validationMessage : "فرم را کامل کنید.";
