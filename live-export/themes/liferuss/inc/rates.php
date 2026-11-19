@@ -57,6 +57,20 @@ function liferuss_rates_assets() {
 		array( 'liferuss-theme' ),
 		LIFERUSS_VERSION
 	);
+	wp_enqueue_script(
+		'liferuss-rates-live',
+		LIFERUSS_URI . '/assets/js/rates-live.js',
+		array(),
+		LIFERUSS_VERSION,
+		true
+	);
+	wp_localize_script(
+		'liferuss-rates-live',
+		'lrRatesLive',
+		array(
+			'url' => rest_url( 'liferuss/v1/rates' ),
+		)
+	);
 }
 add_action( 'wp_enqueue_scripts', 'liferuss_rates_assets' );
 
@@ -99,7 +113,7 @@ add_filter( 'the_content', 'liferuss_rates_prepend', 7 );
 function liferuss_the_rates_table() {
 	$board = liferuss_rates_board();
 	$items = $board['items'];
-	echo '<div class="lr-rates">';
+	echo '<div class="lr-rates" data-lr-live="board">';
 	echo '<h2 class="lr-rates__title">' . esc_html( liferuss_rate_fa( 'rates_title' ) ) . '</h2>';
 	echo '<p class="lr-rates__notice">' . esc_html( liferuss_rates_notice( $board ) ) . '</p>';
 	if ( ! empty( $board['fallback'] ) && $items ) {
@@ -141,26 +155,22 @@ function liferuss_the_rates_table() {
  */
 function liferuss_rates_row( array $item ) {
 	$stale = isset( $item['state'] ) && 'stale' === $item['state'];
-	echo '<tr' . ( $stale ? ' class="is-stale"' : '' ) . '>';
+	$unit  = (string) ( $item['unit'] ?? '' );
+	echo '<tr data-lr-code="' . esc_attr( (string) $item['code'] ) . '" data-lr-unit="' . esc_attr( $unit ) . '"' . ( $stale ? ' class="is-stale"' : '' ) . '>';
 	echo '<th scope="row" data-label="' . esc_attr( liferuss_rate_fa( 'rates_col_name' ) ) . '">';
 	echo esc_html( (string) $item['title'] );
 	if ( ! empty( $item['pair'] ) ) {
 		echo ' <span class="lr-rates__pair" dir="ltr">' . esc_html( (string) $item['pair'] ) . '</span>';
 	}
-	if ( $stale ) {
-		echo ' <span class="lr-rates__badge">' . esc_html( liferuss_rate_fa( 'rates_stale' ) ) . '</span>';
-	}
+	echo ' <span class="lr-rates__badge"' . ( $stale ? '' : ' hidden' ) . '>' . esc_html( liferuss_rate_fa( 'rates_stale' ) ) . '</span>';
 	echo '</th>';
-	$unit = (string) ( $item['unit'] ?? '' );
 	foreach ( array( 'value', 'buy', 'sell' ) as $key ) {
-		echo '<td data-label="' . esc_attr( liferuss_rate_fa( 'rates_col_' . $key ) ) . '">' . esc_html( liferuss_rates_amount( $item[ $key ] ?? null, $unit ) ) . '</td>';
+		echo '<td data-lr-field="' . esc_attr( $key ) . '" data-label="' . esc_attr( liferuss_rate_fa( 'rates_col_' . $key ) ) . '">' . esc_html( liferuss_rates_amount( $item[ $key ] ?? null, $unit ) ) . '</td>';
 	}
-	echo '<td data-label="' . esc_attr( liferuss_rate_fa( 'rates_col_source' ) ) . '">' . esc_html( (string) $item['source'] ) . '</td>';
-	echo '<td data-label="' . esc_attr( liferuss_rate_fa( 'rates_col_age' ) ) . '">';
-	echo esc_html( liferuss_rates_age( $item ) );
-	if ( ! empty( $item['atText'] ) ) {
-		echo '<span class="lr-rates__clock" dir="ltr">' . esc_html( liferuss_rates_clock( (string) $item['atText'] ) ) . '</span>';
-	}
+	echo '<td data-lr-field="source" data-label="' . esc_attr( liferuss_rate_fa( 'rates_col_source' ) ) . '">' . esc_html( (string) $item['source'] ) . '</td>';
+	echo '<td data-lr-field="age" data-label="' . esc_attr( liferuss_rate_fa( 'rates_col_age' ) ) . '">';
+	echo '<span data-lr-field="age-text">' . esc_html( liferuss_rates_age( $item ) ) . '</span>';
+	echo '<span class="lr-rates__clock" data-lr-field="clock" dir="ltr">' . esc_html( liferuss_rates_clock( (string) ( $item['atText'] ?? '' ) ) ) . '</span>';
 	echo '</td></tr>';
 }
 
