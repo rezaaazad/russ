@@ -152,11 +152,11 @@ $tiles = array(
 							<input type="tel" name="consult_phone" required autocomplete="tel" inputmode="tel" dir="ltr" maxlength="16" placeholder="شماره موبایل">
 						</label>
 						<label>
-							<span>ایمیل</span>
+							<span>ایمیل (اختیاری)</span>
 							<input type="email" name="consult_email" autocomplete="email" dir="ltr" maxlength="100" placeholder="example@email.com">
 						</label>
 						<label>
-							<span>مقطع تحصیلی موردنظر</span>
+							<span>مقطع تحصیلی موردنظر (اختیاری)</span>
 							<select name="consult_degree">
 								<option value="">انتخاب کنید</option>
 								<?php foreach ( liferuss_scholarship_degrees() as $slug => $label ) : ?>
@@ -165,7 +165,7 @@ $tiles = array(
 							</select>
 						</label>
 						<label>
-							<span>رشته مورد علاقه</span>
+							<span>رشته مورد علاقه (اختیاری)</span>
 							<select name="consult_field">
 								<option value="">انتخاب کنید</option>
 								<?php foreach ( liferuss_scholarship_fields() as $slug => $label ) : ?>
@@ -174,7 +174,7 @@ $tiles = array(
 							</select>
 						</label>
 						<label>
-							<span>مدرک زبان (در صورت وجود)</span>
+							<span>مدرک زبان (در صورت وجود) (اختیاری)</span>
 							<select name="consult_lang_cert">
 								<option value="">انتخاب کنید</option>
 								<?php foreach ( liferuss_scholarship_languages() as $slug => $label ) : ?>
@@ -183,7 +183,7 @@ $tiles = array(
 							</select>
 						</label>
 						<label class="lr-sch-fields__wide">
-							<span>توضیحات تکمیلی</span>
+							<span>توضیحات تکمیلی (اختیاری)</span>
 							<textarea name="consult_notes" rows="3" placeholder="هر توضیح یا سؤالی دارید اینجا بنویسید."></textarea>
 						</label>
 					</div>
