@@ -350,90 +350,49 @@ function liferuss_theme_img( $file ) {
 }
 
 /**
- * Header wordmark. Layout box is 92×40 so the 64px bar does not grow.
- * h80 is 1x and h160 is 2x. A white plate keeps the navy artwork visible on the dark header.
+ * Header lockup on navy. 83×36 on small screens, 101×44 from 768px.
  */
 function liferuss_the_wordmark() {
-	$alt = trim( liferuss_brand() . ' — LifeRuss' );
-	$one = liferuss_theme_img( 'logo-header-h80.png' );
-	$two = liferuss_theme_img( 'logo-header-h160.png' );
-	echo '<span class="brand-plate">';
+	$src = function_exists( 'liferuss_brand_uri' ) ? liferuss_brand_uri( 'lockup-horizontal-reversed.svg' ) : '';
+	if ( '' === $src ) {
+		return;
+	}
 	printf(
-		'<img class="brand-logo" src="%1$s" srcset="%1$s 1x, %2$s 2x" width="92" height="40" alt="%3$s" decoding="async">',
-		esc_url( $one ),
-		esc_url( $two ),
-		esc_attr( $alt )
+		'<img class="brand-logo" src="%1$s" width="101" height="44" alt="%2$s" decoding="async">',
+		esc_url( $src ),
+		esc_attr( 'لایف روس' )
 	);
-	echo '</span>';
 }
 
 /**
- * Eagle mark for the footer. Decorative: the brand name sits beside it.
+ * Footer uses the same reversed lockup. The footer background is navy.
  */
 function liferuss_the_emblem() {
-	$one = liferuss_theme_img( 'emblem-h80.png' );
-	$two = liferuss_theme_img( 'emblem-h160.png' );
-	echo '<span class="brand-plate brand-plate--emblem">';
-	printf(
-		'<img class="brand-emblem" src="%1$s" srcset="%1$s 1x, %2$s 2x" width="32" height="37" alt="" decoding="async">',
-		esc_url( $one ),
-		esc_url( $two )
-	);
-	echo '</span>';
+	liferuss_the_wordmark();
 }
 
 /**
- * Homepage logo loop. The clip has a white background, so it only sits on the white band under the hero.
- * The navy header and footer keep the static PNG. Reduced motion and Save-Data never request the mp4.
+ * White band under the homepage hero. The color lockup is drawn for a light ground.
  */
 function liferuss_the_logo_motion() {
-	$alt    = trim( liferuss_brand() . ' — LifeRuss' );
-	$still  = liferuss_theme_img( 'logo-header-h80.png' );
-	$still2 = liferuss_theme_img( 'logo-header-h160.png' );
-	$poster = liferuss_theme_img( 'logo-anim-poster.png' );
-	$video  = liferuss_theme_img( 'logo-anim-white.mp4' );
-	?>
-	<div class="lr-logo-motion">
-		<div class="lr-logo-motion__frame">
-			<video class="lr-logo-motion__video" width="320" height="148" muted autoplay loop playsinline preload="metadata" poster="<?php echo esc_url( $poster ); ?>" data-src="<?php echo esc_url( $video ); ?>"></video>
-			<img class="lr-logo-motion__still" src="<?php echo esc_url( $still ); ?>" srcset="<?php echo esc_url( $still ); ?> 1x, <?php echo esc_url( $still2 ); ?> 2x" width="184" height="80" alt="<?php echo esc_attr( $alt ); ?>" decoding="async">
-		</div>
-	</div>
-	<script>
-	(function () {
-		var band = document.currentScript && document.currentScript.previousElementSibling;
-		var video = band ? band.querySelector('.lr-logo-motion__video') : null;
-		var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-		var type = conn && conn.effectiveType ? conn.effectiveType : '';
-		var slow = conn && (conn.saveData || type === 'slow-2g' || type === '2g');
-		if (!video || reduce || slow) {
-			document.documentElement.classList.add('lr-logo-still');
-			if (video) {
-				video.removeAttribute('autoplay');
-				video.preload = 'none';
-				video.removeAttribute('data-src');
-			}
-			return;
-		}
-		var src = video.getAttribute('data-src');
-		if (!src) {
-			return;
-		}
-		var source = document.createElement('source');
-		source.type = 'video/mp4';
-		source.src = src;
-		video.appendChild(source);
-		video.load();
-	}());
-	</script>
-	<?php
+	$src = function_exists( 'liferuss_brand_uri' ) ? liferuss_brand_uri( 'lockup-horizontal-color.svg' ) : '';
+	if ( '' === $src ) {
+		return;
+	}
+	echo '<div class="lr-logo-band">';
+	printf(
+		'<img class="lr-logo-band__img" src="%1$s" width="202" height="88" alt="%2$s" decoding="async">',
+		esc_url( $src ),
+		esc_attr( 'لایف روس' )
+	);
+	echo '</div>';
 }
 
 /**
  * Favicon, apple touch icon, and web manifest from the theme. Replaces the old round mark.
  */
 function liferuss_site_icons() {
+	return;
 	if ( is_admin() ) {
 		return;
 	}
@@ -553,13 +512,13 @@ function liferuss_filter_site_icon_url( $url, $size = 32 ) {
 	} elseif ( $size <= 48 ) {
 		$file = 'favicon-48.png';
 	} elseif ( $size <= 180 ) {
-		$file = 'apple-touch-icon-180.png';
+		$file = 'apple-touch-icon.png';
 	} elseif ( $size <= 192 ) {
-		$file = 'favicon-192.png';
+		$file = 'icon-192.png';
 	} else {
-		$file = 'favicon-512.png';
+		$file = 'icon-512.png';
 	}
-	return liferuss_theme_img( $file );
+	return function_exists( 'liferuss_brand_uri' ) ? liferuss_brand_uri( $file ) : liferuss_theme_img( $file );
 }
 add_filter( 'get_site_icon_url', 'liferuss_filter_site_icon_url', 10, 2 );
 
