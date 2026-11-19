@@ -32,6 +32,9 @@ class LeadAdmin {
 		add_action( 'admin_menu', array( self::class, 'hidden' ) );
 		add_action( 'admin_post_lr_lead_save', array( self::class, 'save' ) );
 		add_action( 'admin_post_lr_leads_bulk', array( self::class, 'bulk' ) );
+		add_action( 'admin_post_lr_lead_delete', array( self::class, 'delete_lead' ) );
+		add_action( 'admin_post_lr_exchange_delete', array( self::class, 'delete_exchange' ) );
+		add_action( 'admin_post_lr_exchange_bulk_delete', array( self::class, 'delete_exchange_bulk' ) );
 		add_action( 'admin_post_lr_export_leads', array( self::class, 'export' ) );
 		add_action( 'admin_post_lr_migrate_leads', array( self::class, 'migrate' ) );
 	}
@@ -405,21 +408,77 @@ class LeadAdmin {
 	}
 
 	/**
-	 * Bulk assign from the list.
+	 * Bulk assign or delete from the list.
 	 */
 	public static function bulk(): void {
-		if ( ! current_user_can( 'lr_assign_leads' ) ) {
-			wp_die( esc_html__( 'اجازهٔ ارجاع ندارید.', 'liferuss-core' ), '', array( 'response' => 403 ) );
-		}
 		check_admin_referer( 'lr_leads_bulk' );
-		$user = isset( $_POST['consultant_id'] ) ? absint( wp_unslash( $_POST['consultant_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$ids  = isset( $_POST['lead_ids'] ) && is_array( $_POST['lead_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['lead_ids'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		foreach ( $ids as $id ) {
-			if ( $id ) {
-				LeadWriter::assign( $id, $user );
+		$do  = isset( $_POST['lr_bulk'] ) ? sanitize_key( wp_unslash( $_POST['lr_bulk'] ) ) : 'assign'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$ids = isset( $_POST['lead_ids'] ) && is_array( $_POST['lead_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['lead_ids'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( 'delete' === $do ) {
+			if ( ! current_user_can( 'lr_delete_leads' ) ) {
+				wp_die( esc_html__( 'اجازهٔ حذف ندارید.', 'liferuss-core' ), '', array( 'response' => 403 ) );
+			}
+			foreach ( $ids as $id ) {
+				if ( $id ) {
+					LeadWriter::delete_lead( $id );
+				}
+			}
+		} else {
+			if ( ! current_user_can( 'lr_assign_leads' ) ) {
+				wp_die( esc_html__( 'اجازهٔ ارجاع ندارید.', 'liferuss-core' ), '', array( 'response' => 403 ) );
+			}
+			$user = isset( $_POST['consultant_id'] ) ? absint( wp_unslash( $_POST['consultant_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			foreach ( $ids as $id ) {
+				if ( $id ) {
+					LeadWriter::assign( $id, $user );
+				}
 			}
 		}
 		wp_safe_redirect( wp_get_referer() ? wp_get_referer() : admin_url( 'admin.php?page=lr-leads' ) );
+		exit;
+	}
+
+	/**
+	 * Delete one lead from its row action.
+	 */
+	public static function delete_lead(): void {
+		$id = isset( $_GET['lead_id'] ) ? absint( wp_unslash( $_GET['lead_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		check_admin_referer( 'lr_lead_delete_' . $id );
+		if ( ! LeadWriter::delete_lead( $id ) ) {
+			wp_die( esc_html__( 'حذف این لید ممکن نشد.', 'liferuss-core' ), '', array( 'response' => 403 ) );
+		}
+		wp_safe_redirect( wp_get_referer() ? wp_get_referer() : admin_url( 'admin.php?page=lr-leads' ) );
+		exit;
+	}
+
+	/**
+	 * Delete one exchange request.
+	 */
+	public static function delete_exchange(): void {
+		$id = isset( $_POST['request_id'] ) ? absint( wp_unslash( $_POST['request_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( 'lr_exchange_delete_' . $id );
+		if ( ! LeadWriter::delete_exchange_request( $id ) ) {
+			wp_die( esc_html__( 'حذف این درخواست ممکن نشد.', 'liferuss-core' ), '', array( 'response' => 403 ) );
+		}
+		wp_safe_redirect( wp_get_referer() ? wp_get_referer() : admin_url( 'admin.php?page=lr-req-exchange' ) );
+		exit;
+	}
+
+	/**
+	 * Delete the checked exchange requests.
+	 */
+	public static function delete_exchange_bulk(): void {
+		if ( ! current_user_can( 'lr_manage_exchange_requests' ) ) {
+			wp_die( esc_html__( 'اجازهٔ حذف ندارید.', 'liferuss-core' ), '', array( 'response' => 403 ) );
+		}
+		check_admin_referer( 'lr_exchange_bulk_delete' );
+		$ids = isset( $_POST['request_ids'] ) && is_array( $_POST['request_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['request_ids'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		foreach ( $ids as $id ) {
+			if ( $id ) {
+				LeadWriter::delete_exchange_request( $id );
+			}
+		}
+		wp_safe_redirect( wp_get_referer() ? wp_get_referer() : admin_url( 'admin.php?page=lr-req-exchange' ) );
 		exit;
 	}
 
@@ -504,13 +563,19 @@ class LeadAdmin {
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		wp_nonce_field( 'lr_leads_bulk' );
 		echo '<input type="hidden" name="action" value="lr_leads_bulk">';
-		if ( current_user_can( 'lr_assign_leads' ) ) {
-			echo '<p><select name="consultant_id"><option value="0">' . esc_html__( 'برداشتن ارجاع', 'liferuss-core' ) . '</option>';
-			foreach ( self::staff() as $staff ) {
-				echo '<option value="' . esc_attr( (string) $staff->ID ) . '">' . esc_html( $staff->display_name ) . '</option>';
+		if ( current_user_can( 'lr_assign_leads' ) || current_user_can( 'lr_delete_leads' ) ) {
+			echo '<p>';
+			if ( current_user_can( 'lr_assign_leads' ) ) {
+				echo '<select name="consultant_id"><option value="0">' . esc_html__( 'برداشتن ارجاع', 'liferuss-core' ) . '</option>';
+				foreach ( self::staff() as $staff ) {
+					echo '<option value="' . esc_attr( (string) $staff->ID ) . '">' . esc_html( $staff->display_name ) . '</option>';
+				}
+				echo '</select> ';
+				echo '<button type="submit" class="button" name="lr_bulk" value="assign">' . esc_html__( 'ارجاع انتخاب‌شده‌ها', 'liferuss-core' ) . '</button> ';
 			}
-			echo '</select> ';
-			submit_button( __( 'ارجاع انتخاب‌شده‌ها', 'liferuss-core' ), 'secondary', 'submit', false );
+			if ( current_user_can( 'lr_delete_leads' ) ) {
+				echo '<button type="submit" class="button" name="lr_bulk" value="delete" data-lr-confirm="لیدهای انتخاب‌شده و درخواست‌های مرتبطشان حذف شوند؟">' . esc_html__( 'حذف انتخاب‌شده‌ها', 'liferuss-core' ) . '</button>';
+			}
 			echo '</p>';
 		}
 		$table->search_box( __( 'جستجو', 'liferuss-core' ), 'leads' );
@@ -546,12 +611,28 @@ class LeadAdmin {
 		);
 		$stages   = Catalog::stages( $suffix );
 		$exchange = 'exchange_requests' === $suffix;
-		$cols     = $exchange ? 7 : 3;
-		echo '<div class="wrap lr-wrap"><h1>' . esc_html( $title ) . '</h1><table class="widefat striped"><thead><tr><th>ID</th><th>لید</th>';
+		$cols     = $exchange ? 9 : 3;
+		echo '<div class="wrap lr-wrap"><h1>' . esc_html( $title ) . '</h1>';
+		if ( $exchange ) {
+			echo '<form id="lr-exchange-bulk" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+			wp_nonce_field( 'lr_exchange_bulk_delete' );
+			echo '<input type="hidden" name="action" value="lr_exchange_bulk_delete">';
+			echo '<p><button type="submit" class="button" data-lr-confirm="درخواست‌های انتخاب‌شده حذف شوند؟">' . esc_html__( 'حذف انتخاب‌شده‌ها', 'liferuss-core' ) . '</button></p>';
+			echo '</form>';
+		}
+		echo '<table class="widefat striped"><thead><tr>';
+		if ( $exchange ) {
+			echo '<th class="check-column"><input type="checkbox" data-lr-check-all="lr-exchange-bulk" aria-label="' . esc_attr__( 'انتخاب همه', 'liferuss-core' ) . '"></th>';
+		}
+		echo '<th>ID</th><th>لید</th>';
 		if ( $exchange ) {
 			echo '<th>' . esc_html__( 'ارز', 'liferuss-core' ) . '</th><th>' . esc_html__( 'شهر', 'liferuss-core' ) . '</th><th>' . esc_html__( 'روش', 'liferuss-core' ) . '</th><th>' . esc_html__( 'هدف', 'liferuss-core' ) . '</th>';
 		}
-		echo '<th>مرحله</th></tr></thead><tbody>';
+		echo '<th>مرحله</th>';
+		if ( $exchange ) {
+			echo '<th>' . esc_html__( 'حذف', 'liferuss-core' ) . '</th>';
+		}
+		echo '</tr></thead><tbody>';
 		if ( ! $rows['items'] ) {
 			echo '<tr><td colspan="' . esc_attr( (string) $cols ) . '">' . esc_html__( 'درخواستی نیست.', 'liferuss-core' ) . '</td></tr>';
 		}
@@ -570,7 +651,11 @@ class LeadAdmin {
 		);
 		foreach ( $rows['items'] as $row ) {
 			$link = admin_url( 'admin.php?page=lr-lead&id=' . (int) $row['lead_id'] );
-			echo '<tr><td>' . esc_html( (string) $row['id'] ) . '</td><td><a href="' . esc_url( $link ) . '">#' . esc_html( (string) $row['lead_id'] ) . '</a></td>';
+			echo '<tr>';
+			if ( $exchange ) {
+				echo '<th class="check-column" scope="row"><input form="lr-exchange-bulk" type="checkbox" name="request_ids[]" value="' . esc_attr( (string) $row['id'] ) . '"></th>';
+			}
+			echo '<td>' . esc_html( (string) $row['id'] ) . '</td><td><a href="' . esc_url( $link ) . '">#' . esc_html( (string) $row['lead_id'] ) . '</a></td>';
 			if ( $exchange ) {
 				$pair = (string) ( $row['currency_from'] ?? '' ) . ' → ' . (string) ( $row['currency_to'] ?? '' );
 				$pay  = (string) ( $row['payment_method'] ?? '' );
@@ -591,7 +676,16 @@ class LeadAdmin {
 			}
 			echo '</select> ';
 			submit_button( __( 'ذخیره', 'liferuss-core' ), 'secondary small', 'submit', false );
-			echo '</form></td></tr>';
+			echo '</form></td>';
+			if ( $exchange ) {
+				echo '<td><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+				wp_nonce_field( 'lr_exchange_delete_' . (int) $row['id'] );
+				echo '<input type="hidden" name="action" value="lr_exchange_delete">';
+				echo '<input type="hidden" name="request_id" value="' . esc_attr( (string) $row['id'] ) . '">';
+				echo '<button type="submit" class="button-link-delete" data-lr-confirm="این درخواست صرافی حذف شود؟">' . esc_html__( 'حذف', 'liferuss-core' ) . '</button>';
+				echo '</form></td>';
+			}
+			echo '</tr>';
 		}
 		echo '</tbody></table></div>';
 	}

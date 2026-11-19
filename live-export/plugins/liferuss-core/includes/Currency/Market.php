@@ -109,7 +109,7 @@ class Market {
 		}
 		$now      = (int) round( microtime( true ) * 1000 );
 		$payload  = array(
-			'items'     => self::decorate( $stored['items'], $now ),
+			'items'     => self::visible( self::decorate( $stored['items'], $now ) ),
 			'fetchedAt' => (string) $stored['fetchedAt'],
 			'fallback'  => empty( $fresh['items'] ),
 			'notice'    => self::notice(),
@@ -131,7 +131,7 @@ class Market {
 		$stored = self::load();
 		$now    = (int) round( microtime( true ) * 1000 );
 		return array(
-			'items'     => self::decorate( $stored['items'], $now ),
+			'items'     => self::visible( self::decorate( $stored['items'], $now ) ),
 			'fetchedAt' => (string) $stored['fetchedAt'],
 			'fallback'  => (bool) $stored['fallback'],
 			'notice'    => self::notice(),
@@ -139,10 +139,79 @@ class Market {
 	}
 
 	/**
+	 * Public focus. `ruble` shows only the Russia ruble quotes. `board` restores
+	 * the full whitelist. The parsers stay in place either way.
+	 */
+	public static function ruble_only(): bool {
+		return 'ruble' === (string) apply_filters( 'lr_market_focus', 'ruble' );
+	}
+
+	/**
+	 * Rows a public response may include.
+	 *
+	 * Ruble mode keeps the Russia quotes Local.Moscow publishes for the ruble:
+	 * toman per ruble (Mir Business Bank) and Moscow cash ruble per tether.
+	 * Tehran dollar, Herat, havale and the rest stay out of the response.
+	 *
+	 * @param array<int, array<string, mixed>> $items Decorated rows.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function visible( array $items ): array {
+		if ( ! self::ruble_only() ) {
+			return $items;
+		}
+		$keep = array(
+			'MBB'           => true,
+			'USDT_RUB_SELL' => true,
+			'USDT_RUB_BUY'  => true,
+		);
+		$out  = array();
+		foreach ( $items as $item ) {
+			if ( ! is_array( $item ) || ! isset( $keep[ (string) ( $item['code'] ?? '' ) ] ) ) {
+				continue;
+			}
+			if ( 'MBB' === (string) $item['code'] ) {
+				$item = self::mbb_as_toman( $item );
+			}
+			$out[] = $item;
+		}
+		return $out;
+	}
+
+	/**
 	 * Persian sentence shown next to the board and stored with an inquiry.
 	 */
 	public static function notice(): string {
+		if ( self::ruble_only() ) {
+			return 'نرخ روبل در روسیه از Local.Moscow است. نرخ نهایی معامله در پاسخ استعلام اعلام می‌شود.';
+		}
 		return 'این اعداد مرجع بازار هستند. نرخ نهایی معامله در پاسخ استعلام اعلام می‌شود.';
+	}
+
+	/**
+	 * Show the bank's rial-per-ruble quote as toman. Dividing by ten is the unit,
+	 * not a new price.
+	 *
+	 * @param array<string, mixed> $item MBB row.
+	 * @return array<string, mixed>
+	 */
+	private static function mbb_as_toman( array $item ): array {
+		$unit = (string) ( $item['unit'] ?? '' );
+		if ( 'تومان' === $unit ) {
+			return $item;
+		}
+		$rial = ( 'ریال' === $unit ) || ( 0 === strpos( $unit, 'IRR' ) );
+		if ( ! $rial ) {
+			return $item;
+		}
+		foreach ( array( 'value', 'buy', 'sell' ) as $key ) {
+			if ( is_numeric( $item[ $key ] ?? null ) ) {
+				$item[ $key ] = ( (float) $item[ $key ] ) / 10;
+			}
+		}
+		$item['unit'] = 'تومان';
+		$item['pair'] = 'RUB/IRT';
+		return $item;
 	}
 
 	/**

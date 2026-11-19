@@ -1,4 +1,26 @@
 (function () {
+	document.addEventListener('click', function (event) {
+		var node = event.target.closest('[data-lr-confirm]');
+		if (!node) {
+			return;
+		}
+		var text = node.getAttribute('data-lr-confirm') || 'حذف شود؟';
+		if (!window.confirm(text)) {
+			event.preventDefault();
+		}
+	});
+
+	document.addEventListener('change', function (event) {
+		var box = event.target;
+		if (!box || !box.getAttribute || !box.getAttribute('data-lr-check-all')) {
+			return;
+		}
+		var formId = box.getAttribute('data-lr-check-all');
+		document.querySelectorAll('input[form="' + formId + '"][name="request_ids[]"]').forEach(function (input) {
+			input.checked = box.checked;
+		});
+	});
+
 	function toast(message, kind) {
 		var node = document.querySelector('.lr-toast');
 		if (!node) {

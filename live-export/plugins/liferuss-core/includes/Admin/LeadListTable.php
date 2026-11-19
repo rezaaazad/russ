@@ -65,7 +65,7 @@ class LeadListTable extends \WP_List_Table {
 			'priority'      => 'اولویت',
 			'created_at'    => 'تاریخ',
 		);
-		if ( ! current_user_can( 'lr_assign_leads' ) ) {
+		if ( ! current_user_can( 'lr_assign_leads' ) && ! current_user_can( 'lr_delete_leads' ) ) {
 			unset( $columns['cb'] );
 		}
 		return $columns;
@@ -78,6 +78,26 @@ class LeadListTable extends \WP_List_Table {
 	 */
 	public function column_cb( $item ): string {
 		return '<input type="checkbox" name="lead_ids[]" value="' . esc_attr( (string) $item['id'] ) . '">';
+	}
+
+	/**
+	 * Lead code, with a delete action for managers.
+	 *
+	 * @param array<string, mixed> $item Row.
+	 */
+	public function column_lead_code( $item ): string {
+		$code = esc_html( (string) $item['lead_code'] );
+		if ( ! current_user_can( 'lr_delete_leads' ) ) {
+			return $code;
+		}
+		$url     = wp_nonce_url(
+			admin_url( 'admin-post.php?action=lr_lead_delete&lead_id=' . (int) $item['id'] ),
+			'lr_lead_delete_' . (int) $item['id']
+		);
+		$actions = array(
+			'delete' => '<a href="' . esc_url( $url ) . '" class="submitdelete" data-lr-confirm="این لید و درخواست‌های مرتبطش حذف شوند؟">حذف</a>',
+		);
+		return $code . $this->row_actions( $actions );
 	}
 
 	/**

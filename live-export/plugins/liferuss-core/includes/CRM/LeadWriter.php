@@ -73,7 +73,11 @@ class LeadWriter {
 		$duplicate = Automation::find_duplicate( $phone, $email );
 		if ( $duplicate && empty( $data['skip_dedupe'] ) ) {
 			Automation::merge( $duplicate, $data );
-			return (int) $duplicate['id'];
+			$id = (int) $duplicate['id'];
+			if ( 'exchange' === $form && $map['request'] ) {
+				self::request( $map['request'], $id, is_array( $data['request'] ?? null ) ? $data['request'] : array(), (int) ( $data['operator_id'] ?? 0 ) );
+			}
+			return $id;
 		}
 
 		$id = Repository::for( 'leads' )->insert( $row );
@@ -318,6 +322,71 @@ class LeadWriter {
 			$patch['operator_id'] = get_current_user_id();
 		}
 		return Repository::for( $suffix )->update( $id, $patch );
+	}
+
+	/**
+	 * Soft-delete a lead and every request row that points at it.
+	 *
+	 * @param int $lead_id Lead id.
+	 */
+	public static function delete_lead( int $lead_id ): bool {
+		if ( ! is_admin() || ! current_user_can( 'lr_delete_leads' ) ) {
+			return false;
+		}
+		$lead = Repository::for( 'leads' )->find( $lead_id );
+		if ( ! $lead ) {
+			return false;
+		}
+		self::delete_requests_for( $lead_id );
+		return Repository::for( 'leads' )->delete( $lead_id );
+	}
+
+	/**
+	 * Soft-delete one exchange request the current user may touch.
+	 *
+	 * @param int $id Request id.
+	 */
+	public static function delete_exchange_request( int $id ): bool {
+		if ( ! is_admin() || ! current_user_can( 'lr_manage_exchange_requests' ) ) {
+			return false;
+		}
+		$row = Repository::for( 'exchange_requests' )->find( $id );
+		if ( ! $row || ! self::can_touch_request( 'exchange_requests', $row ) ) {
+			return false;
+		}
+		return Repository::for( 'exchange_requests' )->delete( $id );
+	}
+
+	/**
+	 * Soft-delete every request row for a lead.
+	 *
+	 * @param int $lead_id Lead id.
+	 */
+	private static function delete_requests_for( int $lead_id ): void {
+		foreach ( array( 'admission_requests', 'exchange_requests', 'cargo_requests', 'trade_requests', 'immigration_requests' ) as $suffix ) {
+			$guard = 0;
+			do {
+				if ( ++$guard > 20 ) {
+					break;
+				}
+				$batch = Repository::for( $suffix )->paginate(
+					array(
+						'lead_id'  => $lead_id,
+						'page'     => 1,
+						'per_page' => 50,
+						'orderby'  => 'id',
+						'order'    => 'ASC',
+					)
+				);
+				$items = isset( $batch['items'] ) && is_array( $batch['items'] ) ? $batch['items'] : array();
+				if ( ! $items ) {
+					break;
+				}
+				foreach ( $items as $row ) {
+					Repository::for( $suffix )->delete( (int) $row['id'] );
+				}
+			} while ( count( $items ) >= 50 );
+		}
 	}
 
 	/**

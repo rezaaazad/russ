@@ -55,7 +55,15 @@ $program  = (string) get_post_meta( $post_id, '_lr_program', true );
 </section>
 <?php endif; ?>
 
-<?php if ( 'exchange' === get_post_field( 'post_name', $post_id ) && 0 === (int) wp_get_post_parent_id( $post_id ) && function_exists( 'liferuss_the_rates_table' ) ) : ?>
+<?php if ( function_exists( 'liferuss_exchange_family' ) && liferuss_exchange_family() && function_exists( 'liferuss_ruble_only' ) && liferuss_ruble_only() && function_exists( 'liferuss_the_ruble_spot' ) ) : ?>
+<section class="section lr-rub-section">
+	<div class="container">
+		<?php liferuss_the_ruble_spot(); ?>
+	</div>
+</section>
+<?php endif; ?>
+
+<?php if ( 'exchange' === get_post_field( 'post_name', $post_id ) && 0 === (int) wp_get_post_parent_id( $post_id ) && function_exists( 'liferuss_the_rates_table' ) && ( ! function_exists( 'liferuss_ruble_only' ) || ! liferuss_ruble_only() ) ) : ?>
 <section class="section">
 	<div class="container">
 		<?php liferuss_the_rates_table(); ?>

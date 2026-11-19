@@ -431,17 +431,61 @@ function latinDigits(value) {
         });
       });
 
+      function persianValidity(field) {
+        var validity = field.validity;
+        if (validity.valueMissing) {
+          if (field.type === "radio" || field.type === "checkbox" || field.tagName === "SELECT") {
+            return "یکی از گزینه‌ها را انتخاب کنید.";
+          }
+          return "این فیلد را پر کنید.";
+        }
+        if (field.name === "consult_phone") {
+          return "شماره را با ارقام درست وارد کنید.";
+        }
+        if (validity.typeMismatch || validity.patternMismatch) {
+          return "این مقدار را درست وارد کنید.";
+        }
+        if (validity.rangeUnderflow) {
+          return "عدد را بزرگ‌تر وارد کنید.";
+        }
+        if (validity.rangeOverflow) {
+          return "عدد را کوچک‌تر وارد کنید.";
+        }
+        if (validity.tooLong) {
+          return "متن از حد مجاز بلندتر است.";
+        }
+        return "این فیلد را کامل کنید.";
+      }
+
+      function stampValidity(target) {
+        target.querySelectorAll("input, select, textarea").forEach(function (field) {
+          field.setCustomValidity("");
+          if (field.disabled || field.type === "hidden" || field.validity.valid) {
+            return;
+          }
+          field.setCustomValidity(persianValidity(field));
+        });
+      }
+
+      form.querySelectorAll("input, select, textarea").forEach(function (field) {
+        field.addEventListener("invalid", function () {
+          if (!field.validity.customError) {
+            field.setCustomValidity(persianValidity(field));
+          }
+        });
+        field.addEventListener("input", function () {
+          field.setCustomValidity("");
+        });
+        field.addEventListener("change", function () {
+          field.setCustomValidity("");
+        });
+      });
+
       form.addEventListener("submit", function (event) {
         event.preventDefault();
         var phone = form.querySelector("[name='consult_phone']");
         if (phone) {
           phone.value = latinDigits(phone.value).replace(/\s+/g, "");
-          var valid = /^(\+?98|0)?9\d{9}$/.test(phone.value) || /^\+?\d{8,15}$/.test(phone.value);
-          phone.setCustomValidity(valid ? "" : "شماره را با ارقام درست وارد کنید.");
-          if (!valid) {
-            phone.reportValidity();
-            return;
-          }
         }
         var visaYear = form.querySelector("[name='consult_visa_expiry_y']");
         var visaHidden = form.querySelector("[name='consult_visa_expiry']");
@@ -450,9 +494,13 @@ function latinDigits(value) {
           var visaDay = form.querySelector("[name='consult_visa_expiry_d']");
           visaHidden.value = visaYear.value + "/" + (visaMonth ? visaMonth.value : "") + "/" + (visaDay ? visaDay.value : "");
         }
+        stampValidity(form);
         if (typeof form.checkValidity === "function" && !form.checkValidity()) {
-          if (typeof form.reportValidity === "function") {
-            form.reportValidity();
+          var first = form.querySelector(":invalid");
+          var message = first && first.validationMessage ? first.validationMessage : "فرم را کامل کنید.";
+          showStatus(false, message);
+          if (first && typeof first.reportValidity === "function") {
+            first.reportValidity();
           }
           return;
         }
