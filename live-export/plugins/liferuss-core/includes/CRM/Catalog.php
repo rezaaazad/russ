@@ -76,6 +76,10 @@ class Catalog {
 				'service' => 'admission',
 				'request' => 'admission_requests',
 			),
+			'scholarship' => array(
+				'service' => 'admission',
+				'request' => 'admission_requests',
+			),
 			'freight'     => array(
 				'service' => 'cargo',
 				'request' => 'cargo_requests',
