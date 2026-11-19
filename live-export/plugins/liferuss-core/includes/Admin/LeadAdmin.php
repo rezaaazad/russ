@@ -544,14 +544,33 @@ class LeadAdmin {
 				)
 			)
 		);
-		$stages = Catalog::stages( $suffix );
-		echo '<div class="wrap lr-wrap"><h1>' . esc_html( $title ) . '</h1><table class="widefat striped"><thead><tr><th>ID</th><th>لید</th><th>مرحله</th></tr></thead><tbody>';
-		if ( ! $rows['items'] ) {
-			echo '<tr><td colspan="3">' . esc_html__( 'درخواستی نیست.', 'liferuss-core' ) . '</td></tr>';
+		$stages   = Catalog::stages( $suffix );
+		$exchange = 'exchange_requests' === $suffix;
+		$cols     = $exchange ? 6 : 3;
+		echo '<div class="wrap lr-wrap"><h1>' . esc_html( $title ) . '</h1><table class="widefat striped"><thead><tr><th>ID</th><th>لید</th>';
+		if ( $exchange ) {
+			echo '<th>' . esc_html__( 'ارز', 'liferuss-core' ) . '</th><th>' . esc_html__( 'شهر', 'liferuss-core' ) . '</th><th>' . esc_html__( 'روش', 'liferuss-core' ) . '</th>';
 		}
+		echo '<th>مرحله</th></tr></thead><tbody>';
+		if ( ! $rows['items'] ) {
+			echo '<tr><td colspan="' . esc_attr( (string) $cols ) . '">' . esc_html__( 'درخواستی نیست.', 'liferuss-core' ) . '</td></tr>';
+		}
+		$pay_labels = array(
+			'cash'     => 'نقد',
+			'card'     => 'کارت',
+			'transfer' => 'انتقال',
+		);
 		foreach ( $rows['items'] as $row ) {
 			$link = admin_url( 'admin.php?page=lr-lead&id=' . (int) $row['lead_id'] );
-			echo '<tr><td>' . esc_html( (string) $row['id'] ) . '</td><td><a href="' . esc_url( $link ) . '">#' . esc_html( (string) $row['lead_id'] ) . '</a></td><td>';
+			echo '<tr><td>' . esc_html( (string) $row['id'] ) . '</td><td><a href="' . esc_url( $link ) . '">#' . esc_html( (string) $row['lead_id'] ) . '</a></td>';
+			if ( $exchange ) {
+				$pair = (string) ( $row['currency_from'] ?? '' ) . ' → ' . (string) ( $row['currency_to'] ?? '' );
+				$pay  = (string) ( $row['payment_method'] ?? '' );
+				echo '<td dir="ltr">' . esc_html( $pair ) . '</td>';
+				echo '<td>' . esc_html( (string) ( $row['city'] ?? '' ) ) . '</td>';
+				echo '<td>' . esc_html( $pay_labels[ $pay ] ?? $pay ) . '</td>';
+			}
+			echo '<td>';
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 			self::save_fields( (int) $row['lead_id'], 'stage' );
 			echo '<input type="hidden" name="request_table" value="' . esc_attr( $suffix ) . '">';

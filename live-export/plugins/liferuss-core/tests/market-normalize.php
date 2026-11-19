@@ -151,6 +151,10 @@ lr_check( isset( $age['USD'] ) && 'live' === $age['USD']['state'] && str_contain
 lr_check( isset( $age['FORA'] ) && 'stale' === $age['FORA']['state'], 'a quote older than three hours is stale' );
 lr_check( isset( $age['USD']['atText'] ) && '' !== $age['USD']['atText'] && str_contains( $age['USD']['atText'], '۱۴۰۵' ), 'Tehran clock uses the Jalali helper' );
 lr_check( false === $age['USD']['locked'], 'visible rows are not locked' );
+lr_check( 'USDT' === Market::inquiry_code( 'usdt', 'IRR' ), 'USDT passes the inquiry whitelist' );
+lr_check( 'IRR' === Market::inquiry_code( 'IRT', 'USD' ), 'IRT is stored as toman IRR' );
+lr_check( 'IRR' === Market::inquiry_code( 'ABC', 'IRR' ), 'unknown codes fall back' );
+lr_check( 'RUB' === Market::inquiry_code( 'RUBB', 'RUB' ), 'codes that are not on the list fall back' );
 
 $market_file = '/tmp/market.json';
 $rates_file  = '/home/ubuntu/.cursor/projects/agent-repos-russ/agent-tools/aab788e0-2d9e-4405-8904-f3d94d0a323f.txt';

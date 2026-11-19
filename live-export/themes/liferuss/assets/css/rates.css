@@ -264,6 +264,54 @@
   color: var(--navy-soft);
 }
 
+.lr-pay {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  margin: 0;
+  padding: 12px;
+}
+
+.lr-pay__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.lr-pay__opt {
+  display: grid;
+  gap: 6px;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.lr-pay__opt img,
+.lr-pay__usdt img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+}
+
+.lr-pay__usdt {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin: 0;
+}
+
+.lr-pay__usdt img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+}
+
+.lr-pay__usdt figcaption {
+  color: var(--navy);
+  font-weight: 700;
+}
+
 @keyframes lr-ticker {
   from {
     transform: translate3d(0, 0, 0);
