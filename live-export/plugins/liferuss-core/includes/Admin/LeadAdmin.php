@@ -546,10 +546,10 @@ class LeadAdmin {
 		);
 		$stages   = Catalog::stages( $suffix );
 		$exchange = 'exchange_requests' === $suffix;
-		$cols     = $exchange ? 6 : 3;
+		$cols     = $exchange ? 7 : 3;
 		echo '<div class="wrap lr-wrap"><h1>' . esc_html( $title ) . '</h1><table class="widefat striped"><thead><tr><th>ID</th><th>لید</th>';
 		if ( $exchange ) {
-			echo '<th>' . esc_html__( 'ارز', 'liferuss-core' ) . '</th><th>' . esc_html__( 'شهر', 'liferuss-core' ) . '</th><th>' . esc_html__( 'روش', 'liferuss-core' ) . '</th>';
+			echo '<th>' . esc_html__( 'ارز', 'liferuss-core' ) . '</th><th>' . esc_html__( 'شهر', 'liferuss-core' ) . '</th><th>' . esc_html__( 'روش', 'liferuss-core' ) . '</th><th>' . esc_html__( 'هدف', 'liferuss-core' ) . '</th>';
 		}
 		echo '<th>مرحله</th></tr></thead><tbody>';
 		if ( ! $rows['items'] ) {
@@ -560,6 +560,14 @@ class LeadAdmin {
 			'card'     => 'کارت',
 			'transfer' => 'انتقال',
 		);
+		$purpose_labels = array(
+			'tuition'   => 'پرداخت شهریه',
+			'transfer'  => 'حواله به روسیه',
+			'dormitory' => 'خوابگاه',
+			'personal'  => 'شخصی',
+			'business'  => 'تجاری',
+			'other'     => 'سایر',
+		);
 		foreach ( $rows['items'] as $row ) {
 			$link = admin_url( 'admin.php?page=lr-lead&id=' . (int) $row['lead_id'] );
 			echo '<tr><td>' . esc_html( (string) $row['id'] ) . '</td><td><a href="' . esc_url( $link ) . '">#' . esc_html( (string) $row['lead_id'] ) . '</a></td>';
@@ -569,6 +577,8 @@ class LeadAdmin {
 				echo '<td dir="ltr">' . esc_html( $pair ) . '</td>';
 				echo '<td>' . esc_html( (string) ( $row['city'] ?? '' ) ) . '</td>';
 				echo '<td>' . esc_html( $pay_labels[ $pay ] ?? $pay ) . '</td>';
+				$purpose = (string) ( $row['purpose'] ?? '' );
+				echo '<td>' . esc_html( $purpose_labels[ $purpose ] ?? $purpose ) . '</td>';
 			}
 			echo '<td>';
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';

@@ -239,6 +239,10 @@ function liferuss_nav_tree() {
 			'class'    => '',
 			'children' => array(
 				array( 'title' => liferuss_t( 'nav_exchange' ), 'url' => liferuss_url( '/exchange/' ) ),
+				array( 'title' => 'پرداخت شهریه', 'url' => liferuss_url( '/exchange/tuition-payment/' ) ),
+				array( 'title' => 'حواله به روسیه', 'url' => liferuss_url( '/exchange/transfer-to-russia/' ) ),
+				array( 'title' => 'انواع ارز', 'url' => liferuss_url( '/exchange/currencies/' ) ),
+				array( 'title' => 'ماشین‌حساب مرجع', 'url' => liferuss_url( '/exchange/calculator/' ) ),
 				array( 'title' => liferuss_t( 'nav_cargo' ), 'url' => liferuss_url( '/cargo/' ) ),
 				array( 'title' => liferuss_t( 'nav_trade' ), 'url' => liferuss_url( '/trade/' ) ),
 			),

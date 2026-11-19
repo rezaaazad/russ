@@ -47,6 +47,22 @@ $program  = (string) get_post_meta( $post_id, '_lr_program', true );
 	</div>
 </header>
 
+<?php if ( function_exists( 'liferuss_exchange_family' ) && liferuss_exchange_family() ) : ?>
+<section class="section lr-exchange-top">
+	<div class="container">
+		<?php liferuss_exchange_nav(); ?>
+	</div>
+</section>
+<?php endif; ?>
+
+<?php if ( 'exchange' === get_post_field( 'post_name', $post_id ) && 0 === (int) wp_get_post_parent_id( $post_id ) && function_exists( 'liferuss_the_rates_table' ) ) : ?>
+<section class="section">
+	<div class="container">
+		<?php liferuss_the_rates_table(); ?>
+	</div>
+</section>
+<?php endif; ?>
+
 <?php if ( get_the_content() && ! liferuss_is_placeholder_copy( get_the_content() ) ) : ?>
 <section class="section">
 	<div class="container path-prose">

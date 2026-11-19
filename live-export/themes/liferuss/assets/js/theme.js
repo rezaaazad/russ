@@ -450,6 +450,12 @@ function latinDigits(value) {
           var visaDay = form.querySelector("[name='consult_visa_expiry_d']");
           visaHidden.value = visaYear.value + "/" + (visaMonth ? visaMonth.value : "") + "/" + (visaDay ? visaDay.value : "");
         }
+        if (typeof form.checkValidity === "function" && !form.checkValidity()) {
+          if (typeof form.reportValidity === "function") {
+            form.reportValidity();
+          }
+          return;
+        }
         applyTracking(form);
         var data = new FormData(form);
         data.set("action", "liferuss_consult");
