@@ -2,7 +2,8 @@
 /**
  * Market-reference quotes from Local.Moscow.
  *
- * Server-side only. The browser never calls localmoscow.com.
+ * The server fetches Local.Moscow. The browser may call only liferuss/v1/rates,
+ * and that response is marked uncacheable. Page cache and object cache stay on.
  * Tuition conversion stays in Rates and the lr_fx_update cron is not used here.
  *
  * /api/market is the board. It does not list every pair the exchange page needs
@@ -92,11 +93,17 @@ class Market {
 	}
 
 	/**
-	 * Sanitized board. Templates should call present() and not this URL from the browser.
+	 * Same-origin board for the browser. Nginx page cache and Redis stay on for the site.
+	 * This response is not stored: the HTML shell keeps the last figures, and the script
+	 * reads this route so a cached page does not freeze the prices.
 	 */
 	public static function rest(): \WP_REST_Response {
+		nocache_headers();
 		$response = new \WP_REST_Response( self::present() );
-		$response->header( 'Cache-Control', 'public, max-age=60' );
+		$response->header( 'Cache-Control', 'private, no-store, no-cache, must-revalidate, max-age=0' );
+		$response->header( 'Pragma', 'no-cache' );
+		$response->header( 'Expires', 'Wed, 11 Jan 1984 05:00:00 GMT' );
+		$response->header( 'X-Accel-Expires', '0' );
 		return $response;
 	}
 
