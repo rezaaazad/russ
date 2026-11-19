@@ -27,7 +27,7 @@ $bullets    = array(
 	array( 'icon' => 'shield', 'label' => 'تأمین مطمئن' ),
 	array( 'icon' => 'language', 'label' => 'شبکه تأمین در روسیه و کشورهای حوزه اوراسیا' ),
 	array( 'icon' => 'star', 'label' => 'راهکارهای اختصاصی' ),
-	array( 'icon' => '', 'label' => 'رشد پایدار تجارت', 'slot' => 'chart-up' ),
+	array( 'icon' => 'steps', 'label' => 'رشد پایدار تجارت' ),
 );
 $steps      = array(
 	array( 'icon' => 'docs', 'label' => 'ثبت درخواست' ),
@@ -48,11 +48,13 @@ $steps      = array(
 			<ul class="lr-src-bullets">
 				<?php foreach ( $bullets as $bullet ) : ?>
 					<li>
-						<?php if ( ! empty( $bullet['slot'] ) ) : ?>
-							<span class="lr-src-ico lr-src-slot" data-slot="<?php echo esc_attr( $bullet['slot'] ); ?>" aria-hidden="true"></span>
-						<?php else : ?>
-							<span class="lr-src-ico" aria-hidden="true"><?php echo liferuss_icon( $bullet['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-						<?php endif; ?>
+						<?php
+						$lr_src_icon = liferuss_icon( $bullet['icon'] );
+						if ( '' === $lr_src_icon && function_exists( 'liferuss_hv2_icon' ) ) {
+							$lr_src_icon = liferuss_hv2_icon( $bullet['icon'] );
+						}
+						?>
+						<span class="lr-src-ico" aria-hidden="true"><?php echo $lr_src_icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 						<span><?php echo esc_html( $bullet['label'] ); ?></span>
 					</li>
 				<?php endforeach; ?>
@@ -155,11 +157,15 @@ $steps      = array(
 					<span>توضیحات تکمیلی</span>
 					<textarea name="consult_notes" rows="3"></textarea>
 				</label>
-				<label class="lr-src-file">
-					<span>آپلود عکس یا فایل محصول</span>
-					<input type="file" name="consult_files[]" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf" data-lr-max-files="<?php echo esc_attr( (string) LIFERUSS_SOURCING_MAX_FILES ); ?>" data-lr-max-bytes="<?php echo esc_attr( (string) liferuss_sourcing_upload_bytes() ); ?>" aria-describedby="lr-src-file-help">
+				<div class="lr-src-file">
+					<span id="lr-src-file-label">آپلود عکس یا فایل محصول</span>
+					<div class="lr-src-file__row">
+						<input id="lr-src-files" class="lr-src-file__input" type="file" name="consult_files[]" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf" data-lr-max-files="<?php echo esc_attr( (string) LIFERUSS_SOURCING_MAX_FILES ); ?>" data-lr-max-bytes="<?php echo esc_attr( (string) liferuss_sourcing_upload_bytes() ); ?>" aria-labelledby="lr-src-file-label" aria-describedby="lr-src-file-help lr-src-file-names">
+						<label for="lr-src-files" class="lr-src-file__btn">انتخاب فایل</label>
+					</div>
+					<ul class="lr-src-file__names" id="lr-src-file-names" aria-live="polite"><li>فایلی انتخاب نشده</li></ul>
 					<small id="lr-src-file-help">تا <?php echo esc_html( liferuss_local_digits( (string) LIFERUSS_SOURCING_MAX_FILES ) ); ?> فایل، هر کدام تا <?php echo esc_html( liferuss_local_digits( (string) $upload_mb ) ); ?> مگابایت. فقط JPG، PNG، WEBP یا PDF.<?php echo $upload_cap ? ' سقف سرور از ۲۰ مگابایت کمتر است، پس همین سقف اعمال می‌شود.' : ''; ?></small>
-				</label>
+				</div>
 				<button class="btn btn-gold btn-block" type="submit">ارسال درخواست</button>
 				<p class="lr-src-form__note"><?php echo esc_html( liferuss_sourcing_form_note() ); ?></p>
 			</form>
@@ -208,6 +214,26 @@ document.addEventListener("DOMContentLoaded", function () {
   if (cat && select && select.querySelector("option[value='" + cat.replace(/[^a-z]/g, "") + "']")) {
     select.value = cat.replace(/[^a-z]/g, "");
   }
+  var picker = document.getElementById("lr-src-files");
+  var names = document.getElementById("lr-src-file-names");
+  if (!picker || !names) {
+    return;
+  }
+  picker.addEventListener("change", function () {
+    names.replaceChildren();
+    var files = picker.files || [];
+    if (!files.length) {
+      var empty = document.createElement("li");
+      empty.textContent = "فایلی انتخاب نشده";
+      names.appendChild(empty);
+      return;
+    }
+    Array.prototype.forEach.call(files, function (file) {
+      var item = document.createElement("li");
+      item.textContent = file.name;
+      names.appendChild(item);
+    });
+  });
 });
 </script>
 
