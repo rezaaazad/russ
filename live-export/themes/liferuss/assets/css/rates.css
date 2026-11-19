@@ -209,10 +209,27 @@
 }
 
 .lr-ticker {
+  position: relative;
   height: 44px;
   overflow: hidden;
-  background: var(--navy);
+  background-color: var(--navy-deep);
+  background-image: linear-gradient(to left, var(--navy-deep) 0%, var(--navy) 55%, transparent 100%), url("../images/rates/home-rates-ticker-bg.webp");
+  background-size: cover;
+  background-position: left center;
   color: var(--white);
+}
+
+.lr-ticker::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--navy-deep);
+  opacity: 0.82;
+}
+
+.lr-ticker__track {
+  position: relative;
+  z-index: 1;
 }
 
 .lr-ticker__track {
