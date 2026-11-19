@@ -60,7 +60,7 @@ class Indexer {
 		if ( LIFERUSS_CORE_VERSION === (string) get_option( 'lr_search_local_ready', '' ) ) {
 			return;
 		}
-		if ( '1' === (string) get_option( 'lr_search_bootstrap_lock', '' ) ) {
+		if ( ! is_admin() || '1' === (string) get_option( 'lr_search_bootstrap_lock', '' ) ) {
 			return;
 		}
 		if ( ! self::table_ready() ) {

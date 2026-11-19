@@ -209,7 +209,10 @@ function liferuss_default_options() {
 	);
 
 	if ( function_exists( 'liferuss_landing_default_options' ) ) {
-		return array_merge( $core, liferuss_landing_default_options() );
+		$core = array_merge( $core, liferuss_landing_default_options() );
+	}
+	if ( function_exists( 'liferuss_home_v2_default_options' ) ) {
+		$core = array_merge( $core, liferuss_home_v2_default_options() );
 	}
 	return $core;
 }
