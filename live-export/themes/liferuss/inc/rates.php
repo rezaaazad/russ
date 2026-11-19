@@ -42,6 +42,19 @@ function liferuss_rate_fa( $key ) {
 		'rates_group_metal' => 'طلا و سکه',
 		'rates_unit_toman' => 'تومان',
 		'rates_unit_rial' => 'ریال',
+		'rates_calculator' => 'ماشین‌حساب مرجع',
+		'conv_title' => 'تبدیل مرجع',
+		'conv_amount' => 'مبلغ',
+		'conv_from' => 'از',
+		'conv_to' => 'به',
+		'conv_result' => 'معادل مرجع',
+		'conv_missing' => 'برای این زوج نرخ تومانی در جدول نیست.',
+		'conv_same' => 'هر دو طرف یکی است.',
+		'conv_irr' => 'تومان',
+		'conv_usd' => 'دلار',
+		'conv_eur' => 'یورو',
+		'conv_rub' => 'روبل',
+		'conv_usdt' => 'تتر',
 		);
 	}
 	return isset( $map[ $key ] ) ? $map[ $key ] : $key;
@@ -144,7 +157,10 @@ function liferuss_the_rates_table() {
 		}
 		echo '</tbody></table></div></section>';
 	}
-	echo '<p class="lr-rates__inquiry"><a class="btn btn-gold" href="#consultation">' . esc_html( liferuss_rate_fa( 'rates_inquiry' ) ) . '</a></p>';
+	echo '<p class="lr-rates__inquiry">';
+	echo '<a class="btn btn-gold" href="#consultation">' . esc_html( liferuss_rate_fa( 'rates_inquiry' ) ) . '</a> ';
+	echo '<a class="btn btn-ghost" href="' . esc_url( liferuss_url( '/exchange/calculator/' ) ) . '">' . esc_html( liferuss_rate_fa( 'rates_calculator' ) ) . '</a>';
+	echo '</p>';
 	echo '</div>';
 }
 
@@ -372,3 +388,142 @@ function liferuss_rate_page_hero() {
 	}
 	echo '>';
 }
+
+/**
+ * [lr_converter] Reference conversion among toman, USD, EUR, RUB, and USDT.
+ *
+ * @return string
+ */
+function liferuss_converter_shortcode() {
+	wp_enqueue_script(
+		'liferuss-converter',
+		LIFERUSS_URI . '/assets/js/converter.js',
+		array( 'liferuss-rates-live' ),
+		LIFERUSS_VERSION,
+		true
+	);
+	$payload = liferuss_converter_payload();
+	ob_start();
+	echo '<div class="lr-conv" data-lr-converter data-quotes="' . esc_attr( wp_json_encode( $payload ) ) . '">';
+	echo '<h2 class="lr-conv__title">' . esc_html( liferuss_rate_fa( 'conv_title' ) ) . '</h2>';
+	echo '<p class="lr-conv__notice">' . esc_html( (string) $payload['notice'] ) . '</p>';
+	if ( ! empty( $payload['fallback'] ) ) {
+		echo '<p class="lr-conv__notice">' . esc_html( liferuss_rate_fa( 'rates_fallback' ) ) . '</p>';
+	}
+	echo '<form class="lr-conv__form" action="#lr-converter" id="lr-converter">';
+	echo '<label><span>' . esc_html( liferuss_rate_fa( 'conv_amount' ) ) . '</span>';
+	echo '<input type="number" name="amount" min="0" step="any" inputmode="decimal" value="1" required></label>';
+	echo '<label><span>' . esc_html( liferuss_rate_fa( 'conv_from' ) ) . '</span><select name="from">';
+	liferuss_converter_options( $payload['quotes'], 'IRR' );
+	echo '</select></label>';
+	echo '<label><span>' . esc_html( liferuss_rate_fa( 'conv_to' ) ) . '</span><select name="to">';
+	liferuss_converter_options( $payload['quotes'], 'USD' );
+	echo '</select></label>';
+	echo '<p class="lr-conv__result" role="status" aria-live="polite"></p>';
+	echo '<p class="lr-conv__meta"></p>';
+	echo '</form>';
+	echo '<p class="lr-rates__inquiry"><a class="btn btn-gold" href="' . esc_url( liferuss_url( '/exchange/#consultation' ) ) . '">' . esc_html( liferuss_rate_fa( 'rates_inquiry' ) ) . '</a></p>';
+	echo '</div>';
+	return (string) ob_get_clean();
+}
+add_shortcode( 'lr_converter', 'liferuss_converter_shortcode' );
+
+/**
+ * Currency options that have a toman quote. Toman itself is always listed.
+ *
+ * @param array<string, array<string, mixed>> $quotes Quotes.
+ * @param string                               $selected Selected code.
+ */
+function liferuss_converter_options( array $quotes, $selected ) {
+	$order = array( 'IRR', 'USD', 'EUR', 'RUB', 'USDT' );
+	foreach ( $order as $code ) {
+		if ( ! isset( $quotes[ $code ] ) ) {
+			continue;
+		}
+		echo '<option value="' . esc_attr( $code ) . '" ' . selected( $selected, $code, false ) . '>' . esc_html( liferuss_rate_fa( 'conv_' . strtolower( $code ) ) ) . '</option>';
+	}
+}
+
+/**
+ * Toman quotes for the five converter currencies. Missing pairs are omitted.
+ *
+ * @return array<string, mixed>
+ */
+function liferuss_converter_payload() {
+	$board  = liferuss_rates_board();
+	$quotes = array(
+		'IRR' => array(
+			'toman'  => 1,
+			'source' => '',
+			'state'  => 'live',
+			'age'    => '',
+		),
+	);
+	$want   = array( 'USD' => true, 'EUR' => true, 'RUB' => true, 'USDT' => true );
+	foreach ( $board['items'] as $item ) {
+		$code = (string) ( $item['code'] ?? '' );
+		if ( ! isset( $want[ $code ] ) || 'تومان' !== (string) ( $item['unit'] ?? '' ) ) {
+			continue;
+		}
+		if ( ! is_numeric( $item['value'] ?? null ) || (float) $item['value'] <= 0 ) {
+			continue;
+		}
+		$quotes[ $code ] = array(
+			'toman'  => (float) $item['value'],
+			'source' => (string) $item['source'],
+			'state'  => (string) ( $item['state'] ?? '' ),
+			'age'    => liferuss_rates_age( $item ),
+		);
+	}
+	$notice = liferuss_rates_notice( $board );
+	return array(
+		'quotes'   => $quotes,
+		'notice'   => $notice,
+		'fallback' => ! empty( $board['fallback'] ),
+		'labels'   => array(
+			'result'  => liferuss_rate_fa( 'conv_result' ),
+			'missing' => liferuss_rate_fa( 'conv_missing' ),
+			'same'    => liferuss_rate_fa( 'conv_same' ),
+			'stale'   => liferuss_rate_fa( 'rates_stale' ),
+		),
+	);
+}
+
+/**
+ * Publish /exchange/calculator/ once the exchange hub exists.
+ */
+function liferuss_ensure_calculator_page() {
+	if ( '1' === (string) get_option( 'lr_exchange_calculator', '' ) ) {
+		return;
+	}
+	$parent = get_page_by_path( 'exchange' );
+	if ( ! $parent instanceof WP_Post ) {
+		return;
+	}
+	$found = get_page_by_path( 'exchange/calculator' );
+	if ( $found instanceof WP_Post ) {
+		update_option( 'lr_exchange_calculator', '1', false );
+		return;
+	}
+	$id = wp_insert_post(
+		array(
+			'post_type'    => 'page',
+			'post_status'  => 'publish',
+			'post_title'   => 'ماشین‌حساب نرخ مرجع',
+			'post_name'    => 'calculator',
+			'post_parent'  => (int) $parent->ID,
+			'post_content' => '[lr_converter]',
+		),
+		true
+	);
+	if ( is_wp_error( $id ) || ! $id ) {
+		return;
+	}
+	update_post_meta( (int) $id, '_wp_page_template', 'templates/path.php' );
+	update_post_meta( (int) $id, '_lr_eyebrow', 'مرجع' );
+	update_post_meta( (int) $id, '_lr_lead', 'تبدیل بین تومان، دلار، یورو، روبل و تتر با همان جدول نرخ روز. حاصل، قیمت معامله نیست.' );
+	update_post_meta( (int) $id, '_lr_form', 'exchange' );
+	update_post_meta( (int) $id, '_lr_schema', 'service' );
+	update_option( 'lr_exchange_calculator', '1', false );
+}
+add_action( 'init', 'liferuss_ensure_calculator_page', 50 );
