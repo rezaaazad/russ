@@ -33,6 +33,7 @@ function liferuss_rate_fa( $key ) {
 		'rates_age' => 'به‌روزرسانی %s دقیقه پیش',
 		'rates_age_unknown' => 'زمان ثبت نشده',
 		'rates_inquiry' => 'ثبت استعلام',
+		'rates_ticker' => 'نرخ‌های مرجع',
 		'rates_group_tehran' => 'دلار تهران، هرات و حواله',
 		'rates_group_board' => 'یورو، درهم، یوان، لیر و روبل',
 		'rates_group_world' => 'پوند، مرجع دلاری',
@@ -527,3 +528,66 @@ function liferuss_ensure_calculator_page() {
 	update_option( 'lr_exchange_calculator', '1', false );
 }
 add_action( 'init', 'liferuss_ensure_calculator_page', 50 );
+
+/**
+ * [lr_rates_ticker] A single-height strip. No network, no motion when the visitor asks for less.
+ *
+ * @return string
+ */
+function liferuss_rates_ticker_shortcode() {
+	$board = liferuss_rates_board();
+	$keep  = array(
+		'USD'           => true,
+		'HERAT'         => true,
+		'HAVALE'        => true,
+		'EUR'           => true,
+		'AED'           => true,
+		'CNY'           => true,
+		'TRY'           => true,
+		'RUB'           => true,
+		'USDT'          => true,
+		'USDT_RUB_SELL' => true,
+		'CBR'           => true,
+		'FORA'          => true,
+		'MBB'           => true,
+		'GOLD'          => true,
+	);
+	$rows  = array();
+	foreach ( $board['items'] as $item ) {
+		if ( isset( $keep[ (string) ( $item['code'] ?? '' ) ] ) ) {
+			$rows[] = $item;
+		}
+	}
+	if ( ! $rows ) {
+		return '';
+	}
+	ob_start();
+	echo '<div class="lr-ticker" data-lr-live="ticker" role="region" aria-label="' . esc_attr( liferuss_rate_fa( 'rates_ticker' ) ) . '">';
+	echo '<div class="lr-ticker__track">';
+	liferuss_rates_ticker_list( $rows, false );
+	liferuss_rates_ticker_list( $rows, true );
+	echo '</div></div>';
+	return (string) ob_get_clean();
+}
+add_shortcode( 'lr_rates_ticker', 'liferuss_rates_ticker_shortcode' );
+
+/**
+ * One copy of the ticker items.
+ *
+ * @param array<int, array<string, mixed>> $rows   Quotes.
+ * @param bool                              $hidden Duplicate for the loop.
+ */
+function liferuss_rates_ticker_list( array $rows, $hidden ) {
+	echo '<ul' . ( $hidden ? ' aria-hidden="true"' : '' ) . '>';
+	foreach ( $rows as $item ) {
+		$stale = isset( $item['state'] ) && 'stale' === $item['state'];
+		$unit  = (string) ( $item['unit'] ?? '' );
+		echo '<li data-lr-code="' . esc_attr( (string) $item['code'] ) . '" data-lr-unit="' . esc_attr( $unit ) . '"' . ( $stale ? ' class="is-stale"' : '' ) . '>';
+		echo '<a href="' . esc_url( liferuss_url( '/exchange/' ) ) . '">';
+		echo '<span>' . esc_html( (string) $item['title'] ) . '</span> ';
+		echo '<b data-lr-field="figure">' . esc_html( liferuss_rates_amount( $item['value'] ?? ( $item['sell'] ?? null ), $unit ) ) . '</b>';
+		echo ' <small data-lr-field="source">' . esc_html( (string) $item['source'] ) . '</small>';
+		echo '</a></li>';
+	}
+	echo '</ul>';
+}

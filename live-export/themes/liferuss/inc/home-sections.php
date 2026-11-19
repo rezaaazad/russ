@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function liferuss_home_section_defs() {
 	return array(
 		'hero'         => array( 'label' => 'هیرو', 'enabled' => '1' ),
+		'rates'        => array( 'label' => 'نوار نرخ روز', 'enabled' => '1' ),
 		'licenses'     => array( 'label' => 'مجوزها و اعتماد', 'enabled' => '1' ),
 		'services'     => array( 'label' => 'شبکه خدمات', 'enabled' => '1' ),
 		'paths'        => array( 'label' => 'مسیرهای تحصیل و خدمات', 'enabled' => '1' ),
@@ -63,6 +64,14 @@ function liferuss_home_sections() {
 			);
 		}
 	}
+	$stored_ids = array();
+	if ( is_array( $stored ) ) {
+		foreach ( $stored as $row ) {
+			if ( is_array( $row ) && ! empty( $row['id'] ) ) {
+				$stored_ids[ sanitize_key( (string) $row['id'] ) ] = true;
+			}
+		}
+	}
 	foreach ( $defs as $id => $def ) {
 		if ( isset( $seen[ $id ] ) ) {
 			continue;
@@ -74,7 +83,46 @@ function liferuss_home_sections() {
 			'label'   => $def['label'],
 		);
 	}
+	if ( ! isset( $stored_ids['rates'] ) ) {
+		$rows = liferuss_home_place_after( $rows, 'rates', 'hero' );
+	}
 	return $rows;
+}
+
+/**
+ * Move one section to sit immediately after another.
+ *
+ * @param array<int, array<string, string>> $rows   Sections.
+ * @param string                             $id     Section to move.
+ * @param string                             $after  Anchor id.
+ * @return array<int, array<string, string>>
+ */
+function liferuss_home_place_after( array $rows, $id, $after ) {
+	$moving = null;
+	$rest   = array();
+	foreach ( $rows as $row ) {
+		if ( $row['id'] === $id ) {
+			$moving = $row;
+			continue;
+		}
+		$rest[] = $row;
+	}
+	if ( null === $moving ) {
+		return $rows;
+	}
+	$placed = array();
+	$done   = false;
+	foreach ( $rest as $row ) {
+		$placed[] = $row;
+		if ( $row['id'] === $after ) {
+			$placed[] = $moving;
+			$done     = true;
+		}
+	}
+	if ( ! $done ) {
+		array_unshift( $placed, $moving );
+	}
+	return $placed;
 }
 
 /**

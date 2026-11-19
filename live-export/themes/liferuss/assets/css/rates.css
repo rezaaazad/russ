@@ -207,3 +207,95 @@
   margin: 0;
   color: var(--muted);
 }
+
+.lr-ticker {
+  position: relative;
+  height: 44px;
+  overflow: hidden;
+  background-color: var(--navy-deep);
+  background-image: linear-gradient(to left, var(--navy-deep) 0%, var(--navy) 55%, transparent 100%), url("../images/rates/home-rates-ticker-bg.webp");
+  background-size: cover;
+  background-position: left center;
+  color: var(--white);
+}
+
+.lr-ticker::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--navy-deep);
+  opacity: 0.82;
+}
+
+.lr-ticker__track {
+  position: relative;
+  z-index: 1;
+}
+
+.lr-ticker__track {
+  display: flex;
+  width: max-content;
+  height: 44px;
+  animation: lr-ticker 48s linear infinite;
+}
+
+.lr-ticker ul {
+  display: flex;
+  align-items: center;
+  gap: 8px 22px;
+  height: 44px;
+  margin: 0;
+  padding: 0 12px;
+  list-style: none;
+}
+
+.lr-ticker a {
+  color: var(--white);
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 0.92rem;
+}
+
+.lr-ticker small {
+  color: var(--gold-soft);
+}
+
+.lr-ticker .is-stale a {
+  color: var(--navy-soft);
+}
+
+@keyframes lr-ticker {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(50%, 0, 0);
+  }
+}
+
+html[dir="ltr"] .lr-ticker__track {
+  animation-name: lr-ticker-ltr;
+}
+
+@keyframes lr-ticker-ltr {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lr-ticker {
+    overflow-x: auto;
+  }
+
+  .lr-ticker__track {
+    animation: none;
+  }
+
+  .lr-ticker ul[aria-hidden="true"] {
+    display: none;
+  }
+}

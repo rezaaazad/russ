@@ -45,6 +45,14 @@
           cell.textContent = amount(item[field], unit);
         }
       });
+      var figure = node.querySelector('[data-lr-field="figure"]');
+      if (figure) {
+        var shown = item.value;
+        if (shown === null || shown === undefined || shown === "") {
+          shown = item.sell;
+        }
+        figure.textContent = amount(shown, unit);
+      }
       var source = node.querySelector('[data-lr-field="source"]');
       if (source) {
         source.textContent = item.source || "";
