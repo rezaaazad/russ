@@ -1,0 +1,123 @@
+/* Market reference board. Mobile cards, desktop table. */
+
+.lr-rates {
+  display: grid;
+  gap: 16px;
+}
+
+.lr-rates__title {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.lr-rates__notice,
+.lr-rates__fallback,
+.lr-rates__empty {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--gold-soft);
+  color: var(--navy);
+}
+
+.lr-rates__fallback,
+.lr-rates__empty {
+  background: var(--navy-soft);
+}
+
+.lr-rates__group h3 {
+  margin: 8px 0;
+  font-size: 1.05rem;
+}
+
+.lr-rates__scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lr-rates__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.lr-rates__table th,
+.lr-rates__table td {
+  padding: 10px 12px;
+  text-align: right;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+
+.lr-rates__table thead th {
+  background: var(--navy);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.lr-rates__pair,
+.lr-rates__clock {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.lr-rates__badge {
+  display: inline-block;
+  margin-inline-start: 6px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  color: var(--gold-ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.lr-rates tr.is-stale th,
+.lr-rates tr.is-stale td {
+  color: var(--muted);
+}
+
+.lr-rates__inquiry {
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .lr-rates__table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .lr-rates__table,
+  .lr-rates__table tbody,
+  .lr-rates__table tr,
+  .lr-rates__table th,
+  .lr-rates__table td {
+    display: block;
+    width: 100%;
+  }
+
+  .lr-rates__table tr {
+    margin-bottom: 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .lr-rates__table th[scope="row"] {
+    background: var(--navy-soft);
+  }
+
+  .lr-rates__table td::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+}
