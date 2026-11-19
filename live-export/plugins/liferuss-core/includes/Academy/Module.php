@@ -53,8 +53,11 @@ class Module {
 		if ( get_option( 'lr_academy_rewrite' ) === LIFERUSS_CORE_VERSION ) {
 			return;
 		}
-		flush_rewrite_rules( false );
+		if ( ! is_admin() ) {
+			return;
+		}
 		update_option( 'lr_academy_rewrite', LIFERUSS_CORE_VERSION, false );
+		flush_rewrite_rules( false );
 	}
 
 	/**

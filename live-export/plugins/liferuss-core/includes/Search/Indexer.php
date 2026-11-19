@@ -60,16 +60,17 @@ class Indexer {
 		if ( LIFERUSS_CORE_VERSION === (string) get_option( 'lr_search_local_ready', '' ) ) {
 			return;
 		}
+		if ( ! is_admin() || '1' === (string) get_option( 'lr_search_bootstrap_lock', '' ) ) {
+			return;
+		}
 		if ( ! self::table_ready() ) {
 			return;
 		}
-		Documents::rebuild();
+		update_option( 'lr_search_bootstrap_lock', '1', false );
 		update_option( 'lr_search_local_ready', LIFERUSS_CORE_VERSION, false );
+		Documents::rebuild();
 		delete_transient( 'lr_search_typo_pool' );
-		if ( Meili::configured() ) {
-			self::queue_all();
-			Meili::ensure();
-		}
+		delete_option( 'lr_search_bootstrap_lock' );
 	}
 
 	/**

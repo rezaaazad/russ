@@ -97,6 +97,9 @@ add_action( 'init', 'liferuss_sync_path_nav', 50 );
 function liferuss_path_footer_extra() {
 	$seen = array();
 	foreach ( (array) liferuss_opt( 'footer_links', array() ) as $item ) {
+		if ( ! is_array( $item ) ) {
+			continue;
+		}
 		$seen[] = untrailingslashit( (string) ( $item['url'] ?? '' ) );
 	}
 	$extra = array();

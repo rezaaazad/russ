@@ -104,6 +104,9 @@ function liferuss_phone_example() {
  * @return bool
  */
 function liferuss_contact_value_is_packaged( $key, $value ) {
+	if ( is_array( $value ) ) {
+		return false;
+	}
 	$value = trim( (string) $value );
 	if ( '' === $value ) {
 		return true;
@@ -188,7 +191,8 @@ function liferuss_contact_from_core( $key ) {
  */
 function liferuss_public_contact( $key ) {
 	$opts  = liferuss_options();
-	$value = isset( $opts[ $key ] ) ? trim( (string) $opts[ $key ] ) : '';
+	$raw   = $opts[ $key ] ?? '';
+	$value = is_array( $raw ) ? '' : trim( (string) $raw );
 	if ( ! get_option( 'liferuss_ux_1142' ) && liferuss_contact_value_is_packaged( $key, $value ) ) {
 		$value = '';
 	}

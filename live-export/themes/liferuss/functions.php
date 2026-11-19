@@ -9,13 +9,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.17.0' );
+define( 'LIFERUSS_VERSION', '1.17.2' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
 require_once LIFERUSS_DIR . '/inc/landing-defaults.php';
 require_once LIFERUSS_DIR . '/inc/defaults.php';
 require_once LIFERUSS_DIR . '/inc/i18n.php';
+if ( is_readable( LIFERUSS_DIR . '/inc/home-v2.php' ) ) {
+	require_once LIFERUSS_DIR . '/inc/home-v2.php';
+}
+if ( is_readable( LIFERUSS_DIR . '/inc/home-v2-i18n.php' ) ) {
+	require_once LIFERUSS_DIR . '/inc/home-v2-i18n.php';
+}
 require_once LIFERUSS_DIR . '/inc/helpers.php';
 require_once LIFERUSS_DIR . '/inc/photos.php';
 require_once LIFERUSS_DIR . '/inc/options.php';

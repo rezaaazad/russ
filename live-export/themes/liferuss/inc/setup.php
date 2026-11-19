@@ -511,16 +511,26 @@ function liferuss_filter_public_html( $html ) {
  * Flush rewrite rules once after a theme update, and import owner photos.
  */
 function liferuss_maybe_flush_i18n() {
-	if ( function_exists( 'liferuss_install_brand_photos' ) ) {
-		liferuss_install_brand_photos();
-	}
 	if ( get_option( 'liferuss_version' ) === LIFERUSS_VERSION ) {
 		return;
 	}
-	flush_rewrite_rules( false );
+	// Record the version before any sideload or permalink flush. A purge that
+	// calls this site back through the CDN must not repeat the work.
 	update_option( 'liferuss_version', LIFERUSS_VERSION );
+	if ( ! is_admin() ) {
+		return;
+	}
+	if ( '1' === (string) get_option( 'lr_theme_upgrade_lock', '' ) ) {
+		return;
+	}
+	update_option( 'lr_theme_upgrade_lock', '1', false );
+	if ( function_exists( 'liferuss_install_brand_photos' ) ) {
+		liferuss_install_brand_photos();
+	}
+	flush_rewrite_rules( false );
+	delete_option( 'lr_theme_upgrade_lock' );
 }
-add_action( 'init', 'liferuss_maybe_flush_i18n', 50 );
+add_action( 'admin_init', 'liferuss_maybe_flush_i18n', 50 );
 
 /**
  * Create a page if the slug is free.

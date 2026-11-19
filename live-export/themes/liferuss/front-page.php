@@ -18,11 +18,17 @@ if ( function_exists( 'liferuss_the_announcement' ) ) {
 	liferuss_the_announcement();
 }
 
+if ( function_exists( 'liferuss_home_v2_active' ) && liferuss_home_v2_active() ) {
+	foreach ( liferuss_home_v2_sections() as $section ) {
+		get_template_part( 'template-parts/home-v2/' . $section );
+	}
+} else {
 foreach ( liferuss_home_sections() as $section ) {
 	if ( empty( $section['enabled'] ) ) {
 		continue;
 	}
 	get_template_part( 'template-parts/home/' . $section['id'] );
+}
 }
 
 get_footer();

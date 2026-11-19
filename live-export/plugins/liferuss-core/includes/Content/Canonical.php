@@ -45,8 +45,13 @@ class Canonical {
 		if ( '1' === (string) get_option( 'lr_canonical_routes' ) ) {
 			return;
 		}
-		self::ensure();
+		if ( ! is_admin() || '1' === (string) get_option( 'lr_canonical_routes_lock', '' ) ) {
+			return;
+		}
+		update_option( 'lr_canonical_routes_lock', '1', false );
 		update_option( 'lr_canonical_routes', '1', false );
+		self::ensure();
+		delete_option( 'lr_canonical_routes_lock' );
 	}
 
 	/**

@@ -59,10 +59,15 @@ class Routes {
 		if ( '1.14.2' === (string) get_option( 'lr_seo_rewrites' ) ) {
 			return;
 		}
+		if ( ! is_admin() || '1' === (string) get_option( 'lr_seo_rewrites_lock', '' ) ) {
+			return;
+		}
+		update_option( 'lr_seo_rewrites_lock', '1', false );
+		update_option( 'lr_seo_rewrites', '1.14.2', false );
 		self::immigration_hub();
 		\LifeRuss\Core\Redirects\Duplicates::ensure();
 		flush_rewrite_rules( false );
-		update_option( 'lr_seo_rewrites', '1.14.2', false );
+		delete_option( 'lr_seo_rewrites_lock' );
 	}
 
 	/**
