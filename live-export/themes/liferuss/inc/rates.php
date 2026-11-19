@@ -250,3 +250,115 @@ function liferuss_rates_amount( $value, $unit ) {
 function liferuss_rates_unit( $unit ) {
 	return (string) $unit;
 }
+
+/**
+ * Bundled heroes. A file is added by the pull request that owns that screen.
+ * An attachment in _lr_slot_image replaces the file.
+ *
+ * @return array<string, array<string, mixed>>
+ */
+function liferuss_rate_heroes() {
+	return array(
+		'exchange'           => array(
+			'file'  => 'exchange-hero.webp',
+			'alt'   => 'استعلام نرخ روز ارز',
+			'w'     => 1920,
+			'h'     => 1086,
+			'eager' => true,
+			'hub'   => true,
+		),
+		'calculator'         => array(
+			'file'  => 'exchange-calculator-hero.webp',
+			'alt'   => 'ماشین‌حساب نرخ مرجع',
+			'w'     => 1920,
+			'h'     => 1086,
+			'eager' => false,
+		),
+		'transfer-to-russia' => array(
+			'file'  => 'exchange-transfer-to-russia-hero.webp',
+			'alt'   => 'حواله به روسیه',
+			'w'     => 1920,
+			'h'     => 1086,
+			'eager' => false,
+		),
+		'tuition-payment'    => array(
+			'file'  => 'exchange-tuition-payment-hero.webp',
+			'alt'   => 'پرداخت شهریه',
+			'w'     => 1920,
+			'h'     => 1086,
+			'eager' => false,
+		),
+		'currencies'         => array(
+			'file'  => 'exchange-currencies-hero.webp',
+			'alt'   => 'انواع ارز',
+			'w'     => 1920,
+			'h'     => 1086,
+			'eager' => false,
+		),
+	);
+}
+
+/**
+ * Hero behind the page title. The photograph’s open area is on the left; the scrim covers the right, where the Persian text sits.
+ */
+function liferuss_rate_page_hero() {
+	if ( ! is_page() ) {
+		return;
+	}
+	$post = get_queried_object();
+	if ( ! $post instanceof WP_Post ) {
+		return;
+	}
+	$map = liferuss_rate_heroes();
+	if ( ! isset( $map[ $post->post_name ] ) ) {
+		return;
+	}
+	$item = $map[ $post->post_name ];
+	if ( ! empty( $item['hub'] ) && (int) $post->post_parent !== 0 ) {
+		return;
+	}
+	$width  = (int) $item['w'];
+	$height = (int) $item['h'];
+	$alt    = (string) $item['alt'];
+	$image  = (int) get_post_meta( $post->ID, '_lr_slot_image', true );
+	$path   = LIFERUSS_DIR . '/assets/images/rates/' . $item['file'];
+	$has_file = is_readable( $path );
+	if ( ! $has_file && ! ( $image && wp_attachment_is_image( $image ) ) ) {
+		return;
+	}
+	echo '<span class="lr-hero__scrim" aria-hidden="true"></span>';
+	if ( $image && wp_attachment_is_image( $image ) ) {
+		$meta_w = (int) get_post_meta( $post->ID, '_lr_slot_w', true );
+		$meta_h = (int) get_post_meta( $post->ID, '_lr_slot_h', true );
+		if ( $meta_w > 0 ) {
+			$width = $meta_w;
+		}
+		if ( $meta_h > 0 ) {
+			$height = $meta_h;
+		}
+		echo wp_get_attachment_image(
+			$image,
+			'large',
+			false,
+			array(
+				'class'         => 'lr-hero__img',
+				'alt'           => $alt,
+				'width'         => $width,
+				'height'        => $height,
+				'sizes'         => '(max-width: 720px) 100vw, 1120px',
+				'loading'       => empty( $item['eager'] ) ? 'lazy' : false,
+				'fetchpriority' => empty( $item['eager'] ) ? false : 'high',
+				'decoding'      => 'async',
+			)
+		);
+		return;
+	}
+	$src = LIFERUSS_URI . '/assets/images/rates/' . $item['file'];
+	echo '<img class="lr-hero__img" src="' . esc_url( $src ) . '" alt="' . esc_attr( $alt ) . '" width="' . esc_attr( (string) $width ) . '" height="' . esc_attr( (string) $height ) . '" sizes="(max-width: 720px) 100vw, 1120px" decoding="async"';
+	if ( ! empty( $item['eager'] ) ) {
+		echo ' fetchpriority="high"';
+	} else {
+		echo ' loading="lazy"';
+	}
+	echo '>';
+}

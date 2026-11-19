@@ -121,3 +121,37 @@
     font-size: 0.78rem;
   }
 }
+
+/* Hero photograph. The open area of the picture is on the left; Persian text sits on the right, under the scrim. */
+.page-hero:has(.lr-hero__img) {
+  position: relative;
+  overflow: hidden;
+  background: var(--navy-deep);
+  color: var(--white);
+}
+
+.lr-hero__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+}
+
+.lr-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to left, var(--navy-deep) 0%, var(--navy-deep) 42%, var(--navy) 68%, transparent 100%);
+}
+
+.page-hero:has(.lr-hero__img) .container {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 720px) {
+  .lr-hero__scrim {
+    background: linear-gradient(to left, var(--navy-deep) 0%, var(--navy) 78%, transparent 100%);
+  }
+}
