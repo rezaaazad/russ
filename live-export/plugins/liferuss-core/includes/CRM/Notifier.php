@@ -154,12 +154,6 @@ class Notifier {
 	}
 
 	/**
-	 * Email every administrator and the shared Telegram channel.
-	 *
-	 * @param string $subject Subject.
-	 * @param string $body    Body.
-	 */
-	/**
 	 * Email exchange operators. The service inbox still gets the normal lead notice.
 	 *
 	 * @param int $lead_id Lead id.
@@ -185,6 +179,12 @@ class Notifier {
 		}
 	}
 
+	/**
+	 * Email every administrator and the shared Telegram channel.
+	 *
+	 * @param string $subject Subject.
+	 * @param string $body    Body.
+	 */
 	public static function notify_admins( string $subject, string $body ): void {
 		$admins = get_users(
 			array(

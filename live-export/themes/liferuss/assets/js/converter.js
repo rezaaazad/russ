@@ -59,20 +59,52 @@
     }
     var value = amount * (from.toman / to.toman);
     result.textContent = data.labels.result + " " + format(value);
-    var bits = [];
-    if (from.source) {
-      bits.push(from.source);
+    meta.textContent = metaLine(form.from.value, form.to.value);
+  }
+
+  function metaLine(fromCode, toCode) {
+    var sides = [];
+    [fromCode, toCode].forEach(function (code) {
+      if (code === "IRR") {
+        return;
+      }
+      var quote = data.quotes[code];
+      if (!quote || sides.some(function (side) { return side.code === code; })) {
+        return;
+      }
+      sides.push({
+        code: code,
+        source: quote.source || "",
+        age: quote.age || "",
+        ageMs: Number(quote.ageMs) || 0,
+        state: quote.state || ""
+      });
+    });
+    if (!sides.length) {
+      return "";
     }
-    if (to.source && to.source !== from.source) {
-      bits.push(to.source);
+    var sources = [];
+    var oldest = sides[0];
+    var stale = false;
+    sides.forEach(function (side) {
+      if (side.source && sources.indexOf(side.source) === -1) {
+        sources.push(side.source);
+      }
+      if (side.ageMs >= oldest.ageMs) {
+        oldest = side;
+      }
+      if (side.state === "stale") {
+        stale = true;
+      }
+    });
+    var bits = sources.slice();
+    if (oldest.age) {
+      bits.push(oldest.age);
     }
-    if (from.age) {
-      bits.push(from.age);
-    }
-    if (from.state === "stale" || to.state === "stale") {
+    if (stale) {
       bits.push(data.labels.stale);
     }
-    meta.textContent = bits.join(" · ");
+    return bits.join(" · ");
   }
 
   function applyBoard(board) {
@@ -88,6 +120,7 @@
       quote.source = item.source || "";
       quote.state = item.state || "";
       quote.age = item.ageText || "";
+      quote.ageMs = Number(item.ageMs) || 0;
     });
     paint();
   }

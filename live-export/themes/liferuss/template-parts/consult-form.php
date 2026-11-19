@@ -22,6 +22,13 @@ $degree      = isset( $form['degree'] ) ? (string) $form['degree'] : '';
 $level_value = isset( $form['level'] ) ? (string) $form['level'] : '';
 $scholarship = isset( $form['scholarship'] ) ? (string) $form['scholarship'] : '';
 $needs_level = in_array( $type, array( 'consult', 'admission' ), true );
+$lr_purpose  = 'other';
+if ( 'exchange' === $type ) {
+	$lr_purpose = sanitize_key( (string) get_post_meta( get_queried_object_id(), '_lr_exchange_purpose', true ) );
+	if ( ! in_array( $lr_purpose, array( 'tuition', 'transfer', 'other' ), true ) ) {
+		$lr_purpose = 'other';
+	}
+}
 $form_title  = liferuss_opt( 'form_title' );
 $form_intro  = liferuss_opt( 'form_intro' );
 if ( 'admission' === $type ) {
@@ -88,6 +95,25 @@ if ( 'admission' === $type ) {
 				</label>
 				<?php endif; ?>
 				<?php if ( 'exchange' === $type ) : ?>
+				<input type="hidden" name="consult_purpose" value="<?php echo esc_attr( $lr_purpose ); ?>">
+				<?php if ( 'tuition' === $lr_purpose ) : ?>
+				<label>
+					<span>نام دانشجو</span>
+					<input type="text" name="consult_student" required maxlength="120" autocomplete="name">
+				</label>
+				<label>
+					<span>دانشگاه</span>
+					<input type="text" name="consult_uni" required maxlength="160">
+				</label>
+				<label>
+					<span>شمارهٔ دانشجویی/فاکتور</span>
+					<input type="text" name="consult_invoice" required maxlength="80">
+				</label>
+				<label>
+					<span>مهلت فاکتور</span>
+					<input type="text" name="consult_invoice_due" maxlength="40" placeholder="مثلاً مهلت روی فاکتور">
+				</label>
+				<?php endif; ?>
 				<label>
 					<span><?php echo esc_html( liferuss_t( 'form_amount' ) ); ?></span>
 					<input type="number" name="consult_amount" required min="1" step="1" inputmode="decimal">

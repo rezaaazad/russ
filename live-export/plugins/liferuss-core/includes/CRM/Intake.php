@@ -320,7 +320,23 @@ class Intake {
 				'card'     => 'کارت',
 				'transfer' => 'انتقال',
 			);
+			$purpose_labels = array(
+				'tuition'  => 'پرداخت شهریه',
+				'transfer' => 'حواله به روسیه',
+				'other'    => 'سایر',
+			);
+			$purpose = self::purpose();
 			$lines[] = 'صف: صرافی';
+			$lines[] = 'هدف: ' . ( $purpose_labels[ $purpose ] ?? 'سایر' );
+			if ( 'tuition' === $purpose ) {
+				$lines[] = 'نام دانشجو: ' . self::text( 'consult_student' );
+				$lines[] = 'دانشگاه: ' . self::text( 'consult_uni' );
+				$lines[] = 'شمارهٔ دانشجویی/فاکتور: ' . self::text( 'consult_invoice' );
+				$due     = self::text( 'consult_invoice_due' );
+				if ( '' !== $due ) {
+					$lines[] = 'مهلت فاکتور: ' . $due;
+				}
+			}
 			$lines[] = 'روش پرداخت: ' . ( $labels[ $pay ] ?? $pay );
 			$lines[] = 'شهر: ' . self::text( 'consult_city' );
 			$lines[] = 'نرخ مرجع بازار کنار درخواست ذخیره شد. نرخ نهایی را در پاسخ همین درخواست بنویسید.';
@@ -383,7 +399,8 @@ class Intake {
 				'currency_to'    => self::currency( 'consult_currency_to', 'RUB' ),
 				'city'           => function_exists( 'mb_substr' ) ? mb_substr( $city, 0, 100 ) : substr( $city, 0, 100 ),
 				'payment_method' => self::payment_method(),
-				'description'    => self::area( 'consult_notes' ),
+				'purpose'        => self::purpose(),
+				'description'    => self::exchange_notes(),
 				'rate_snapshot'  => wp_json_encode( Market::snapshot() ),
 				'stage'          => 'new',
 			);
@@ -477,6 +494,35 @@ class Intake {
 	}
 
 	/**
+	 * tuition, transfer, or other. Anything else is other.
+	 */
+	private static function purpose(): string {
+		$purpose = sanitize_key( self::text( 'consult_purpose' ) );
+		return in_array( $purpose, array( 'tuition', 'transfer', 'other' ), true ) ? $purpose : 'other';
+	}
+
+	/**
+	 * Notes, plus the tuition invoice lines when this request is a tuition payment.
+	 */
+	private static function exchange_notes(): string {
+		$notes = self::area( 'consult_notes' );
+		if ( 'tuition' !== self::purpose() ) {
+			return $notes;
+		}
+		$lines = array(
+			'نام دانشجو: ' . self::text( 'consult_student' ),
+			'دانشگاه: ' . self::text( 'consult_uni' ),
+			'شمارهٔ دانشجویی/فاکتور: ' . self::text( 'consult_invoice' ),
+		);
+		$due = self::text( 'consult_invoice_due' );
+		if ( '' !== $due ) {
+			$lines[] = 'مهلت فاکتور: ' . $due;
+		}
+		$extra = implode( "\n", $lines );
+		return '' === trim( $notes ) ? $extra : $notes . "\n" . $extra;
+	}
+
+	/**
 	 * cash, card, or transfer. Anything else is empty.
 	 */
 	private static function payment_method(): string {
@@ -495,6 +541,20 @@ class Intake {
 		$len  = function_exists( 'mb_strlen' ) ? mb_strlen( $city ) : strlen( $city );
 		if ( $len < 2 ) {
 			return self::t( 'form_need_city', 'شهر را بنویسید.' );
+		}
+		if ( 'tuition' === self::purpose() ) {
+			$required = array(
+				'consult_student'  => 'نام دانشجو را بنویسید.',
+				'consult_uni'      => 'دانشگاه را بنویسید.',
+				'consult_invoice'  => 'شمارهٔ دانشجویی یا فاکتور را بنویسید.',
+			);
+			foreach ( $required as $key => $message ) {
+				$value = self::text( $key );
+				$size  = function_exists( 'mb_strlen' ) ? mb_strlen( $value ) : strlen( $value );
+				if ( $size < 2 ) {
+					return self::t( 'form_need_' . $key, $message );
+				}
+			}
 		}
 		return '';
 	}

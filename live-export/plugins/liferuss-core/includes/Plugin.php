@@ -30,6 +30,7 @@ use LifeRuss\Core\Front\Routes as FrontRoutes;
 use LifeRuss\Core\Search\Cli as SearchCli;
 use LifeRuss\Core\Search\Indexer;
 use LifeRuss\Core\Content\Editor as ContentEditor;
+use LifeRuss\Core\Content\ExchangeCopy;
 use LifeRuss\Core\Content\Canonical;
 use LifeRuss\Core\Content\Copy;
 use LifeRuss\Core\Content\Seed as ContentSeed;
@@ -114,6 +115,7 @@ class Plugin {
 		Canonical::hooks();
 		ServiceSeed::hooks();
 		Copy::hooks();
+		ExchangeCopy::hooks();
 		Runner::hooks();
 		NotFound::hooks();
 		TwoFactor::hooks();

@@ -81,16 +81,25 @@ $copy        = str_replace( '{year}', liferuss_local_digits( gmdate( 'Y' ) ), li
 			</ul>
 		</details>
 
-		<?php if ( liferuss_services() ) : ?>
 		<details class="footer-col footer-acc" open>
 			<summary><h2><?php echo esc_html( liferuss_t( 'footer_services' ) ); ?></h2></summary>
 			<ul class="footer-links">
 				<?php foreach ( liferuss_services() as $service ) : ?>
 					<li><a href="<?php echo esc_url( liferuss_service_href( (string) ( $service['icon'] ?? '' ) ) ); ?>"><?php echo esc_html( $service['title'] ); ?></a></li>
 				<?php endforeach; ?>
+				<?php
+				$lr_fx_links = array(
+					array( 'پرداخت شهریه', '/exchange/tuition-payment/' ),
+					array( 'حواله به روسیه', '/exchange/transfer-to-russia/' ),
+					array( 'انواع ارز', '/exchange/currencies/' ),
+					array( 'ماشین‌حساب مرجع', '/exchange/calculator/' ),
+				);
+				foreach ( $lr_fx_links as $lr_fx_link ) :
+					?>
+					<li><a href="<?php echo esc_url( liferuss_url( $lr_fx_link[1] ) ); ?>"><?php echo esc_html( $lr_fx_link[0] ); ?></a></li>
+				<?php endforeach; ?>
 			</ul>
 		</details>
-		<?php endif; ?>
 
 		<?php if ( $has_contact ) : ?>
 		<details class="footer-col footer-acc" open>

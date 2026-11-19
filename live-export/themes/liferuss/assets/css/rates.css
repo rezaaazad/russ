@@ -50,6 +50,7 @@
   vertical-align: top;
   border-bottom: 1px solid var(--line);
   font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .lr-rates__table thead th {
@@ -152,7 +153,7 @@
 
 @media (max-width: 720px) {
   .lr-hero__scrim {
-    background: linear-gradient(to left, var(--navy-deep) 0%, var(--navy) 78%, transparent 100%);
+    background: var(--navy);
   }
 }
 
@@ -201,6 +202,7 @@
   font-size: 1.25rem;
   font-weight: 800;
   color: var(--navy);
+  font-variant-numeric: tabular-nums;
 }
 
 .lr-conv__meta {
@@ -271,6 +273,12 @@
   padding: 12px;
 }
 
+.lr-pay legend {
+  padding: 0 6px;
+  color: var(--navy);
+  font-weight: 700;
+}
+
 .lr-pay__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -280,8 +288,20 @@
 .lr-pay__opt {
   display: grid;
   gap: 6px;
+  padding: 6px;
+  border-radius: var(--radius-sm);
   color: var(--navy);
   font-weight: 700;
+}
+
+.lr-pay__opt:has(input:checked) {
+  outline: 2px solid var(--gold);
+  background: var(--gold-soft);
+}
+
+.lr-pay__opt input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .lr-pay__opt img,
@@ -299,6 +319,8 @@
   gap: 10px;
   align-items: center;
   margin: 0;
+  cursor: default;
+  user-select: none;
 }
 
 .lr-pay__usdt img {
@@ -332,6 +354,56 @@ html[dir="ltr"] .lr-ticker__track {
   to {
     transform: translate3d(-50%, 0, 0);
   }
+}
+
+.lr-home-rates__cta {
+  margin: 12px 16px 16px;
+}
+
+.lr-exchange-top {
+  padding-top: 24px;
+}
+
+.lr-slot {
+  margin: 0 0 16px;
+  max-width: 720px;
+}
+
+.lr-slot img,
+.lr-slot__hold {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.lr-slot__hold {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  min-height: 160px;
+  border: 1px dashed var(--navy-mid);
+  background: var(--bg);
+  color: var(--navy);
+  text-align: center;
+  padding: 16px;
+}
+
+.lr-exnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lr-exnav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--navy);
+  text-decoration: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.15.0' );
+define( 'LIFERUSS_VERSION', '1.15.1' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -37,6 +37,7 @@ require_once LIFERUSS_DIR . '/inc/admin-options.php';
 require_once LIFERUSS_DIR . '/inc/ux.php';
 require_once LIFERUSS_DIR . '/inc/legal.php';
 require_once LIFERUSS_DIR . '/inc/rates.php';
+require_once LIFERUSS_DIR . '/inc/exchange-pages.php';
 
 /**
  * Theme supports, menus, and image sizes.
