@@ -282,11 +282,16 @@ p {
 }
 
 .brand-logo {
-  width: 92px;
-  height: 40px;
-  max-width: 92px;
+  width: 83px;
+  height: 36px;
   display: block;
-  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .brand-logo {
+    width: 101px;
+    height: 44px;
+  }
 }
 
 .brand-emblem {
@@ -294,6 +299,25 @@ p {
   height: 37px;
   display: block;
   object-fit: contain;
+}
+
+.lr-logo-band {
+  background: var(--white);
+  padding: 18px 16px;
+}
+
+.lr-logo-band__img {
+  display: block;
+  width: 168px;
+  height: 73px;
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .lr-logo-band__img {
+    width: 202px;
+    height: 88px;
+  }
 }
 
 /* White-background logo loop. Header and footer stay on the static mark. */
@@ -1902,6 +1926,11 @@ html[dir="ltr"] .page-hero-photo.scene-couple .hero-overlay {
 .site-footer h3 {
   color: #fff;
   font-size: 1.05rem;
+}
+
+.footer-tagline {
+  margin: 8px 0 0;
+  color: var(--navy-soft);
 }
 
 .footer-logo .brand-text strong,
