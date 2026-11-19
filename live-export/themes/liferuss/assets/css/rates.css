@@ -154,6 +154,8 @@
   .lr-hero__scrim {
     background: linear-gradient(to left, var(--navy-deep) 0%, var(--navy) 78%, transparent 100%);
   }
+}
+
 .lr-conv {
   display: grid;
   gap: 12px;
