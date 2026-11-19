@@ -46,6 +46,7 @@ require_once LIFERUSS_DIR . '/inc/exchange-pages.php';
 require_once LIFERUSS_DIR . '/inc/sourcing.php';
 require_once LIFERUSS_DIR . '/inc/cargo-page.php';
 require_once LIFERUSS_DIR . '/inc/danestaniha-page.php';
+require_once LIFERUSS_DIR . '/inc/scholarship-page.php';
 
 /**
  * Theme supports, menus, and image sizes.

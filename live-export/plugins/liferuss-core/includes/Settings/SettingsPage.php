@@ -387,6 +387,15 @@ class SettingsPage {
 		self::text_row( 'sourcing_consult_url', __( 'مقصد دکمهٔ مشاورهٔ بازرگانی', 'liferuss-core' ), (string) ( $v['sourcing_consult_url'] ?? '/contact/' ) );
 		self::text_row( 'cargo_consult_url', __( 'مقصد دکمهٔ مشاورهٔ کارگو', 'liferuss-core' ), (string) ( $v['cargo_consult_url'] ?? '/contact/' ) );
 		self::text_row( 'danestaniha_consult_url', __( 'مقصد دکمهٔ مشاورهٔ دانستنی‌ها', 'liferuss-core' ), (string) ( $v['danestaniha_consult_url'] ?? '/contact/' ) );
+		self::text_row( 'scholarship_consult_url', __( 'مقصد دکمهٔ مشاورهٔ بورسیه', 'liferuss-core' ), (string) ( $v['scholarship_consult_url'] ?? '/contact/' ) );
+		echo '<tr><th scope="row">' . esc_html__( 'نوار آمار بورسیه', 'liferuss-core' ) . '</th><td>';
+		echo '<label><input type="checkbox" name="scholarship_stats_on" value="1" ' . checked( '1', (string) ( $v['scholarship_stats_on'] ?? '0' ), false ) . '> ';
+		echo esc_html__( 'نشان داده شود. تا وقتی هر چهار مقدار پر نشده باشد، نوار در سایت دیده نمی‌شود.', 'liferuss-core' );
+		echo '</label></td></tr>';
+		self::text_row( 'scholarship_stat_satisfaction', __( 'رضایت متقاضیان', 'liferuss-core' ), (string) ( $v['scholarship_stat_satisfaction'] ?? '' ) );
+		self::text_row( 'scholarship_stat_years', __( 'سال تجربه', 'liferuss-core' ), (string) ( $v['scholarship_stat_years'] ?? '' ) );
+		self::text_row( 'scholarship_stat_universities', __( 'دانشگاه همکار', 'liferuss-core' ), (string) ( $v['scholarship_stat_universities'] ?? '' ) );
+		self::text_row( 'scholarship_stat_students', __( 'دانشجوی اعزام‌شده', 'liferuss-core' ), (string) ( $v['scholarship_stat_students'] ?? '' ) );
 		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'اگر هر دو کلید خالی باشند، فرم عمومی بدون Turnstile ثبت می‌شود. مقصد مشاوره یک مسیر صفحه است، مثل /contact/، و شمارهٔ تلفن نیست.', 'liferuss-core' ) . '</p></td></tr>';
 	}
 
@@ -685,6 +694,32 @@ class SettingsPage {
 	}
 
 	/**
+	 * Stats stay off until every figure has been entered.
+	 */
+	private static function scholarship_stats_on(): string {
+		$posted = isset( $_POST['scholarship_stats_on'] ) ? '1' : '0'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		foreach ( array( 'scholarship_stat_satisfaction', 'scholarship_stat_years', 'scholarship_stat_universities', 'scholarship_stat_students' ) as $key ) {
+			if ( '' === self::scholarship_stat( $key ) ) {
+				return '0';
+			}
+		}
+		return $posted;
+	}
+
+	/**
+	 * One saved statistic. Phone links and long text are dropped.
+	 *
+	 * @param string $key Posted field.
+	 */
+	private static function scholarship_stat( string $key ): string {
+		$value = trim( self::posted_text( $key ) );
+		if ( '' === $value || str_starts_with( strtolower( $value ), 'tel:' ) ) {
+			return '';
+		}
+		return function_exists( 'mb_substr' ) ? mb_substr( $value, 0, 40 ) : substr( $value, 0, 40 );
+	}
+
+	/**
 	 * A page path for a consultation button. Phone links are refused.
 	 *
 	 * @param string $key Posted field.
@@ -708,9 +743,15 @@ class SettingsPage {
 				'notify_email'       => sanitize_email( self::posted_text( 'notify_email' ) ),
 				'turnstile_site_key'   => self::posted_text( 'turnstile_site_key' ),
 				'turnstile_secret'     => self::posted_text( 'turnstile_secret' ),
-				'sourcing_consult_url' => self::sourcing_consult_url(),
-				'cargo_consult_url'       => self::path_setting( 'cargo_consult_url' ),
-				'danestaniha_consult_url' => self::path_setting( 'danestaniha_consult_url' ),
+				'sourcing_consult_url'          => self::sourcing_consult_url(),
+				'cargo_consult_url'             => self::path_setting( 'cargo_consult_url' ),
+				'danestaniha_consult_url'       => self::path_setting( 'danestaniha_consult_url' ),
+				'scholarship_consult_url'       => self::path_setting( 'scholarship_consult_url' ),
+				'scholarship_stats_on'          => self::scholarship_stats_on(),
+				'scholarship_stat_satisfaction' => self::scholarship_stat( 'scholarship_stat_satisfaction' ),
+				'scholarship_stat_years'        => self::scholarship_stat( 'scholarship_stat_years' ),
+				'scholarship_stat_universities' => self::scholarship_stat( 'scholarship_stat_universities' ),
+				'scholarship_stat_students'     => self::scholarship_stat( 'scholarship_stat_students' ),
 			)
 		);
 	}

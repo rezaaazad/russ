@@ -477,9 +477,6 @@ function liferuss_filter_nav_tree( $tree ) {
 	if ( liferuss_public_count( 'lr_city' ) < 1 ) {
 		$hide[] = '/cities/';
 	}
-	if ( liferuss_public_count( 'lr_scholarship' ) < 1 ) {
-		$hide[] = '/scholarships/';
-	}
 	if ( liferuss_public_count( 'lr_university' ) < 2 ) {
 		$hide[] = '/compare/';
 	}
@@ -537,9 +534,6 @@ function liferuss_filter_menu_objects( $items ) {
 	}
 	if ( liferuss_public_count( 'lr_city' ) < 1 ) {
 		$hide[] = '/cities/';
-	}
-	if ( liferuss_public_count( 'lr_scholarship' ) < 1 ) {
-		$hide[] = '/scholarships/';
 	}
 	if ( liferuss_public_count( 'lr_university' ) < 2 ) {
 		$hide[] = '/compare/';
