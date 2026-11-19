@@ -334,6 +334,52 @@ html[dir="ltr"] .lr-ticker__track {
   }
 }
 
+.lr-exchange-top {
+  padding-top: 24px;
+}
+
+.lr-slot {
+  margin: 0 0 16px;
+  max-width: 720px;
+}
+
+.lr-slot img,
+.lr-slot__hold {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.lr-slot__hold {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  min-height: 160px;
+  border: 1px dashed var(--navy-mid);
+  background: var(--bg);
+  color: var(--navy);
+  text-align: center;
+  padding: 16px;
+}
+
+.lr-exnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lr-exnav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--navy);
+  text-decoration: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lr-ticker {
     overflow-x: auto;
