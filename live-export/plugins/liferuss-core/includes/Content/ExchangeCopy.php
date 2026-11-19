@@ -28,6 +28,21 @@ class ExchangeCopy {
 		'پرداخت شهریه باید با فاکتور همان دانشگاه و نام دانشجو یکی باشد.',
 		'استعلام معمول بین تومان، دلار، یورو و روبل است. ارز دیگر را فقط وقتی مسیر واقعی دارد می‌پذیریم.',
 		'تبدیل بین تومان، دلار، یورو، روبل و تتر با همان جدول نرخ روز. حاصل، قیمت معامله نیست.',
+		'حواله به روسیه برای شهریه، خوابگاه یا هزینهٔ زندگی، بعد از ثبت استعلام و تطبیق نام ذی‌نفع انجام می‌شود. عدد جدول مرجع بازار است و نرخ نهایی را در پاسخ استعلام می‌نویسیم.',
+		'پرداخت شهریه فقط وقتی شروع می‌شود که فاکتور همان دانشگاه و نام همان دانشجو با هم بخوانند. این صفحه خودش پرداخت را انجام نمی‌دهد.',
+		'جدول نرخ روز چند بازار را کنار هم نشان می‌دهد. هر ردیف نام منبع و زمان خودش را دارد. نرخ نهایی معامله در پاسخ استعلام است، نه در جدول.',
+		'تبدیل مرجع بین تومان، دلار، یورو، روبل و تتر. اگر نرخ تومانی یک ارز در جدول نباشد، آن ارز در ماشین‌حساب نمی‌آید. حاصل، نرخ معامله نیست.',
+	);
+
+	/**
+	 * Hub leads already published, including the softened sentence.
+	 *
+	 * @var string[]
+	 */
+	private const HUB_LEADS = array(
+		'',
+		'این صفحه نرخ را برای تصمیم شما نشان می‌دهد و درخواست استعلام ثبت می‌کند. تبدیل خودکار و سفارش پرداخت اینجا انجام نمی‌شود.',
+		'نرخ روز را می‌بینید و استعلام را ثبت می‌کنید تا مبلغ، ارز و روش را برایتان روشن کنیم.',
 	);
 
 	/**
@@ -41,18 +56,14 @@ class ExchangeCopy {
 	 * Fill the three children and the calculator once the hub exists.
 	 */
 	public static function maybe(): void {
-		if ( '1' === (string) get_option( 'lr_exchange_copy', '' ) ) {
+		if ( '1' === (string) get_option( 'lr_exchange_copy_v2', '' ) ) {
 			return;
 		}
 		$parent = get_page_by_path( 'exchange' );
 		if ( ! $parent instanceof \WP_Post ) {
 			return;
 		}
-		self::seo(
-			(int) $parent->ID,
-			'استعلام نرخ روز ارز',
-			'جدول نرخ روز با نام منبع و زمان هر ردیف. این اعداد مرجع بازار هستند و نرخ نهایی در پاسخ استعلام نوشته می‌شود.'
-		);
+		self::hub( (int) $parent->ID );
 		foreach ( Library::pages() as $page ) {
 			if ( 'exchange' !== (string) ( $page['parent'] ?? '' ) ) {
 				continue;
@@ -64,6 +75,7 @@ class ExchangeCopy {
 		}
 		self::calculator( (int) $parent->ID );
 		update_option( 'lr_exchange_copy', '1', false );
+		update_option( 'lr_exchange_copy_v2', '1', false );
 	}
 
 	/**
@@ -115,7 +127,82 @@ class ExchangeCopy {
 			update_post_meta( $id, '_lr_schema', 'service' );
 		}
 		self::slot( $id );
-		self::seo( $id, (string) $page['title'], (string) $page['lead'] );
+		self::purpose_meta( $id, (string) $page['slug'] );
+		self::seo( $id, self::keyword_title( (string) $page['slug'], (string) $page['title'] ), (string) $page['lead'], self::title_defaults( (string) $page['slug'], (string) $page['title'] ) );
+	}
+
+	/**
+	 * Thicken the hub when it still has a known lead.
+	 *
+	 * @param int $id Hub id.
+	 */
+	private static function hub( int $id ): void {
+		$page = null;
+		foreach ( Library::pages() as $row ) {
+			if ( 'exchange' === (string) ( $row['slug'] ?? '' ) && '' === (string) ( $row['parent'] ?? '' ) ) {
+				$page = $row;
+				break;
+			}
+		}
+		$lead = (string) get_post_meta( $id, '_lr_lead', true );
+		if ( is_array( $page ) && in_array( $lead, self::HUB_LEADS, true ) ) {
+			wp_update_post(
+				array(
+					'ID'           => $id,
+					'post_content' => (string) $page['content'],
+				)
+			);
+			update_post_meta( $id, '_lr_lead', (string) $page['lead'] );
+			update_post_meta( $id, '_lr_sections', wp_json_encode( $page['sections'], JSON_UNESCAPED_UNICODE ) );
+			$eye = (string) get_post_meta( $id, '_lr_eyebrow', true );
+			if ( '' === $eye || 'فقط استعلام' === $eye ) {
+				update_post_meta( $id, '_lr_eyebrow', (string) $page['eyebrow'] );
+			}
+		}
+		$description = is_array( $page ) ? (string) $page['lead'] : '';
+		self::seo( $id, 'استعلام نرخ روز ارز', $description, array( '', 'استعلام نرخ روز ارز', 'استعلام نرخ ارز' ) );
+	}
+
+	/**
+	 * Tuition and transfer forms read this meta.
+	 *
+	 * @param int    $id   Page id.
+	 * @param string $slug Slug.
+	 */
+	private static function purpose_meta( int $id, string $slug ): void {
+		$map = array(
+			'tuition-payment'    => 'tuition',
+			'transfer-to-russia' => 'transfer',
+		);
+		if ( isset( $map[ $slug ] ) ) {
+			update_post_meta( $id, '_lr_exchange_purpose', $map[ $slug ] );
+		}
+	}
+
+	/**
+	 * Keyword title, used only when the stored title is still a default.
+	 *
+	 * @param string $slug  Slug.
+	 * @param string $title Page title.
+	 */
+	private static function keyword_title( string $slug, string $title ): string {
+		$titles = array(
+			'tuition-payment'    => 'پرداخت شهریه دانشگاه‌های روسیه',
+			'transfer-to-russia' => 'حواله به روسیه برای شهریه',
+			'currencies'         => 'انواع ارز برای شهریه و حواله',
+		);
+		return $titles[ $slug ] ?? $title;
+	}
+
+	/**
+	 * Titles that still count as untouched.
+	 *
+	 * @param string $slug  Slug.
+	 * @param string $title Page title.
+	 * @return string[]
+	 */
+	private static function title_defaults( string $slug, string $title ): array {
+		return array( '', $title, self::keyword_title( $slug, $title ) );
 	}
 
 	/**
@@ -174,7 +261,7 @@ class ExchangeCopy {
 			update_post_meta( $id, '_lr_form', 'exchange' );
 		}
 		self::slot( $id );
-		self::seo( $id, 'ماشین‌حساب نرخ مرجع', (string) get_post_meta( $id, '_lr_lead', true ) );
+		self::seo( $id, 'ماشین‌حساب نرخ ارز', (string) get_post_meta( $id, '_lr_lead', true ), array( '', 'ماشین‌حساب نرخ مرجع', 'ماشین‌حساب نرخ', 'ماشین‌حساب' ) );
 		unset( $parent_id );
 	}
 
@@ -185,11 +272,12 @@ class ExchangeCopy {
 	 * @param string $title Document title.
 	 * @param string $lead  Meta description.
 	 */
-	private static function seo( int $id, string $title, string $lead ): void {
+	private static function seo( int $id, string $title, string $lead, array $defaults = array( '' ) ): void {
 		if ( $id < 1 ) {
 			return;
 		}
-		if ( '' === (string) get_post_meta( $id, '_lr_seo_title', true ) && '' !== $title ) {
+		$current = (string) get_post_meta( $id, '_lr_seo_title', true );
+		if ( '' !== $title && in_array( $current, $defaults, true ) ) {
 			update_post_meta( $id, '_lr_seo_title', $title );
 		}
 		if ( '' === (string) get_post_meta( $id, '_lr_seo_description', true ) && '' !== $lead ) {

@@ -113,12 +113,12 @@ function liferuss_rates_shortcode() {
 add_shortcode( 'lr_rates', 'liferuss_rates_shortcode' );
 
 /**
- * Put the board on /exchange/ when the page body does not already contain the shortcode.
+ * The hub prints the board itself. Drop a stored shortcode so it is not drawn twice.
  *
  * @param string $content Post content.
  * @return string
  */
-function liferuss_rates_prepend( $content ) {
+function liferuss_rates_strip_hub_shortcode( $content ) {
 	if ( is_admin() || ! is_singular( 'page' ) || ! in_the_loop() || ! is_main_query() ) {
 		return $content;
 	}
@@ -126,12 +126,9 @@ function liferuss_rates_prepend( $content ) {
 	if ( ! $post instanceof WP_Post || 'exchange' !== $post->post_name || (int) $post->post_parent !== 0 ) {
 		return $content;
 	}
-	if ( str_contains( $content, '[lr_rates]' ) ) {
-		return $content;
-	}
-	return '[lr_rates]' . $content;
+	return str_replace( '[lr_rates]', '', $content );
 }
-add_filter( 'the_content', 'liferuss_rates_prepend', 7 );
+add_filter( 'the_content', 'liferuss_rates_strip_hub_shortcode', 7 );
 
 /**
  * Print the grouped table.
@@ -311,28 +308,28 @@ function liferuss_rate_heroes() {
 			'alt'   => 'ماشین‌حساب نرخ مرجع',
 			'w'     => 1920,
 			'h'     => 1086,
-			'eager' => false,
+			'eager' => true,
 		),
 		'transfer-to-russia' => array(
 			'file'  => 'exchange-transfer-to-russia-hero.webp',
 			'alt'   => 'حواله به روسیه',
 			'w'     => 1920,
 			'h'     => 1086,
-			'eager' => false,
+			'eager' => true,
 		),
 		'tuition-payment'    => array(
 			'file'  => 'exchange-tuition-payment-hero.webp',
 			'alt'   => 'پرداخت شهریه',
 			'w'     => 1920,
 			'h'     => 1086,
-			'eager' => false,
+			'eager' => true,
 		),
 		'currencies'         => array(
 			'file'  => 'exchange-currencies-hero.webp',
 			'alt'   => 'انواع ارز',
 			'w'     => 1920,
 			'h'     => 1086,
-			'eager' => false,
+			'eager' => true,
 		),
 	);
 }
@@ -392,8 +389,14 @@ function liferuss_rate_page_hero() {
 		);
 		return;
 	}
-	$src = LIFERUSS_URI . '/assets/images/rates/' . $item['file'];
-	echo '<img class="lr-hero__img" src="' . esc_url( $src ) . '" alt="' . esc_attr( $alt ) . '" width="' . esc_attr( (string) $width ) . '" height="' . esc_attr( (string) $height ) . '" sizes="(max-width: 720px) 100vw, 1120px" decoding="async"';
+	$src      = LIFERUSS_URI . '/assets/images/rates/' . $item['file'];
+	$stem     = preg_replace( '/\.webp$/', '', (string) $item['file'] );
+	$small    = LIFERUSS_DIR . '/assets/images/rates/' . $stem . '-960.webp';
+	$srcset   = '';
+	if ( is_string( $stem ) && is_readable( $small ) ) {
+		$srcset = ' srcset="' . esc_url( LIFERUSS_URI . '/assets/images/rates/' . $stem . '-960.webp' ) . ' 960w, ' . esc_url( $src ) . ' 1920w"';
+	}
+	echo '<img class="lr-hero__img" src="' . esc_url( $src ) . '"' . $srcset . ' alt="' . esc_attr( $alt ) . '" width="' . esc_attr( (string) $width ) . '" height="' . esc_attr( (string) $height ) . '" sizes="(max-width: 720px) 100vw, 1120px" decoding="async"';
 	if ( ! empty( $item['eager'] ) ) {
 		echo ' fetchpriority="high"';
 	} else {
@@ -405,9 +408,20 @@ function liferuss_rate_page_hero() {
 /**
  * [lr_converter] Reference conversion among toman, USD, EUR, RUB, and USDT.
  *
+ * Attributes: from, to. Tuition and transfer pages pass to="RUB".
+ *
+ * @param array<string, string>|string $atts Shortcode attributes.
  * @return string
  */
-function liferuss_converter_shortcode() {
+function liferuss_converter_shortcode( $atts ) {
+	$atts = shortcode_atts(
+		array(
+			'from' => 'IRR',
+			'to'   => 'USD',
+		),
+		is_array( $atts ) ? $atts : array(),
+		'lr_converter'
+	);
 	wp_enqueue_script(
 		'liferuss-converter',
 		LIFERUSS_URI . '/assets/js/converter.js',
@@ -426,20 +440,73 @@ function liferuss_converter_shortcode() {
 	echo '<form class="lr-conv__form" action="#lr-converter" id="lr-converter">';
 	echo '<label><span>' . esc_html( liferuss_rate_fa( 'conv_amount' ) ) . '</span>';
 	echo '<input type="number" name="amount" min="0" step="any" inputmode="decimal" value="1" required></label>';
+	$from = strtoupper( (string) $atts['from'] );
+	$to   = strtoupper( (string) $atts['to'] );
+	if ( ! isset( $payload['quotes'][ $from ] ) ) {
+		$from = 'IRR';
+	}
+	if ( ! isset( $payload['quotes'][ $to ] ) ) {
+		$to = 'USD';
+	}
 	echo '<label><span>' . esc_html( liferuss_rate_fa( 'conv_from' ) ) . '</span><select name="from">';
-	liferuss_converter_options( $payload['quotes'], 'IRR' );
+	liferuss_converter_options( $payload['quotes'], $from );
 	echo '</select></label>';
 	echo '<label><span>' . esc_html( liferuss_rate_fa( 'conv_to' ) ) . '</span><select name="to">';
-	liferuss_converter_options( $payload['quotes'], 'USD' );
+	liferuss_converter_options( $payload['quotes'], $to );
 	echo '</select></label>';
 	echo '<p class="lr-conv__result" role="status" aria-live="polite"></p>';
-	echo '<p class="lr-conv__meta"></p>';
+	echo '<p class="lr-conv__meta">' . esc_html( liferuss_converter_meta( $payload['quotes'], $from, $to ) ) . '</p>';
 	echo '</form>';
 	echo '<p class="lr-rates__inquiry"><a class="btn btn-gold" href="' . esc_url( liferuss_url( '/exchange/#consultation' ) ) . '">' . esc_html( liferuss_rate_fa( 'rates_inquiry' ) ) . '</a></p>';
 	echo '</div>';
 	return (string) ob_get_clean();
 }
 add_shortcode( 'lr_converter', 'liferuss_converter_shortcode' );
+
+/**
+ * Source and age for the converter. IRR has no feed age, so the line is built from the other side.
+ * When both sides are non-IRR, both sources are listed and the older age is kept.
+ *
+ * @param array<string, array<string, mixed>> $quotes Quotes.
+ * @param string                               $from   From code.
+ * @param string                               $to     To code.
+ */
+function liferuss_converter_meta( array $quotes, $from, $to ) {
+	$sides = array();
+	foreach ( array( (string) $from, (string) $to ) as $code ) {
+		if ( 'IRR' === $code || isset( $sides[ $code ] ) || ! isset( $quotes[ $code ] ) ) {
+			continue;
+		}
+		$sides[ $code ] = $quotes[ $code ];
+	}
+	if ( ! $sides ) {
+		return '';
+	}
+	$sources = array();
+	$oldest  = null;
+	$stale   = false;
+	foreach ( $sides as $quote ) {
+		$source = (string) ( $quote['source'] ?? '' );
+		if ( '' !== $source && ! in_array( $source, $sources, true ) ) {
+			$sources[] = $source;
+		}
+		if ( null === $oldest || (int) ( $quote['ageMs'] ?? 0 ) >= (int) ( $oldest['ageMs'] ?? 0 ) ) {
+			$oldest = $quote;
+		}
+		if ( 'stale' === (string) ( $quote['state'] ?? '' ) ) {
+			$stale = true;
+		}
+	}
+	$bits = $sources;
+	$age  = (string) ( $oldest['age'] ?? '' );
+	if ( '' !== $age ) {
+		$bits[] = $age;
+	}
+	if ( $stale ) {
+		$bits[] = liferuss_rate_fa( 'rates_stale' );
+	}
+	return implode( ' · ', $bits );
+}
 
 /**
  * Currency options that have a toman quote. Toman itself is always listed.
@@ -486,6 +553,7 @@ function liferuss_converter_payload() {
 			'source' => (string) $item['source'],
 			'state'  => (string) ( $item['state'] ?? '' ),
 			'age'    => liferuss_rates_age( $item ),
+			'ageMs'  => isset( $item['ageMs'] ) ? (int) $item['ageMs'] : 0,
 		);
 	}
 	$notice = liferuss_rates_notice( $board );

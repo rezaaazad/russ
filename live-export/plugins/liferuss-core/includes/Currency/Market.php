@@ -328,19 +328,20 @@ class Market {
 			return $cached;
 		}
 
+		$last = get_option( self::OPTION, array() );
+		if ( is_array( $last ) && ! empty( $last['items'] ) && is_array( $last['items'] ) ) {
+			$last['fetchedAt'] = (string) ( $last['fetchedAt'] ?? '' );
+			$last['fallback']  = ! empty( $last['fallback'] );
+			set_transient( self::TRANSIENT, $last, MINUTE_IN_SECONDS );
+			add_action( 'shutdown', array( self::class, 'refresh' ) );
+			return $last;
+		}
+
 		$fresh = self::pull();
 		if ( $fresh['items'] ) {
 			set_transient( self::TRANSIENT, $fresh, 5 * MINUTE_IN_SECONDS );
 			update_option( self::OPTION, $fresh, false );
 			return $fresh;
-		}
-
-		$last = get_option( self::OPTION, array() );
-		if ( is_array( $last ) && ! empty( $last['items'] ) && is_array( $last['items'] ) ) {
-			$last['fetchedAt'] = (string) ( $last['fetchedAt'] ?? '' );
-			$last['fallback']  = true;
-			set_transient( self::TRANSIENT, $last, 5 * MINUTE_IN_SECONDS );
-			return $last;
 		}
 
 		$empty = array(
@@ -350,6 +351,22 @@ class Market {
 		);
 		set_transient( self::TRANSIENT, $empty, MINUTE_IN_SECONDS );
 		return $empty;
+	}
+
+	/**
+	 * Refresh after the page has the last good board. Does not flush the object cache.
+	 */
+	public static function refresh(): void {
+		if ( get_transient( 'lr_market_refresh_lock' ) ) {
+			return;
+		}
+		set_transient( 'lr_market_refresh_lock', '1', 20 );
+		$fresh = self::pull();
+		if ( $fresh['items'] ) {
+			set_transient( self::TRANSIENT, $fresh, 5 * MINUTE_IN_SECONDS );
+			update_option( self::OPTION, $fresh, false );
+		}
+		delete_transient( 'lr_market_refresh_lock' );
 	}
 
 	/**
@@ -383,7 +400,7 @@ class Market {
 		$response = wp_remote_get(
 			$url,
 			array(
-				'timeout'     => 8,
+				'timeout'     => 4,
 				'redirection' => 2,
 				'headers'     => array(
 					'Accept'     => 'application/json',
