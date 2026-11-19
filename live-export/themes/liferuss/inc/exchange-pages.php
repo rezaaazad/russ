@@ -131,7 +131,7 @@ function liferuss_exchange_slot_box_html( $post ) {
 	if ( $height < 1 ) {
 		$height = 900;
 	}
-	echo '<p>شناسهٔ پیوست تصویر لایف‌روس. تا وقتی خالی است، قاب خالی با همین عرض و ارتفاع نشان داده می‌شود. تصویر آمادهٔ خارجی نگذارید.</p>';
+	echo '<p>شناسهٔ پیوست. تا وقتی خالی است، عکس همراه قالب در سرصفحه نشان داده می‌شود. عرض و ارتفاع را با همان عکس یکی بگذارید.</p>';
 	echo '<p><label>شناسه<input class="widefat" type="number" name="lr_slot_image" min="0" value="' . esc_attr( (string) $image ) . '"></label></p>';
 	echo '<p><label>عرض<input class="widefat" type="number" name="lr_slot_w" min="1" value="' . esc_attr( (string) $width ) . '"></label></p>';
 	echo '<p><label>ارتفاع<input class="widefat" type="number" name="lr_slot_h" min="1" value="' . esc_attr( (string) $height ) . '"></label></p>';

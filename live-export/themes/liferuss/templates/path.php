@@ -50,7 +50,6 @@ $program  = (string) get_post_meta( $post_id, '_lr_program', true );
 <?php if ( function_exists( 'liferuss_exchange_family' ) && liferuss_exchange_family() ) : ?>
 <section class="section lr-exchange-top">
 	<div class="container">
-		<?php liferuss_the_image_slot( $post_id ); ?>
 		<?php liferuss_exchange_nav(); ?>
 	</div>
 </section>

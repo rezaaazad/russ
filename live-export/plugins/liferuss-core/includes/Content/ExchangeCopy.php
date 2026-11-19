@@ -222,10 +222,10 @@ class ExchangeCopy {
 	 */
 	private static function slot( int $id ): void {
 		if ( '' === (string) get_post_meta( $id, '_lr_slot_w', true ) ) {
-			update_post_meta( $id, '_lr_slot_w', '1600' );
+			update_post_meta( $id, '_lr_slot_w', '1920' );
 		}
 		if ( '' === (string) get_post_meta( $id, '_lr_slot_h', true ) ) {
-			update_post_meta( $id, '_lr_slot_h', '900' );
+			update_post_meta( $id, '_lr_slot_h', '1086' );
 		}
 	}
 
