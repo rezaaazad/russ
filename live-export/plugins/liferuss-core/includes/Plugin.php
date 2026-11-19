@@ -36,6 +36,7 @@ use LifeRuss\Core\Content\Seed as ContentSeed;
 use LifeRuss\Core\Content\Stories;
 use LifeRuss\Core\Content\ServiceSeed;
 use LifeRuss\Core\Redirects\Runner;
+use LifeRuss\Core\Currency\Market;
 use LifeRuss\Core\Currency\Rates;
 use LifeRuss\Core\Payments\Admin as PaymentAdmin;
 use LifeRuss\Core\Payments\Checkout;
@@ -93,6 +94,7 @@ class Plugin {
 		Intake::hooks();
 		Automation::hooks();
 		Rates::hooks();
+		Market::hooks();
 		Checkout::hooks();
 		ScholarshipAdmin::hooks();
 		Portal::hooks();
