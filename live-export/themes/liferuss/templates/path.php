@@ -30,6 +30,11 @@ $program  = (string) get_post_meta( $post_id, '_lr_program', true );
 ?>
 
 <header class="page-hero">
+	<?php
+	if ( function_exists( 'liferuss_rate_page_hero' ) ) {
+		liferuss_rate_page_hero();
+	}
+	?>
 	<div class="container">
 		<?php if ( $eyebrow && ! liferuss_is_placeholder_copy( $eyebrow ) ) : ?>
 			<p class="eyebrow"><?php echo esc_html( $eyebrow ); ?></p>
