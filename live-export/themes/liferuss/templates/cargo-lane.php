@@ -151,15 +151,15 @@ $steps      = array(
 					</select>
 				</label>
 				<label>
-					<span>وزن تقریبی (کیلوگرم)</span>
+					<span>وزن تقریبی (کیلوگرم) (اختیاری)</span>
 					<input type="number" name="consult_weight" min="0" step="0.1" inputmode="decimal">
 				</label>
 				<label>
-					<span>ابعاد تقریبی (سانتی‌متر)</span>
+					<span>ابعاد تقریبی (سانتی‌متر) (اختیاری)</span>
 					<input type="text" name="consult_dims" maxlength="80">
 				</label>
 				<label>
-					<span>تعداد بسته‌ها</span>
+					<span>تعداد بسته‌ها (اختیاری)</span>
 					<input type="number" name="consult_packages" min="1" step="1" inputmode="numeric">
 				</label>
 				<label>
@@ -176,7 +176,7 @@ $steps      = array(
 					<small id="lr-cgo-file-help">تا <?php echo esc_html( liferuss_local_digits( (string) LIFERUSS_SOURCING_MAX_FILES ) ); ?> فایل، هر کدام تا <?php echo esc_html( liferuss_local_digits( (string) $upload_mb ) ); ?> مگابایت. فقط JPG، PNG، WEBP یا PDF.<?php echo $upload_cap ? ' سقف سرور از ۲۰ مگابایت کمتر است، پس همین سقف اعمال می‌شود.' : ''; ?></small>
 				</div>
 				<label>
-					<span>ارزش تقریبی کالا (دلار)</span>
+					<span>ارزش تقریبی کالا (دلار) (اختیاری)</span>
 					<input type="number" name="consult_value" min="0" step="1" inputmode="numeric">
 				</label>
 				<button class="btn btn-gold btn-block" type="submit">ارسال درخواست</button>

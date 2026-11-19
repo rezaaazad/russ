@@ -205,12 +205,11 @@
 }
 
 .lr-src-card__badge {
-  position: absolute;
-  inset-inline-start: 50%;
-  top: calc(100% * 0.62);
+  position: relative;
+  z-index: 1;
   width: 38px;
   height: 38px;
-  margin-inline-start: -19px;
+  margin: -19px auto 0;
   border-radius: 50%;
   background: var(--navy);
 }
@@ -221,6 +220,10 @@
   padding: 22px 10px 12px;
   font-size: 0.82rem;
   font-weight: 800;
+}
+
+.lr-src-card strong {
+  padding-top: 12px;
 }
 
 .lr-src-cats span {
