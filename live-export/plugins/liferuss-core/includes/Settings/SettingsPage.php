@@ -417,7 +417,7 @@ class SettingsPage {
 		echo '<label><input type="checkbox" name="index_incomplete" value="1" ' . checked( '1', (string) $v['index_incomplete'], false ) . '> ';
 		echo esc_html__( 'روسی، انگلیسی و عربی حتی قبل از علامت «ترجمه کامل» ایندکس شوند. پیش‌فرض خاموش است.', 'liferuss-core' );
 		echo '</label></td></tr>';
-		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'فارسی زبان پیش‌فرض است. اگر Polylang فعال باشد، نوع‌های نوشته و رشته‌های قالب در آن ثبت می‌شوند. ردیف‌های کاتالوگ زبان‌خنثی می‌مانند.', 'liferuss-core' ) . '</p></td></tr>';
+		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'سایت فقط فارسی است. این تنظیم دیگر زبان دیگری منتشر نمی‌کند.', 'liferuss-core' ) . '</p></td></tr>';
 	}
 
 	/**

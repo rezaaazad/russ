@@ -16,27 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string
  */
 function liferuss_legal_label( $which ) {
-	$lang = function_exists( 'liferuss_current_lang' ) ? liferuss_current_lang() : 'fa';
-	$map  = array(
-		'fa' => array(
-			'privacy' => 'حریم خصوصی',
-			'terms'   => 'شرایط استفاده',
-		),
-		'en' => array(
-			'privacy' => 'Privacy',
-			'terms'   => 'Terms',
-		),
-		'ru' => array(
-			'privacy' => 'Конфиденциальность',
-			'terms'   => 'Условия',
-		),
-		'ar' => array(
-			'privacy' => 'الخصوصية',
-			'terms'   => 'الشروط',
-		),
+	$map = array(
+		'privacy' => 'حریم خصوصی',
+		'terms'   => 'شرایط استفاده',
 	);
-	$pack = isset( $map[ $lang ] ) ? $map[ $lang ] : $map['fa'];
-	return isset( $pack[ $which ] ) ? $pack[ $which ] : $map['fa']['privacy'];
+	return isset( $map[ $which ] ) ? $map[ $which ] : $map['privacy'];
 }
 
 /**

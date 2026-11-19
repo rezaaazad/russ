@@ -37,84 +37,6 @@ function liferuss_ui_extra() {
 			'plans_empty_title'  => 'طرح اشتراک فعالی نیست',
 			'plans_empty_lead'   => 'تا اعلام طرح‌ها، از مشاوره یا دوره‌های منتشرشده شروع کنید.',
 		),
-		'en' => array(
-			'path_home_title'    => 'Study and immigration paths',
-			'account_login'      => 'Log in',
-			'account_mine'       => 'My account',
-			'account_aria_guest' => 'Log in to your account',
-			'account_aria_user'  => 'Your account',
-			'catalog_empty_title'=> 'This list is not published yet',
-			'catalog_empty_lead' => 'Universities and scholarships appear here after confirmed data is imported. Until then, a free consultation can match a field, city, and budget.',
-			'catalog_empty_filter_title' => 'Nothing matches this filter',
-			'catalog_empty_filter_lead'  => 'Clear the filter, or set the path in a consultation.',
-			'catalog_empty_cta'  => 'Request a consultation',
-			'catalog_empty_reset'=> 'Clear filters',
-			'drawer_consult'     => 'Free consultation',
-			'file_choose'        => 'Choose file',
-			'file_none'          => 'No file chosen',
-			'table_scroll'       => 'Scroll →',
-			'contact_send'       => 'Send message',
-			'filter_more'        => 'Filters',
-			'lesson_save_login'  => 'Log in to save progress',
-			'plans_empty_title'  => 'No subscription plans yet',
-			'plans_empty_lead'   => 'Until plans are published, start with a consultation or an available course.',
-			'nav_podfak'         => 'Preparatory year',
-			'nav_direct'         => 'Direct admission',
-			'nav_immigration'    => 'Immigration',
-			'nav_study'          => 'Study in Russia',
-		),
-		'ru' => array(
-			'path_home_title'    => 'Пути учёбы и переезда',
-			'account_login'      => 'Войти',
-			'account_mine'       => 'Мой кабинет',
-			'account_aria_guest' => 'Войти в кабинет',
-			'account_aria_user'  => 'Личный кабинет',
-			'catalog_empty_title'=> 'Список ещё не опубликован',
-			'catalog_empty_lead' => 'Вузы и стипендии появятся здесь после загрузки проверенных данных. До этого бесплатная консультация поможет выбрать направление, город и бюджет.',
-			'catalog_empty_filter_title' => 'По этому фильтру ничего нет',
-			'catalog_empty_filter_lead'  => 'Сбросьте фильтр или уточните маршрут на консультации.',
-			'catalog_empty_cta'  => 'Запросить консультацию',
-			'catalog_empty_reset'=> 'Сбросить фильтр',
-			'drawer_consult'     => 'Бесплатная консультация',
-			'file_choose'        => 'Выбрать файл',
-			'file_none'          => 'Файл не выбран',
-			'table_scroll'       => 'Листайте →',
-			'contact_send'       => 'Отправить',
-			'filter_more'        => 'Фильтры',
-			'lesson_save_login'  => 'Войдите, чтобы сохранить прогресс',
-			'plans_empty_title'  => 'Планов подписки пока нет',
-			'plans_empty_lead'   => 'Пока планы не опубликованы, начните с консультации или открытого курса.',
-			'nav_podfak'         => 'Подфак',
-			'nav_direct'         => 'Прямое поступление',
-			'nav_immigration'    => 'Переезд',
-			'nav_study'          => 'Учёба в России',
-		),
-		'ar' => array(
-			'path_home_title'    => 'مسارات الدراسة والهجرة',
-			'account_login'      => 'دخول',
-			'account_mine'       => 'حسابي',
-			'account_aria_guest' => 'الدخول إلى الحساب',
-			'account_aria_user'  => 'حساب المستخدم',
-			'catalog_empty_title'=> 'هذه القائمة غير منشورة بعد',
-			'catalog_empty_lead' => 'تظهر الجامعات والمنح بعد إدخال بيانات مؤكدة. إلى ذلك الحين، تحدد الاستشارة المجانية التخصص والمدينة والميزانية.',
-			'catalog_empty_filter_title' => 'لا توجد نتيجة بهذا التصفية',
-			'catalog_empty_filter_lead'  => 'أزل التصفية أو حدّد المسار في الاستشارة.',
-			'catalog_empty_cta'  => 'طلب استشارة',
-			'catalog_empty_reset'=> 'مسح التصفية',
-			'drawer_consult'     => 'استشارة مجانية',
-			'file_choose'        => 'اختيار ملف',
-			'file_none'          => 'لم يُختر ملف',
-			'table_scroll'       => 'اسحب →',
-			'contact_send'       => 'إرسال الرسالة',
-			'filter_more'        => 'عوامل التصفية',
-			'lesson_save_login'  => 'سجّل الدخول لحفظ التقدم',
-			'plans_empty_title'  => 'لا خطط اشتراك بعد',
-			'plans_empty_lead'   => 'إلى أن تُنشر الخطط، ابدأ باستشارة أو بدورة متاحة.',
-			'nav_podfak'         => 'السنة التحضيرية',
-			'nav_direct'         => 'قبول مباشر',
-			'nav_immigration'    => 'الهجرة',
-			'nav_study'          => 'الدراسة في روسيا',
-		),
 	);
 }
 
@@ -359,37 +281,21 @@ function liferuss_the_contact_channels() {
  * @return string
  */
 function liferuss_contact_page_lead() {
-	$lang  = function_exists( 'liferuss_current_lang' ) ? liferuss_current_lang() : 'fa';
 	$names = array(
-		'fa' => array( 'whatsapp' => 'واتساپ', 'telegram' => 'تلگرام', 'instagram' => 'اینستاگرام' ),
-		'en' => array( 'whatsapp' => 'WhatsApp', 'telegram' => 'Telegram', 'instagram' => 'Instagram' ),
-		'ru' => array( 'whatsapp' => 'WhatsApp', 'telegram' => 'Telegram', 'instagram' => 'Instagram' ),
-		'ar' => array( 'whatsapp' => 'واتساب', 'telegram' => 'تيليغرام', 'instagram' => 'إنستغرام' ),
+		'whatsapp'  => 'واتساپ',
+		'telegram'  => 'تلگرام',
+		'instagram' => 'اینستاگرام',
 	);
-	$pack = $names[ $lang ] ?? $names['fa'];
 	$have = array();
-	foreach ( $pack as $key => $label ) {
+	foreach ( $names as $key => $label ) {
 		if ( '' !== liferuss_public_contact( $key ) ) {
 			$have[] = $label;
 		}
 	}
 	if ( ! $have ) {
-		$plain = array(
-			'fa' => 'فرم را پر کنید تا تیم پشتیبانی با شما تماس بگیرد.',
-			'en' => 'Fill in the form and the support team will contact you.',
-			'ru' => 'Заполните форму — служба поддержки свяжется с вами.',
-			'ar' => 'املأ النموذج ليتواصل معك فريق الدعم.',
-		);
-		return $plain[ $lang ] ?? $plain['fa'];
+		return 'فرم را پر کنید تا تیم پشتیبانی با شما تماس بگیرد.';
 	}
-	$list = implode( 'fa' === $lang || 'ar' === $lang ? '، ' : ', ', $have );
-	$with = array(
-		'fa' => 'فرم را پر کنید یا از ' . $list . ' پیام بگذارید.',
-		'en' => 'Fill in the form or message us on ' . $list . '.',
-		'ru' => 'Заполните форму или напишите в ' . $list . '.',
-		'ar' => 'املأ النموذج أو راسلنا عبر ' . $list . '.',
-	);
-	return $with[ $lang ] ?? $with['fa'];
+	return 'فرم را پر کنید یا از ' . implode( '، ', $have ) . ' پیام بگذارید.';
 }
 
 /**
@@ -399,15 +305,21 @@ function liferuss_contact_page_lead() {
  * @return string
  */
 function liferuss_local_digits( $ascii ) {
-	$ascii = (string) $ascii;
-	$lang  = function_exists( 'liferuss_current_lang' ) ? liferuss_current_lang() : 'fa';
-	if ( 'ar' === $lang ) {
-		return strtr( $ascii, array( '0' => '٠', '1' => '١', '2' => '٢', '3' => '٣', '4' => '٤', '5' => '٥', '6' => '٦', '7' => '٧', '8' => '٨', '9' => '٩' ) );
-	}
-	if ( 'fa' !== $lang ) {
-		return $ascii;
-	}
-	return strtr( $ascii, array( '0' => '۰', '1' => '۱', '2' => '۲', '3' => '۳', '4' => '۴', '5' => '۵', '6' => '۶', '7' => '۷', '8' => '۸', '9' => '۹' ) );
+	return strtr(
+		(string) $ascii,
+		array(
+			'0' => '۰',
+			'1' => '۱',
+			'2' => '۲',
+			'3' => '۳',
+			'4' => '۴',
+			'5' => '۵',
+			'6' => '۶',
+			'7' => '۷',
+			'8' => '۸',
+			'9' => '۹',
+		)
+	);
 }
 
 /**
