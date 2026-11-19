@@ -53,6 +53,7 @@ class Migrator {
 
 		self::add_foreign_keys( $errors );
 		self::lesson_file_type();
+		self::exchange_currency();
 
 		update_option( 'lr_db_version', LIFERUSS_CORE_DB_VERSION, false );
 		update_option( 'lr_core_version', LIFERUSS_CORE_VERSION, false );
@@ -168,6 +169,60 @@ class Migrator {
 			return;
 		}
 		$wpdb->query( "ALTER TABLE `{$table}` MODIFY `type` enum('video','text','quiz','live','file') NOT NULL DEFAULT 'video'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->last_error = '';
+	}
+
+	/**
+	 * Widen currency codes so USDT fits, and add the payment method and rate snapshot.
+	 * dbDelta does not reliably change char(3) to varchar.
+	 */
+	private static function exchange_currency(): void {
+		global $wpdb;
+
+		$table = $wpdb->prefix . 'lr_exchange_requests';
+		$found = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
+		if ( $found !== $table ) {
+			return;
+		}
+		$defaults = array(
+			'currency_from' => 'IRR',
+			'currency_to'   => 'RUB',
+		);
+		foreach ( $defaults as $column => $default ) {
+			$row = $wpdb->get_row( $wpdb->prepare( "SHOW COLUMNS FROM `{$table}` LIKE %s", $column ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			if ( ! is_array( $row ) || empty( $row['Type'] ) ) {
+				continue;
+			}
+			$type  = strtolower( (string) $row['Type'] );
+			$width = 0;
+			if ( preg_match( '/\((\d+)\)/', $type, $match ) ) {
+				$width = (int) $match[1];
+			}
+			if ( str_starts_with( $type, 'varchar' ) && $width >= 8 ) {
+				continue;
+			}
+			$wpdb->query( "ALTER TABLE `{$table}` MODIFY `{$column}` varchar(8) NOT NULL DEFAULT '{$default}'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->last_error = '';
+		}
+		self::add_exchange_column( $table, 'payment_method', 'varchar(16) DEFAULT NULL' );
+		self::add_exchange_column( $table, 'rate_snapshot', 'longtext DEFAULT NULL' );
+	}
+
+	/**
+	 * Add one exchange column when an older table does not have it yet.
+	 *
+	 * @param string $table  Full table name.
+	 * @param string $column Column.
+	 * @param string $ddl    Column type clause.
+	 */
+	private static function add_exchange_column( string $table, string $column, string $ddl ): void {
+		global $wpdb;
+
+		$row = $wpdb->get_row( $wpdb->prepare( "SHOW COLUMNS FROM `{$table}` LIKE %s", $column ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( is_array( $row ) ) {
+			return;
+		}
+		$wpdb->query( "ALTER TABLE `{$table}` ADD `{$column}` {$ddl}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->last_error = '';
 	}
 
