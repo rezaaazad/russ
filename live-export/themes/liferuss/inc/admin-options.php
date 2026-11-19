@@ -764,7 +764,7 @@ function liferuss_options_page() {
 				liferuss_admin_field( 'org_url', $o['org_url'], 'آدرس رسمی سازمان', 'url' );
 				liferuss_admin_table_end();
 				?>
-				<p class="description">JSON-LD سازمان، وب‌سایت، خدمات حرفه‌ای و پرسش‌های متداول به‌صورت خودکار از همین فیلدها ساخته می‌شود. فایل <code>llms.txt</code> در ریشه سایت از طریق قالب سرو می‌شود. عنوان و توضیح سئوی فارسی اینجاست؛ EN / RU / AR را در زبانه زبان‌ها پر کنید.</p>
+				<p class="description">JSON-LD سازمان، وب‌سایت، خدمات حرفه‌ای و پرسش‌های متداول به‌صورت خودکار از همین فیلدها ساخته می‌شود. فایل <code>llms.txt</code> در ریشه سایت از طریق قالب سرو می‌شود.</p>
 			</div>
 
 			<?php
@@ -774,7 +774,7 @@ function liferuss_options_page() {
 			?>
 
 			<div id="tab-languages" class="liferuss-tab">
-				<?php liferuss_admin_i18n_tab(); ?>
+				<p>سایت فقط فارسی است. نشانی‌های /ru و /ar و /en به صفحهٔ فارسی همان مسیر برمی‌گردند.</p>
 			</div>
 
 			<?php submit_button( 'ذخیره تنظیمات لایف روس' ); ?>
@@ -807,6 +807,8 @@ function liferuss_admin_i18n_value( $lang, $key, $sub = null ) {
  * Languages tab: EN / RU / AR editors. Persian stays on the other tabs.
  */
 function liferuss_admin_i18n_tab() {
+	echo '<p>سایت فقط فارسی است.</p>';
+	return;
 	$langs = array(
 		'en' => 'English · LTR · /en/',
 		'ru' => 'Русский · LTR · /ru/',

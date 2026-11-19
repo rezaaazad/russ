@@ -15,8 +15,6 @@ define( 'LIFERUSS_URI', get_template_directory_uri() );
 
 require_once LIFERUSS_DIR . '/inc/landing-defaults.php';
 require_once LIFERUSS_DIR . '/inc/defaults.php';
-require_once LIFERUSS_DIR . '/inc/landing-i18n.php';
-require_once LIFERUSS_DIR . '/inc/i18n-defaults.php';
 require_once LIFERUSS_DIR . '/inc/i18n.php';
 require_once LIFERUSS_DIR . '/inc/helpers.php';
 require_once LIFERUSS_DIR . '/inc/photos.php';

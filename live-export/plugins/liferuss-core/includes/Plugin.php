@@ -48,7 +48,6 @@ use LifeRuss\Core\CRM\Intake;
 use LifeRuss\Core\CRM\Notifier;
 use LifeRuss\Core\CRM\Purge;
 use LifeRuss\Core\Database\Migrator;
-use LifeRuss\Core\I18n\Polylang;
 use LifeRuss\Core\Monitor\NotFound;
 use LifeRuss\Core\PostTypes\PostTypeRegistrar;
 use LifeRuss\Core\PostTypes\RequestGuard;
@@ -118,7 +117,6 @@ class Plugin {
 		PublicLogin::hooks();
 		Hardening::hooks();
 		RankMath::hooks();
-		Polylang::hooks();
 		FrontRoutes::hooks();
 		SeoRoutes::hooks();
 		Quality::hooks();

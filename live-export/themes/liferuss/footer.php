@@ -136,7 +136,6 @@ $copy        = str_replace( '{year}', liferuss_local_digits( gmdate( 'Y' ) ), li
 				<a href="<?php echo esc_url( liferuss_url( '/privacy-policy/' ) ); ?>"><?php echo esc_html( liferuss_legal_label( 'privacy' ) ); ?></a>
 				<a href="<?php echo esc_url( liferuss_url( '/terms/' ) ); ?>"><?php echo esc_html( liferuss_legal_label( 'terms' ) ); ?></a>
 			</nav>
-			<?php liferuss_language_switcher( 'footer' ); ?>
 			<p class="footer-en"><?php echo esc_html( liferuss_opt( 'footer_en' ) ); ?></p>
 		</div>
 	</div>

@@ -413,26 +413,11 @@ function liferuss_head_meta() {
 		echo '<link rel="canonical" href="' . esc_url( $url ) . '">' . "\n";
 	}
 
-	$hreflang = liferuss_complete_langs();
-	if ( ! function_exists( 'pll_current_language' ) && count( $hreflang ) >= 2 ) {
-		foreach ( $hreflang as $code ) {
-			$info = liferuss_languages()[ $code ];
-			echo '<link rel="alternate" hreflang="' . esc_attr( $info['hreflang'] ) . '" href="' . esc_url( liferuss_current_canonical( $code ) ) . '">' . "\n";
-		}
-		echo '<link rel="alternate" hreflang="x-default" href="' . esc_url( liferuss_current_canonical( 'fa' ) ) . '">' . "\n";
-	}
-
 	if ( $rank ) {
 		return;
 	}
 
 	echo '<meta property="og:locale" content="' . esc_attr( $meta['og_locale'] ) . '">' . "\n";
-	foreach ( liferuss_languages() as $code => $info ) {
-		if ( $code === $lang ) {
-			continue;
-		}
-		echo '<meta property="og:locale:alternate" content="' . esc_attr( $info['og_locale'] ) . '">' . "\n";
-	}
 	echo '<meta property="og:type" content="' . ( is_front_page() ? 'website' : 'article' ) . '">' . "\n";
 	echo '<meta property="og:site_name" content="' . esc_attr( $brand ) . '">' . "\n";
 	echo '<meta property="og:title" content="' . esc_attr( $og_title ) . '">' . "\n";
@@ -741,16 +726,13 @@ function liferuss_llms_txt() {
 		'## Organization',
 		'- Name: ' . $brand,
 		'- Alternate names: LifeRuss, Life Russ, لایف روس',
-		'- Languages: fa (default, x-default), ru, ar, en',
+		'- Language: fa (Persian, RTL)',
 		'- Email: ' . liferuss_opt( 'email' ),
 		'- Phone: ' . liferuss_opt( 'phone' ),
 		'- Address: ' . liferuss_opt( 'address' ),
 		'',
-		'## Language homes',
-		'- [Persian (RTL)](' . liferuss_home( 'fa' ) . ')',
-		'- [Russian (LTR)](' . liferuss_home( 'ru' ) . ')',
-		'- [Arabic (RTL)](' . liferuss_home( 'ar' ) . ')',
-		'- [English (LTR)](' . liferuss_home( 'en' ) . ')',
+		'## Home',
+		'- [Persian (RTL)](' . liferuss_home() . ')',
 		'',
 		'## Pages',
 	);
@@ -794,13 +776,9 @@ function liferuss_llms_txt() {
 		}
 	}
 	$lines[] = '';
-	$lines[] = '## Preferred sources (all language variants)';
-	foreach ( array_keys( $pages ) as $path ) {
-		foreach ( array_keys( liferuss_languages() ) as $code ) {
-			$url   = liferuss_url( $path, $code );
-			$label = $pages[ $path ] . ' (' . $code . ')';
-			$lines[] = '- [' . $label . '](' . $url . ')';
-		}
+	$lines[] = '## Preferred sources';
+	foreach ( $pages as $path => $label ) {
+		$lines[] = '- [' . $label . '](' . liferuss_url( $path ) . ')';
 	}
 	echo implode( "\n", $lines );
 	exit;
@@ -813,11 +791,7 @@ add_action( 'template_redirect', 'liferuss_llms_txt', 0 );
  * @param WP_Sitemaps $wp_sitemaps Server.
  */
 function liferuss_register_sitemap_provider( $wp_sitemaps ) {
-	if ( liferuss_rank_math_active() || function_exists( 'pll_current_language' ) ) {
-		return;
-	}
-	require_once LIFERUSS_DIR . '/inc/sitemap-provider.php';
-	$wp_sitemaps->registry->add_provider( 'langs', new LifeRuss_Sitemap_Provider() );
+	unset( $wp_sitemaps );
 }
 add_action( 'wp_sitemaps_init', 'liferuss_register_sitemap_provider' );
 
