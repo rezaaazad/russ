@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.15.1' );
+define( 'LIFERUSS_VERSION', '1.16.0' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -83,7 +83,7 @@ function liferuss_content_width() {
 add_action( 'after_setup_theme', 'liferuss_content_width', 0 );
 
 /**
- * Enqueue local Vazirmatn, lean CSS, and deferred JS.
+ * Enqueue Dana, lean CSS, and deferred JS.
  */
 function liferuss_assets() {
 	wp_enqueue_style(
@@ -254,7 +254,7 @@ function liferuss_critical_css() {
 	$uni  = is_singular( 'lr_university' );
 	echo '<style id="lr-critical">';
 	echo ':root{--navy:#0b2341;--navy-mid:#14325a;--navy-deep:#071627;--navy-soft:#e8eef6;--gold:#e8b923;--gold-soft:#fff4c8;--white:#fff;--bg:#f5f7fb;--text:#1b2a3a;--muted:#5b6b7c;--line:#e4eaf2;--shadow:0 12px 36px rgba(11,35,65,.08);--radius:18px;--radius-sm:12px;--header:64px;--max:1180px}';
-	echo '*,*::before,*::after{box-sizing:border-box}html{max-width:100%;overflow-x:clip}body.liferuss-theme{margin:0;font-family:Tahoma,sans-serif;color:var(--text);background:#fff;line-height:1.8;direction:rtl;text-align:right;max-width:100%;overflow-x:clip}';
+	echo '*,*::before,*::after{box-sizing:border-box}html{max-width:100%;overflow-x:clip}body.liferuss-theme{margin:0;font-family:Dana,Tahoma,sans-serif;font-variant-numeric:tabular-nums;color:var(--text);background:#fff;line-height:1.8;direction:rtl;text-align:right;max-width:100%;overflow-x:clip}';
 	echo 'img{max-width:100%}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}h1,h2,h3{font-weight:700;line-height:1.35;color:var(--navy);margin:0 0 .6em}p{margin:0 0 1em}';
 	echo '.container{width:min(var(--max),calc(100% - 32px));max-width:100%;min-width:0;margin-inline:auto}';
 	echo '.skip-link{position:absolute;right:12px;top:-60px}.screen-reader-text,.hp{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap;border:0}';
@@ -337,9 +337,16 @@ function liferuss_form_tracking_fields() {
 }
 
 /**
- * Preload the 700-weight font and LCP hero image.
+ * Preload Dana Regular and Bold, then the LCP hero image.
  */
 function liferuss_preload() {
+	$fonts = array(
+		'assets/fonts/dana/DanaFaNum-Regular.woff2',
+		'assets/fonts/dana/DanaFaNum-Bold.woff2',
+	);
+	foreach ( $fonts as $font ) {
+		echo '<link rel="preload" href="' . esc_url( LIFERUSS_URI . '/' . $font ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
+	}
 	$id       = 0;
 	$fallback = '';
 	$sizes    = '100vw';
