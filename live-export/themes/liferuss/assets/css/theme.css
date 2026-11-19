@@ -1,33 +1,41 @@
 /* لایف روس — liferuss.com */
 
 @font-face {
-  font-family: Vazirmatn;
-  src: url("../fonts/vazirmatn-400.woff2") format("woff2");
+  font-family: Dana;
+  src: url("../fonts/dana/DanaFaNum-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: Vazirmatn;
-  src: url("../fonts/vazirmatn-700.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: Vazirmatn;
-  src: url("../fonts/vazirmatn-700.woff2") format("woff2");
+  font-family: Dana;
+  src: url("../fonts/dana/DanaFaNum-Medium.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: Vazirmatn;
-  src: url("../fonts/vazirmatn-700.woff2") format("woff2");
+  font-family: Dana;
+  src: url("../fonts/dana/DanaFaNum-DemiBold.woff2") format("woff2");
   font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Dana;
+  src: url("../fonts/dana/DanaFaNum-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Dana;
+  src: url("../fonts/dana/DanaFaNum-ExtraBold.woff2") format("woff2");
+  font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
@@ -53,6 +61,7 @@
   --radius-sm: 12px;
   --header: 64px;
   --max: 1180px;
+  --font: "Dana", Tahoma, "Segoe UI", sans-serif;
   --lr-nav-h: 52px;
   --lr-fab-clearance: 32px;
 }
@@ -72,7 +81,8 @@ html {
 
 body.liferuss-theme {
   margin: 0;
-  font-family: "Vazirmatn", "Tahoma", sans-serif;
+  font-family: var(--font);
+  font-variant-numeric: tabular-nums;
   color: var(--text);
   background: var(--white);
   line-height: 1.8;
@@ -338,6 +348,11 @@ html.lr-logo-still .lr-logo-motion__video {
 
 html.lr-logo-still .lr-logo-motion__still {
   display: block;
+}
+
+.brand,
+.brand-text {
+  font-family: var(--font);
 }
 
 .brand-text {
@@ -2612,12 +2627,9 @@ html[dir="ltr"] .page-hero-photo.scene-couple .hero-overlay {
 
 /* LTR (English, Russian) — RTL remains the default for fa / ar */
 
-html[lang="en"] body.liferuss-theme {
-  font-family: "Vazirmatn", "Segoe UI", system-ui, sans-serif;
-}
-
+html[lang="en"] body.liferuss-theme,
 html[lang="ru"] body.liferuss-theme {
-  font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font);
 }
 
 html[dir="ltr"] .skip-link {

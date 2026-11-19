@@ -39,15 +39,15 @@ class Assets {
 		}
 
 		$deps = array();
-		$font = get_template_directory() . '/assets/fonts/vazirmatn.css';
+		$font = get_template_directory() . '/assets/fonts/dana/dana.css';
 		if ( is_readable( $font ) ) {
 			wp_enqueue_style(
-				'liferuss-vazirmatn',
-				get_template_directory_uri() . '/assets/fonts/vazirmatn.css',
+				'liferuss-dana',
+				get_template_directory_uri() . '/assets/fonts/dana/dana.css',
 				array(),
 				LIFERUSS_CORE_VERSION
 			);
-			$deps[] = 'liferuss-vazirmatn';
+			$deps[] = 'liferuss-dana';
 		}
 
 		wp_enqueue_style(

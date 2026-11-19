@@ -1,7 +1,7 @@
 .lr-wrap {
 	direction: rtl;
 	text-align: right;
-	font-family: Vazirmatn, Tahoma, sans-serif;
+	font-family: Dana, Tahoma, sans-serif;
 }
 
 .lr-wrap h1,
@@ -148,7 +148,7 @@ body.lr-ui button,
 body.lr-ui input,
 body.lr-ui select,
 body.lr-ui textarea {
-	font-family: Vazirmatn, Tahoma, sans-serif;
+	font-family: Dana, Tahoma, sans-serif;
 }
 
 .lr-app {
