@@ -321,10 +321,11 @@ class Settings {
 				'body_scripts' => '',
 			),
 			'forms'         => array(
-				'success_message'    => 'درخواست شما ثبت شد. به‌زودی با شما تماس می‌گیریم.',
-				'notify_email'       => '',
-				'turnstile_site_key' => '',
-				'turnstile_secret'   => '',
+				'success_message'      => 'درخواست شما ثبت شد. به‌زودی با شما تماس می‌گیریم.',
+				'notify_email'         => '',
+				'turnstile_site_key'   => '',
+				'turnstile_secret'     => '',
+				'sourcing_consult_url' => '/contact/',
 			),
 			'security'      => array(
 				'delete_data_on_uninstall' => '0',

@@ -30,6 +30,50 @@ class Files {
 		'application/pdf' => 'pdf',
 	);
 
+	public const SOURCING_MAX_FILES = 5;
+
+	public const SOURCING_MAX_BYTES = 20971520;
+
+	/**
+	 * Per-file ceiling for sourcing: 20 MB, or the lower PHP upload ceiling.
+	 */
+	public static function sourcing_limit(): int {
+		$cap  = self::SOURCING_MAX_BYTES;
+		$up   = self::ini_bytes( ini_get( 'upload_max_filesize' ) );
+		$post = self::ini_bytes( ini_get( 'post_max_size' ) );
+		if ( $up > 0 ) {
+			$cap = min( $cap, $up );
+		}
+		if ( $post > 0 ) {
+			$cap = min( $cap, $post );
+		}
+		return $cap;
+	}
+
+	/**
+	 * Bytes in an ini size.
+	 *
+	 * @param mixed $value Raw ini value.
+	 */
+	private static function ini_bytes( $value ): int {
+		$value = trim( (string) $value );
+		if ( '' === $value ) {
+			return 0;
+		}
+		$unit = strtolower( substr( $value, -1 ) );
+		$num  = (float) $value;
+		if ( 'g' === $unit ) {
+			return (int) ( $num * 1024 * 1024 * 1024 );
+		}
+		if ( 'm' === $unit ) {
+			return (int) ( $num * 1024 * 1024 );
+		}
+		if ( 'k' === $unit ) {
+			return (int) ( $num * 1024 );
+		}
+		return (int) $num;
+	}
+
 	/**
 	 * Register the download endpoint.
 	 */
@@ -62,8 +106,9 @@ class Files {
 		if ( ! is_file( $base . '/index.php' ) ) {
 			file_put_contents( $base . '/index.php', "<?php\n// Silence.\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 		}
-		if ( ! is_file( $base . '/.htaccess' ) ) {
-			file_put_contents( $base . '/.htaccess', "Require all denied\nDeny from all\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		$rules = "<FilesMatch \"\\.(php|phtml|php3|php4|php5|phar|cgi|pl)$\">\nRequire all denied\n</FilesMatch>\nphp_flag engine off\nRemoveHandler .php .phtml .phar\nRequire all denied\nDeny from all\n";
+		if ( ! is_file( $base . '/.htaccess' ) || false === strpos( (string) file_get_contents( $base . '/.htaccess' ), 'php_flag engine off' ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			file_put_contents( $base . '/.htaccess', $rules ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 		}
 	}
 
@@ -75,7 +120,7 @@ class Files {
 	 * @param string $doc_type ERD doc_type.
 	 * @return int|\WP_Error File row id.
 	 */
-	public static function store_upload( int $lead_id, string $field, string $doc_type ) {
+	public static function store_upload( int $lead_id, string $field, string $doc_type, int $max_bytes = 0, array $allow = array() ) {
 		if ( empty( $_FILES[ $field ] ) || ! isset( $_FILES[ $field ]['tmp_name'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			return new \WP_Error( 'lr_file', __( 'فایلی ارسال نشده است.', 'liferuss-core' ) );
 		}
@@ -89,14 +134,87 @@ class Files {
 		$tmp  = (string) $_FILES[ $field ]['tmp_name']; // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$size = isset( $_FILES[ $field ]['size'] ) ? (int) $_FILES[ $field ]['size'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$name = isset( $_FILES[ $field ]['name'] ) ? sanitize_file_name( wp_unslash( (string) $_FILES[ $field ]['name'] ) ) : 'file'; // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		if ( $size < 1 || $size > 10 * MB_IN_BYTES ) {
-			return new \WP_Error( 'lr_file', __( 'حجم فایل باید بین ۱ بایت و ۱۰ مگابایت باشد.', 'liferuss-core' ) );
+		$limit = $max_bytes > 0 ? $max_bytes : 10 * MB_IN_BYTES;
+		if ( $size < 1 || $size > $limit ) {
+			return new \WP_Error( 'lr_file', __( 'حجم فایل از سقف مجاز بیشتر است.', 'liferuss-core' ) );
 		}
 		$checked = self::inspect( $tmp, $name );
 		if ( is_wp_error( $checked ) ) {
 			return $checked;
 		}
+		if ( $allow && ! isset( $allow[ $checked ] ) ) {
+			return new \WP_Error( 'lr_file', __( 'فقط JPG، PNG یا PDF پذیرفته می‌شود.', 'liferuss-core' ) );
+		}
 		return self::write( $lead_id, $tmp, $name, $checked, $size, $doc_type );
+	}
+
+	/**
+	 * Store up to several files from one multi-file input.
+	 *
+	 * @param int                  $lead_id   Lead id.
+	 * @param string               $field     $_FILES key.
+	 * @param string               $doc_type  Doc type.
+	 * @param int                  $max_files File count.
+	 * @param int                  $max_bytes Bytes per file.
+	 * @param array<string, string> $allow    MIME to extension.
+	 * @return true|\WP_Error
+	 */
+	public static function store_many( int $lead_id, string $field, string $doc_type, int $max_files, int $max_bytes, array $allow ) {
+		if ( empty( $_FILES[ $field ] ) || ! isset( $_FILES[ $field ]['name'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return true;
+		}
+		$bag   = $_FILES[ $field ]; // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$names = $bag['name'];
+		if ( ! is_array( $names ) ) {
+			$names        = array( $names );
+			$bag['name']  = $names;
+			$bag['type']  = array( $bag['type'] ?? '' );
+			$bag['tmp_name'] = array( $bag['tmp_name'] ?? '' );
+			$bag['error'] = array( $bag['error'] ?? UPLOAD_ERR_NO_FILE );
+			$bag['size']  = array( $bag['size'] ?? 0 );
+		}
+		$present = 0;
+		foreach ( $bag['error'] as $error ) {
+			if ( UPLOAD_ERR_NO_FILE !== (int) $error ) {
+				++$present;
+			}
+		}
+		if ( 0 === $present ) {
+			return true;
+		}
+		if ( $present > $max_files ) {
+			return new \WP_Error( 'lr_file', __( 'حداکثر ۵ فایل می‌توانید بفرستید.', 'liferuss-core' ) );
+		}
+		foreach ( $bag['error'] as $index => $error ) {
+			$error = (int) $error;
+			if ( UPLOAD_ERR_NO_FILE === $error ) {
+				continue;
+			}
+			if ( UPLOAD_ERR_INI_SIZE === $error || UPLOAD_ERR_FORM_SIZE === $error ) {
+				return new \WP_Error( 'lr_file', __( 'حجم فایل از سقف سرور بیشتر است.', 'liferuss-core' ) );
+			}
+			if ( UPLOAD_ERR_OK !== $error ) {
+				return new \WP_Error( 'lr_file', __( 'آپلود ناموفق بود.', 'liferuss-core' ) );
+			}
+			$tmp  = (string) ( $bag['tmp_name'][ $index ] ?? '' );
+			$size = (int) ( $bag['size'][ $index ] ?? 0 );
+			$name = sanitize_file_name( (string) ( $bag['name'][ $index ] ?? 'file' ) );
+			if ( $size < 1 || $size > $max_bytes ) {
+				return new \WP_Error( 'lr_file', __( 'هر فایل باید کوچک‌تر از سقف مجاز باشد.', 'liferuss-core' ) );
+			}
+			$checked = self::inspect( $tmp, $name );
+			if ( is_wp_error( $checked ) ) {
+				return $checked;
+			}
+			if ( $allow && ! isset( $allow[ $checked ] ) ) {
+				return new \WP_Error( 'lr_file', __( 'فقط JPG، PNG، WEBP یا PDF پذیرفته می‌شود.', 'liferuss-core' ) );
+			}
+			$stored = self::write( $lead_id, $tmp, $name, $checked, $size, $doc_type );
+			if ( is_wp_error( $stored ) ) {
+				return $stored;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -222,7 +340,7 @@ class Files {
 	private static function write( int $lead_id, string $source, string $name, string $mime, int $size, string $doc_type, bool $copy = false ) {
 		$ext  = self::MIMES[ $mime ];
 		$hash = hash_file( 'sha256', $source );
-		$file = $lead_id . '-' . substr( (string) $hash, 0, 16 ) . '.' . $ext;
+		$file = bin2hex( random_bytes( 16 ) ) . '.' . $ext;
 		$dest = self::dir() . '/' . $file;
 		$ok   = $copy ? copy( $source, $dest ) : rename( $source, $dest ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 		if ( ! $ok ) {

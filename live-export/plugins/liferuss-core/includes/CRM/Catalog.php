@@ -88,6 +88,10 @@ class Catalog {
 				'service' => 'trade',
 				'request' => 'trade_requests',
 			),
+			'sourcing'    => array(
+				'service' => 'trade',
+				'request' => 'trade_requests',
+			),
 			'exchange'    => array(
 				'service' => 'exchange',
 				'request' => 'exchange_requests',
