@@ -1,0 +1,545 @@
+/* Scholarship landing. Colours come from the theme variables. */
+
+.lr-sch {
+  background: var(--bg);
+  color: var(--navy);
+}
+
+.lr-sch-wrap {
+  width: min(1200px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+.lr-sch-hero {
+  position: relative;
+  background: var(--white);
+}
+
+.lr-sch-hero__photo {
+  display: block;
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  object-position: left center;
+}
+
+.lr-sch-hero__scrim {
+  display: none;
+}
+
+.lr-sch-hero__copy {
+  padding: 18px 16px 8px;
+}
+
+.lr-sch-hero h1 {
+  margin: 0;
+  color: var(--navy);
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.lr-sch-hero h1 span,
+.lr-sch-steps h2 span,
+.lr-sch-form h2 span,
+.lr-sch-fields-band h2 span,
+.lr-sch-cta h2 span,
+.lr-sch-banner__copy span {
+  color: var(--gold-deep);
+}
+
+.lr-sch-hero__sub {
+  margin: 6px 0 8px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.7;
+}
+
+.lr-sch-hero__copy > p {
+  margin: 0 0 12px;
+  color: var(--navy-mid);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.lr-sch-bullets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lr-sch-bullets li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  color: var(--navy-mid);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.lr-sch-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid var(--gold-deep);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--gold-deep);
+}
+
+.lr-sch-ico svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lr-sch-cards {
+  padding: 16px 16px 0;
+}
+
+.lr-sch-cards__grid,
+.lr-sch-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.lr-sch-card,
+.lr-sch-tiles a {
+  display: block;
+  overflow: hidden;
+  border-radius: 12px;
+  border-bottom: 3px solid var(--gold);
+  background: var(--white);
+  box-shadow: var(--shadow);
+  color: var(--navy);
+  text-decoration: none;
+}
+
+.lr-sch-card img,
+.lr-sch-tiles img,
+.lr-sch-cta img,
+.lr-sch-banner > img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+}
+
+.lr-sch-card img {
+  aspect-ratio: 8 / 5;
+}
+
+.lr-sch-card__body {
+  position: relative;
+  display: block;
+  padding: 32px 12px 14px;
+  text-align: center;
+}
+
+.lr-sch-card__body .lr-sch-ico {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--navy);
+  color: var(--gold);
+}
+
+.lr-sch-card strong,
+.lr-sch-tiles strong {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+.lr-sch-card em {
+  display: block;
+  min-height: 3.2em;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+.lr-sch-card__more {
+  display: block;
+  margin-top: 6px;
+  color: var(--gold-deep);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.lr-sch-steps {
+  margin-top: 26px;
+  padding: 26px 16px 28px;
+  background: linear-gradient(135deg, var(--navy-deep), var(--navy));
+  color: var(--white);
+  text-align: center;
+}
+
+.lr-sch-steps h2,
+.lr-sch-fields-band h2,
+.lr-sch-form h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.lr-sch-steps h2::after,
+.lr-sch-fields-band h2::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin: 8px auto 16px;
+  border-radius: 2px;
+  background: var(--gold);
+}
+
+.lr-sch-steps ol {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lr-sch-steps li {
+  position: relative;
+}
+
+.lr-sch-steps__n {
+  position: absolute;
+  top: -4px;
+  right: calc(50% + 16px);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 20px;
+}
+
+.lr-sch-steps .lr-sch-ico {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 6px;
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+  color: var(--gold);
+}
+
+.lr-sch-steps .lr-sch-ico svg {
+  width: 24px;
+  height: 24px;
+}
+
+.lr-sch-steps strong {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.lr-sch-steps em {
+  display: block;
+  margin-top: 2px;
+  color: color-mix(in srgb, var(--white) 75%, transparent);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.lr-sch-request {
+  padding: 26px 0 0;
+}
+
+.lr-sch-request__grid {
+  display: grid;
+  gap: 16px;
+}
+
+.lr-sch-form {
+  padding: 18px 16px;
+  border-top: 3px solid var(--gold);
+  border-radius: 12px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.lr-sch-fields {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.lr-sch-form label {
+  display: grid;
+  gap: 4px;
+  color: var(--navy);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.lr-sch-form input,
+.lr-sch-form select,
+.lr-sch-form textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--navy);
+  font-weight: 500;
+}
+
+.lr-sch-form input:focus,
+.lr-sch-form select:focus,
+.lr-sch-form textarea:focus {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 1px;
+  background: var(--white);
+}
+
+.lr-sch-submit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.lr-sch-submit small {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.lr-sch-submit a {
+  color: var(--navy-mid);
+}
+
+.lr-sch-banner {
+  position: relative;
+  display: none;
+  overflow: hidden;
+  min-height: 420px;
+  border-radius: 12px;
+  background: var(--navy-deep);
+}
+
+.lr-sch-banner > img {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+
+.lr-sch-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--navy-deep) 75%, transparent), transparent 55%);
+}
+
+.lr-sch-banner__copy {
+  position: relative;
+  z-index: 1;
+  padding: 28px 18px;
+  color: var(--white);
+  text-align: center;
+}
+
+.lr-sch-banner__copy .brand-logo {
+  display: block;
+  width: 140px;
+  height: auto;
+  margin: 0 auto 12px;
+}
+
+.lr-sch-banner__copy strong,
+.lr-sch-banner__copy span {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.lr-sch-fields-band {
+  padding: 28px 0 8px;
+  text-align: center;
+}
+
+.lr-sch-tiles img {
+  aspect-ratio: 5 / 4;
+}
+
+.lr-sch-tiles strong {
+  padding: 8px 4px;
+}
+
+.lr-sch-stats {
+  width: min(1200px, calc(100% - 32px));
+  margin: 26px auto 0;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, var(--white));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--gold-soft) 75%, var(--white));
+}
+
+.lr-sch-stats ul {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+}
+
+.lr-sch-stats li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--navy-mid);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.lr-sch-stats strong,
+.lr-sch-stats em {
+  display: block;
+  font-style: normal;
+}
+
+.lr-sch-stats strong {
+  color: var(--navy);
+}
+
+.lr-sch-cta {
+  position: relative;
+  margin-top: 28px;
+  min-height: 190px;
+  background: var(--navy-deep);
+  color: var(--white);
+  text-align: center;
+}
+
+.lr-sch-cta img {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  opacity: 0.55;
+}
+
+.lr-sch-cta__copy {
+  position: relative;
+  z-index: 1;
+  padding: 36px 16px 28px;
+}
+
+.lr-sch-cta h2 {
+  margin: 0 0 14px;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.lr-sch-cta .btn {
+  margin: 4px;
+}
+
+.lr-sch-cta__line {
+  border: 1px solid var(--gold);
+  color: var(--white);
+  background: transparent;
+}
+
+.post-type-archive-lr_scholarship .nav-list .current-menu-item > a,
+.page-template-templates-scholarship-php .nav-list .current-menu-item > a {
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
+
+@media (min-width: 800px) {
+  .lr-sch-hero {
+    min-height: 437px;
+  }
+
+  .lr-sch-hero__photo {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+  }
+
+  .lr-sch-hero__scrim {
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to left,
+      color-mix(in srgb, var(--white) 80%, transparent) 0,
+      color-mix(in srgb, var(--white) 55%, transparent) 36%,
+      transparent 62%
+    );
+  }
+
+  .lr-sch-hero__copy {
+    position: relative;
+    z-index: 1;
+    width: min(360px, 46%);
+    margin-inline-start: 28px;
+    padding-top: 36px;
+  }
+
+  .lr-sch-bullets {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .lr-sch-cards {
+    margin-top: -52px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .lr-sch-cards__grid,
+  .lr-sch-tiles,
+  .lr-sch-steps ol {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .lr-sch-steps ol {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .lr-sch-request__grid {
+    grid-template-columns: 1fr 250px;
+  }
+
+  .lr-sch-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .lr-sch-fields__wide {
+    grid-column: 1 / -1;
+  }
+
+  .lr-sch-banner {
+    display: block;
+  }
+
+  .lr-sch-stats ul {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
