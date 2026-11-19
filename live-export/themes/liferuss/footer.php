@@ -9,7 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$brand     = liferuss_brand();
 $phone     = liferuss_public_contact( 'phone' );
 $phone_alt = liferuss_public_contact( 'phone_alt' );
 $email     = liferuss_public_contact( 'email' );
@@ -28,12 +27,11 @@ $copy        = str_replace( '{year}', liferuss_local_digits( gmdate( 'Y' ) ), li
 	<div class="container footer-grid footer-grid--<?php echo (int) $footer_cols; ?>">
 		<div class="footer-brand">
 			<a class="brand footer-logo" href="<?php echo esc_url( liferuss_home() ); ?>">
-				<?php liferuss_the_emblem(); ?>
-				<span class="brand-text">
-					<strong><?php echo esc_html( $brand ); ?></strong>
-					<small><?php echo esc_html( liferuss_opt( 'tagline' ) ); ?></small>
-				</span>
+				<?php liferuss_the_wordmark(); ?>
 			</a>
+			<?php if ( liferuss_opt( 'tagline' ) ) : ?>
+				<p class="footer-tagline"><?php echo esc_html( liferuss_opt( 'tagline' ) ); ?></p>
+			<?php endif; ?>
 			<p><?php echo esc_html( liferuss_opt( 'footer_about' ) ); ?></p>
 		</div>
 

@@ -88,7 +88,9 @@ class PublicLogin {
 	public static function brand(): void {
 		echo '<style id="lr-login">';
 		echo 'body.login{background:#0b2341;direction:rtl}';
-		echo 'body.login h1 a{background-image:none!important;text-indent:0;width:auto;height:auto;font-size:1.7rem;font-weight:800;color:#e8b923;overflow:visible}';
+		$mark = function_exists( 'liferuss_brand_uri' ) ? liferuss_brand_uri( 'lockup-horizontal-reversed.svg' ) : '';
+		echo 'body.login{font-family:Dana,Tahoma,sans-serif}';
+		echo 'body.login h1 a{background-image:url("' . esc_url( $mark ) . '")!important;background-repeat:no-repeat;background-position:center;background-size:contain;width:168px;height:73px;text-indent:-9999px;overflow:hidden;font-size:0}';
 		echo 'body.login form{border:0;border-radius:18px;box-shadow:none}';
 		echo 'body.login form .input,body.login input[type=text],body.login input[type=password]{border-radius:12px;padding:8px 12px}';
 		echo 'body.login .button-primary{background:#e8b923;border-color:#e8b923;color:#0b2341;border-radius:999px;font-weight:700}';

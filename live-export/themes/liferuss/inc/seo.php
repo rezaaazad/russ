@@ -458,7 +458,7 @@ function liferuss_json_ld() {
 	$email   = liferuss_opt( 'email' );
 	$phone   = liferuss_opt( 'phone' );
 	$address = liferuss_opt( 'address' );
-	$logo = function_exists( 'liferuss_theme_img' ) ? liferuss_theme_img( 'logo-lockup.png' ) : liferuss_og_image_url();
+	$logo = function_exists( 'liferuss_brand_uri' ) ? liferuss_brand_uri( 'badge-512-transparent.png' ) : liferuss_og_image_url();
 
 	$same_as = array_values(
 		array_filter(
@@ -479,7 +479,7 @@ function liferuss_json_ld() {
 		'alternateName'   => array( $legal, 'Life Russ', 'LifeRuss', 'لایف روس' ),
 		'url'             => liferuss_home( $lang ),
 		'logo'            => $logo,
-		'image'           => $logo,
+		'image'           => liferuss_og_image_url(),
 		'email'           => $email,
 		'telephone'       => $phone,
 		'description'     => liferuss_opt( 'seo_description' ),
