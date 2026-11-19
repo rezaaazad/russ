@@ -562,7 +562,7 @@ function liferuss_rates_ticker_shortcode() {
 		return '';
 	}
 	ob_start();
-	echo '<div class="lr-ticker" role="region" aria-label="' . esc_attr( liferuss_rate_fa( 'rates_ticker' ) ) . '">';
+	echo '<div class="lr-ticker" data-lr-live="ticker" role="region" aria-label="' . esc_attr( liferuss_rate_fa( 'rates_ticker' ) ) . '">';
 	echo '<div class="lr-ticker__track">';
 	liferuss_rates_ticker_list( $rows, false );
 	liferuss_rates_ticker_list( $rows, true );
@@ -581,11 +581,12 @@ function liferuss_rates_ticker_list( array $rows, $hidden ) {
 	echo '<ul' . ( $hidden ? ' aria-hidden="true"' : '' ) . '>';
 	foreach ( $rows as $item ) {
 		$stale = isset( $item['state'] ) && 'stale' === $item['state'];
-		echo '<li' . ( $stale ? ' class="is-stale"' : '' ) . '>';
+		$unit  = (string) ( $item['unit'] ?? '' );
+		echo '<li data-lr-code="' . esc_attr( (string) $item['code'] ) . '" data-lr-unit="' . esc_attr( $unit ) . '"' . ( $stale ? ' class="is-stale"' : '' ) . '>';
 		echo '<a href="' . esc_url( liferuss_url( '/exchange/' ) ) . '">';
 		echo '<span>' . esc_html( (string) $item['title'] ) . '</span> ';
-		echo '<b>' . esc_html( liferuss_rates_amount( $item['value'] ?? ( $item['sell'] ?? null ), (string) ( $item['unit'] ?? '' ) ) ) . '</b>';
-		echo ' <small>' . esc_html( (string) $item['source'] ) . '</small>';
+		echo '<b data-lr-field="figure">' . esc_html( liferuss_rates_amount( $item['value'] ?? ( $item['sell'] ?? null ), $unit ) ) . '</b>';
+		echo ' <small data-lr-field="source">' . esc_html( (string) $item['source'] ) . '</small>';
 		echo '</a></li>';
 	}
 	echo '</ul>';
