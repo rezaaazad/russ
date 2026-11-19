@@ -121,10 +121,14 @@
   border: 0;
 }
 
-.lr-src-form label.lr-src-file__btn {
+.lr-src-form label.lr-src-file__btn,
+.consult-form label.lr-src-file__btn {
   display: inline-flex;
   width: auto;
   min-height: 44px;
+  padding: 0 16px;
+  color: var(--white);
+  line-height: 1.2;
 }
 
 .lr-src-file__btn {

@@ -74,7 +74,7 @@ class LeadWriter {
 		if ( $duplicate && empty( $data['skip_dedupe'] ) ) {
 			Automation::merge( $duplicate, $data );
 			$id = (int) $duplicate['id'];
-			if ( in_array( $form, array( 'exchange', 'sourcing' ), true ) && $map['request'] ) {
+			if ( in_array( $form, array( 'exchange', 'sourcing', 'cargo', 'freight' ), true ) && $map['request'] ) {
 				self::request( $map['request'], $id, is_array( $data['request'] ?? null ) ? $data['request'] : array(), (int) ( $data['operator_id'] ?? 0 ) );
 			}
 			return $id;

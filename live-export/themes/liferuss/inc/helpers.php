@@ -239,12 +239,12 @@ function liferuss_nav_tree() {
 			'class'    => '',
 			'children' => array(
 				array( 'title' => 'بازرگانی و سورسینگ', 'url' => liferuss_url( '/bazargani/' ) ),
+				array( 'title' => 'باربری و کارگو', 'url' => liferuss_url( '/cargo/' ) ),
 				array( 'title' => liferuss_t( 'nav_exchange' ), 'url' => liferuss_url( '/exchange/' ) ),
 				array( 'title' => 'پرداخت شهریه', 'url' => liferuss_url( '/exchange/tuition-payment/' ) ),
 				array( 'title' => 'حواله به روسیه', 'url' => liferuss_url( '/exchange/transfer-to-russia/' ) ),
 				array( 'title' => 'انواع ارز', 'url' => liferuss_url( '/exchange/currencies/' ) ),
 				array( 'title' => 'ماشین‌حساب مرجع', 'url' => liferuss_url( '/exchange/calculator/' ) ),
-				array( 'title' => liferuss_t( 'nav_cargo' ), 'url' => liferuss_url( '/cargo/' ) ),
 				array( 'title' => liferuss_t( 'nav_trade' ), 'url' => liferuss_url( '/trade/' ) ),
 			),
 		),
@@ -442,8 +442,15 @@ function liferuss_fallback_menu() {
 		if ( $children ) {
 			echo '<ul class="sub-menu">';
 			foreach ( $children as $child ) {
+				$child_class = 'menu-item';
+				$child_path  = (string) wp_parse_url( $child['url'], PHP_URL_PATH );
+				$here_path   = (string) wp_parse_url( home_url( add_query_arg( array() ) ), PHP_URL_PATH );
+				if ( '' !== $child_path && untrailingslashit( $child_path ) === untrailingslashit( $here_path ) ) {
+					$child_class .= ' current-menu-item';
+				}
 				printf(
-					'<li class="menu-item"><a href="%s">%s</a></li>',
+					'<li class="%s"><a href="%s">%s</a></li>',
+					esc_attr( $child_class ),
 					esc_url( $child['url'] ),
 					esc_html( $child['title'] )
 				);
