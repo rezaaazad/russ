@@ -121,15 +121,30 @@ if ( 'admission' === $type ) {
 						<?php endforeach; ?>
 					</select>
 				</label>
-				<label>
-					<span><?php echo esc_html( liferuss_rate_fa( 'form_pay' ) ); ?></span>
-					<select name="consult_payment" required>
-						<option value=""><?php echo esc_html( liferuss_rate_fa( 'form_pay' ) ); ?></option>
-						<option value="cash"><?php echo esc_html( liferuss_rate_fa( 'form_pay_cash' ) ); ?></option>
-						<option value="card"><?php echo esc_html( liferuss_rate_fa( 'form_pay_card' ) ); ?></option>
-						<option value="transfer"><?php echo esc_html( liferuss_rate_fa( 'form_pay_transfer' ) ); ?></option>
-					</select>
-				</label>
+				<fieldset class="lr-pay">
+					<legend><?php echo esc_html( liferuss_rate_fa( 'form_pay' ) ); ?></legend>
+					<div class="lr-pay__grid">
+						<?php
+						$lr_pay = array(
+							'cash'     => array( 'card-cash.webp', 'پرداخت نقدی', liferuss_rate_fa( 'form_pay_cash' ) ),
+							'card'     => array( 'card-card.webp', 'پرداخت با کارت', liferuss_rate_fa( 'form_pay_card' ) ),
+							'transfer' => array( 'card-bank-transfer.webp', 'انتقال بانکی', liferuss_rate_fa( 'form_pay_transfer' ) ),
+						);
+						foreach ( $lr_pay as $lr_value => $lr_card ) :
+							$lr_src = LIFERUSS_URI . '/assets/images/rates/' . $lr_card[0];
+							?>
+							<label class="lr-pay__opt">
+								<input type="radio" name="consult_payment" value="<?php echo esc_attr( $lr_value ); ?>" required>
+								<img src="<?php echo esc_url( $lr_src ); ?>" alt="<?php echo esc_attr( $lr_card[1] ); ?>" width="800" height="800" loading="lazy" decoding="async" sizes="(max-width: 720px) 30vw, 180px">
+								<span><?php echo esc_html( $lr_card[2] ); ?></span>
+							</label>
+						<?php endforeach; ?>
+					</div>
+				</fieldset>
+				<figure class="lr-pay__usdt">
+					<img src="<?php echo esc_url( LIFERUSS_URI . '/assets/images/rates/card-usdt.webp' ); ?>" alt="تتر" width="800" height="800" loading="lazy" decoding="async" sizes="72px">
+					<figcaption><?php echo esc_html( liferuss_rate_fa( 'conv_usdt' ) ); ?></figcaption>
+				</figure>
 				<label>
 					<span><?php echo esc_html( liferuss_rate_fa( 'form_city' ) ); ?></span>
 					<input type="text" name="consult_city" required maxlength="100" autocomplete="address-level2" placeholder="<?php echo esc_attr( liferuss_rate_fa( 'form_city_ph' ) ); ?>">
