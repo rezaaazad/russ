@@ -116,27 +116,6 @@ function liferuss_contact_directory() {
 			'wa'   => 'واتساپ',
 			'tg'   => 'تلگرام',
 		),
-		'en' => array(
-			'ru'   => 'Russia',
-			'uk'   => 'UK',
-			'call' => 'Call',
-			'wa'   => 'WhatsApp',
-			'tg'   => 'Telegram',
-		),
-		'ru' => array(
-			'ru'   => 'Россия',
-			'uk'   => 'Великобритания',
-			'call' => 'Звонок',
-			'wa'   => 'WhatsApp',
-			'tg'   => 'Telegram',
-		),
-		'ar' => array(
-			'ru'   => 'روسيا',
-			'uk'   => 'بريطانيا',
-			'call' => 'اتصال',
-			'wa'   => 'واتساب',
-			'tg'   => 'تيليغرام',
-		),
 	);
 	$pack    = isset( $copy[ $lang ] ) ? $copy[ $lang ] : $copy['fa'];
 	$regions = array(
