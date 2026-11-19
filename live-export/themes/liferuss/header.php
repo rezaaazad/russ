@@ -47,6 +47,7 @@ $phone      = liferuss_opt( 'header_phone', liferuss_opt( 'phone' ) );
 			<?php if ( $show_phone && $phone ) : ?>
 				<p class="drawer-phone"><a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>"><bdi dir="ltr"><?php echo esc_html( $phone ); ?></bdi></a></p>
 			<?php endif; ?>
+			<?php liferuss_the_contact_directory( 'drawer' ); ?>
 			<?php
 			liferuss_language_switcher( 'drawer' );
 			?>
@@ -73,6 +74,7 @@ $phone      = liferuss_opt( 'header_phone', liferuss_opt( 'phone' ) );
 				<?php endif; ?>
 			</a>
 			<?php liferuss_language_switcher( 'header' ); ?>
+			<?php liferuss_the_contact_directory( 'header' ); ?>
 			<?php if ( $show_phone && $phone ) : ?>
 				<a class="header-phone" href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>">
 					<?php echo liferuss_icon( 'phone' ); ?>

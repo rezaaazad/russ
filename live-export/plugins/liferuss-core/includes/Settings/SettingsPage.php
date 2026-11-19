@@ -273,6 +273,13 @@ class SettingsPage {
 		self::text_row( 'instagram', __( 'اینستاگرام', 'liferuss-core' ), (string) $v['instagram'], 'text', 'liferuss' );
 		self::text_row( 'email', __( 'ایمیل', 'liferuss-core' ), (string) $v['email'], 'email', 'info@example.com' );
 		self::area_row( 'address', __( 'نشانی', 'liferuss-core' ), (string) $v['address'] );
+		echo '<tr><td colspan="2"><p>' . esc_html__( 'دو خط تماس، روسیه و بریتانیا. هر خط تلفن، واتساپ (wa.me یا شماره) و تلگرام (t.me یا نام کاربری) جدا دارد. تا وقتی پر نشود در هدر، نوار پایین موبایل، فوتر و فرم نشان داده نمی‌شود. شماره‌ای در کد نیست.', 'liferuss-core' ) . '</p></td></tr>';
+		self::text_row( 'phone_ru', __( 'تلفن روسیه', 'liferuss-core' ), (string) $v['phone_ru'], 'text', '+…' );
+		self::text_row( 'whatsapp_ru', __( 'واتساپ روسیه', 'liferuss-core' ), (string) $v['whatsapp_ru'], 'text', 'https://wa.me/…' );
+		self::text_row( 'telegram_ru', __( 'تلگرام روسیه', 'liferuss-core' ), (string) $v['telegram_ru'], 'text', 'https://t.me/…' );
+		self::text_row( 'phone_uk', __( 'تلفن بریتانیا', 'liferuss-core' ), (string) $v['phone_uk'], 'text', '+…' );
+		self::text_row( 'whatsapp_uk', __( 'واتساپ بریتانیا', 'liferuss-core' ), (string) $v['whatsapp_uk'], 'text', 'https://wa.me/…' );
+		self::text_row( 'telegram_uk', __( 'تلگرام بریتانیا', 'liferuss-core' ), (string) $v['telegram_uk'], 'text', 'https://t.me/…' );
 	}
 
 	/**
@@ -582,12 +589,18 @@ class SettingsPage {
 		Settings::update(
 			'contact',
 			array(
-				'phone'     => self::posted_text( 'phone' ),
-				'whatsapp'  => self::posted_text( 'whatsapp' ),
-				'telegram'  => self::posted_text( 'telegram' ),
-				'instagram' => self::posted_text( 'instagram' ),
-				'email'     => sanitize_email( self::posted_text( 'email' ) ),
-				'address'   => self::posted_area( 'address' ),
+				'phone'       => self::posted_text( 'phone' ),
+				'whatsapp'    => self::posted_text( 'whatsapp' ),
+				'telegram'    => self::posted_text( 'telegram' ),
+				'instagram'   => self::posted_text( 'instagram' ),
+				'email'       => sanitize_email( self::posted_text( 'email' ) ),
+				'address'     => self::posted_area( 'address' ),
+				'phone_ru'    => self::posted_text( 'phone_ru' ),
+				'whatsapp_ru' => self::posted_text( 'whatsapp_ru' ),
+				'telegram_ru' => self::posted_text( 'telegram_ru' ),
+				'phone_uk'    => self::posted_text( 'phone_uk' ),
+				'whatsapp_uk' => self::posted_text( 'whatsapp_uk' ),
+				'telegram_uk' => self::posted_text( 'telegram_uk' ),
 			)
 		);
 	}
