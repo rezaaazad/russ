@@ -581,9 +581,14 @@ function liferuss_ensure_calculator_page() {
 	if ( ! $parent instanceof WP_Post ) {
 		return;
 	}
+	if ( ! is_admin() || '1' === (string) get_option( 'lr_exchange_calculator_lock', '' ) ) {
+		return;
+	}
+	update_option( 'lr_exchange_calculator_lock', '1', false );
 	$found = get_page_by_path( 'exchange/calculator' );
 	if ( $found instanceof WP_Post ) {
 		update_option( 'lr_exchange_calculator', '1', false );
+		delete_option( 'lr_exchange_calculator_lock' );
 		return;
 	}
 	$id = wp_insert_post(
@@ -598,6 +603,7 @@ function liferuss_ensure_calculator_page() {
 		true
 	);
 	if ( is_wp_error( $id ) || ! $id ) {
+		delete_option( 'lr_exchange_calculator_lock' );
 		return;
 	}
 	update_post_meta( (int) $id, '_wp_page_template', 'templates/path.php' );
@@ -606,8 +612,9 @@ function liferuss_ensure_calculator_page() {
 	update_post_meta( (int) $id, '_lr_form', 'exchange' );
 	update_post_meta( (int) $id, '_lr_schema', 'service' );
 	update_option( 'lr_exchange_calculator', '1', false );
+	delete_option( 'lr_exchange_calculator_lock' );
 }
-add_action( 'init', 'liferuss_ensure_calculator_page', 50 );
+add_action( 'admin_init', 'liferuss_ensure_calculator_page', 50 );
 
 /**
  * [lr_rates_ticker] A single-height strip. No network, no motion when the visitor asks for less.

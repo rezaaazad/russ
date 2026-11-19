@@ -49,7 +49,7 @@ class ExchangeCopy {
 	 * Hook the upgrade after the other copy seeders.
 	 */
 	public static function hooks(): void {
-		add_action( 'init', array( self::class, 'maybe' ), 52 );
+		add_action( 'admin_init', array( self::class, 'maybe' ), 52 );
 	}
 
 	/**
@@ -59,8 +59,13 @@ class ExchangeCopy {
 		if ( '1' === (string) get_option( 'lr_exchange_copy_v2', '' ) ) {
 			return;
 		}
+		if ( ! is_admin() || '1' === (string) get_option( 'lr_exchange_copy_v2_lock', '' ) ) {
+			return;
+		}
+		update_option( 'lr_exchange_copy_v2_lock', '1', false );
 		$parent = get_page_by_path( 'exchange' );
 		if ( ! $parent instanceof \WP_Post ) {
+			delete_option( 'lr_exchange_copy_v2_lock' );
 			return;
 		}
 		self::hub( (int) $parent->ID );
@@ -76,6 +81,7 @@ class ExchangeCopy {
 		self::calculator( (int) $parent->ID );
 		update_option( 'lr_exchange_copy', '1', false );
 		update_option( 'lr_exchange_copy_v2', '1', false );
+		delete_option( 'lr_exchange_copy_v2_lock' );
 	}
 
 	/**

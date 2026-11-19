@@ -142,7 +142,13 @@ add_action( 'wp_head', 'liferuss_brand_head_icons', 1 );
  * Copy icon-512 into the media library once and point site_icon at it.
  */
 function liferuss_maybe_site_icon() {
+	if ( ! is_admin() ) {
+		return;
+	}
 	if ( '1' === (string) get_option( 'lr_brand_v2_icon', '' ) ) {
+		return;
+	}
+	if ( '1' === (string) get_option( 'lr_brand_v2_icon_lock', '' ) ) {
 		return;
 	}
 	$current = (int) get_option( 'site_icon' );
@@ -154,28 +160,33 @@ function liferuss_maybe_site_icon() {
 	if ( ! is_readable( $file ) ) {
 		return;
 	}
-	$bits = file_get_contents( $file );
-	if ( false === $bits || '' === $bits ) {
+	update_option( 'lr_brand_v2_icon_lock', '1', false );
+	if ( ! function_exists( 'media_handle_sideload' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+	}
+	$tmp = wp_tempnam( 'liferuss-icon-512.png' );
+	if ( ! $tmp || ! copy( $file, $tmp ) ) {
+		delete_option( 'lr_brand_v2_icon_lock' );
 		return;
 	}
-	$upload = wp_upload_bits( 'liferuss-icon-512.png', null, $bits );
-	if ( ! empty( $upload['error'] ) || empty( $upload['file'] ) ) {
-		return;
-	}
-	$attachment = array(
-		'post_mime_type' => 'image/png',
-		'post_title'     => 'لایف روس',
-		'post_status'    => 'inherit',
+	$id = media_handle_sideload(
+		array(
+			'name'     => 'liferuss-icon-512.png',
+			'tmp_name' => $tmp,
+		),
+		0,
+		'لایف روس'
 	);
-	$id = wp_insert_attachment( $attachment, $upload['file'] );
-	if ( ! $id || is_wp_error( $id ) ) {
+	if ( is_wp_error( $id ) || ! $id ) {
+		@unlink( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		delete_option( 'lr_brand_v2_icon_lock' );
 		return;
 	}
-	require_once ABSPATH . 'wp-admin/includes/image.php';
-	wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $upload['file'] ) );
-	update_post_meta( $id, '_lr_brand_v2_icon', '1' );
+	update_post_meta( (int) $id, '_lr_brand_v2_icon', '1' );
 	update_option( 'site_icon', (int) $id );
 	update_option( 'lr_brand_v2_icon', '1', false );
+	delete_option( 'lr_brand_v2_icon_lock' );
 }
-add_action( 'after_switch_theme', 'liferuss_maybe_site_icon' );
-add_action( 'init', 'liferuss_maybe_site_icon', 30 );
+add_action( 'admin_init', 'liferuss_maybe_site_icon', 30 );

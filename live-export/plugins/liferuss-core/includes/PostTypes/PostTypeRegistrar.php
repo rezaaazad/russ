@@ -46,8 +46,11 @@ class PostTypeRegistrar {
 		if ( get_option( 'lr_rewrite_version' ) === $stamp ) {
 			return;
 		}
-		flush_rewrite_rules( false );
+		if ( ! is_admin() ) {
+			return;
+		}
 		update_option( 'lr_rewrite_version', $stamp, false );
+		flush_rewrite_rules( false );
 	}
 
 	/**

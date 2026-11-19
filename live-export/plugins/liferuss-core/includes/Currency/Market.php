@@ -99,7 +99,22 @@ class Market {
 	 */
 	public static function rest(): \WP_REST_Response {
 		nocache_headers();
-		$response = new \WP_REST_Response( self::present() );
+		$fresh = self::pull();
+		if ( ! empty( $fresh['items'] ) ) {
+			set_transient( self::TRANSIENT, $fresh, 5 * MINUTE_IN_SECONDS );
+			update_option( self::OPTION, $fresh, false );
+			$stored = $fresh;
+		} else {
+			$stored = self::load();
+		}
+		$now      = (int) round( microtime( true ) * 1000 );
+		$payload  = array(
+			'items'     => self::decorate( $stored['items'], $now ),
+			'fetchedAt' => (string) $stored['fetchedAt'],
+			'fallback'  => empty( $fresh['items'] ),
+			'notice'    => self::notice(),
+		);
+		$response = new \WP_REST_Response( $payload );
 		$response->header( 'Cache-Control', 'private, no-store, no-cache, must-revalidate, max-age=0' );
 		$response->header( 'Pragma', 'no-cache' );
 		$response->header( 'Expires', 'Wed, 11 Jan 1984 05:00:00 GMT' );
@@ -316,7 +331,7 @@ class Market {
 	}
 
 	/**
-	 * Cached board, or a fresh pull, or the last good option.
+	 * Cached board, or the last good option. Page renders do not call the network.
 	 *
 	 * @return array{items: array<int, array<string, mixed>>, fetchedAt: string, fallback: bool}
 	 */
@@ -331,17 +346,9 @@ class Market {
 		$last = get_option( self::OPTION, array() );
 		if ( is_array( $last ) && ! empty( $last['items'] ) && is_array( $last['items'] ) ) {
 			$last['fetchedAt'] = (string) ( $last['fetchedAt'] ?? '' );
-			$last['fallback']  = ! empty( $last['fallback'] );
+			$last['fallback']  = true;
 			set_transient( self::TRANSIENT, $last, MINUTE_IN_SECONDS );
-			add_action( 'shutdown', array( self::class, 'refresh' ) );
 			return $last;
-		}
-
-		$fresh = self::pull();
-		if ( $fresh['items'] ) {
-			set_transient( self::TRANSIENT, $fresh, 5 * MINUTE_IN_SECONDS );
-			update_option( self::OPTION, $fresh, false );
-			return $fresh;
 		}
 
 		$empty = array(
@@ -354,23 +361,8 @@ class Market {
 	}
 
 	/**
-	 * Refresh after the page has the last good board. Does not flush the object cache.
-	 */
-	public static function refresh(): void {
-		if ( get_transient( 'lr_market_refresh_lock' ) ) {
-			return;
-		}
-		set_transient( 'lr_market_refresh_lock', '1', 20 );
-		$fresh = self::pull();
-		if ( $fresh['items'] ) {
-			set_transient( self::TRANSIENT, $fresh, 5 * MINUTE_IN_SECONDS );
-			update_option( self::OPTION, $fresh, false );
-		}
-		delete_transient( 'lr_market_refresh_lock' );
-	}
-
-	/**
 	 * HTTP GET of both documents. A failed call yields null and the other side is still used.
+	 * Called only from the uncached rates route, never while rendering a page.
 	 *
 	 * @return array{items: array<int, array<string, mixed>>, fetchedAt: string, fallback: bool}
 	 */

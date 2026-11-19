@@ -26,8 +26,13 @@ class Migrator {
 		if ( LIFERUSS_CORE_DB_VERSION === $current ) {
 			return;
 		}
+		if ( '1' === (string) get_option( 'lr_db_migrate_lock', '' ) ) {
+			return;
+		}
+		update_option( 'lr_db_migrate_lock', '1', false );
 		self::migrate();
 		Seeder::seed();
+		delete_option( 'lr_db_migrate_lock' );
 	}
 
 	/**
