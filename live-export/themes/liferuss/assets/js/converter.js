@@ -111,6 +111,32 @@
     if (!board || !board.items) {
       return;
     }
+    var by = {};
+    board.items.forEach(function (item) {
+      if (item && item.code) {
+        by[item.code] = item;
+      }
+    });
+    if (data.focus === "ruble") {
+      var mbb = by.MBB;
+      if (mbb && mbb.unit === "تومان" && mbb.value > 0 && data.quotes.RUB) {
+        data.quotes.RUB.toman = mbb.value;
+        data.quotes.RUB.source = mbb.source || "";
+        data.quotes.RUB.state = mbb.state || "";
+        data.quotes.RUB.age = mbb.ageText || "";
+        data.quotes.RUB.ageMs = Number(mbb.ageMs) || 0;
+      }
+      var sell = by.USDT_RUB_SELL;
+      if (sell && sell.value > 0 && data.quotes.RUB && data.quotes.USDT) {
+        data.quotes.USDT.toman = Number(sell.value) * data.quotes.RUB.toman;
+        data.quotes.USDT.source = sell.source || "";
+        data.quotes.USDT.state = sell.state || "";
+        data.quotes.USDT.age = sell.ageText || "";
+        data.quotes.USDT.ageMs = Number(sell.ageMs) || 0;
+      }
+      paint();
+      return;
+    }
     board.items.forEach(function (item) {
       var quote = data.quotes[item.code];
       if (!quote || item.unit !== "تومان" || !(item.value > 0)) {

@@ -107,7 +107,11 @@ add_action( 'wp_enqueue_scripts', 'liferuss_rates_assets' );
  */
 function liferuss_rates_shortcode() {
 	ob_start();
-	liferuss_the_rates_table();
+	if ( liferuss_ruble_only() ) {
+		liferuss_the_ruble_spot();
+	} else {
+		liferuss_the_rates_table();
+	}
 	return (string) ob_get_clean();
 }
 add_shortcode( 'lr_rates', 'liferuss_rates_shortcode' );
@@ -219,6 +223,94 @@ function liferuss_rates_board() {
 		'fallback' => ! empty( $board['fallback'] ),
 		'notice'   => (string) ( $board['notice'] ?? '' ),
 	);
+}
+
+/**
+ * Whether the public site shows only the Russia ruble quote.
+ */
+function liferuss_ruble_only() {
+	if ( ! class_exists( '\LifeRuss\Core\Currency\Market' ) ) {
+		return true;
+	}
+	return \LifeRuss\Core\Currency\Market::ruble_only();
+}
+
+/**
+ * One decorated row by code.
+ *
+ * @param array<string, mixed> $board Board.
+ * @param string               $code  Code.
+ * @return array<string, mixed>|null
+ */
+function liferuss_board_item( array $board, $code ) {
+	foreach ( $board['items'] as $item ) {
+		if ( is_array( $item ) && $code === (string) ( $item['code'] ?? '' ) ) {
+			return $item;
+		}
+	}
+	return null;
+}
+
+/**
+ * The ruble card and the Local.Moscow banner. No network call.
+ */
+function liferuss_the_ruble_spot() {
+	if ( ! liferuss_ruble_only() ) {
+		return;
+	}
+	$board = liferuss_rates_board();
+	$item  = liferuss_board_item( $board, 'MBB' );
+	$mode  = 'toman';
+	if ( ! $item ) {
+		$item = liferuss_board_item( $board, 'USDT_RUB_SELL' );
+		$mode = 'usdt';
+	}
+	echo '<div class="lr-rub-spot">';
+	if ( ! $item ) {
+		echo '<article class="lr-rub"><p class="lr-rub__kicker">نرخ روبل در روسیه</p><p class="lr-rub__figure">الان نرخ روبل از منبع نرسیده است.</p></article>';
+	} else {
+		$stale   = isset( $item['state'] ) && 'stale' === $item['state'];
+		$unit    = 'toman' === $mode ? 'تومان' : '₽';
+		$caption = 'toman' === $mode ? 'هر روبل' : 'روبل نقد مسکو برای هر تتر';
+		$shown   = $item['value'] ?? null;
+		echo '<article class="lr-rub' . ( $stale ? ' is-stale' : '' ) . '" data-lr-code="' . esc_attr( (string) $item['code'] ) . '" data-lr-unit="' . esc_attr( $unit ) . '">';
+		echo '<p class="lr-rub__kicker">نرخ روبل در روسیه</p>';
+		echo '<p class="lr-rub__figure"><b data-lr-field="figure">' . esc_html( liferuss_rates_amount( $shown, $unit ) ) . '</b> <span>' . esc_html( $caption ) . '</span></p>';
+		echo '<p class="lr-rub__meta"><span>منبع: <span data-lr-field="source">' . esc_html( (string) ( $item['source'] ?? '' ) ) . '</span> · Local.Moscow</span>';
+		echo '<span data-lr-field="age-text">' . esc_html( liferuss_rates_age( $item ) ) . '</span></p>';
+		echo '<p class="lr-rates__badge"' . ( $stale ? '' : ' hidden' ) . '>این نرخ کهنه است</p>';
+		echo '</article>';
+	}
+	liferuss_the_local_banner();
+	echo '</div>';
+}
+
+/**
+ * Banner to Local.Moscow. The picture is a Higgsfield file dropped in later.
+ * Until that file is in the theme, the card is the navy and gold palette.
+ */
+function liferuss_the_local_banner() {
+	$desktop = LIFERUSS_DIR . '/assets/img/localmoscow-banner.webp';
+	$mobile  = LIFERUSS_DIR . '/assets/img/localmoscow-banner-mobile.webp';
+	$has_d   = is_readable( $desktop );
+	$has_m   = is_readable( $mobile );
+	$class   = 'lr-local-banner' . ( $has_d ? ' has-photo' : '' );
+	echo '<a class="' . esc_attr( $class ) . '" href="https://localmoscow.com" target="_blank" rel="noopener">';
+	if ( $has_d ) {
+		echo '<picture class="lr-local-banner__photo">';
+		if ( $has_m ) {
+			echo '<source media="(max-width: 767px)" srcset="' . esc_url( LIFERUSS_URI . '/assets/img/localmoscow-banner-mobile.webp' ) . '" width="780" height="520">';
+		}
+		echo '<img src="' . esc_url( LIFERUSS_URI . '/assets/img/localmoscow-banner.webp' ) . '" alt="" width="1200" height="400" loading="lazy" decoding="async">';
+		echo '</picture>';
+	}
+	echo '<span class="lr-local-banner__scrim">';
+	echo '<span class="lr-local-banner__copy">';
+	echo '<strong>نرخ لحظه‌ای و تبدیل کامل در لوکال مسکو</strong>';
+	echo '<span>جدول کامل و تبدیل ارز را در لوکال مسکو ببینید.</span>';
+	echo '</span>';
+	echo '<span class="lr-local-banner__btn">مشاهده در Local.Moscow</span>';
+	echo '</span></a>';
 }
 
 /**
@@ -437,11 +529,22 @@ function liferuss_converter_shortcode( $atts ) {
 	if ( ! empty( $payload['fallback'] ) ) {
 		echo '<p class="lr-conv__notice">' . esc_html( liferuss_rate_fa( 'rates_fallback' ) ) . '</p>';
 	}
+	$purpose = '';
+	$post_id = (int) get_the_ID();
+	if ( $post_id ) {
+		$purpose = sanitize_key( (string) get_post_meta( $post_id, '_lr_exchange_purpose', true ) );
+	}
+	$amount = '1';
+	$from   = strtoupper( (string) $atts['from'] );
+	$to     = strtoupper( (string) $atts['to'] );
+	if ( in_array( $purpose, array( 'tuition', 'transfer' ), true ) ) {
+		$from   = 'RUB';
+		$to     = 'IRR';
+		$amount = '100000';
+	}
 	echo '<form class="lr-conv__form" action="#lr-converter" id="lr-converter">';
 	echo '<label><span>' . esc_html( liferuss_rate_fa( 'conv_amount' ) ) . '</span>';
-	echo '<input type="number" name="amount" min="0" step="any" inputmode="decimal" value="1" required></label>';
-	$from = strtoupper( (string) $atts['from'] );
-	$to   = strtoupper( (string) $atts['to'] );
+	echo '<input type="number" name="amount" min="0" step="any" inputmode="decimal" value="' . esc_attr( $amount ) . '" required></label>';
 	if ( ! isset( $payload['quotes'][ $from ] ) ) {
 		$from = 'IRR';
 	}
@@ -529,35 +632,59 @@ function liferuss_converter_options( array $quotes, $selected ) {
  *
  * @return array<string, mixed>
  */
+function liferuss_converter_quote( array $item ) {
+	return array(
+		'toman'  => (float) $item['value'],
+		'source' => (string) ( $item['source'] ?? '' ),
+		'state'  => (string) ( $item['state'] ?? '' ),
+		'age'    => liferuss_rates_age( $item ),
+		'ageMs'  => isset( $item['ageMs'] ) ? (int) $item['ageMs'] : 0,
+	);
+}
+
+/**
+ * Toman quotes for the converter. Ruble mode uses only the Russia ruble rates.
+ *
+ * @return array<string, mixed>
+ */
 function liferuss_converter_payload() {
 	$board  = liferuss_rates_board();
+	$focus  = liferuss_ruble_only() ? 'ruble' : 'board';
 	$quotes = array(
 		'IRR' => array(
 			'toman'  => 1,
 			'source' => '',
-			'state'  => 'live',
+			'state'  => '',
 			'age'    => '',
 		),
 	);
-	$want   = array( 'USD' => true, 'EUR' => true, 'RUB' => true, 'USDT' => true );
-	foreach ( $board['items'] as $item ) {
-		$code = (string) ( $item['code'] ?? '' );
-		if ( ! isset( $want[ $code ] ) || 'تومان' !== (string) ( $item['unit'] ?? '' ) ) {
-			continue;
+	if ( 'ruble' === $focus ) {
+		$mbb = liferuss_board_item( $board, 'MBB' );
+		if ( $mbb && 'تومان' === (string) ( $mbb['unit'] ?? '' ) && is_numeric( $mbb['value'] ?? null ) && (float) $mbb['value'] > 0 ) {
+			$quotes['RUB'] = liferuss_converter_quote( $mbb );
 		}
-		if ( ! is_numeric( $item['value'] ?? null ) || (float) $item['value'] <= 0 ) {
-			continue;
+		$sell = liferuss_board_item( $board, 'USDT_RUB_SELL' );
+		if ( $sell && isset( $quotes['RUB'] ) && is_numeric( $sell['value'] ?? null ) && (float) $sell['value'] > 0 ) {
+			$usdt           = liferuss_converter_quote( $sell );
+			$usdt['toman']  = (float) $sell['value'] * (float) $quotes['RUB']['toman'];
+			$quotes['USDT'] = $usdt;
 		}
-		$quotes[ $code ] = array(
-			'toman'  => (float) $item['value'],
-			'source' => (string) $item['source'],
-			'state'  => (string) ( $item['state'] ?? '' ),
-			'age'    => liferuss_rates_age( $item ),
-			'ageMs'  => isset( $item['ageMs'] ) ? (int) $item['ageMs'] : 0,
-		);
+	} else {
+		$want = array( 'USD' => true, 'EUR' => true, 'RUB' => true, 'USDT' => true );
+		foreach ( $board['items'] as $item ) {
+			$code = (string) ( $item['code'] ?? '' );
+			if ( ! isset( $want[ $code ] ) || 'تومان' !== (string) ( $item['unit'] ?? '' ) ) {
+				continue;
+			}
+			if ( ! is_numeric( $item['value'] ?? null ) || (float) $item['value'] <= 0 ) {
+				continue;
+			}
+			$quotes[ $code ] = liferuss_converter_quote( $item );
+		}
 	}
 	$notice = liferuss_rates_notice( $board );
 	return array(
+		'focus'    => $focus,
 		'quotes'   => $quotes,
 		'notice'   => $notice,
 		'fallback' => ! empty( $board['fallback'] ),
@@ -622,6 +749,9 @@ add_action( 'admin_init', 'liferuss_ensure_calculator_page', 50 );
  * @return string
  */
 function liferuss_rates_ticker_shortcode() {
+	if ( liferuss_ruble_only() ) {
+		return '';
+	}
 	$board = liferuss_rates_board();
 	$keep  = array(
 		'USD'           => true,
