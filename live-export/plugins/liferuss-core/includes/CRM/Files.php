@@ -35,10 +35,31 @@ class Files {
 	public const SOURCING_MAX_BYTES = 20971520;
 
 	/**
+	 * Cargo per-file ceiling. Change this one constant to 10485760 for 10 MB.
+	 */
+	public const CARGO_MAX_BYTES = 20971520;
+
+	/**
 	 * Per-file ceiling for sourcing: 20 MB, or the lower PHP upload ceiling.
 	 */
 	public static function sourcing_limit(): int {
-		$cap  = self::SOURCING_MAX_BYTES;
+		return self::capped_bytes( self::SOURCING_MAX_BYTES );
+	}
+
+	/**
+	 * Per-file ceiling for cargo. Uses CARGO_MAX_BYTES, then the PHP ceiling.
+	 */
+	public static function cargo_limit(): int {
+		return self::capped_bytes( self::CARGO_MAX_BYTES );
+	}
+
+	/**
+	 * Configured cap, or less when PHP will not accept that size.
+	 *
+	 * @param int $configured Byte cap.
+	 */
+	private static function capped_bytes( int $configured ): int {
+		$cap  = $configured;
 		$up   = self::ini_bytes( ini_get( 'upload_max_filesize' ) );
 		$post = self::ini_bytes( ini_get( 'post_max_size' ) );
 		if ( $up > 0 ) {
