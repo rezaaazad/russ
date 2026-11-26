@@ -1,6 +1,6 @@
 /* Cargo lane uses the sourcing layout. These rules only adjust this page. */
 
-.page-template-templates-cargo-lane-php .nav-list .current-menu-item > a {
+.page-template-cargo-lane .nav-list .current-menu-item > a {
   box-shadow: inset 0 -2px 0 var(--gold);
 }
 
@@ -15,19 +15,28 @@
   line-height: 1.6;
 }
 
-.lr-src-hero img.lr-cgo-script {
+.lr-cgo-script {
   position: absolute;
-  z-index: 2;
-  inset: auto;
+  z-index: 3;
   top: 8px;
-  inset-inline-start: auto;
-  inset-inline-end: 10px;
-  width: min(34vw, 136px);
-  height: auto;
+  right: 8px;
+  left: auto;
+  width: min(42vw, 148px);
   margin: 0;
-  object-fit: contain;
-  object-position: center;
-  pointer-events: none;
+  padding: 6px 8px 4px;
+  border-radius: 16px;
+  background: rgba(255, 250, 240, 0.92);
+  box-shadow: 0 8px 22px rgba(11, 35, 65, 0.16);
+}
+
+.lr-src-hero img.lr-cgo-script__img {
+  position: static !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  inset: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
 }
 
 .lr-src-steps em,
@@ -88,6 +97,19 @@
   text-align: center;
 }
 
+.page-template-cargo-lane .lr-src-file,
+.page-template-cargo-lane .lr-src-file span,
+.page-template-cargo-lane .lr-src-file__names,
+.page-template-cargo-lane .lr-src-file__names li,
+.page-template-cargo-lane .lr-src-file__btn {
+  font-family: var(--font);
+}
+
+.lr-cgo-opts {
+  display: grid;
+  gap: 10px;
+}
+
 .lr-src-steps__lead {
   margin: 0;
   text-align: center;
@@ -96,16 +118,28 @@
   opacity: 0.9;
 }
 
+.page-template-cargo-lane .lr-src-hero__scrim {
+  padding-bottom: 36px;
+}
+
 @media (min-width: 800px) {
-  .page-template-templates-cargo-lane-php .lr-src-hero,
-  .page-template-templates-cargo-lane-php .lr-src-hero__scrim {
-    min-height: 460px;
+  .page-template-cargo-lane .lr-src-hero,
+  .page-template-cargo-lane .lr-src-hero__scrim {
+    min-height: 620px;
   }
 
-  .lr-src-hero img.lr-cgo-script {
-    top: 16px;
-    inset-inline-end: 24px;
-    width: 210px;
-    height: auto;
+  .page-template-cargo-lane .lr-src-services {
+    margin-top: 16px;
+  }
+
+  .lr-cgo-script {
+    top: 14px;
+    right: auto;
+    left: 42%;
+    width: 220px;
+  }
+
+  .lr-cgo-opts {
+    grid-template-columns: 1fr 1fr;
   }
 }

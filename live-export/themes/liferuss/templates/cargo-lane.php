@@ -65,7 +65,9 @@ $steps      = array(
 
 <section class="lr-src-hero">
 	<?php liferuss_cargo_picture( 'hero-cargo.webp', 'پرچم ایران و روسیه، برج میلاد، کامیون، لیفتراک، کانتینر، کشتی باری و کلیسای سنت باسیل', 1600, 700, true, '100vw' ); ?>
-	<img class="lr-cgo-script" src="<?php echo esc_url( LIFERUSS_URI . '/assets/img/cargo/calligraphy-mahmoole.webp' ); ?>" srcset="<?php echo esc_url( LIFERUSS_URI . '/assets/img/cargo/calligraphy-mahmoole-900.webp' ); ?> 900w, <?php echo esc_url( LIFERUSS_URI . '/assets/img/cargo/calligraphy-mahmoole.webp' ); ?> 1774w" sizes="(max-width: 599px) 34vw, 210px" width="1774" height="887" alt="از مدارک دانشجویی تا محموله تجاری" decoding="async" fetchpriority="high">
+	<div class="lr-cgo-script">
+		<img class="lr-cgo-script__img" src="<?php echo esc_url( LIFERUSS_URI . '/assets/img/cargo/calligraphy-mahmoole.webp' ); ?>" srcset="<?php echo esc_url( LIFERUSS_URI . '/assets/img/cargo/calligraphy-mahmoole-900.webp' ); ?> 900w, <?php echo esc_url( LIFERUSS_URI . '/assets/img/cargo/calligraphy-mahmoole.webp' ); ?> 1774w" sizes="(max-width: 599px) 46vw, 220px" width="1774" height="887" alt="از مدارک دانشجویی تا محموله تجاری" decoding="async" fetchpriority="high">
+	</div>
 	<div class="lr-src-hero__scrim">
 		<div class="lr-src-hero__copy">
 			<h1>باربری، کارگو و ارسال<br><span>بین ایران و روسیه</span></h1>
@@ -155,18 +157,24 @@ $steps      = array(
 						<option value="other">سایر</option>
 					</select>
 				</label>
-				<label>
-					<span>وزن تقریبی (کیلوگرم) (اختیاری)</span>
-					<input type="number" name="consult_weight" min="0" step="0.1" inputmode="decimal">
-				</label>
-				<label>
-					<span>ابعاد تقریبی (سانتی‌متر) (اختیاری)</span>
-					<input type="text" name="consult_dims" maxlength="80">
-				</label>
-				<label>
-					<span>تعداد بسته‌ها (اختیاری)</span>
-					<input type="number" name="consult_packages" min="1" step="1" inputmode="numeric">
-				</label>
+				<div class="lr-cgo-opts">
+					<label>
+						<span>وزن تقریبی (کیلوگرم) (اختیاری)</span>
+						<input type="number" name="consult_weight" min="0" step="0.1" inputmode="decimal">
+					</label>
+					<label>
+						<span>ابعاد تقریبی (سانتی‌متر) (اختیاری)</span>
+						<input type="text" name="consult_dims" maxlength="80">
+					</label>
+					<label>
+						<span>تعداد بسته‌ها (اختیاری)</span>
+						<input type="number" name="consult_packages" min="1" step="1" inputmode="numeric">
+					</label>
+					<label>
+						<span>ارزش تقریبی کالا (دلار) (اختیاری)</span>
+						<input type="number" name="consult_value" min="0" step="1" inputmode="numeric">
+					</label>
+				</div>
 				<label>
 					<span>توضیحات تکمیلی (اختیاری)</span>
 					<textarea name="consult_notes" rows="3"></textarea>
@@ -180,10 +188,6 @@ $steps      = array(
 					<ul class="lr-src-file__names" id="lr-cgo-file-names" aria-live="polite"><li>فایلی انتخاب نشده</li></ul>
 					<small id="lr-cgo-file-help">تا <?php echo esc_html( liferuss_local_digits( (string) LIFERUSS_SOURCING_MAX_FILES ) ); ?> فایل. هر فایل حداکثر <?php echo esc_html( liferuss_local_digits( (string) $configured_mb ) ); ?> مگابایت. فقط JPG، PNG، WEBP یا PDF.<?php echo $upload_cap ? ' سقف سرور کمتر است، پس همین سقف ' . liferuss_local_digits( (string) $upload_mb ) . ' مگابایت اعمال می‌شود.' : ''; ?></small>
 				</div>
-				<label>
-					<span>ارزش تقریبی کالا (دلار) (اختیاری)</span>
-					<input type="number" name="consult_value" min="0" step="1" inputmode="numeric">
-				</label>
 				<button class="btn btn-gold btn-block" type="submit">ارسال درخواست</button>
 				<p class="lr-src-form__note"><?php echo esc_html( liferuss_cargo_form_note() ); ?></p>
 			</form>
