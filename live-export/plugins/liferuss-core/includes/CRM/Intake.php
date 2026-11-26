@@ -170,6 +170,15 @@ class Intake {
 				);
 			}
 		}
+		if ( 'danestaniha' === $type ) {
+			$guide_error = self::danestaniha_error();
+			if ( '' !== $guide_error ) {
+				return array(
+					'ok'      => false,
+					'message' => $guide_error,
+				);
+			}
+		}
 		if ( 'cargo' === $type && '' !== self::text( 'consult_cargo_kind' ) ) {
 			$cargo_error = self::cargo_lane_error();
 			if ( '' !== $cargo_error ) {
@@ -358,6 +367,19 @@ class Intake {
 			$lines[] = 'مقصد: ' . self::text( 'consult_dest' );
 			$lines[] = 'نوع بار: ' . self::text( 'consult_cargo_kind' );
 		}
+		if ( 'danestaniha' === $type ) {
+			$lines[] = 'هدف: دانستنی‌های روسیه';
+			$kinds   = function_exists( 'liferuss_danestaniha_kinds' ) ? liferuss_danestaniha_kinds() : array();
+			$topics  = function_exists( 'liferuss_danestaniha_topics' ) ? liferuss_danestaniha_topics() : array();
+			$kind    = sanitize_key( self::text( 'consult_guide_kind' ) );
+			$topic   = sanitize_key( self::text( 'consult_guide_topic' ) );
+			if ( isset( $kinds[ $kind ] ) ) {
+				$lines[] = 'نوع درخواست: ' . $kinds[ $kind ];
+			}
+			if ( isset( $topics[ $topic ] ) ) {
+				$lines[] = 'موضوع: ' . $topics[ $topic ];
+			}
+		}
 		if ( 'sourcing' === $type ) {
 			$lines[] = 'هدف: سورسینگ کالا';
 			$lines[] = 'کالا: ' . self::text( 'consult_product' );
@@ -431,6 +453,21 @@ class Intake {
 	 * @return array<string, mixed>
 	 */
 	private static function request_fields( string $type, string $level ): array {
+		if ( 'danestaniha' === $type ) {
+			$kinds  = function_exists( 'liferuss_danestaniha_kinds' ) ? liferuss_danestaniha_kinds() : array();
+			$topics = function_exists( 'liferuss_danestaniha_topics' ) ? liferuss_danestaniha_topics() : array();
+			$kind   = sanitize_key( self::text( 'consult_guide_kind' ) );
+			$label  = isset( $kinds[ $kind ] ) ? (string) $kinds[ $kind ] : '';
+			$topic  = sanitize_key( self::text( 'consult_guide_topic' ) );
+			if ( isset( $topics[ $topic ] ) ) {
+				$label = trim( $label . ' / ' . $topics[ $topic ] );
+			}
+			return array(
+				'program_type'      => 'degree',
+				'current_education' => function_exists( 'mb_substr' ) ? mb_substr( $label, 0, 60 ) : substr( $label, 0, 60 ),
+				'stage'             => 'new',
+			);
+		}
 		if ( 'consult' === $type || 'admission' === $type ) {
 			$program = sanitize_key( self::text( 'consult_program' ) );
 			if ( ! in_array( $program, array( 'degree', 'padfak', 'direct_course', 'scholarship' ), true ) ) {
@@ -592,6 +629,23 @@ class Intake {
 		}
 		$extra = implode( "\n", $lines );
 		return '' === trim( $notes ) ? $extra : $notes . "\n" . $extra;
+	}
+
+	/**
+	 * Cargo lane fields. Weight and value stay optional.
+	 */
+	private static function danestaniha_error(): string {
+		$email = self::text( 'consult_email' );
+		if ( '' !== $email && '' === sanitize_email( $email ) ) {
+			return 'ایمیل معتبر نیست.';
+		}
+		if ( ! in_array( sanitize_key( self::text( 'consult_guide_kind' ) ), array( 'travel', 'study', 'life', 'trade', 'other' ), true ) ) {
+			return 'نوع درخواست را انتخاب کنید.';
+		}
+		if ( ! in_array( sanitize_key( self::text( 'consult_guide_topic' ) ), array( 'souvenirs', 'cities', 'food', 'culture', 'weather', 'transport', 'other' ), true ) ) {
+			return 'موضوع مشاوره را انتخاب کنید.';
+		}
+		return '';
 	}
 
 	/**

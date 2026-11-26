@@ -32,6 +32,7 @@ use LifeRuss\Core\Search\Indexer;
 use LifeRuss\Core\Content\Editor as ContentEditor;
 use LifeRuss\Core\Content\ExchangeCopy;
 use LifeRuss\Core\Content\Canonical;
+use LifeRuss\Core\Content\GuideTerms;
 use LifeRuss\Core\Content\Copy;
 use LifeRuss\Core\Content\Seed as ContentSeed;
 use LifeRuss\Core\Content\Stories;
@@ -112,6 +113,7 @@ class Plugin {
 		ContentSeed::hooks();
 		Stories::hooks();
 		Canonical::hooks();
+		GuideTerms::hooks();
 		ServiceSeed::hooks();
 		Copy::hooks();
 		ExchangeCopy::hooks();
