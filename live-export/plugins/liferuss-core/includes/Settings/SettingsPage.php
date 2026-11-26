@@ -385,6 +385,7 @@ class SettingsPage {
 		self::text_row( 'turnstile_site_key', 'Turnstile site key', (string) $v['turnstile_site_key'] );
 		self::text_row( 'turnstile_secret', 'Turnstile secret', (string) $v['turnstile_secret'] );
 		self::text_row( 'sourcing_consult_url', __( 'مقصد دکمهٔ مشاورهٔ بازرگانی', 'liferuss-core' ), (string) ( $v['sourcing_consult_url'] ?? '/contact/' ) );
+		self::text_row( 'cargo_consult_url', __( 'مقصد دکمهٔ مشاورهٔ کارگو', 'liferuss-core' ), (string) ( $v['cargo_consult_url'] ?? '/contact/' ) );
 		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'اگر هر دو کلید خالی باشند، فرم عمومی بدون Turnstile ثبت می‌شود. مقصد مشاوره یک مسیر صفحه است، مثل /contact/، و شمارهٔ تلفن نیست.', 'liferuss-core' ) . '</p></td></tr>';
 	}
 
@@ -679,7 +680,16 @@ class SettingsPage {
 	 * Contact-page path for the sourcing consultation button. Rejects phone links.
 	 */
 	private static function sourcing_consult_url(): string {
-		$url = trim( self::posted_text( 'sourcing_consult_url' ) );
+		return self::path_setting( 'sourcing_consult_url' );
+	}
+
+	/**
+	 * A page path for a consultation button. Phone links are refused.
+	 *
+	 * @param string $key Posted field.
+	 */
+	private static function path_setting( string $key ): string {
+		$url = trim( self::posted_text( $key ) );
 		if ( '' === $url || str_starts_with( strtolower( $url ), 'tel:' ) ) {
 			return '/contact/';
 		}
@@ -698,6 +708,7 @@ class SettingsPage {
 				'turnstile_site_key'   => self::posted_text( 'turnstile_site_key' ),
 				'turnstile_secret'     => self::posted_text( 'turnstile_secret' ),
 				'sourcing_consult_url' => self::sourcing_consult_url(),
+				'cargo_consult_url'    => self::path_setting( 'cargo_consult_url' ),
 			)
 		);
 	}

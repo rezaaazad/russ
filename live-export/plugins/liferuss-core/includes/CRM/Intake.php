@@ -170,6 +170,15 @@ class Intake {
 				);
 			}
 		}
+		if ( 'cargo' === $type && '' !== self::text( 'consult_cargo_kind' ) ) {
+			$cargo_error = self::cargo_lane_error();
+			if ( '' !== $cargo_error ) {
+				return array(
+					'ok'      => false,
+					'message' => $cargo_error,
+				);
+			}
+		}
 
 		$payload = array(
 			'name'           => $name,
@@ -199,11 +208,12 @@ class Intake {
 			);
 		}
 
-		if ( 'sourcing' === $type ) {
+		if ( 'sourcing' === $type || ( 'cargo' === $type && ! empty( $_FILES['consult_files']['name'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$doc    = 'cargo' === $type ? 'cargo_doc' : 'trade_doc';
 			$stored = Files::store_many(
 				(int) $lead_id,
 				'consult_files',
-				'trade_doc',
+				$doc,
 				Files::SOURCING_MAX_FILES,
 				Files::sourcing_limit(),
 				array(
@@ -342,6 +352,12 @@ class Intake {
 		if ( $level ) {
 			$lines[] = 'مقطع: ' . $level;
 		}
+		if ( 'cargo' === $type && '' !== self::text( 'consult_cargo_kind' ) ) {
+			$lines[] = 'هدف: کارگو و ارسال بار';
+			$lines[] = 'مبدأ: ' . self::text( 'consult_origin' );
+			$lines[] = 'مقصد: ' . self::text( 'consult_dest' );
+			$lines[] = 'نوع بار: ' . self::text( 'consult_cargo_kind' );
+		}
 		if ( 'sourcing' === $type ) {
 			$lines[] = 'هدف: سورسینگ کالا';
 			$lines[] = 'کالا: ' . self::text( 'consult_product' );
@@ -447,15 +463,21 @@ class Intake {
 			);
 		}
 		if ( 'freight' === $type || 'cargo' === $type ) {
+			$kind = sanitize_key( self::text( 'consult_cargo_kind' ) );
+			$note = trim( self::text( 'consult_dims' ) . "\n" . self::area( 'consult_notes' ) );
+			if ( '' !== $kind ) {
+				$note = trim( "نوع: " . $kind . "\n" . $note );
+			}
 			return array(
 				'direction'        => self::direction(),
-				'cargo_type'       => self::cargo_type(),
+				'cargo_type'       => '' !== $kind ? self::cargo_kind_enum( $kind ) : self::cargo_type(),
 				'origin_city'      => self::text( 'consult_origin' ),
 				'destination_city' => self::text( 'consult_dest' ),
 				'weight_kg'        => self::decimal( 'consult_weight' ),
 				'pieces'           => absint( self::text( 'consult_packages' ) ) ? absint( self::text( 'consult_packages' ) ) : null,
 				'declared_value'   => self::decimal( 'consult_value' ),
-				'description'      => trim( self::text( 'consult_dims' ) . ' ' . self::area( 'consult_notes' ) ),
+				'currency'         => 'USD',
+				'description'      => $note,
 				'stage'            => 'new',
 			);
 		}
@@ -570,6 +592,41 @@ class Intake {
 		}
 		$extra = implode( "\n", $lines );
 		return '' === trim( $notes ) ? $extra : $notes . "\n" . $extra;
+	}
+
+	/**
+	 * Cargo lane fields. Weight and value stay optional.
+	 */
+	private static function cargo_lane_error(): string {
+		if ( ( function_exists( 'mb_strlen' ) ? mb_strlen( self::text( 'consult_origin' ) ) : strlen( self::text( 'consult_origin' ) ) ) < 2 ) {
+			return 'مبدأ را بنویسید.';
+		}
+		if ( ( function_exists( 'mb_strlen' ) ? mb_strlen( self::text( 'consult_dest' ) ) : strlen( self::text( 'consult_dest' ) ) ) < 2 ) {
+			return 'مقصد را بنویسید.';
+		}
+		$allowed = array( 'documents', 'personal', 'samples', 'student', 'cosmetics', 'parts', 'commercial', 'clothing', 'other' );
+		if ( ! in_array( sanitize_key( self::text( 'consult_cargo_kind' ) ), $allowed, true ) ) {
+			return 'نوع کالا را انتخاب کنید.';
+		}
+		return self::sourcing_files_error();
+	}
+
+	/**
+	 * Map a goods slug onto the cargo_type enum. The exact slug stays in the note.
+	 *
+	 * @param string $kind Goods slug.
+	 */
+	private static function cargo_kind_enum( string $kind ): string {
+		if ( 'documents' === $kind ) {
+			return 'documents';
+		}
+		if ( in_array( $kind, array( 'personal', 'clothing' ), true ) ) {
+			return 'personal_items';
+		}
+		if ( in_array( $kind, array( 'samples', 'student' ), true ) ) {
+			return 'samples';
+		}
+		return 'commercial';
 	}
 
 	/**
