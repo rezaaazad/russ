@@ -16,7 +16,34 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Suggested hero paragraph from the spec.
  */
 function liferuss_cargo_hero_lead() {
-	return 'لایف روس درخواست ارسال شما را بررسی می‌کند و روش مناسب حمل را به شما اعلام می‌کند.';
+	return 'شرکت لایف روس با شبکه لجستیکی مطمئن در ایران و روسیه، تمام نیازهای ارسال شما از مدارک دانشجویی و وسایل شخصی تا نمونه کالا برای بازرگانان و محموله‌های تجاری را با هماهنگی کامل و مطابق با قوانین حمل‌ونقل و امور گمرکی انجام می‌دهد.';
+}
+
+/**
+ * Configured cargo per-file cap. The number lives in Files::CARGO_MAX_BYTES.
+ */
+function liferuss_cargo_max_bytes() {
+	if ( class_exists( '\LifeRuss\Core\CRM\Files' ) ) {
+		return (int) \LifeRuss\Core\CRM\Files::CARGO_MAX_BYTES;
+	}
+	return 20971520;
+}
+
+/**
+ * Bytes actually accepted for one cargo file.
+ */
+function liferuss_cargo_upload_bytes() {
+	if ( class_exists( '\LifeRuss\Core\CRM\Files' ) ) {
+		return (int) \LifeRuss\Core\CRM\Files::cargo_limit();
+	}
+	return liferuss_cargo_max_bytes();
+}
+
+/**
+ * True when PHP will not accept the configured cargo file size.
+ */
+function liferuss_cargo_upload_capped() {
+	return liferuss_cargo_upload_bytes() < liferuss_cargo_max_bytes();
 }
 
 /**

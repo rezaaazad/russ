@@ -215,7 +215,7 @@ class Intake {
 				'consult_files',
 				$doc,
 				Files::SOURCING_MAX_FILES,
-				Files::sourcing_limit(),
+				'cargo' === $type ? Files::cargo_limit() : Files::sourcing_limit(),
 				array(
 					'image/jpeg'      => 'jpg',
 					'image/png'       => 'png',
@@ -670,7 +670,7 @@ class Intake {
 			$tmps   = array( $tmps );
 		}
 		$count = 0;
-		$limit = Files::sourcing_limit();
+		$limit = 'cargo' === sanitize_key( self::text( 'consult_type' ) ) ? Files::cargo_limit() : Files::sourcing_limit();
 		$allow = array( 'image/jpeg', 'image/png', 'image/webp', 'application/pdf' );
 		foreach ( $errors as $index => $error ) {
 			$error = (int) $error;
