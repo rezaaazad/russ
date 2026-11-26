@@ -15,16 +15,19 @@
   line-height: 1.6;
 }
 
-.lr-cgo-script {
-  position: relative;
+.lr-src-hero img.lr-cgo-script {
+  position: absolute;
   z-index: 2;
+  inset: auto;
+  top: 8px;
+  inset-inline-start: auto;
+  inset-inline-end: 10px;
+  width: min(34vw, 136px);
+  height: auto;
   margin: 0;
-  padding: 14px 16px 0;
-  color: var(--gold);
-  font-family: var(--font);
-  font-size: 1.35rem;
-  font-weight: 800;
-  line-height: 1.45;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
 }
 
 .lr-src-steps em,
@@ -99,14 +102,10 @@
     min-height: 460px;
   }
 
-  .lr-cgo-script {
-    position: absolute;
-    top: 28px;
-    inset-inline-start: auto;
-    inset-inline-end: 36px;
-    max-width: 7.5em;
-    padding: 0;
-    color: var(--white);
-    text-shadow: 0 2px 12px color-mix(in srgb, var(--navy-deep) 75%, transparent);
+  .lr-src-hero img.lr-cgo-script {
+    top: 16px;
+    inset-inline-end: 24px;
+    width: 210px;
+    height: auto;
   }
 }
