@@ -84,6 +84,10 @@ class Catalog {
 				'service' => 'cargo',
 				'request' => 'cargo_requests',
 			),
+			'danestaniha' => array(
+				'service' => 'admission',
+				'request' => 'admission_requests',
+			),
 			'trade'       => array(
 				'service' => 'trade',
 				'request' => 'trade_requests',

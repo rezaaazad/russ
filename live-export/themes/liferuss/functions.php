@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LIFERUSS_VERSION', '1.20.2' );
+define( 'LIFERUSS_VERSION', '1.21.1' );
 define( 'LIFERUSS_DIR', get_template_directory() );
 define( 'LIFERUSS_URI', get_template_directory_uri() );
 
@@ -45,6 +45,7 @@ require_once LIFERUSS_DIR . '/inc/rates.php';
 require_once LIFERUSS_DIR . '/inc/exchange-pages.php';
 require_once LIFERUSS_DIR . '/inc/sourcing.php';
 require_once LIFERUSS_DIR . '/inc/cargo-page.php';
+require_once LIFERUSS_DIR . '/inc/danestaniha-page.php';
 
 /**
  * Theme supports, menus, and image sizes.

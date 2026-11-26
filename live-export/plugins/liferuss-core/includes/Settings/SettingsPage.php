@@ -386,6 +386,7 @@ class SettingsPage {
 		self::text_row( 'turnstile_secret', 'Turnstile secret', (string) $v['turnstile_secret'] );
 		self::text_row( 'sourcing_consult_url', __( 'مقصد دکمهٔ مشاورهٔ بازرگانی', 'liferuss-core' ), (string) ( $v['sourcing_consult_url'] ?? '/contact/' ) );
 		self::text_row( 'cargo_consult_url', __( 'مقصد دکمهٔ مشاورهٔ کارگو', 'liferuss-core' ), (string) ( $v['cargo_consult_url'] ?? '/contact/' ) );
+		self::text_row( 'danestaniha_consult_url', __( 'مقصد دکمهٔ مشاورهٔ دانستنی‌ها', 'liferuss-core' ), (string) ( $v['danestaniha_consult_url'] ?? '/contact/' ) );
 		echo '<tr><td colspan="2"><p class="description">' . esc_html__( 'اگر هر دو کلید خالی باشند، فرم عمومی بدون Turnstile ثبت می‌شود. مقصد مشاوره یک مسیر صفحه است، مثل /contact/، و شمارهٔ تلفن نیست.', 'liferuss-core' ) . '</p></td></tr>';
 	}
 
@@ -708,7 +709,8 @@ class SettingsPage {
 				'turnstile_site_key'   => self::posted_text( 'turnstile_site_key' ),
 				'turnstile_secret'     => self::posted_text( 'turnstile_secret' ),
 				'sourcing_consult_url' => self::sourcing_consult_url(),
-				'cargo_consult_url'    => self::path_setting( 'cargo_consult_url' ),
+				'cargo_consult_url'       => self::path_setting( 'cargo_consult_url' ),
+				'danestaniha_consult_url' => self::path_setting( 'danestaniha_consult_url' ),
 			)
 		);
 	}

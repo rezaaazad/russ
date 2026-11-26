@@ -266,6 +266,12 @@ function liferuss_nav_tree() {
 			),
 		),
 		array(
+			'title'    => 'دانستنی‌های روسیه',
+			'url'      => liferuss_url( '/danestaniha/' ),
+			'class'    => '',
+			'children' => array(),
+		),
+		array(
 			'title'    => liferuss_t( 'nav_magazine' ),
 			'url'      => $blog,
 			'class'    => '',

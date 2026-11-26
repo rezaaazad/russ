@@ -97,12 +97,24 @@
   text-align: center;
 }
 
-.page-template-cargo-lane .lr-src-file,
-.page-template-cargo-lane .lr-src-file span,
+.page-template-cargo-lane .lr-src-hero h1,
+.page-template-cargo-lane .lr-src-steps h2,
+.page-template-cargo-lane .lr-src-cta h2 {
+  color: var(--white);
+}
+
+.page-template-cargo-lane .lr-src-hero h1 span,
+.page-template-cargo-lane .lr-src-steps h2 span,
+.page-template-cargo-lane .lr-src-cta h2 span {
+  color: var(--gold);
+}
+
+.page-template-cargo-lane #lr-cgo-file-label,
 .page-template-cargo-lane .lr-src-file__names,
-.page-template-cargo-lane .lr-src-file__names li,
-.page-template-cargo-lane .lr-src-file__btn {
-  font-family: var(--font);
+.page-template-cargo-lane .lr-src-file__names li {
+  font-family: Dana, Tahoma, "Segoe UI", sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
 }
 
 .lr-cgo-opts {
