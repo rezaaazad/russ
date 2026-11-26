@@ -136,7 +136,7 @@ $tiles = array(
 					<div class="lr-dn-fields">
 						<label>
 							<span>نام و نام خانوادگی</span>
-							<input type="text" name="consult_name" required autocomplete="name" maxlength="150" placeholder="مثال: علی محمدی">
+							<input type="text" name="consult_name" required autocomplete="name" maxlength="150" placeholder="نام و نام خانوادگی">
 						</label>
 						<label>
 							<span>نوع درخواست</span>
