@@ -141,9 +141,10 @@ $choices     = (array) liferuss_opt( $choices_key, array() );
 					'id'       => liferuss_opt( $prefix . '_form_banner_image_id' ),
 					'fallback' => liferuss_opt( $prefix . '_form_banner_image', 'consult-student.jpg' ),
 					'alt'      => liferuss_opt( $prefix . '_form_banner_title' ),
-					'width'    => 520,
-					'height'   => 640,
+					'width'    => 720,
+					'height'   => 480,
 					'size'     => 'medium_large',
+					'sizes'    => '(max-width: 860px) 92vw, 420px',
 				)
 			);
 			?>

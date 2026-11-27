@@ -9,6 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( defined( 'LIFERUSS_LEADS_ACTIVE' ) && LIFERUSS_LEADS_ACTIVE ) {
+	return;
+}
+
 /**
  * Register leads post type for the admin inbox.
  */

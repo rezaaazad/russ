@@ -23,7 +23,8 @@ $heading   = is_front_page() ? 'h2' : 'h2';
 			<p class="eyebrow"><?php echo esc_html( liferuss_opt( 'form_eyebrow' ) ); ?></p>
 			<<?php echo $heading; ?>><?php echo esc_html( liferuss_opt( 'form_title' ) ); ?></<?php echo $heading; ?>>
 			<p><?php echo esc_html( liferuss_opt( 'form_intro' ) ); ?></p>
-			<div class="consult-channels" aria-label="<?php echo esc_attr( liferuss_t( 'channels_aria' ) ); ?>">
+			<div class="consult-channels">
+				<p class="screen-reader-text"><?php echo esc_html( liferuss_t( 'channels_aria' ) ); ?></p>
 				<?php if ( $whatsapp ) : ?>
 					<a class="channel" href="<?php echo esc_url( liferuss_whatsapp_url( $whatsapp ) ); ?>" target="_blank" rel="noopener noreferrer">
 						<?php echo liferuss_icon( 'whatsapp' ); ?>
@@ -57,6 +58,7 @@ $heading   = is_front_page() ? 'h2' : 'h2';
 			</div>
 			<form class="consult-form" id="consult-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" novalidate>
 				<input type="hidden" name="action" value="liferuss_consult">
+				<input type="hidden" name="consult_type" value="consult">
 				<input type="hidden" name="consult_lang" value="<?php echo esc_attr( liferuss_current_lang() ); ?>">
 				<input type="hidden" name="liferuss_nonce" value="<?php echo esc_attr( wp_create_nonce( 'liferuss_consult' ) ); ?>">
 				<div class="hp" aria-hidden="true">
@@ -93,9 +95,10 @@ $heading   = is_front_page() ? 'h2' : 'h2';
 					'id'       => liferuss_opt( 'form_image_id' ),
 					'fallback' => 'consult-student.jpg',
 					'alt'      => liferuss_t( 'form_alt' ),
-					'width'    => 520,
-					'height'   => 640,
+					'width'    => 720,
+					'height'   => 480,
 					'size'     => 'medium_large',
+					'sizes'    => '(max-width: 860px) 92vw, 520px',
 				)
 			);
 			?>

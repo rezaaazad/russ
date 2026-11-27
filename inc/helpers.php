@@ -20,6 +20,169 @@ function liferuss_img( $file ) {
 }
 
 /**
+ * Bundled WebP variants for a theme JPEG/PNG (relative to assets/images).
+ *
+ * @param string $file Relative image path.
+ * @return array<int, array{file:string,w:int}>
+ */
+function liferuss_bundled_webp_sources( $file ) {
+	$file = ltrim( (string) $file, '/' );
+	if ( '' === $file ) {
+		return array();
+	}
+
+	static $known = array(
+		'st-basil.jpg'             => array(
+			array( 'file' => 'st-basil-800.webp', 'w' => 800 ),
+			array( 'file' => 'st-basil.webp', 'w' => 933 ),
+		),
+		'hero-student.jpg'         => array(
+			array( 'file' => 'hero-student-400.webp', 'w' => 400 ),
+			array( 'file' => 'hero-student.webp', 'w' => 640 ),
+		),
+		'consult-student.jpg'      => array(
+			array( 'file' => 'consult-student.webp', 'w' => 720 ),
+		),
+		'universities/bauman.jpg'  => array(
+			array( 'file' => 'universities/bauman.webp', 'w' => 720 ),
+		),
+		'universities/hse.jpg'     => array(
+			array( 'file' => 'universities/hse.webp', 'w' => 524 ),
+		),
+		'universities/msu.jpg'     => array(
+			array( 'file' => 'universities/msu.webp', 'w' => 720 ),
+		),
+		'universities/rudn.jpg'    => array(
+			array( 'file' => 'universities/rudn.webp', 'w' => 720 ),
+		),
+		'universities/sechenov.jpg' => array(
+			array( 'file' => 'universities/sechenov.webp', 'w' => 446 ),
+		),
+		'universities/spbu.jpg'    => array(
+			array( 'file' => 'universities/spbu.webp', 'w' => 524 ),
+		),
+		'students/student-1.jpg'   => array(
+			array( 'file' => 'students/student-1.webp', 'w' => 160 ),
+		),
+		'students/student-2.jpg'   => array(
+			array( 'file' => 'students/student-2.webp', 'w' => 160 ),
+		),
+		'students/student-3.jpg'   => array(
+			array( 'file' => 'students/student-3.webp', 'w' => 160 ),
+		),
+	);
+
+	if ( isset( $known[ $file ] ) ) {
+		$candidates = $known[ $file ];
+	} else {
+		$sibling = preg_replace( '/\.(jpe?g|png)$/i', '.webp', $file );
+		$candidates = ( $sibling && $sibling !== $file ) ? array( array( 'file' => $sibling, 'w' => 0 ) ) : array();
+	}
+
+	$dir    = LIFERUSS_DIR . '/assets/images/';
+	$sources = array();
+	foreach ( $candidates as $candidate ) {
+		if ( ! empty( $candidate['file'] ) && is_readable( $dir . $candidate['file'] ) ) {
+			$sources[] = $candidate;
+		}
+	}
+	return $sources;
+}
+
+/**
+ * Build a srcset string from bundled WebP variants.
+ *
+ * @param array<int, array{file:string,w:int}> $sources Sources.
+ * @return string
+ */
+function liferuss_webp_srcset( $sources ) {
+	$parts = array();
+	foreach ( $sources as $source ) {
+		$url = liferuss_img( $source['file'] );
+		if ( ! empty( $source['w'] ) ) {
+			$parts[] = $url . ' ' . (int) $source['w'] . 'w';
+		} else {
+			$parts[] = $url;
+		}
+	}
+	return implode( ', ', $parts );
+}
+
+/**
+ * Preload an LCP image (attachment or bundled WebP).
+ *
+ * @param int    $id       Attachment ID.
+ * @param string $fallback Bundled fallback path.
+ * @param string $sizes    imagesizes attribute.
+ */
+function liferuss_print_image_preload( $id, $fallback = '', $sizes = '100vw' ) {
+	$id = absint( $id );
+	if ( $id ) {
+		$url = wp_get_attachment_image_url( $id, 'liferuss-wide' );
+		if ( $url ) {
+			echo '<link rel="preload" as="image" href="' . esc_url( $url ) . '" fetchpriority="high">' . "\n";
+		}
+		return;
+	}
+
+	$sources = liferuss_bundled_webp_sources( $fallback );
+	if ( $sources ) {
+		$href   = liferuss_img( $sources[0]['file'] );
+		$srcset = liferuss_webp_srcset( $sources );
+		printf(
+			'<link rel="preload" as="image" type="image/webp" href="%s" imagesrcset="%s" imagesizes="%s" fetchpriority="high">' . "\n",
+			esc_url( $href ),
+			esc_attr( $srcset ),
+			esc_attr( $sizes )
+		);
+		return;
+	}
+
+	if ( $fallback ) {
+		echo '<link rel="preload" as="image" href="' . esc_url( liferuss_img( $fallback ) ) . '" fetchpriority="high">' . "\n";
+	}
+}
+
+/**
+ * Decorative homepage hero LCP image (real img, not CSS background).
+ *
+ * @param int    $id       Attachment ID.
+ * @param string $fallback Bundled fallback path.
+ */
+function liferuss_the_hero_lcp( $id, $fallback = 'st-basil.jpg' ) {
+	echo '<div class="hero-media" aria-hidden="true">';
+	$id = absint( $id );
+	if ( $id && function_exists( 'wp_attachment_is_image' ) && wp_attachment_is_image( $id ) ) {
+		echo wp_get_attachment_image(
+			$id,
+			'liferuss-wide',
+			false,
+			array(
+				'class'         => 'hero-lcp',
+				'alt'           => '',
+				'decoding'      => 'async',
+				'fetchpriority' => 'high',
+				'loading'       => 'eager',
+			)
+		);
+	} else {
+		liferuss_the_image(
+			array(
+				'fallback' => $fallback,
+				'alt'      => '',
+				'width'    => 800,
+				'height'   => 1201,
+				'class'    => 'hero-lcp',
+				'lazy'     => false,
+				'priority' => true,
+				'sizes'    => '100vw',
+			)
+		);
+	}
+	echo '</div>';
+}
+
+/**
  * WhatsApp chat URL from a phone number.
  *
  * @param string $phone Raw phone.
@@ -102,11 +265,12 @@ function liferuss_study_levels() {
  */
 function liferuss_stars( $rating ) {
 	$rating = max( 1, min( 5, (int) $rating ) );
-	$html   = '<p class="stars" aria-label="' . esc_attr( (string) $rating ) . ' / 5">';
+	$html  = '<div class="stars">';
+	$html .= '<span class="screen-reader-text">' . esc_html( (string) $rating ) . ' / 5</span>';
 	for ( $i = 1; $i <= 5; $i++ ) {
-		$html .= '<span' . ( $i <= $rating ? ' class="is-on"' : '' ) . '>' . liferuss_icon( 'star' ) . '</span>';
+		$html .= '<span' . ( $i <= $rating ? ' class="is-on"' : '' ) . ' aria-hidden="true">' . liferuss_icon( 'star' ) . '</span>';
 	}
-	return $html . '</p>';
+	return $html . '</div>';
 }
 
 /**
@@ -158,6 +322,7 @@ function liferuss_icon( $name ) {
 		'globe'     => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.8 12h16.4M12 3.5c2.4 2.4 3.7 5.3 3.7 8.5S14.4 18.1 12 20.5C9.6 18.1 8.3 15.2 8.3 12S9.6 5.9 12 3.5z"/></svg>',
 		'search'    => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.2 4.2"/></svg>',
 		'info'      => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v6M12 8v.2"/></svg>',
+		'building'  => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V9l8-5 8 5v11H4z"/><path d="M9 20v-6h6v6"/><path d="M9 11h.01M15 11h.01M12 11h.01"/></svg>',
 	);
 
 	return isset( $icons[ $name ] ) ? $icons[ $name ] : '';
@@ -199,4 +364,87 @@ function liferuss_cta_url( $link ) {
 		return liferuss_url( $link );
 	}
 	return $link;
+}
+
+/**
+ * Resolve a floating-contact channel href from type + optional URL.
+ *
+ * Empty URL reuses Theme Options phone / WhatsApp / Telegram / Instagram.
+ *
+ * @param array $item Channel row.
+ * @return string
+ */
+function liferuss_channel_href( $item ) {
+	$type = isset( $item['type'] ) ? sanitize_key( $item['type'] ) : '';
+	$url  = isset( $item['url'] ) ? trim( (string) $item['url'] ) : '';
+
+	if ( '' !== $url ) {
+		if ( 0 === strpos( $url, 'tel:' ) ) {
+			return $url;
+		}
+		if ( 'phone' === $type ) {
+			$digits = preg_replace( '/\D+/', '', $url );
+			return $digits ? 'tel:' . $digits : liferuss_cta_url( $url );
+		}
+		return liferuss_cta_url( $url );
+	}
+
+	switch ( $type ) {
+		case 'phone':
+			$phone = liferuss_opt( 'phone' );
+			$digits = preg_replace( '/\s+/', '', (string) $phone );
+			return $digits ? 'tel:' . $digits : '';
+		case 'whatsapp':
+			return liferuss_whatsapp_url( liferuss_opt( 'whatsapp' ) );
+		case 'telegram':
+			return liferuss_social_url( liferuss_opt( 'telegram' ), 'telegram' );
+		case 'instagram':
+			return liferuss_social_url( liferuss_opt( 'instagram' ), 'instagram' );
+		case 'consult':
+			return liferuss_cta_url( '#consultation' );
+		default:
+			return '';
+	}
+}
+
+/**
+ * Whether a href should open in a new tab.
+ *
+ * @param string $href Href.
+ * @return bool
+ */
+function liferuss_href_is_external( $href ) {
+	$href = (string) $href;
+	if ( '' === $href || '#' === $href[0] || 0 === strpos( $href, 'tel:' ) || 0 === strpos( $href, 'mailto:' ) ) {
+		return false;
+	}
+	if ( ! preg_match( '#^https?://#i', $href ) ) {
+		return false;
+	}
+	$host = wp_parse_url( $href, PHP_URL_HOST );
+	$home = wp_parse_url( home_url(), PHP_URL_HOST );
+	return $host && $home && strtolower( $host ) !== strtolower( $home );
+}
+
+/**
+ * Whether the current request matches a nav href (path only).
+ *
+ * @param string $href Href.
+ * @return bool
+ */
+function liferuss_href_is_current( $href ) {
+	$href = trim( (string) $href );
+	if ( '' === $href || ( isset( $href[0] ) && '#' === $href[0] ) ) {
+		return false;
+	}
+	$path = wp_parse_url( $href, PHP_URL_PATH );
+	if ( ! $path ) {
+		return false;
+	}
+	$current = function_exists( 'liferuss_current_path' ) ? liferuss_current_path() : '/';
+	$norm    = function ( $p ) {
+		$p = '/' . trim( (string) $p, '/' );
+		return '/' === $p ? '/' : trailingslashit( $p );
+	};
+	return $norm( $path ) === $norm( $current );
 }
