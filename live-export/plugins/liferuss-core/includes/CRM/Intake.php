@@ -188,6 +188,15 @@ class Intake {
 				);
 			}
 		}
+		if ( 'scholarship' === $type ) {
+			$scholarship_error = self::scholarship_error();
+			if ( '' !== $scholarship_error ) {
+				return array(
+					'ok'      => false,
+					'message' => $scholarship_error,
+				);
+			}
+		}
 
 		$payload = array(
 			'name'           => $name,
@@ -380,6 +389,24 @@ class Intake {
 				$lines[] = 'موضوع: ' . $topics[ $topic ];
 			}
 		}
+		if ( 'scholarship' === $type ) {
+			$lines[] = 'هدف: بورسیه روسیه';
+			$degree  = sanitize_key( self::text( 'consult_degree' ) );
+			$field   = sanitize_key( self::text( 'consult_field' ) );
+			$cert    = sanitize_key( self::text( 'consult_lang_cert' ) );
+			$degrees = function_exists( 'liferuss_scholarship_degrees' ) ? liferuss_scholarship_degrees() : array();
+			$fields  = function_exists( 'liferuss_scholarship_fields' ) ? liferuss_scholarship_fields() : array();
+			$certs   = function_exists( 'liferuss_scholarship_languages' ) ? liferuss_scholarship_languages() : array();
+			if ( isset( $degrees[ $degree ] ) ) {
+				$lines[] = 'مقطع: ' . $degrees[ $degree ];
+			}
+			if ( isset( $fields[ $field ] ) ) {
+				$lines[] = 'رشته: ' . $fields[ $field ];
+			}
+			if ( isset( $certs[ $cert ] ) ) {
+				$lines[] = 'مدرک زبان: ' . $certs[ $cert ];
+			}
+		}
 		if ( 'sourcing' === $type ) {
 			$lines[] = 'هدف: سورسینگ کالا';
 			$lines[] = 'کالا: ' . self::text( 'consult_product' );
@@ -467,6 +494,26 @@ class Intake {
 				'current_education' => function_exists( 'mb_substr' ) ? mb_substr( $label, 0, 60 ) : substr( $label, 0, 60 ),
 				'stage'             => 'new',
 			);
+		}
+		if ( 'scholarship' === $type ) {
+			$degree = sanitize_key( self::text( 'consult_degree' ) );
+			$field  = sanitize_key( self::text( 'consult_field' ) );
+			$cert   = sanitize_key( self::text( 'consult_lang_cert' ) );
+			$fields = array(
+				'program_type' => 'scholarship',
+				'stage'        => 'new',
+			);
+			if ( in_array( $degree, array( 'bachelor', 'master', 'phd' ), true ) ) {
+				$fields['degree'] = $degree;
+			}
+			if ( in_array( $cert, array( 'en', 'ru' ), true ) ) {
+				$fields['language'] = $cert;
+			}
+			$labels = function_exists( 'liferuss_scholarship_fields' ) ? liferuss_scholarship_fields() : array();
+			if ( isset( $labels[ $field ] ) ) {
+				$fields['current_education'] = function_exists( 'mb_substr' ) ? mb_substr( $labels[ $field ], 0, 60 ) : substr( $labels[ $field ], 0, 60 );
+			}
+			return $fields;
 		}
 		if ( 'consult' === $type || 'admission' === $type ) {
 			$program = sanitize_key( self::text( 'consult_program' ) );
@@ -629,6 +676,29 @@ class Intake {
 		}
 		$extra = implode( "\n", $lines );
 		return '' === trim( $notes ) ? $extra : $notes . "\n" . $extra;
+	}
+
+	/**
+	 * Scholarship form. Name and phone are checked earlier. The rest is optional.
+	 */
+	private static function scholarship_error(): string {
+		$email = self::text( 'consult_email' );
+		if ( '' !== $email && '' === sanitize_email( $email ) ) {
+			return 'ایمیل معتبر نیست.';
+		}
+		$degree = sanitize_key( self::text( 'consult_degree' ) );
+		$field  = sanitize_key( self::text( 'consult_field' ) );
+		$cert   = sanitize_key( self::text( 'consult_lang_cert' ) );
+		if ( '' !== $degree && ! in_array( $degree, array( 'bachelor', 'master', 'phd', 'unsure' ), true ) ) {
+			return 'مقطع تحصیلی را از فهرست انتخاب کنید.';
+		}
+		if ( '' !== $field && ! in_array( $field, array( 'medicine', 'dentistry', 'engineering', 'other' ), true ) ) {
+			return 'رشته را از فهرست انتخاب کنید.';
+		}
+		if ( '' !== $cert && ! in_array( $cert, array( 'none', 'en', 'ru', 'other' ), true ) ) {
+			return 'مدرک زبان را از فهرست انتخاب کنید.';
+		}
+		return '';
 	}
 
 	/**
