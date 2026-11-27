@@ -15,30 +15,6 @@
   line-height: 1.6;
 }
 
-.lr-cgo-script {
-  position: absolute;
-  z-index: 3;
-  top: 8px;
-  right: 8px;
-  left: auto;
-  width: min(42vw, 148px);
-  margin: 0;
-  padding: 6px 8px 4px;
-  border-radius: 16px;
-  background: rgba(255, 250, 240, 0.92);
-  box-shadow: 0 8px 22px rgba(11, 35, 65, 0.16);
-}
-
-.lr-src-hero img.lr-cgo-script__img {
-  position: static !important;
-  display: block !important;
-  width: 100% !important;
-  height: auto !important;
-  inset: auto !important;
-  max-height: none !important;
-  object-fit: contain !important;
-}
-
 .lr-src-steps em,
 .lr-cgo-cta__kicker {
   display: block;
@@ -142,13 +118,6 @@
 
   .page-template-cargo-lane .lr-src-services {
     margin-top: 16px;
-  }
-
-  .lr-cgo-script {
-    top: 14px;
-    right: auto;
-    left: 42%;
-    width: 220px;
   }
 
   .lr-cgo-opts {

@@ -65,9 +65,6 @@ $steps      = array(
 
 <section class="lr-src-hero">
 	<?php liferuss_cargo_picture( 'hero-cargo.webp', 'پرچم ایران و روسیه، برج میلاد، کامیون، لیفتراک، کانتینر، کشتی باری و کلیسای سنت باسیل', 1600, 700, true, '100vw' ); ?>
-	<div class="lr-cgo-script">
-		<img class="lr-cgo-script__img" src="<?php echo esc_url( LIFERUSS_URI . '/assets/img/cargo/calligraphy-mahmoole.webp' ); ?>" srcset="<?php echo esc_url( LIFERUSS_URI . '/assets/img/cargo/calligraphy-mahmoole-900.webp' ); ?> 900w, <?php echo esc_url( LIFERUSS_URI . '/assets/img/cargo/calligraphy-mahmoole.webp' ); ?> 1774w" sizes="(max-width: 599px) 46vw, 220px" width="1774" height="887" alt="از مدارک دانشجویی تا محموله تجاری" decoding="async" fetchpriority="high">
-	</div>
 	<div class="lr-src-hero__scrim">
 		<div class="lr-src-hero__copy">
 			<h1>باربری، کارگو و ارسال<br><span>بین ایران و روسیه</span></h1>
